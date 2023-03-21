@@ -1,25 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Card from "../components/Card.astro";
-import Header from "../components/home/Header.astro";
-
-import { baseUrl } from "../utils/public-variables";
 import Hero from "../components/home/Hero.astro";
-import Footer from "../components/Footer.astro";
 import CardList from "../components/home/CardList.astro";
 ---
 
 <Layout title="Welcome to Astro.">
   <div>
-    <Header />
+    <Hero />
 
-    <main>
-      <Hero />
-
-      <CardList />
-    </main>
-
-    <Footer />
+    <CardList />
   </div>
 </Layout>
 
