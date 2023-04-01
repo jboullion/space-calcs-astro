@@ -5,20 +5,43 @@ import Card from "../Card.astro";
 const tools: SpaceTool[] = [
   {
     name: "Delta V",
-    description: "A tool for calculating the delta v required for a mission",
+    description: "Calculate the delta v required for a mission",
     category: "Mission Planning",
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/delta-v",
   },
+  {
+    name: "Hohmann Transfer",
+    description: "Calculate the delta v required for a Hohmann transfer",
+    category: "Mission Planning",
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/hohmann-transfer",
+  },
+  {
+    name: "Orbit Visualizer",
+    description: "Visualize the orbit of a satellite",
+    category: "Mission Planning",
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/hohmann-transfer",
+  },
+  {
+    name: "Rotational Gravity",
+    description: "Calculate the forces on a rotating space station",
+    category: "Mission Planning",
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/hohmann-transfer",
+  },
 ];
 ---
 
-<div class="album py-5 bg-light">
+<div class="album py-5 bg-light flex-fill">
   <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+    <div
+      class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center"
+    >
       {
         tools.map((tool) => (
-          <div class="col">
+          <div class="col ">
             <Card tool={tool} />
           </div>
         ))

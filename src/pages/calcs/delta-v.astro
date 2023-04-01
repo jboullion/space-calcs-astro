@@ -1,14 +1,17 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/calcs/Hero.astro";
+
+import DeltaV from "../../components/vue/delta-v/DeltaV.vue";
 ---
 
 <Layout title="Delta V">
-  <div>
+  <div class="container">
     <Hero
       title="Delta V"
       description="Calculate the Delta V needed to move around the solar system"
     />
+    <DeltaV />
   </div>
 </Layout>
 

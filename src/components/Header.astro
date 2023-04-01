@@ -10,10 +10,19 @@ import Logo from "./Logo.astro";
         class="navbar-brand d-flex align-items-center text-white gap-4"
       >
         <div style="transform: rotate(90deg)">
-          <Logo />
+          <Logo height={40} />
         </div>
         <strong>Space Calcs</strong>
       </a>
+
+      <ul class="nav justify-content-center text-white">
+        <li class="nav-item">
+          <a href="/about" class="nav-link px-4 py-2 link-light">About</a>
+        </li>
+        <li class="nav-item">
+          <a href="/contact" class="nav-link px-4 py-2 link-light">Contact</a>
+        </li>
+      </ul>
     </div>
   </div>
 </header>

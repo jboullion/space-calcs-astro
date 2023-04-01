@@ -1,12 +1,12 @@
 :root {
-  --bs-primary: red;
+  /* --bs-primary: red;
   --bs-primary-hover: #c00;
   --bs-primary-active: #e00;
   --bs-primary-border: #a00;
-  --bs-primary-text: white;
+  --bs-primary-text: white; */
 }
 
-.btn-primary {
+/* .btn-primary {
   --bs-btn-color: #fff;
   --bs-btn-bg: var(--bs-primary);
   --bs-btn-border-color: var(--bs-primary);
@@ -21,4 +21,4 @@
   --bs-btn-disabled-color: #fff;
   --bs-btn-disabled-bg: var(--bs-primary);
   --bs-btn-disabled-border-color: var(--bs-primary);
-}
+} */
