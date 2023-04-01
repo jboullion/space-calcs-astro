@@ -1,43 +1,105 @@
 <template>
   <div id="delta-v__form" class="col-lg-4">
     <div class="calc-form mb-5">
-      <number-input
+      <NumberInput
         id="payload-mass"
         label="Payload Mass"
         v-model="formData.payloadMass"
         unit="mt"
       />
 
-      <number-input
+      <!-- checkboxInput(
+        'reusable', 
+        'Is the rocket reusable?', 
+        'formData.reusable', 
+        $tooltip = 'Save 8% of fuel for landing. Very rough estimate for the boostback burn, reentry burn, landing burn, and remaining fuel combined', 
+        $description = ''); -->
+      <CheckboxInput
+        id="reusable"
+        label="Is the rocket reusable?"
+        v-model="formData.reusable"
+        :value="true"
+        tooltip="Save 8% of fuel for landing. Very rough estimate for the boostback burn, reentry burn, landing burn, and remaining fuel combined"
+      />
+
+      <CheckboxInput
+        id="two-stage"
+        label="Is This a Two Stage Rocket?"
+        v-model="formData.twoStage"
+        :value="true"
+        tooltip="Will this rocket have two stages?"
+      />
+
+      <div v-show="formData.twoStage">
+        <NumberInput
+          id="first-stage"
+          label="First Stage Dry Mass"
+          v-model="formData.firstStageMass"
+          unit="mt"
+          tooltip="How massive is the first stage?"
+        />
+
+        <NumberInput
+          id="first-stage-fuel"
+          label="First Stage Fuel Mass"
+          v-model="formData.firstStageFuel"
+          unit="mt"
+          tooltip="How much fuel is in the first stage?"
+        />
+
+        <NumberInput
+          id="specific-impulse-sea"
+          label="Sea Level Specific Impulse"
+          v-model="formData.seaLevelSpecificImpulse"
+          unit="s"
+          @update:modelValue="calcExhaustVelocity"
+          tooltip="Sea Level Specific Impulse."
+          :description="
+            addCommas(formData.seaLevelVelocity) +
+            ' m/s Exhaust Velocity (V<sub>e</sub>)'
+          "
+        />
+      </div>
+
+      <NumberInput
         id="rocket-mass"
-        :label="formData.twoStage ? 'Second Stage ' : '' + 'Rocket Mass'"
+        :label="(formData.twoStage ? 'Second Stage ' : '') + 'Rocket Mass'"
         v-model="formData.rocketMass"
         unit="mt"
         tooltip="Rocket mass is the mass of the rocket without fuel or payload."
       />
 
-      <number-input
+      <NumberInput
         id="fuel-mass"
-        :label="formData.twoStage ? 'Second Stage ' : '' + 'Fuel Mass'"
+        :label="(formData.twoStage ? 'Second Stage ' : '') + 'Fuel Mass'"
         v-model="formData.fuelMass"
         unit="mt"
       />
 
-      <number-input
+      <NumberInput
         id="specific-impulse"
         :label="
-          formData.twoStage
-            ? 'Second Stage '
-            : '' + 'Specific Impulse (I<sub>sp</sub>)'
+          (formData.twoStage ? 'Second Stage ' : '') +
+          'Specific Impulse (I<sub>sp</sub>)'
         "
         v-model="formData.specificImpulse"
         unit="s"
-        :change-fn="calcExhaustVelocity"
+        @update:modelValue="calcExhaustVelocity"
         tooltip="How efficiently an engine creates thrust. Directly related to exhaust velocity."
         :description="
           addCommas(formData.exhaustVelocity) +
           ' m/s Exhaust Velocity (V<sub>e</sub>)'
         "
+      />
+
+      <SelectInput
+        id="engine"
+        label="Example Rocket Engine"
+        v-model="formData.engine"
+        :options="defaultEngines"
+        tooltip="Select a Common Rocket Engine to set example Specific Impulse"
+        description="Specific Impulse values are estimates"
+        @update:modelValue="updateEngine"
       />
     </div>
   </div>
@@ -52,21 +114,55 @@
 // 2. Should we add a third stage?
 // 3. Do we need payload mass? We already calculate a range? Perhaps we could always do range 100-150?
 
-import { onBeforeMount, ref, onMounted, computed } from "vue";
+import { ref, computed } from "vue";
 import {
   constants,
-  formData,
   rockets,
   destinations,
   defaultEngines,
   formResults,
 } from "./constants";
+import type { DeltaVForm } from "./types";
 import NumberInput from "../forms/NumberInput.vue";
+import SelectInput from "../forms/SelectInput.vue";
+import CheckboxInput from "../forms/CheckboxInput.vue";
 
 // @ts-ignore
 import { GoogleCharts } from "google-charts";
 
+function inputClick() {
+  console.log("inputClick");
+}
+
 const updating = ref(false);
+const checkedNames = ref([]);
+
+const formData = ref<DeltaVForm>({
+  //location: null,
+  pause: false,
+  payloadMass: 10,
+  rocketMass: 85,
+  fuelMass: 1200,
+  fuelType: null,
+  engine: {
+    name: "-",
+    ispVacuum: 0,
+    ispSeaLevel: 0,
+  },
+  exhaustVelocity: 0,
+  seaLevelVelocity: 0,
+  specificImpulse: 350,
+  seaLevelSpecificImpulse: 330,
+  firstStageFuel: 3400,
+  firstStageMass: 200,
+  //startLocation: null,
+  showMap: false,
+  showC3: false,
+  twoStage: false,
+  reusable: false,
+  aerobrake: true,
+  refill: false,
+});
 
 /**
  *

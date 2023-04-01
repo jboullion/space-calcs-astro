@@ -7,33 +7,6 @@ export const constants = {
   escVe: 11.186, // km/s
 };
 
-export const formData = ref<DeltaVForm>({
-  //location: null,
-  pause: false,
-  payloadMass: 10,
-  rocketMass: 85,
-  fuelMass: 1200,
-  fuelType: null,
-  engine: {
-    name: "-",
-    ispVacuum: 0,
-    ispSeaLevel: 0,
-  },
-  exhaustVelocity: 0,
-  seaLevelVelocity: 0,
-  specificImpulse: 350,
-  seaLevelSpecificImpulse: 330,
-  firstStageFuel: 3400,
-  firstStageMass: 200,
-  //startLocation: null,
-  showMap: false,
-  showC3: false,
-  twoStage: false,
-  reusable: false,
-  aerobrake: true,
-  refill: false,
-});
-
 export const formResults = ref({
   C3: 0,
 });
