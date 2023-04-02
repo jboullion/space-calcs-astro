@@ -1,0 +1,156 @@
+.na-calculator {
+}
+
+.na-calculator .calc-form,
+.na-calculator .calc-form .form-control,
+.na-calculator .calc-form .form-select,
+.na-calculator .calc-form .input-group-text {
+  font-size: 16px;
+}
+
+.na-calculator .calc-form .form-control,
+.na-calculator .calc-form .form-select,
+.na-calculator .calc-form .input-group-text {
+  padding: 6px 10px;
+}
+
+.na-calculator .calc-form .form-label {
+  margin-bottom: 2px;
+}
+
+.na-calculator .calc-form .form-label .fa-question-circle {
+  cursor: pointer;
+}
+
+.na-calculator .calc-form .form-check-label,
+.na-calculator .calc-form .form-check-input {
+  cursor: pointer;
+}
+
+.na-calculator .form-section {
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #000;
+  /* display: none; */
+}
+
+/* .na-calculator .form-section.active {
+  display: block;
+} */
+
+/* 
+.na-calculator .form-section::before { 
+  display: block; 
+  content: " "; 
+  margin-top: -80px; 
+  height: 80px; 
+  visibility: hidden; 
+  pointer-events: none;
+  z-index: -1;
+}
+
+.na-calculator .form-section:first-child:before {
+  content: none; 
+  display: none;
+} 
+*/
+
+/* .na-calculator .form-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+} */
+
+.na-calculator h4 {
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+
+.na-calculator h4 i {
+  color: var(--nexus-brown);
+}
+
+.na-calculator .calc-toggle {
+  margin-top: 20px;
+}
+
+.na-calculator .table-responsive {
+  font-size: 14px;
+}
+
+.na-calculator .table-responsive .toggleDetails {
+  cursor: pointer;
+}
+
+.na-calculator .table-responsive thead th,
+.na-calculator .table-responsive td {
+  text-align: center;
+}
+
+@media screen and (max-width: 991px) {
+  /* .na-calculator .calc-form {
+
+    border-bottom: 2px solid #000;
+  } */
+
+  .table-responsive {
+    margin-bottom: 50px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+}
+
+/* THREE JS */
+canvas + .dg.main {
+  position: absolute;
+  z-index: 10;
+}
+
+/* ROTATIONAL CALCULATOR */
+#rotational-canvas .fa-cog {
+  font-size: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+}
+
+.quick-details .alert {
+  cursor: help;
+}
+
+/* DELTA V CALCULATOR */
+#delta-v__map .main {
+  font-size: 30px;
+  text-anchor: middle;
+  fill: #000000;
+  stroke: none;
+  stroke-width: 30px;
+}
+
+#delta-v__map text,
+#delta-v__map use {
+  stroke: none;
+  stroke-width: 0px;
+}
+
+#delta-v__map .object {
+  font-weight: bold;
+  font-style: italic;
+}
+
+#delta-v__map #object {
+  stroke: black;
+}
+
+#delta-v__map #object:hover {
+  stroke: #ba3700;
+}
+
+#delta-v__map .deltav {
+  font-weight: bold;
+  font-style: normal;
+}
+
+#delta-v__map .pack {
+  letter-spacing: -0.1ex;
+}

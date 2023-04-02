@@ -12,7 +12,8 @@
   "dependencies": {
     "@astrojs/vue": "^2.1.0",
     "astro": "^2.1.9",
-    "vue": "^3.2.47"
+    "vue": "^3.2.47",
+    "vue-google-charts": "^1.1.0"
   },
   "devDependencies": {
     "google-charts": "^2.0.0"

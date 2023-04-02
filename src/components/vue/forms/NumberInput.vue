@@ -7,10 +7,10 @@
         :id="id"
         type="number"
         class="form-control"
-        :value="modelValue"
+        :value.number="modelValue"
         :min="min"
         :max="max"
-        @change="($event) => $emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+        @change="($event) => $emit('update:modelValue', parseInt(($event.target as HTMLInputElement).value))"
       />
       <span v-if="unit" class="input-group-text bg-dark text-white">{{
         unit

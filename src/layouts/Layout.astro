@@ -1,6 +1,8 @@
 ---
 import "../styles/bootswatch-zephyr.css";
 import "../styles/global.css";
+import "../styles/calculators.css";
+
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 export interface Props {
@@ -31,6 +33,12 @@ const { title } = Astro.props;
       crossorigin="anonymous"
       referrerPolicy="no-referrer"
     />
+
+    <!-- Google Charts -->
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
   </head>
   <body class="d-flex flex-column h-100">
     <Header />
