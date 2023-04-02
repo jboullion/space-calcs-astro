@@ -103,15 +103,15 @@
 
       <table class="table table-striped">
         <tbody>
-          <tr v-if="formData.twoStage">
+          <tr v-if="formData.twoStage" class="table-info">
             <th>First Stage ΔV</th>
             <td class="text-end">{{ addCommas(firstStageDeltaV) }} m/s</td>
           </tr>
-          <tr v-if="formData.twoStage">
+          <tr v-if="formData.twoStage" class="table-info">
             <th>Second Stage ΔV</th>
             <td class="text-end">{{ addCommas(secondStageDeltaV) }} m/s</td>
           </tr>
-          <tr>
+          <tr class="table-success">
             <th>Total ΔV</th>
             <td class="text-end">{{ addCommas(totalDeltaV) }} m/s</td>
           </tr>
@@ -276,7 +276,7 @@ const totalDeltaV = computed(() => {
   formResults.value.C3 = calcC3(deltaV);
   //}
 
-  if (GoogleCharts?.api?.visualization) {
+  if (GoogleCharts.api?.visualization) {
     nextTick(drawCharts);
   }
 
