@@ -1,0 +1,29 @@
+---
+import type { Reference } from "../vue/types";
+
+export interface Props {
+  references: Reference[];
+}
+
+const { references } = Astro.props;
+---
+
+<div class="offset-lg-3 col-lg-6 my-5">
+  <h4 class="my-4">References and Resources:</h4>
+  <div class="list-group">
+    {
+      references.map((reference) => (
+        <a
+          v-for="reference in references"
+          href={reference.url}
+          aria-current="true"
+          target="_blank"
+          class="list-group-item list-group-item-action"
+        >
+          {reference.title}
+          <i class="fas fa-external-link-alt float-end" />
+        </a>
+      ))
+    }
+  </div>
+</div>

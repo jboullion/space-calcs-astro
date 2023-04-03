@@ -4,18 +4,18 @@ import Logo from "./Logo.astro";
 
 <header>
   <div class="navbar navbar-dark bg-dark shadow-sm">
-    <div class="container">
+    <div class="container justify-content-center justify-content-md-between">
       <a
         href="/"
         class="navbar-brand d-flex align-items-center text-white gap-4"
       >
-        <div style="transform: rotate(90deg)">
+        <div style="transform: rotate(90deg);" class="ms-2">
           <Logo height={40} />
         </div>
-        <strong>Space Calcs</strong>
+        Space Calcs
       </a>
 
-      <ul class="nav justify-content-center text-white">
+      <ul class="nav text-white">
         <li class="nav-item">
           <a href="/about" class="nav-link px-4 py-2 link-light">About</a>
         </li>
@@ -26,3 +26,10 @@ import Logo from "./Logo.astro";
     </div>
   </div>
 </header>
+<style>
+  .navbar-brand {
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 1px;
+    font-size: 1.5rem;
+  }
+</style>

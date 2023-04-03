@@ -1,6 +1,6 @@
 <template>
-  <div id="delta-v__app" class="row mt-5" v-if="formData" v-cloak>
-    <div id="delta-v__form" class="col-lg-4">
+  <div id="delta-v__app" class="row" v-if="formData" v-cloak>
+    <div id="delta-v__form" class="col-lg-4 py-2 bg-light rounded">
       <div class="calc-form mb-5">
         <NumberInput
           id="payload-mass"
@@ -26,6 +26,14 @@
         />
 
         <div v-show="formData.twoStage">
+          <CheckboxInput
+            id="refill"
+            label="Refill second stage in orbit?"
+            v-model="formData.refill"
+            :value="true"
+            tooltip="Add a full tank of fuel to a 2nd stage in orbit. Greatly extends ΔV."
+          />
+
           <NumberInput
             id="first-stage"
             label="First Stage Dry Mass"
@@ -99,15 +107,13 @@
       </div>
     </div>
     <div id="delta-v__results" class="col-lg-8 calc-form">
-      <h3>Results</h3>
-
       <table class="table table-striped">
         <tbody>
-          <tr v-if="formData.twoStage" class="table-info">
+          <tr v-if="formData.twoStage" class="">
             <th>First Stage ΔV</th>
             <td class="text-end">{{ addCommas(firstStageDeltaV) }} m/s</td>
           </tr>
-          <tr v-if="formData.twoStage" class="table-info">
+          <tr v-if="formData.twoStage" class="">
             <th>Second Stage ΔV</th>
             <td class="text-end">{{ addCommas(secondStageDeltaV) }} m/s</td>
           </tr>
@@ -118,11 +124,7 @@
         </tbody>
       </table>
 
-      <div
-        class="btn-group btn-group-lg w-100"
-        role="group"
-        aria-label="Basic example"
-      >
+      <div class="btn-group w-100" role="group" aria-label="Basic example">
         <button
           class="btn"
           :class="{
@@ -164,44 +166,6 @@
           Map
         </button>
       </div>
-      <!-- <ul class="nav nav-pills nav-fill">
-        <li class="nav-item">
-          <button
-            class="nav-link btn btn-primary"
-            :class="{ active: showResult == 'payload' }"
-            @click="showResultChart('payload')"
-          >
-            Payload &amp; Delta V
-          </button>
-        </li>
-        <li class="nav-item">
-          <button
-            class="nav-link"
-            :class="{ active: showResult == 'fuel' }"
-            @click="showResultChart('fuel')"
-          >
-            Fuel &amp; Delta V
-          </button>
-        </li>
-        <li class="nav-item">
-          <button
-            class="nav-link"
-            :class="{ active: showResult == 'c3' }"
-            @click="showResultChart('c3')"
-          >
-            Payload &amp; C3
-          </button>
-        </li>
-        <li class="nav-item">
-          <button
-            class="nav-link"
-            :class="{ active: showResult == 'map' }"
-            @click="showResultChart('map')"
-          >
-            Map
-          </button>
-        </li>
-      </ul> -->
 
       <div class="result-chart my-4">
         <div

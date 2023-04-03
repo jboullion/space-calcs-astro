@@ -22,7 +22,7 @@
   --bs-btn-disabled-bg: var(--bs-primary);
   --bs-btn-disabled-border-color: var(--bs-primary);
 } */
-
+/* 
 .nav-underline {
   --bs-nav-underline-gap: 1rem;
   --bs-nav-underline-border-width: 0.125rem;
@@ -40,4 +40,8 @@
   padding-right: 0;
   padding-left: 0;
   border-bottom: var(--bs-nav-underline-border-width) solid transparent;
+} */
+
+h1 {
+  font-family: "Orbitron", sans-serif;
 }

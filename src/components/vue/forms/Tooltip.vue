@@ -19,13 +19,14 @@ const props = defineProps({
 
 .sc-tooltip .sc-tooltip-inner {
   visibility: hidden;
-  border: 2px solid var(--bs-dark);
-  background-color: var(--bs-light);
+  border: 1px solid var(--bs-dark);
+  background-color: white;
   width: 200px;
   font-size: 14px;
   line-height: 1.4;
   text-align: center;
   font-family: "Inter", sans-serif;
+  font-weight: normal;
   border-radius: 6px;
   padding: 6px;
 

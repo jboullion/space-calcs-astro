@@ -3,15 +3,55 @@ import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/calcs/Hero.astro";
 
 import DeltaV from "../../components/vue/delta-v/DeltaV.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../components/vue/types";
+
+const title = "Delta V";
+const references: Reference[] = [
+  {
+    title: "Tsiolkovsky rocket equation",
+    url: "https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation",
+  },
+  {
+    title: "Delta V budget",
+    url: "https://en.wikipedia.org/wiki/Delta-v_budget#Budget",
+  },
+  {
+    title: "Delta V Calc",
+    url: "https://strout.net/info/science/delta-v/",
+  },
+  {
+    title: "Hohmann transfer orbit",
+    url: "https://en.wikipedia.org/wiki/Hohmann_transfer_orbit",
+  },
+  {
+    title: "Aerobraking",
+    url: "https://en.wikipedia.org/wiki/Aerobraking",
+  },
+  {
+    title: "Specific impulse",
+    url: "https://en.wikipedia.org/wiki/Specific_impulse",
+  },
+  {
+    title: "Comparison of orbital rocket engines",
+    url: "https://en.wikipedia.org/wiki/Comparison_of_orbital_rocket_engines",
+  },
+  {
+    title: "Characteristic energy",
+    url: "https://en.wikipedia.org/wiki/Characteristic_energy",
+  },
+];
 ---
 
-<Layout title="Delta V">
+<Layout title={title}>
   <div class="container">
     <Hero
-      title="Delta V"
-      description="Calculate the Delta V needed to move around the solar system"
+      title={title}
+      description="Delta V refers to the change in velocity required for a spacecraft to perform a particular maneuver, such as entering orbit around a planet or moon, or escaping from the gravitational pull of a celestial body."
     />
     <DeltaV client:load />
+
+    <References references={references} />
   </div>
 </Layout>
 
