@@ -184,9 +184,9 @@ const calcs = ref({
   originEndingRads: 0,
 });
 
-const startingOrbitGroup = new THREE.Group();
-const endingOrbitGroup = new THREE.Group();
-const hohmannOrbitGroup = new THREE.Group();
+let startingOrbitGroup = new THREE.Group();
+let endingOrbitGroup = new THREE.Group();
+let hohmannOrbitGroup = new THREE.Group();
 
 const hohmannCenter = ref(0);
 
@@ -451,9 +451,27 @@ function updateOrbits() {
   threeScene.remove(endingOrbitGroup);
   threeScene.remove(hohmannOrbitGroup);
 
-  // if(ship.value){
-  //
+  // for (var i = threeScene.children.length - 1; i >= 0; i--) {
+  //   const obj = threeScene.children[i];
+
+  //   // @ts-ignore
+  //   if (obj.isGroup) {
+  //     console.log("remove obj", obj);
+  //     threeScene.remove(obj);
+  //   }
   // }
+
+  // threeScene.traverse((object) => {
+  //   // @ts-ignore
+  //   if (!object.isMesh || !object.isGroup) return;
+
+  //   deleteObject(object);
+  // });
+
+  // @ts-ignore
+  // threeScene.children.slice().forEach((obj) => threeScene.remove(obj));
+
+  // console.log("threeScene.children", threeScene.children);
 
   setupOrbits(formData.value.startOrbit, false);
   setupOrbits(formData.value.endOrbit, true);
@@ -467,6 +485,21 @@ function updateOrbits() {
   animationConstants.play = false;
   animationConstants.complete = false;
   animationConstants.currentFrame = 1;
+}
+
+// @ts-ignore
+function deleteObject(object: THREE.Object) {
+  if (!threeScene) return;
+
+  object.geometry.dispose();
+
+  if (object.material instanceof Array) {
+    object.material.forEach((material: THREE.Material) => material.dispose());
+  } else {
+    object.material.dispose();
+  }
+  object.removeFromParent();
+  threeScene.remove(object);
 }
 
 function setupOrbits(orbit: Location, endOrbit: boolean) {
@@ -523,7 +556,7 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
 
     endingOrbitGroup.add(planetMesh);
     endingOrbitGroup.add(orbitMesh);
-    threeScene.add(endingOrbitGroup);
+    //threeScene.add(endingOrbitGroup);
   } else if (startingOrbitGroup) {
     planetMesh.position.set(orbitSize, 0, 0);
 
@@ -536,7 +569,7 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
 
     startingOrbitGroup.add(planetMesh);
     startingOrbitGroup.add(orbitMesh);
-    threeScene.add(startingOrbitGroup);
+    //threeScene.add(startingOrbitGroup);
 
     // ? This will move the planet to the correct "end" position in the orbit. Can be used for testing endingRads calcualtions
     // this.rotateAboutPoint(
@@ -592,7 +625,7 @@ function setupHohmannOrbit() {
   hohmannOrbitGroup.add(axisMesh);
   hohmannOrbitGroup.add(hohmannMesh);
 
-  threeScene.add(hohmannOrbitGroup);
+  //threeScene.add(hohmannOrbitGroup);
 }
 
 function setupShip() {
