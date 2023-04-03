@@ -225,6 +225,7 @@ import {
   defaultEngines,
   formResults,
 } from "./constants";
+import { addCommas } from "../utils";
 import type { DeltaVForm } from "./types";
 import NumberInput from "../forms/NumberInput.vue";
 import SelectInput from "../forms/SelectInput.vue";
@@ -293,10 +294,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("resize", drawCharts);
 });
-
-function addCommas(value: number) {
-  return value.toLocaleString();
-}
 
 function showResultChart(chart: ResultTabs) {
   showResult.value = chart;
@@ -1209,4 +1206,5 @@ function getDestinationRows() {
 });
 */
 </script>
+
 <style></style>
