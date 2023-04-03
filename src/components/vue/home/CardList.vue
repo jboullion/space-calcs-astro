@@ -1,7 +1,38 @@
----
-import type { SpaceTool } from "../../types/tools";
-import Card from "../shared/Card.astro";
+<template>
+  <div class="album py-5 bg-light flex-fill">
+    <div class="container">
+      <div
+        class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center"
+      >
+        <div class="col" v-for="tool in filteredTools">
+          <Card :tool="tool" />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { computed } from "vue";
+import type { SpaceTool } from "../../../types/types";
+import Card from "./Card.vue";
 
+const props = defineProps<{
+  search: string;
+}>();
+
+const filteredTools = computed(() => {
+  if (props.search === "") {
+    return tools;
+  }
+
+  return tools.filter(
+    (tool) =>
+      tool.name.toLowerCase().includes(props.search.toLowerCase()) ||
+      tool.description.toLowerCase().includes(props.search.toLowerCase())
+  );
+});
+
+// TODO: Is there a better way to do this? Maybe a JSON file?
 const tools: SpaceTool[] = [
   {
     name: "Delta V",
@@ -32,20 +63,4 @@ const tools: SpaceTool[] = [
     link: "/calcs/hohmann-transfer",
   },
 ];
----
-
-<div class="album py-5 bg-light flex-fill">
-  <div class="container">
-    <div
-      class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center"
-    >
-      {
-        tools.map((tool) => (
-          <div class="col ">
-            <Card tool={tool} />
-          </div>
-        ))
-      }
-    </div>
-  </div>
-</div>
+</script>

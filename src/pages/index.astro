@@ -1,13 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Hero from "../components/home/Hero.astro";
-import CardList from "../components/home/CardList.astro";
+import Home from "../components/vue/home/Home.vue";
 ---
 
 <Layout title="Welcome to Astro.">
-  <Hero />
-
-  <CardList />
+  <Home client:load />
 </Layout>
 
 <style></style>

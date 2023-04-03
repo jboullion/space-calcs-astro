@@ -1,5 +1,5 @@
 ---
-import type { SpaceTool } from "../../types/tools";
+import type { SpaceTool } from "../../types/types";
 
 export interface Props {
   tool: SpaceTool;
@@ -13,7 +13,7 @@ const { tool } = Astro.props;
     <h5 class="card-title fw-bold">{tool.name}</h5>
     <p class="card-text flex-fill">{tool.description}</p>
     <div class="d-flex justify-content-between align-items-center">
-      <small class="text-muted">{tool.category}</small>
+      <small class="text-primary">{tool.category}</small>
     </div>
   </a>
 </div>

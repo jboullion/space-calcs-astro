@@ -1,3 +1,8 @@
+export interface Reference {
+  title: string;
+  url: string;
+}
+
 export type SpaceTool = {
   name: string;
   description: string;
@@ -5,10 +10,3 @@ export type SpaceTool = {
   image: string;
   link: string;
 };
-
-// export type HeroProps = {
-//   title: string;
-//   description: string;
-//   image: string;
-//   alt: string;
-// };

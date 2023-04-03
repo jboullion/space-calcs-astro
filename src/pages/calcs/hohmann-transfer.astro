@@ -4,7 +4,7 @@ import Hero from "../../components/calcs/Hero.astro";
 
 import HohmannTransfer from "../../components/vue/hohmann-transfer/HohmannTransfer.vue";
 import References from "../../components/shared/References.astro";
-import type { Reference } from "../../components/vue/types";
+import type { Reference } from "../../types/types";
 
 const title = "Hohmann Transfer";
 const references: Reference[] = [];
@@ -16,7 +16,7 @@ const references: Reference[] = [];
       title={title}
       description="A Hohmann transfer orbit is a type of elliptical orbit used to transfer a spacecraft from one circular orbit to another by using a minimum amount of propellant. It is named after Walter Hohmann, a German engineer who first described the technique in 1925."
     />
-    <HohmannTransfer client:only />
+    <HohmannTransfer client:only="vue" />
 
     <References references={references} />
   </div>

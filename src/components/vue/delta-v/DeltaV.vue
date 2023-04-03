@@ -1,6 +1,6 @@
 <template>
   <div id="delta-v__app" class="row" v-if="formData" v-cloak>
-    <div id="delta-v__form" class="col-lg-4 py-2 bg-light rounded">
+    <div id="delta-v__form" class="col-lg-4 py-2 bg-light rounded border">
       <div class="calc-form mb-5">
         <NumberInput
           id="payload-mass"
