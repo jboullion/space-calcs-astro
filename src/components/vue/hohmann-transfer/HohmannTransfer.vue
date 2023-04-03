@@ -450,28 +450,9 @@ function updateOrbits() {
   threeScene.remove(startingOrbitGroup);
   threeScene.remove(endingOrbitGroup);
   threeScene.remove(hohmannOrbitGroup);
-
-  // for (var i = threeScene.children.length - 1; i >= 0; i--) {
-  //   const obj = threeScene.children[i];
-
-  //   // @ts-ignore
-  //   if (obj.isGroup) {
-  //     console.log("remove obj", obj);
-  //     threeScene.remove(obj);
-  //   }
-  // }
-
-  // threeScene.traverse((object) => {
-  //   // @ts-ignore
-  //   if (!object.isMesh || !object.isGroup) return;
-
-  //   deleteObject(object);
-  // });
-
-  // @ts-ignore
-  // threeScene.children.slice().forEach((obj) => threeScene.remove(obj));
-
-  // console.log("threeScene.children", threeScene.children);
+  startingOrbitGroup = new THREE.Group();
+  endingOrbitGroup = new THREE.Group();
+  hohmannOrbitGroup = new THREE.Group();
 
   setupOrbits(formData.value.startOrbit, false);
   setupOrbits(formData.value.endOrbit, true);
@@ -485,21 +466,6 @@ function updateOrbits() {
   animationConstants.play = false;
   animationConstants.complete = false;
   animationConstants.currentFrame = 1;
-}
-
-// @ts-ignore
-function deleteObject(object: THREE.Object) {
-  if (!threeScene) return;
-
-  object.geometry.dispose();
-
-  if (object.material instanceof Array) {
-    object.material.forEach((material: THREE.Material) => material.dispose());
-  } else {
-    object.material.dispose();
-  }
-  object.removeFromParent();
-  threeScene.remove(object);
 }
 
 function setupOrbits(orbit: Location, endOrbit: boolean) {
