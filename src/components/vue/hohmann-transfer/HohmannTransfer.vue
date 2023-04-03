@@ -14,16 +14,17 @@ const mesh = new THREE.Mesh(geometry, material);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 const scene = new THREE.Scene();
 
-let camera = new THREE.PerspectiveCamera(
-  70,
-  window.innerWidth / window.innerHeight,
-  0.01,
-  10
-);
+let camera: any = null;
 
 onMounted(() => {
+  camera = new THREE.PerspectiveCamera(
+    70,
+    window.innerWidth / window.innerHeight,
+    0.01,
+    10
+  );
   camera.position.z = 1;
-  console.log("mesh", mesh);
+
   scene.add(mesh);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animation);
