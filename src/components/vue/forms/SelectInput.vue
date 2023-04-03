@@ -5,13 +5,14 @@
     <select
       :id="id"
       class="form-select"
-      :value="modelValue"
-      @change="($event) => $emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      :value="modelValue.name"
+      @change="($event) => emitOption(($event.target as HTMLInputElement).value)"
     >
-      <option v-for="option in options" :value="option">
+      <option v-for="option in options" :value="option.name">
         {{ option.name }}
       </option>
     </select>
+
     <p v-if="description" class="description">
       <small class="text-muted" v-html="description"></small>
     </p>
@@ -21,14 +22,9 @@
 <script setup lang="ts">
 import Tooltip from "./Tooltip.vue";
 
-// type SelectOption = {
-//   name: string;
-//   value: number;
-// };
+const emit = defineEmits(["update:modelValue"]);
 
-defineEmits(["update:modelValue"]);
-
-defineProps<{
+const props = defineProps<{
   id: string;
   label: string;
   modelValue: any;
@@ -37,4 +33,9 @@ defineProps<{
   description?: string;
   options: any[];
 }>();
+
+function emitOption(value?: any) {
+  const result = props.options.find((option) => option.name === value);
+  emit("update:modelValue", result);
+}
 </script>

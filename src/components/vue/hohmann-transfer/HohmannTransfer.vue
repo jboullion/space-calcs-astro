@@ -2,99 +2,84 @@
   <div id="hohmann-transfer__app" class="row">
     <div id="hohmann__form" class="col-lg-4">
       <div class="calc-form mb-5">
-        <!-- <?php 
-      selectInput(
-        'startOrbit', 
-        'Starting Orbit', 
-        'formData.startOrbit', 
-        'availableStartOrbits', 
-        '', 
-        '', 
-        'updateOrbits');
-      
-      selectInput(
-        'endOrbit', 
-        'Ending Orbit', 
-        'formData.endOrbit', 
-        'availableEndOrbits', 
-        '', 
-        '', 
-        'updateOrbits');
-    ?> -->
+        <SelectInput
+          id="start-orbit"
+          label="Starting Orbit"
+          v-model="formData.startOrbit"
+          :options="availableStartOrbits"
+          @update:modelValue="updateOrbits"
+        />
+
+        <SelectInput
+          id="end-orbit"
+          label="Ending Orbit"
+          v-model="formData.endOrbit"
+          :options="availableEndOrbits"
+          @update:modelValue="updateOrbits"
+        />
 
         <table class="table table-striped">
-          <!-- <tr>
-        <th>{{ formData.startOrbit.name }} Orbit Radius</th>
-        <td class="text-end">{{ formData.startOrbit.distance | addCommas }} km</td>
-      </tr>
-      <tr>
-        <th>{{ formData.endOrbit.name }} Orbit Radius</th>
-        <td class="text-end">{{ formData.endOrbit.distance | addCommas }} km</td>
-      </tr> -->
-          <tr>
-            <th>{{ formData.endOrbit.name }} Starting Degree</th>
-            <td class="text-end">{{ calcs.destinationStartingDegree }}&deg;</td>
-          </tr>
-          <tr>
-            <th>{{ formData.startOrbit.name }} Ending Degree</th>
-            <td class="text-end">
-              {{ addCommas(calcs.originEndingDegree) }}&deg;
-            </td>
-          </tr>
-          <tr>
-            <th>Semi Major Axis</th>
-            <td class="text-end">{{ addCommas(semiMajorAxis) }} km</td>
-          </tr>
-          <tr>
-            <th>{{ formData.startOrbit.name }} Orbit Velocity</th>
-            <td class="text-end">
-              {{ addCommas(startingOrbitVelocity) }} km/s
-            </td>
-          </tr>
-          <tr>
-            <th>{{ formData.endOrbit.name }} Orbit Velocity</th>
-            <td class="text-end">{{ addCommas(endingOrbitVelocity) }} km/s</td>
-          </tr>
-          <tr>
-            <th>Hohman Orbit Velocity</th>
-            <td class="text-end">{{ addCommas(hohmannOrbitVelocity) }} km/s</td>
-          </tr>
-          <!-- <tr>
-        <th>Perihelion Velocity</th>
-        <td class="text-end">{{ perihelionVelocity | addCommas }} m/s</td>
-      </tr>
-      <tr>
-        <th>Aphelion Velocity</th>
-        <td class="text-end">{{ aphelionVelocity | addCommas }} m/s</td>
-      </tr> -->
-          <tr>
-            <th>Delta V1</th>
-            <td class="text-end">{{ addCommas(firstDeltaV) }} m/s</td>
-          </tr>
-          <tr>
-            <th>Delta V2</th>
-            <td class="text-end">{{ addCommas(secondDeltaV) }} m/s</td>
-          </tr>
-          <tr>
-            <th>Total Delta V</th>
-            <td class="text-end">
-              {{ addCommas(firstDeltaV + secondDeltaV) }} m/s
-            </td>
-          </tr>
-          <!-- <tr>
-        <th>Hohman Orbit Period</th>
-        <td class="text-end">{{ transferPeriod / conversion.secondsToDays | addCommas }} days</td>
-      </tr> -->
-          <tr>
-            <th>Travel Time</th>
-            <td class="text-end">{{ addCommas(timeOfFlightDays) }} days</td>
-          </tr>
+          <tbody>
+            <tr>
+              <th>{{ formData.endOrbit.name }} Starting Degree</th>
+              <td class="text-end">
+                {{ calcs.destinationStartingDegree }}&deg;
+              </td>
+            </tr>
+            <tr>
+              <th>{{ formData.startOrbit.name }} Ending Degree</th>
+              <td class="text-end">
+                {{ addCommas(calcs.originEndingDegree) }}&deg;
+              </td>
+            </tr>
+            <tr>
+              <th>Semi Major Axis</th>
+              <td class="text-end">{{ addCommas(semiMajorAxis) }} km</td>
+            </tr>
+            <tr>
+              <th>{{ formData.startOrbit.name }} Orbit Velocity</th>
+              <td class="text-end">
+                {{ addCommas(startingOrbitVelocity) }} km/s
+              </td>
+            </tr>
+            <tr>
+              <th>{{ formData.endOrbit.name }} Orbit Velocity</th>
+              <td class="text-end">
+                {{ addCommas(endingOrbitVelocity) }} km/s
+              </td>
+            </tr>
+            <tr>
+              <th>Hohman Orbit Velocity</th>
+              <td class="text-end">
+                {{ addCommas(hohmannOrbitVelocity) }} km/s
+              </td>
+            </tr>
+
+            <tr>
+              <th>Delta V1</th>
+              <td class="text-end">{{ addCommas(firstDeltaV) }} m/s</td>
+            </tr>
+            <tr>
+              <th>Delta V2</th>
+              <td class="text-end">{{ addCommas(secondDeltaV) }} m/s</td>
+            </tr>
+            <tr>
+              <th>Total Delta V</th>
+              <td class="text-end">
+                {{ addCommas(firstDeltaV + secondDeltaV) }} m/s
+              </td>
+            </tr>
+            <tr>
+              <th>Travel Time</th>
+              <td class="text-end">{{ addCommas(timeOfFlightDays) }} days</td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>
     <div id="hohmann__results" class="col-lg-8 calc-form">
       <div class="d-flex justify-content-between mb-3">
-        <button class="btn btn-nexus" @click="play">
+        <button class="btn btn-primary btn-lg px-5" @click="play">
           <i class="fas" :class="playClass"></i>
         </button>
         <h3 class="mb-0">Day {{ currentDay }}</h3>
@@ -103,7 +88,7 @@
       <div
         id="hohmann-canvas"
         class="mb-3"
-        style="position: relative; height: 500px"
+        style="position: relative; height: 600px; width: 100%"
       >
         <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
       </div>
@@ -139,6 +124,8 @@ import {
 } from "./constants";
 import type { Location } from "./constants";
 
+import SelectInput from "../forms/SelectInput.vue";
+
 const loading = ref(true);
 const textureDir = "/textures/";
 
@@ -154,7 +141,7 @@ interface PlanetTextures {
   neptune: THREE.Texture | null;
 }
 
-const planetTextures = ref<PlanetTextures>({
+const planetTextures: PlanetTextures = {
   sun: null,
   mercury: null,
   venus: null,
@@ -164,43 +151,26 @@ const planetTextures = ref<PlanetTextures>({
   saturn: null,
   uranus: null,
   neptune: null,
-});
+};
 
-interface ThreeElements {
-  canvas: HTMLElement | HTMLCanvasElement | null;
-  renderer: THREE.WebGLRenderer | null;
-  scene: THREE.Scene | null;
-  camera: THREE.PerspectiveCamera | null;
-  controls: OrbitControls | null;
-  group: null;
-  stats: null; // used for debugging
-  gui: null; // used for debugging
-  raycaster: null;
-  mouse: null;
-  minMovement: null;
-  maxMovement: null;
-}
+let threeCanvas: HTMLElement | HTMLCanvasElement | null = null;
+let threeRenderer: THREE.WebGLRenderer | null = null;
+let threeScene: THREE.Scene | null = null;
+let threeCamera: THREE.PerspectiveCamera | null = null;
+let threeControls: OrbitControls | null = null;
+// let threeGroup: THREE.Group | null = null;
+// let threeStats: null = null; // used for debugging
+// let threeGui: null = null; // used for debugging
+// let threeRaycaster: null = null;
+// let threeMouse: null = null;
+// let threeMinMovement: number | null = null;
+// let threeMaxMovement: number | null = null;
 
-const three = ref<ThreeElements>({
-  canvas: null,
-  renderer: null,
-  scene: null,
-  camera: null,
-  controls: null,
-  group: null,
-  stats: null, // used for debugging
-  gui: null, // used for debugging
-  raycaster: null,
-  mouse: null,
-  minMovement: null,
-  maxMovement: null,
-});
-
-const help = ref({
-  tooltipModal: null,
-  tooltipTitle: null,
-  tooltipDescription: "",
-});
+// const help = ref({
+//   tooltipModal: null,
+//   tooltipTitle: null,
+//   tooltipDescription: "",
+// });
 
 const formData = ref({
   startOrbit: locations[2],
@@ -214,9 +184,10 @@ const calcs = ref({
   originEndingRads: 0,
 });
 
-const startingOrbitGroup = ref<THREE.Group | null>(null);
-const endingOrbitGroup = ref<THREE.Group | null>(null);
-const hohmannOrbitGroup = ref<THREE.Group | null>(null);
+const startingOrbitGroup = new THREE.Group();
+const endingOrbitGroup = new THREE.Group();
+const hohmannOrbitGroup = new THREE.Group();
+
 const hohmannCenter = ref(0);
 
 /**
@@ -226,20 +197,20 @@ const hohmannCenter = ref(0);
  *
  *
  */
-const availableStartOrbits = computed(() => {
-  let loc = locations.filter(
+const availableStartOrbits = computed<Location[]>(() => {
+  let locs = locations.filter(
     (location) => location.distance != formData.value.endOrbit.distance
   );
 
-  return loc;
+  return locs;
 });
 
-const availableEndOrbits = computed(() => {
-  let loc = locations.filter(
+const availableEndOrbits = computed<Location[]>(() => {
+  let locs = locations.filter(
     (location) => location.distance != formData.value.startOrbit.distance
   );
 
-  return loc;
+  return locs;
 });
 
 const semiMajorAxis = computed(() => {
@@ -351,36 +322,36 @@ const playClass = computed(() => {
  */
 onMounted(() => {
   loadModels();
+
+  formData.value.startOrbit = locations[2];
+  formData.value.endOrbit = locations[3];
 });
 
 async function loadModels() {
   const textureLoader = new THREE.TextureLoader();
   // TODO: Do we want to load these dynamically instead of on load?
-  planetTextures.value.sun = await textureLoader.load(
-    textureDir + "2k_sun.jpg"
-  );
-  planetTextures.value.mercury = await textureLoader.load(
+  planetTextures.sun = await textureLoader.load(textureDir + "2k_sun.jpg");
+
+  planetTextures.mercury = await textureLoader.load(
     textureDir + "2k_mercury.jpg"
   );
-  planetTextures.value.venus = await textureLoader.load(
+  planetTextures.venus = await textureLoader.load(
     textureDir + "2k_venus_atmosphere.jpg"
   );
-  planetTextures.value.earth = await textureLoader.load(
+  planetTextures.earth = await textureLoader.load(
     textureDir + "4k_earth_day.jpg"
   );
-  planetTextures.value.mars = await textureLoader.load(
-    textureDir + "2k_mars.jpg"
-  );
-  planetTextures.value.jupiter = await textureLoader.load(
+  planetTextures.mars = await textureLoader.load(textureDir + "2k_mars.jpg");
+  planetTextures.jupiter = await textureLoader.load(
     textureDir + "2k_jupiter.jpg"
   );
-  planetTextures.value.saturn = await textureLoader.load(
+  planetTextures.saturn = await textureLoader.load(
     textureDir + "2k_saturn.jpg"
   );
-  planetTextures.value.uranus = await textureLoader.load(
+  planetTextures.uranus = await textureLoader.load(
     textureDir + "2k_uranus.jpg"
   );
-  planetTextures.value.neptune = await textureLoader.load(
+  planetTextures.neptune = await textureLoader.load(
     textureDir + "2k_neptune.jpg"
   );
 
@@ -393,75 +364,74 @@ function setupScene() {
 
   setupThreeJS();
 
-  // setupSun();
-  // updateOrbits();
+  setupSun();
+  updateOrbits();
 
-  // if (!animationConstants.prevTick) {
-  //   animate();
-  // }
+  if (!animationConstants.prevTick) {
+    animate();
+  }
 }
 
 function setupThreeJS() {
-  three.value.scene = new THREE.Scene();
+  threeScene = new THREE.Scene();
 
   // Renderer
-  three.value.renderer = new THREE.WebGLRenderer({
+  threeRenderer = new THREE.WebGLRenderer({
     antialias: true,
     logarithmicDepthBuffer: true,
   }); // { alpha: true }
-  three.value.canvas = document.getElementById("hohmann-canvas");
-  if (!three.value.canvas) return;
+  threeCanvas = document.getElementById("hohmann-canvas");
+  if (!threeCanvas) return;
 
-  three.value.canvas.appendChild(three.value.renderer.domElement);
+  threeCanvas.appendChild(threeRenderer.domElement);
 
-  const width = three.value.canvas.getBoundingClientRect().width;
+  const width = threeCanvas.getBoundingClientRect().width;
   const height = 500;
 
-  three.value.renderer.setSize(width, height);
+  threeRenderer.setSize(width, height);
 
-  // updateCamera();
+  updateCamera();
 
   // Lights
-  three.value.scene.add(new THREE.AmbientLight(0xffffff));
+  threeScene.add(new THREE.AmbientLight(0xffffff));
   const light = new THREE.PointLight(0xffffff, 1, 0, 1);
-  three.value.scene.add(light);
+  threeScene.add(light);
 }
 
 function updateCamera() {
-  if (!three.value.renderer) return;
+  if (!threeRenderer) return;
 
   // Camera
-  const distanceMultiple = 1000; // ? NOTE: This is arbitrary and can be updated to give cammera different viewing distance
+  const distanceMultiple = 1200; // ? NOTE: This is arbitrary and can be updated to give cammera different viewing distance
   const cameraPositionDistance = distanceMultiple * 5;
   const cameraZoomDistance = distanceMultiple * 5;
+
   let rendererSize = new THREE.Vector2();
-  three.value.renderer.getSize(rendererSize);
-  three.value.camera = new THREE.PerspectiveCamera(
+  threeRenderer.getSize(rendererSize);
+
+  threeCamera = new THREE.PerspectiveCamera(
     45,
     rendererSize.width / rendererSize.height,
     0.1,
     cameraZoomDistance * 20
   );
 
-  three.value.camera.position.z = cameraPositionDistance;
+  threeCamera.position.z = cameraPositionDistance;
 
   // Controls
-  three.value.controls = new OrbitControls(
-    three.value.camera,
-    three.value.renderer.domElement
-  );
+  threeControls = new OrbitControls(threeCamera, threeRenderer.domElement);
 
-  if (!three.value.controls) return;
+  if (!threeControls) return;
 
-  three.value.controls.minDistance = distanceMultiple;
-  three.value.controls.maxDistance = cameraZoomDistance * 20;
+  threeControls.minDistance = distanceMultiple;
+  threeControls.maxDistance = cameraZoomDistance * 20;
 }
 
 function setupSun() {
-  if (!three.value.scene) return;
+  if (!threeScene) return;
 
   const material = new THREE.MeshLambertMaterial({
-    map: planetTextures.value.sun,
+    map: planetTextures.sun,
     side: THREE.FrontSide,
   });
   material.emissive = new THREE.Color(0xffff00);
@@ -471,47 +441,36 @@ function setupSun() {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.set(Math.PI / 2, 0, 0);
 
-  three.value.scene.add(mesh);
+  threeScene.add(mesh);
 }
 
 function updateOrbits() {
-  if (!three.value.scene) return;
+  if (!threeScene) return;
 
-  if (startingOrbitGroup.value) {
-    three.value.scene.remove(startingOrbitGroup.value);
-  }
-
-  if (endingOrbitGroup.value) {
-    three.value.scene.remove(endingOrbitGroup.value);
-  }
-
-  if (hohmannOrbitGroup.value) {
-    three.value.scene.remove(hohmannOrbitGroup.value);
-  }
+  threeScene.remove(startingOrbitGroup);
+  threeScene.remove(endingOrbitGroup);
+  threeScene.remove(hohmannOrbitGroup);
 
   // if(ship.value){
-  //   three.value.scene.remove(ship.value);
+  //
   // }
-
-  startingOrbitGroup.value = new THREE.Group();
-  endingOrbitGroup.value = new THREE.Group();
-  hohmannOrbitGroup.value = new THREE.Group();
 
   setupOrbits(formData.value.startOrbit, false);
   setupOrbits(formData.value.endOrbit, true);
   setupHohmannOrbit();
   setupShip();
 
-  three.value.scene.add(startingOrbitGroup.value);
-  three.value.scene.add(endingOrbitGroup.value);
-  three.value.scene.add(hohmannOrbitGroup.value);
+  threeScene.add(startingOrbitGroup);
+  threeScene.add(endingOrbitGroup);
+  threeScene.add(hohmannOrbitGroup);
 
   animationConstants.play = false;
   animationConstants.complete = false;
   animationConstants.currentFrame = 1;
 }
+
 function setupOrbits(orbit: Location, endOrbit: boolean) {
-  if (!three.value.scene) return;
+  if (!threeScene) return;
 
   const orbitSize = orbit.distance / scaleConversions.scaleFactor;
   const planetMaterial = getMaterial(orbit.name);
@@ -538,7 +497,7 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
 
   // this.drawDeltaV(orbit, endOrbit);
 
-  if (endOrbit && endingOrbitGroup.value) {
+  if (endOrbit && endingOrbitGroup) {
     planetMesh.position.set(orbitSize, 0, 0);
 
     // This planet will be at 180º when the ship reaches it.
@@ -562,10 +521,10 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
       false
     );
 
-    endingOrbitGroup.value.add(planetMesh);
-    endingOrbitGroup.value.add(orbitMesh);
-    three.value.scene.add(endingOrbitGroup.value);
-  } else if (startingOrbitGroup.value) {
+    endingOrbitGroup.add(planetMesh);
+    endingOrbitGroup.add(orbitMesh);
+    threeScene.add(endingOrbitGroup);
+  } else if (startingOrbitGroup) {
     planetMesh.position.set(orbitSize, 0, 0);
 
     // How far does this body move in its orbit during the transit?
@@ -575,9 +534,9 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
       calcs.value.originEndingRads
     );
 
-    startingOrbitGroup.value.add(planetMesh);
-    startingOrbitGroup.value.add(orbitMesh);
-    three.value.scene.add(startingOrbitGroup.value);
+    startingOrbitGroup.add(planetMesh);
+    startingOrbitGroup.add(orbitMesh);
+    threeScene.add(startingOrbitGroup);
 
     // ? This will move the planet to the correct "end" position in the orbit. Can be used for testing endingRads calcualtions
     // this.rotateAboutPoint(
@@ -591,8 +550,8 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
 }
 
 function setupHohmannOrbit() {
-  if (!three.value.scene) return;
-  if (!hohmannOrbitGroup.value) return;
+  if (!threeScene) return;
+  if (!hohmannOrbitGroup) return;
 
   // setup orbit
   const sMajorAxis = semiMajorAxis.value / scaleConversions.scaleFactor;
@@ -630,14 +589,14 @@ function setupHohmannOrbit() {
   axisMesh.position.set(hohmannCenter.value, 0, 0);
   hohmannMesh.position.set(hohmannCenter.value, 0, 0);
 
-  hohmannOrbitGroup.value.add(axisMesh);
-  hohmannOrbitGroup.value.add(hohmannMesh);
+  hohmannOrbitGroup.add(axisMesh);
+  hohmannOrbitGroup.add(hohmannMesh);
 
-  three.value.scene.add(hohmannOrbitGroup.value);
+  threeScene.add(hohmannOrbitGroup);
 }
 
 function setupShip() {
-  if (!hohmannOrbitGroup.value) return;
+  if (!hohmannOrbitGroup) return;
 
   const orbitSize =
     formData.value.startOrbit.distance / scaleConversions.scaleFactor;
@@ -650,11 +609,11 @@ function setupShip() {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(orbitSize, 0, 0); // 80 * formData.value.startOrbit.planetSize // ? NOTE: Do we want to put the ship above the starting planet?
 
-  hohmannOrbitGroup.value.add(mesh);
+  hohmannOrbitGroup.add(mesh);
 }
 
 function drawDeltaV(orbit: Location, endOrbit: Location) {
-  if (!three.value.scene) return;
+  if (!threeScene) return;
 
   const orbitSize = orbit.distance / scaleConversions.scaleFactor;
   const deltaVgeometry = new THREE.ConeGeometry(50, 150, 32);
@@ -670,8 +629,9 @@ function drawDeltaV(orbit: Location, endOrbit: Location) {
     deltaVcone.position.set(orbitSize + 50 * orbit.planetSize + 75, 0, 0);
   }
 
-  three.value.scene.add(deltaVcone);
+  threeScene.add(deltaVcone);
 }
+
 function play() {
   if (animationConstants.complete) {
     reset();
@@ -680,23 +640,25 @@ function play() {
 
   animationConstants.play = !animationConstants.play;
 }
+
 function reset() {
   updateOrbits();
 }
+
 function animate() {
-  if (!three.value.scene) return;
-  if (!three.value.camera) return;
-  if (!three.value.renderer) return;
-  if (!three.value.controls) return;
-  if (!startingOrbitGroup.value) return;
-  if (!endingOrbitGroup.value) return;
+  if (!threeScene) return;
+  if (!threeCamera) return;
+  if (!threeRenderer) return;
+  if (!threeControls) return;
+  if (!startingOrbitGroup) return;
+  if (!endingOrbitGroup) return;
 
   requestAnimationFrame(animate);
 
-  three.value.controls.update();
+  threeControls.update();
 
-  //three.value.camera.position.clamp(three.value.minMovement, three.value.maxMovement);
-  three.value.renderer.render(three.value.scene, three.value.camera);
+  //threeCamera.position.clamp(three.value.minMovement, three.value.maxMovement);
+  threeRenderer.render(threeScene, threeCamera);
 
   if (animationConstants.complete || !animationConstants.play) return;
 
@@ -708,18 +670,18 @@ function animate() {
   animationConstants.prevTick = now;
 
   // Move the planets about their orbits
-  startingOrbitGroup.value.rotateOnAxis(
+  startingOrbitGroup.rotateOnAxis(
     animationConstants.orbitRotationVector,
     startingOrbitAnimationSpeed.value
   );
-  endingOrbitGroup.value.rotateOnAxis(
+  endingOrbitGroup.rotateOnAxis(
     animationConstants.orbitRotationVector,
     endingOrbitAnimationSpeed.value
   );
 
   // Move our ship along the hohmann orbit
   rotateAboutPoint(
-    hohmannOrbitGroup.value,
+    hohmannOrbitGroup,
     new THREE.Vector3(hohmannCenter.value, 0, 0),
     new THREE.Vector3(0, 0, 1),
     hohmannAnimationSpeed.value,
@@ -780,61 +742,45 @@ function getMaterial(name: string) {
   switch (name) {
     case "Mercury":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.mercury,
+        map: planetTextures.mercury,
         side: THREE.FrontSide,
       });
     case "Venus":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.venus,
+        map: planetTextures.venus,
         side: THREE.FrontSide,
       });
     case "Earth":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.earth,
+        map: planetTextures.earth,
         side: THREE.FrontSide,
       });
     case "Mars":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.mars,
+        map: planetTextures.mars,
         side: THREE.FrontSide,
       });
     case "Jupiter":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.jupiter,
+        map: planetTextures.jupiter,
         side: THREE.FrontSide,
       });
     case "Saturn":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.saturn,
+        map: planetTextures.saturn,
         side: THREE.FrontSide,
       });
     case "Uranus":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.uranus,
+        map: planetTextures.uranus,
         side: THREE.FrontSide,
       });
     case "Neptune":
       return new THREE.MeshLambertMaterial({
-        map: planetTextures.value.neptune,
+        map: planetTextures.neptune,
         side: THREE.FrontSide,
       });
   }
 }
-
-/**
- * 
- * 
-data: {
-
-  filters: {
-    addCommas(value) {
-      return value.toLocaleString();
-    },
-    capitalize(value) {
-      return value.charAt(0).toUpperCase() + value.slice(1);
-    },
-  },
-  watch: {},
-*/
 </script>
 <style></style>
