@@ -18,17 +18,23 @@ import Card from "./Card.vue";
 
 const props = defineProps<{
   search: string;
+  activeCategories: string[];
 }>();
 
 const filteredTools = computed(() => {
-  if (props.search === "") {
-    return tools;
+  if (props.activeCategories.length === 0) {
+    return tools.filter(
+      (tool) =>
+        tool.name.toLowerCase().includes(props.search.toLowerCase()) ||
+        tool.description.toLowerCase().includes(props.search.toLowerCase())
+    );
   }
 
   return tools.filter(
     (tool) =>
-      tool.name.toLowerCase().includes(props.search.toLowerCase()) ||
-      tool.description.toLowerCase().includes(props.search.toLowerCase())
+      props.activeCategories.includes(tool.category) &&
+      (tool.name.toLowerCase().includes(props.search.toLowerCase()) ||
+        tool.description.toLowerCase().includes(props.search.toLowerCase()))
   );
 });
 
@@ -37,28 +43,28 @@ const tools: SpaceTool[] = [
   {
     name: "Delta V",
     description: "Calculate the delta v required for a mission",
-    category: "Mission Planning",
+    category: "rockets",
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/delta-v",
   },
   {
     name: "Hohmann Transfer",
     description: "Calculate the delta v required for a Hohmann transfer",
-    category: "Mission Planning",
+    category: "orbits",
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/hohmann-transfer",
   },
   {
     name: "Orbit Visualizer",
     description: "Visualize the orbit of a satellite",
-    category: "Mission Planning",
+    category: "orbits",
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/hohmann-transfer",
   },
   {
     name: "Rotational Gravity",
     description: "Calculate the forces on a rotating space station",
-    category: "Mission Planning",
+    category: "orbits",
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/hohmann-transfer",
   },

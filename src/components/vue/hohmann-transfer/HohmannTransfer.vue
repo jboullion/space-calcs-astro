@@ -1,7 +1,7 @@
 <template>
   <div id="hohmann-transfer__app" class="row">
     <div id="hohmann__form" class="col-lg-4">
-      <div class="calc-form mb-5">
+      <div class="calc-form mb-5 p-2 bg-light rounded border">
         <SelectInput
           id="start-orbit"
           label="Starting Orbit"
@@ -332,10 +332,13 @@ const hohmannAnimationSpeed = computed(() => {
 });
 
 const currentDay = computed(() => {
-  return (
-    (animationConstants.value.currentFrame / totalFramesInHohmannOrbit.value) *
-    timeOfFlightDays.value
-  ).toFixed(0);
+  return animationConstants.value.currentFrame === 1
+    ? 1
+    : (
+        (animationConstants.value.currentFrame /
+          totalFramesInHohmannOrbit.value) *
+        timeOfFlightDays.value
+      ).toLocaleString(undefined, { maximumFractionDigits: 0 });
 });
 
 const totalFramesInHohmannOrbit = computed(() => {
@@ -622,21 +625,18 @@ function setupHohmannOrbit() {
 
   // setup orbit
   const sMajorAxis = semiMajorAxis.value / scaleConversions.scaleFactor;
+  const lineSize = farthestOrbitScaled.value / 100;
 
   const axisMaterial = new THREE.MeshBasicMaterial({
     color: 0xfd7e14,
     side: THREE.FrontSide,
   });
-  const axisGeometry = new THREE.SphereGeometry(
-    farthestOrbitScaled.value / 100,
-    12,
-    12
-  );
+  const axisGeometry = new THREE.SphereGeometry(lineSize * 2, 12, 12);
   const axisMesh = new THREE.Mesh(axisGeometry, axisMaterial);
 
   const hohmannGeometry = new THREE.RingGeometry(
-    sMajorAxis - farthestOrbitScaled.value / 150,
-    sMajorAxis + farthestOrbitScaled.value / 150,
+    sMajorAxis - lineSize,
+    sMajorAxis + lineSize,
     128
   );
   const hohmannMaterial = new THREE.MeshBasicMaterial({
@@ -671,12 +671,17 @@ function setupShip() {
 
   const orbitSize =
     formData.value.startOrbit.distance / scaleConversions.scaleFactor;
+  const lineSize = farthestOrbitScaled.value / 100;
 
   const material = new THREE.MeshBasicMaterial({
     color: 0xea6730,
     side: THREE.FrontSide,
   });
-  const geometry = new THREE.SphereGeometry(30, 12, 12);
+  const geometry = new THREE.SphereGeometry(
+    farthestOrbitScaled.value / 50,
+    12,
+    12
+  );
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(orbitSize, 0, 0); // 80 * formData.value.startOrbit.planetSize // ? NOTE: Do we want to put the ship above the starting planet?
 

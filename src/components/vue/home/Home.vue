@@ -24,16 +24,54 @@
             </div>
           </div>
         </div>
+        <div class="category-filter mt-3">
+          <button
+            v-for="category in categories"
+            :key="category.slug"
+            type="button"
+            class="btn mx-2"
+            :class="getCategoryClass(category)"
+            @click="toggleCategory(category.slug)"
+          >
+            {{ category.name }}
+          </button>
+        </div>
       </div>
     </section>
 
-    <CardList :search="search" />
+    <CardList :search="search" :active-categories="activeCategories" />
   </div>
 </template>
 
 <script setup lang="ts">
 import CardList from "./CardList.vue";
 import { ref } from "vue";
+import type { Category } from "./constants";
+import { categories } from "./constants";
 
 const search = ref("");
+
+const activeCategories = ref<string[]>([]);
+
+function toggleCategory(slug: string): void {
+  if (activeCategories.value.includes(slug)) {
+    activeCategories.value = activeCategories.value.filter(
+      (category) => category !== slug
+    );
+  } else {
+    activeCategories.value.push(slug);
+  }
+}
+
+function getCategoryClass(category: Category): string {
+  let btnClasses = [];
+
+  if (activeCategories.value.includes(category.slug)) {
+    btnClasses.push("btn-" + category.color);
+  } else {
+    btnClasses.push("btn-outline-" + category.color);
+  }
+
+  return btnClasses.join(" ");
+}
 </script>
