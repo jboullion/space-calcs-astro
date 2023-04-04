@@ -1,0 +1,27 @@
+---
+import type { Reference } from "../../types/types";
+
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import OrbitVisualizer from "../../components/vue/orbit-visualizer/OrbitVisualizer.vue";
+import References from "../../components/shared/References.astro";
+
+const title = "Orbit Visualizer";
+const description = "Visualize the orbit of a spacecraft around a planet.";
+
+const references: Reference[] = [];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;">
+      <OrbitVisualizer client:only="vue" />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

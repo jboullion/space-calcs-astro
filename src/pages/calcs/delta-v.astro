@@ -48,12 +48,10 @@ const references: Reference[] = [
 
 <Layout title={title} description={description}>
   <div class="container">
-    <Hero
-      title={title}
-      description="Delta V refers to the change in velocity required for a spacecraft to perform a particular maneuver, such as entering orbit around a planet or moon, or escaping from the gravitational pull of a celestial body."
-    />
-
-    <DeltaV client:only="vue" />
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;">
+      <DeltaV client:only="vue" />
+    </div>
 
     <References references={references} />
   </div>

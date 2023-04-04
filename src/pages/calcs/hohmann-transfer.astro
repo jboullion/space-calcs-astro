@@ -28,11 +28,11 @@ const references: Reference[] = [
 
 <Layout title={title} description={description}>
   <div class="container">
-    <Hero
-      title={title}
-      description="A Hohmann transfer orbit is a type of elliptical orbit used to transfer a spacecraft from one circular orbit to another by using a minimum amount of propellant. It is named after Walter Hohmann, a German engineer who first described the technique in 1925."
-    />
-    <HohmannTransfer client:only="vue" />
+    <Hero title={title} description={description} />
+
+    <div style="min-height: 600px;">
+      <HohmannTransfer client:only="vue" />
+    </div>
 
     <References references={references} />
   </div>

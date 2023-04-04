@@ -59,7 +59,7 @@ const tools: SpaceTool[] = [
     description: "Visualize the orbit of a satellite",
     category: "orbits",
     image: "https://i.imgur.com/4ZQZQ2M.png",
-    link: "/calcs/hohmann-transfer",
+    link: "/calcs/orbit-visualizer",
   },
   {
     name: "Rotational Gravity",
