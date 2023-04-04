@@ -20,58 +20,99 @@
 
         <table class="table table-striped">
           <tbody>
-            <tr>
-              <th>{{ formData.endOrbit.name }} Starting Degree</th>
-              <td class="text-end">
-                {{ calcs.destinationStartingDegree }}&deg;
-              </td>
-            </tr>
-            <tr>
-              <th>{{ formData.startOrbit.name }} Ending Degree</th>
-              <td class="text-end">
+            <tr
+              :style="{
+                backgroundColor: getOrbitColorHex(formData.startOrbit),
+              }"
+            >
+              <th class="text-light">
+                {{ formData.startOrbit.name }} Ending Degree
+              </th>
+              <td class="text-end text-light">
                 {{ addCommas(calcs.originEndingDegree) }}&deg;
               </td>
             </tr>
-            <tr>
-              <th>Semi Major Axis</th>
-              <td class="text-end">{{ addCommas(semiMajorAxis) }} km</td>
+            <tr
+              :style="{
+                backgroundColor: getOrbitColorHex(formData.startOrbit),
+              }"
+            >
+              <th class="text-light">Delta V1</th>
+              <td class="text-light text-end">
+                {{ addCommas(firstDeltaV) }} m/s
+              </td>
             </tr>
-            <tr>
-              <th>{{ formData.startOrbit.name }} Orbit Velocity</th>
-              <td class="text-end">
+            <tr
+              :style="{
+                backgroundColor: getOrbitColorHex(formData.startOrbit),
+              }"
+            >
+              <th class="text-light">
+                {{ formData.startOrbit.name }} Orbit Velocity
+              </th>
+              <td class="text-light text-end">
                 {{ addCommas(startingOrbitVelocity) }} km/s
               </td>
             </tr>
-            <tr>
-              <th>{{ formData.endOrbit.name }} Orbit Velocity</th>
-              <td class="text-end">
+            <tr
+              :style="{
+                backgroundColor: getOrbitColorHex(formData.endOrbit),
+              }"
+            >
+              <th class="text-light">
+                {{ formData.endOrbit.name }} Starting Degree
+              </th>
+              <td class="text-light text-end">
+                {{ calcs.destinationStartingDegree }}&deg;
+              </td>
+            </tr>
+
+            <tr
+              :style="{
+                backgroundColor: getOrbitColorHex(formData.endOrbit),
+              }"
+            >
+              <th class="text-light">Delta V2</th>
+              <td class="text-light text-end">
+                {{ addCommas(secondDeltaV) }} m/s
+              </td>
+            </tr>
+            <tr
+              :style="{
+                backgroundColor: getOrbitColorHex(formData.endOrbit),
+              }"
+            >
+              <th class="text-light">
+                {{ formData.endOrbit.name }} Orbit Velocity
+              </th>
+              <td class="text-light text-end">
                 {{ addCommas(endingOrbitVelocity) }} km/s
               </td>
             </tr>
-            <tr>
-              <th>Hohman Orbit Velocity</th>
-              <td class="text-end">
+            <tr class="bg-orange">
+              <th class="text-light">Semi Major Axis</th>
+              <td class="text-light text-end">
+                {{ addCommas(semiMajorAxis) }} km
+              </td>
+            </tr>
+            <tr class="bg-orange">
+              <th class="text-light">Hohmann Orbit Velocity</th>
+              <td class="text-light text-end">
                 {{ addCommas(hohmannOrbitVelocity) }} km/s
               </td>
             </tr>
 
-            <tr>
-              <th>Delta V1</th>
-              <td class="text-end">{{ addCommas(firstDeltaV) }} m/s</td>
-            </tr>
-            <tr>
-              <th>Delta V2</th>
-              <td class="text-end">{{ addCommas(secondDeltaV) }} m/s</td>
-            </tr>
-            <tr>
-              <th>Total Delta V</th>
-              <td class="text-end">
+            <tr class="bg-dark">
+              <th class="text-light">Total Delta V</th>
+              <td class="text-light text-end">
                 {{ addCommas(firstDeltaV + secondDeltaV) }} m/s
               </td>
             </tr>
-            <tr>
-              <th>Travel Time</th>
-              <td class="text-end">{{ addCommas(timeOfFlightDays) }} days</td>
+            <tr class="bg-dark">
+              <th class="text-light">Travel Time</th>
+              <td class="text-light text-end">
+                {{ addCommas(timeOfFlightDays) }} days
+              </td>
             </tr>
           </tbody>
         </table>
@@ -292,18 +333,18 @@ const hohmannAnimationSpeed = computed(() => {
 
 const currentDay = computed(() => {
   return (
-    (animationConstants.currentFrame / totalFramesInHohmannOrbit.value) *
+    (animationConstants.value.currentFrame / totalFramesInHohmannOrbit.value) *
     timeOfFlightDays.value
   ).toFixed(0);
 });
 
 const totalFramesInHohmannOrbit = computed(() => {
-  return animationConstants.duration * animationConstants.FPS;
+  return animationConstants.value.duration * animationConstants.value.FPS;
 });
 
 const playClass = computed(() => {
-  if (!animationConstants.complete) {
-    if (!animationConstants.play) {
+  if (!animationConstants.value.complete) {
+    if (!animationConstants.value.play) {
       return "fa-play";
     } else {
       return "fa-pause";
@@ -311,6 +352,15 @@ const playClass = computed(() => {
   } else {
     return "fa-undo";
   }
+});
+
+const farthestOrbitScaled = computed(() => {
+  return (
+    Math.max(
+      formData.value.startOrbit.distance,
+      formData.value.endOrbit.distance
+    ) / scaleConversions.scaleFactor
+  );
 });
 
 /**
@@ -326,6 +376,26 @@ onMounted(() => {
   formData.value.startOrbit = locations[2];
   formData.value.endOrbit = locations[3];
 });
+
+/**
+ *
+ *
+ * METHODS
+ *
+ *
+ */
+
+function getOrbitColorHex(location: Location) {
+  if (!location.orbitColor) return "#ffffff";
+
+  let hex = location.orbitColor.toString(16).replace(/^0x/, "");
+  if (hex.length < 6) {
+    hex = "0" + hex;
+  }
+
+  // orbitColor is setup for Three.js to use 0x######, so we need to convert it to a hex (16) string
+  return "#" + hex;
+}
 
 async function loadModels() {
   const textureLoader = new THREE.TextureLoader();
@@ -367,7 +437,7 @@ function setupScene() {
   setupSun();
   updateOrbits();
 
-  if (!animationConstants.prevTick) {
+  if (!animationConstants.value.prevTick) {
     animate();
   }
 }
@@ -402,9 +472,8 @@ function updateCamera() {
   if (!threeRenderer) return;
 
   // Camera
-  const distanceMultiple = 1200; // ? NOTE: This is arbitrary and can be updated to give cammera different viewing distance
-  const cameraPositionDistance = distanceMultiple * 5;
-  const cameraZoomDistance = distanceMultiple * 5;
+  const cameraPositionDistance = farthestOrbitScaled.value * 3;
+  const cameraZoomDistance = farthestOrbitScaled.value * 3 * 20;
 
   let rendererSize = new THREE.Vector2();
   threeRenderer.getSize(rendererSize);
@@ -413,7 +482,7 @@ function updateCamera() {
     45,
     rendererSize.width / rendererSize.height,
     0.1,
-    cameraZoomDistance * 20
+    cameraZoomDistance
   );
 
   threeCamera.position.z = cameraPositionDistance;
@@ -423,8 +492,8 @@ function updateCamera() {
 
   if (!threeControls) return;
 
-  threeControls.minDistance = distanceMultiple;
-  threeControls.maxDistance = cameraZoomDistance * 20;
+  threeControls.minDistance = farthestOrbitScaled.value;
+  threeControls.maxDistance = cameraZoomDistance;
 }
 
 function setupSun() {
@@ -463,29 +532,28 @@ function updateOrbits() {
   threeScene.add(endingOrbitGroup);
   threeScene.add(hohmannOrbitGroup);
 
-  animationConstants.play = false;
-  animationConstants.complete = false;
-  animationConstants.currentFrame = 1;
+  updateCamera();
+
+  animationConstants.value.play = false;
+  animationConstants.value.complete = false;
+  animationConstants.value.currentFrame = 1;
 }
 
 function setupOrbits(orbit: Location, endOrbit: boolean) {
   if (!threeScene) return;
 
   const orbitSize = orbit.distance / scaleConversions.scaleFactor;
+  const lineSize = farthestOrbitScaled.value / 100;
   const planetMaterial = getMaterial(orbit.name);
 
-  const planetGeometry = new THREE.SphereGeometry(
-    50 * orbit.planetSize,
-    32,
-    32
-  );
+  const planetGeometry = new THREE.SphereGeometry(lineSize * 2, 32, 32);
   const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
   // Rotate the planet to the (more or less) correct orientation compared to the plane of the system
   planetMesh.rotation.set(Math.PI / 2, 0, 0);
 
   const orbitGeometry = new THREE.RingGeometry(
-    orbitSize - 5,
-    orbitSize + 5,
+    orbitSize - lineSize,
+    orbitSize + lineSize,
     128
   );
   const orbitMaterial = new THREE.MeshBasicMaterial({
@@ -556,19 +624,23 @@ function setupHohmannOrbit() {
   const sMajorAxis = semiMajorAxis.value / scaleConversions.scaleFactor;
 
   const axisMaterial = new THREE.MeshBasicMaterial({
-    color: 0xea6730,
+    color: 0xfd7e14,
     side: THREE.FrontSide,
   });
-  const axisGeometry = new THREE.SphereGeometry(20, 12, 12);
+  const axisGeometry = new THREE.SphereGeometry(
+    farthestOrbitScaled.value / 100,
+    12,
+    12
+  );
   const axisMesh = new THREE.Mesh(axisGeometry, axisMaterial);
 
   const hohmannGeometry = new THREE.RingGeometry(
-    sMajorAxis - 5,
-    sMajorAxis + 5,
+    sMajorAxis - farthestOrbitScaled.value / 150,
+    sMajorAxis + farthestOrbitScaled.value / 150,
     128
   );
   const hohmannMaterial = new THREE.MeshBasicMaterial({
-    color: 0xea6730,
+    color: 0xfd7e14,
     side: THREE.DoubleSide,
   });
   const hohmannMesh = new THREE.Mesh(hohmannGeometry, hohmannMaterial);
@@ -632,12 +704,12 @@ function drawDeltaV(orbit: Location, endOrbit: Location) {
 }
 
 function play() {
-  if (animationConstants.complete) {
+  if (animationConstants.value.complete) {
     reset();
     return;
   }
 
-  animationConstants.play = !animationConstants.play;
+  animationConstants.value.play = !animationConstants.value.play;
 }
 
 function reset() {
@@ -659,22 +731,23 @@ function animate() {
   //threeCamera.position.clamp(three.value.minMovement, three.value.maxMovement);
   threeRenderer.render(threeScene, threeCamera);
 
-  if (animationConstants.complete || !animationConstants.play) return;
+  if (animationConstants.value.complete || !animationConstants.value.play)
+    return;
 
   // clamp to fixed framerate
   const now = Math.round(
-    (animationConstants.FPS * window.performance.now()) / 1000
+    (animationConstants.value.FPS * window.performance.now()) / 1000
   );
-  if (now == animationConstants.prevTick) return;
-  animationConstants.prevTick = now;
+  if (now == animationConstants.value.prevTick) return;
+  animationConstants.value.prevTick = now;
 
   // Move the planets about their orbits
   startingOrbitGroup.rotateOnAxis(
-    animationConstants.orbitRotationVector,
+    animationConstants.value.orbitRotationVector,
     startingOrbitAnimationSpeed.value
   );
   endingOrbitGroup.rotateOnAxis(
-    animationConstants.orbitRotationVector,
+    animationConstants.value.orbitRotationVector,
     endingOrbitAnimationSpeed.value
   );
 
@@ -690,11 +763,13 @@ function animate() {
   // three.value.stats.update();
 
   // Are we at the end of our orbit?
-  animationConstants.currentFrame++;
+  animationConstants.value.currentFrame++;
 
-  if (animationConstants.currentFrame >= totalFramesInHohmannOrbit.value) {
-    animationConstants.play = false;
-    animationConstants.complete = true;
+  if (
+    animationConstants.value.currentFrame >= totalFramesInHohmannOrbit.value
+  ) {
+    animationConstants.value.play = false;
+    animationConstants.value.complete = true;
   }
 }
 
@@ -728,12 +803,12 @@ function radiansToDegrees(radians: number) {
 
 // velocityToAnimationSpeed(velocity) {
 //   // convert days -> seconds -> frames -> simulation speed
-//   return velocity / scaleConversions.secondsToDays / animationConstants.FPS * animationConstants.simulationSpeed;
+//   return velocity / scaleConversions.secondsToDays / animationConstants.value.FPS * animationConstants.value.simulationSpeed;
 // },
 
 function radsToAnimationSpeed(rads: number) {
-  const radsPerSecond = rads / animationConstants.duration;
-  const radsPerFrame = radsPerSecond / animationConstants.FPS;
+  const radsPerSecond = rads / animationConstants.value.duration;
+  const radsPerFrame = radsPerSecond / animationConstants.value.FPS;
   return radsPerFrame;
 }
 

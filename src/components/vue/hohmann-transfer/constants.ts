@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ref } from "vue";
 
 export type Location = {
   name: string;
@@ -15,7 +16,7 @@ export const locations: Location[] = [
     distance: 57910000, // km
     au: 0.39,
     orbitalPeriod: 87.66, // days. Convert to seconds before use.
-    orbitColor: 0xdddddd,
+    orbitColor: 0x6c757d,
     planetSize: 0.35,
   },
   {
@@ -23,7 +24,7 @@ export const locations: Location[] = [
     distance: 108210000, // km
     au: 0.72,
     orbitalPeriod: 224.701, // days. Convert to seconds before use.
-    orbitColor: 0xe7d520,
+    orbitColor: 0xffc107,
     planetSize: 0.9,
   },
   {
@@ -31,7 +32,7 @@ export const locations: Location[] = [
     distance: 149600000, // km
     au: 1,
     orbitalPeriod: 365.25636, // days. Convert to seconds before use.
-    orbitColor: 0x064293,
+    orbitColor: 0x0d6efd,
     planetSize: 1,
   },
   {
@@ -39,7 +40,7 @@ export const locations: Location[] = [
     distance: 227920000, // km
     au: 1.52,
     orbitalPeriod: 686.6812, // days. Convert to seconds before use.
-    orbitColor: 0xbb4444,
+    orbitColor: 0xdc3545,
     planetSize: 0.4,
   },
   {
@@ -63,7 +64,7 @@ export const locations: Location[] = [
     distance: 2872460000, // km
     au: 19.2,
     orbitalPeriod: 30685.1868, // days. Convert to seconds before use.
-    orbitColor: 0xc6d3e3,
+    orbitColor: 0x0dcaf0,
     planetSize: 2,
   },
   {
@@ -88,7 +89,7 @@ export const scaleConversions = {
   scaleFactor: 100000,
 };
 
-export const animationConstants = {
+export const animationConstants = ref({
   play: false,
   FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
   prevTick: 0, // track the last tick timestamp
@@ -97,7 +98,7 @@ export const animationConstants = {
   currentFrame: 1,
   complete: false,
   duration: 10, // seconds
-};
+});
 
 // Hohman transfers for things orbiting Earth
 // TODO: If a user selects Earth as either the starting or ending orbit, include these locations in the other option

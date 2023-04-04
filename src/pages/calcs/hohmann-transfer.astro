@@ -7,7 +7,21 @@ import References from "../../components/shared/References.astro";
 import type { Reference } from "../../types/types";
 
 const title = "Hohmann Transfer";
-const references: Reference[] = [];
+
+const references: Reference[] = [
+  {
+    title: "Hohmann transfer Wiki",
+    url: "https://en.wikipedia.org/wiki/Hohmann_transfer_orbit",
+  },
+  {
+    title: "Instructables: Hohmann Transfer",
+    url: "https://www.instructables.com/Calculating-a-Hohmann-Transfer/",
+  },
+  {
+    title: "Let's Go to Mars!",
+    url: "https://www.jpl.nasa.gov/edu/teach/activity/lets-go-to-mars-calculating-launch-windows/",
+  },
+];
 ---
 
 <Layout title={title}>

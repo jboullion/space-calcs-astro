@@ -45,3 +45,7 @@
 h1 {
   font-family: "Orbitron", sans-serif;
 }
+
+.bg-orange {
+  background-color: var(--bs-orange);
+}
