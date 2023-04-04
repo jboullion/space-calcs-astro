@@ -1,7 +1,7 @@
 <template>
   <div class="card shadow-sm h-100">
     <a :href="tool.link" class="card-body d-flex flex-column">
-      <h5 class="card-title fw-bold">{{ tool.name }}</h5>
+      <h2 class="card-title fw-bold">{{ tool.name }}</h2>
       <p class="card-text flex-fill">{{ tool.description }}</p>
       <div class="d-flex justify-content-between align-items-center">
         <small class="text-primary">{{ tool.category }}</small>
@@ -22,6 +22,10 @@ defineProps<{
 a {
   color: inherit;
   text-decoration: none;
+}
+
+h2.card-title {
+  font-size: 1.4rem;
 }
 
 .card:hover {

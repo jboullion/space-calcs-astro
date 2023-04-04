@@ -18,7 +18,7 @@
           @update:modelValue="updateOrbits"
         />
 
-        <table class="table table-striped">
+        <table class="table">
           <tbody>
             <tr
               :style="{

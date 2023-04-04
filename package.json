@@ -11,10 +11,11 @@
   },
   "dependencies": {
     "@astrojs/vue": "^2.1.0",
+    "@fortawesome/fontawesome-free": "^6.4.0",
     "astro": "^2.1.9",
+    "bootstrap": "^5.3.0-alpha3",
     "three": "^0.151.2",
-    "vue": "^3.2.47",
-    "vue-google-charts": "^1.1.0"
+    "vue": "^3.2.47"
   },
   "devDependencies": {
     "@types/three": "^0.150.1",

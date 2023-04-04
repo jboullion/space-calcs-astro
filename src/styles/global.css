@@ -6,6 +6,10 @@
   --bs-primary-text: white; */
 }
 
+body {
+  font-family: "Montserrat", sans-serif !important;
+}
+
 /* .btn-primary {
   --bs-btn-color: #fff;
   --bs-btn-bg: var(--bs-primary);
