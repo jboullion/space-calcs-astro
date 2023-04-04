@@ -23,6 +23,7 @@
           v-model="formData.twoStage"
           :value="true"
           tooltip="Will this rocket have two stages?"
+          @change="updateTwoStage"
         />
 
         <div v-show="formData.twoStage">
@@ -209,6 +210,7 @@
 // 1. Should we move first stage to top of form? When two stage is active then second stage is on bottom?
 // 2. Should we add a third stage?
 // 3. Do we need payload mass? We already calculate a range? Perhaps we could always do range 100-150?
+// 4. Checkbox select number of destinations to display in graph? Can make the data more readable for specific destinations.
 
 import {
   ref,
@@ -266,6 +268,11 @@ const formData = ref<DeltaVForm>({
 type ResultTabs = "payload" | "fuel" | "c3" | "map";
 
 const showResult = ref<ResultTabs>("payload");
+
+let deltaVChartHTML: GoogleCharts.api.visualization.LineChart;
+let fuelChartHTML: GoogleCharts.api.visualization.LineChart;
+let c3ChartHTML: GoogleCharts.api.visualization.LineChart;
+
 /**
  *
  *
@@ -284,15 +291,18 @@ onBeforeMount(() => {
   formData.value.engine = defaultEngines[1];
 
   calcExhaustVelocity();
-  GoogleCharts.load(drawCharts, { packages: ["line", "corechart"] });
+
+  GoogleCharts.load("52", {
+    packages: ["line", "corechart"],
+  }).then(setupCharts);
 });
 
 onMounted(() => {
-  window.addEventListener("resize", drawCharts, { passive: true });
+  //window.addEventListener("resize", drawCharts, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", drawCharts);
+  //window.removeEventListener("resize", drawCharts);
 });
 
 function showResultChart(chart: ResultTabs) {
@@ -301,6 +311,11 @@ function showResultChart(chart: ResultTabs) {
   if (GoogleCharts.api?.visualization) {
     nextTick(drawCharts);
   }
+}
+
+// Only refillvot two stage rockets
+function updateTwoStage() {
+  if (!formData.value.twoStage) formData.value.refill = false;
 }
 
 /**
@@ -399,19 +414,21 @@ const secondStageDeltaV = computed(() => {
  *
  *
  * */
-function calcIsp(seaLevel = false) {
-  if (seaLevel) {
-    formData.value.seaLevelSpecificImpulse = round(
-      formData.value.seaLevelVelocity / constants.g,
-      3
-    );
-  } else {
-    formData.value.specificImpulse = round(
-      formData.value.exhaustVelocity / constants.g,
-      3
-    );
-  }
-}
+
+// NOTE: Saved in case we want to calculate Isp instead of velocity
+// function calcIsp(seaLevel = false) {
+//   if (seaLevel) {
+//     formData.value.seaLevelSpecificImpulse = round(
+//       formData.value.seaLevelVelocity / constants.g,
+//       3
+//     );
+//   } else {
+//     formData.value.specificImpulse = round(
+//       formData.value.exhaustVelocity / constants.g,
+//       3
+//     );
+//   }
+// }
 
 function calcExhaustVelocity() {
   formData.value.exhaustVelocity = convertIspToVe(
@@ -499,6 +516,23 @@ function round(num: number, digit: number) {
  *
  *
  * */
+function setupCharts() {
+  if (!GoogleCharts.api.visualization) return;
+
+  deltaVChartHTML = new GoogleCharts.api.visualization.LineChart(
+    document.getElementById("delta-v-chart")
+  );
+
+  fuelChartHTML = new GoogleCharts.api.visualization.LineChart(
+    document.getElementById("fuel-chart")
+  );
+
+  c3ChartHTML = new GoogleCharts.api.visualization.LineChart(
+    document.getElementById("c3-chart")
+  );
+
+  drawCharts();
+}
 
 function drawCharts() {
   switch (showResult.value) {
@@ -519,6 +553,142 @@ function drawPayloadChart() {
 
   const dataTable = deltaVDataTable();
 
+  const rows = getDeltaVRows();
+
+  dataTable.addRows(rows);
+
+  var options = getDeltaVChartOptions();
+
+  deltaVChartHTML.draw(dataTable, options);
+}
+
+function drawFuelChart() {
+  if (!GoogleCharts.api.visualization) return;
+
+  const fuelRange = [
+    formData.value.fuelMass - 500,
+    formData.value.fuelMass - 400,
+    formData.value.fuelMass - 300,
+    formData.value.fuelMass - 200,
+    formData.value.fuelMass - 100,
+    formData.value.fuelMass,
+    formData.value.fuelMass + 100,
+    formData.value.fuelMass + 200,
+    formData.value.fuelMass + 300,
+    formData.value.fuelMass + 400,
+    formData.value.fuelMass + 500,
+  ];
+
+  const dataTable = deltaVDataTable();
+
+  const rows = getFuelRows(fuelRange);
+
+  dataTable.addRows(rows);
+
+  const options = getFuelOptions(fuelRange);
+
+  fuelChartHTML.draw(dataTable, options);
+}
+
+function drawC3Chart() {
+  if (!GoogleCharts.api.visualization) return;
+
+  const dataTable = c3DataTable();
+
+  const rows = getC3Rows();
+
+  dataTable.addRows(rows);
+
+  const options = getC3Options();
+
+  c3ChartHTML.draw(dataTable, options);
+}
+
+function buildC3Tooltip(
+  title: string,
+  payload: number | string,
+  C3: number | null
+) {
+  return (
+    '<div style="padding:10px; white-space: nowrap;">' +
+    '<strong style="font-size: 120%;">' +
+    title +
+    "</strong><br />" +
+    "Payload: <strong>" +
+    payload +
+    " (mt)</strong><br />" +
+    "C3: <strong>" +
+    C3 +
+    " (km²/s²)</strong></div>"
+  );
+}
+
+function buildDeltaVTooltip(
+  title: string,
+  deltaV: number,
+  type?: string,
+  value?: number
+) {
+  let tooltipString =
+    '<div style="padding:10px; white-space: nowrap;">' +
+    '<strong style="font-size: 120%;">' +
+    title +
+    "</strong><br />";
+
+  if (type) {
+    tooltipString += type + ": <strong>" + value + " (mt)</strong><br />";
+  }
+
+  tooltipString += "Delta V: <strong>" + deltaV + " (m/s)</strong></div>";
+
+  return tooltipString;
+}
+
+function calcPayloadRowC3(payload: number) {
+  let deltaV = calcDeltaV(
+    payload + formData.value.rocketMass,
+    formData.value.fuelMass,
+    formData.value.exhaustVelocity,
+    true
+  );
+
+  if (formData.value.twoStage) {
+    const secondStageMass =
+      formData.value.rocketMass + payload + formData.value.fuelMass; // c3Payload
+    deltaV += calcDeltaV(
+      secondStageMass + formData.value.firstStageMass,
+      formData.value.firstStageFuel,
+      formData.value.seaLevelVelocity,
+      false
+    );
+  }
+
+  return calcC3(deltaV);
+}
+
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *  DATA FUNCTIONS
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * */
+function getDeltaVRows() {
   let rows = [];
 
   const destinationRows = getDestinationRows();
@@ -611,16 +781,18 @@ function drawPayloadChart() {
     }
   }
 
-  dataTable.addRows(rows);
+  return rows;
+}
 
-  const options = {
+function getDeltaVChartOptions() {
+  return {
     chartArea: {
       // leave room for y-axis labels
       width: "80%",
     },
     title: "Payload and Delta V (ΔV)",
     curveType: "function",
-    theme: "material",
+    //theme: "maximized",
     hAxis: {
       title: "ΔV (m/s)",
     },
@@ -647,33 +819,80 @@ function drawPayloadChart() {
       9: { color: "gold", lineDashStyle: [10, 10] },
     },
   };
-
-  const chart = new GoogleCharts.api.visualization.LineChart(
-    document.getElementById("delta-v-chart")
-  );
-
-  chart.draw(dataTable, options);
 }
 
-function drawFuelChart() {
+function deltaVDataTable() {
   if (!GoogleCharts.api.visualization) return;
 
-  const dataTable = deltaVDataTable();
+  const dataTable = new GoogleCharts.api.visualization.DataTable();
 
+  dataTable.addColumn("number", "Delta V");
+  dataTable.addColumn("number", "Your Rocket");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "LEO");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Moon");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Mars (Aerobrake)");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Ceres");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Venus Orbit");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Mercury");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Jupiter");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Saturn");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Sun Escape");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+
+  return dataTable;
+}
+
+function getFuelRows(fuelRange: number[]) {
   let rows = [];
-  const fuelRange = [
-    formData.value.fuelMass - 500,
-    formData.value.fuelMass - 400,
-    formData.value.fuelMass - 300,
-    formData.value.fuelMass - 200,
-    formData.value.fuelMass - 100,
-    formData.value.fuelMass,
-    formData.value.fuelMass + 100,
-    formData.value.fuelMass + 200,
-    formData.value.fuelMass + 300,
-    formData.value.fuelMass + 400,
-    formData.value.fuelMass + 500,
-  ];
 
   const destinationRows = getDestinationRows();
 
@@ -718,16 +937,18 @@ function drawFuelChart() {
     rows.push(newRow);
   }
 
-  dataTable.addRows(rows);
+  return rows;
+}
 
-  const options = {
+function getFuelOptions(fuelRange: number[]) {
+  return {
     chartArea: {
       // leave room for y-axis labels
       width: "80%",
     },
     title: "Fuel and Delta V (ΔV)",
     curveType: "function",
-    theme: "material",
+    // theme: "material",
     hAxis: {
       title: "ΔV (m/s)",
     },
@@ -754,80 +975,60 @@ function drawFuelChart() {
       9: { color: "gold", lineDashStyle: [10, 10] },
     },
   };
-
-  const chart = new GoogleCharts.api.visualization.LineChart(
-    document.getElementById("fuel-chart")
-  );
-
-  chart.draw(dataTable, options);
 }
 
-function drawC3Chart() {
-  if (!GoogleCharts.api.visualization) return;
+function getDestinationRows() {
+  return [
+    destinations.value[0].deltaV, // LEO
+    buildDeltaVTooltip(
+      destinations.value[0].name,
+      destinations.value[0].deltaV
+    ),
+    destinations.value[2].deltaV, // Moon
+    buildDeltaVTooltip(
+      destinations.value[2].name,
+      destinations.value[2].deltaV
+    ),
+    destinations.value[3].deltaV, // Mars
+    buildDeltaVTooltip(
+      destinations.value[3].name,
+      destinations.value[3].deltaV
+    ),
+    destinations.value[4].deltaV, // Ceres
+    buildDeltaVTooltip(
+      destinations.value[4].name,
+      destinations.value[4].deltaV
+    ),
+    destinations.value[5].deltaV, // Venus
+    buildDeltaVTooltip(
+      destinations.value[5].name,
+      destinations.value[5].deltaV
+    ),
+    destinations.value[6].deltaV, // Mercury
+    buildDeltaVTooltip(
+      destinations.value[6].name,
+      destinations.value[6].deltaV
+    ),
+    destinations.value[7].deltaV, // Jupiter
+    buildDeltaVTooltip(
+      destinations.value[7].name,
+      destinations.value[7].deltaV
+    ),
+    destinations.value[8].deltaV, // Saturn
+    buildDeltaVTooltip(
+      destinations.value[8].name,
+      destinations.value[8].deltaV
+    ),
+    destinations.value[9].deltaV, // Sun
+    buildDeltaVTooltip(
+      destinations.value[9].name,
+      destinations.value[9].deltaV
+    ),
+  ];
+}
 
-  const dataTable = new GoogleCharts.api.visualization.DataTable();
-
-  dataTable.addColumn("number", "C3");
-  dataTable.addColumn("number", "Falcon Heavy (Expendable)");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Falcon Heavy (Recoverable)");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "New Glenn");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "SLS Block 1");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "SLS Block 2");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Your Rocket");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Moon");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Mars");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Jupiter");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Saturn Direct");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
+function getC3Rows() {
+  let rows = [];
 
   const planetC3s = [
     -0.6,
@@ -839,8 +1040,6 @@ function drawC3Chart() {
     139,
     buildC3Tooltip("Saturn Direct", "-", 139),
   ];
-
-  let rows = [];
 
   // Row 0. Added for debugging. Can be removed if not needed.
   const payloadZeroC3 = calcPayloadRowC3(0);
@@ -931,16 +1130,88 @@ function drawC3Chart() {
     }
   }
 
-  dataTable.addRows(rows);
+  return rows;
+}
 
-  const options = {
+function c3DataTable() {
+  if (!GoogleCharts.api.visualization) return;
+
+  const dataTable = new GoogleCharts.api.visualization.DataTable();
+
+  dataTable.addColumn("number", "C3");
+  dataTable.addColumn("number", "Falcon Heavy (Expendable)");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Falcon Heavy (Recoverable)");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "New Glenn");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "SLS Block 1");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "SLS Block 2");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Your Rocket");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Moon");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Mars");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Jupiter");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+  dataTable.addColumn("number", "Saturn Direct");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+
+  return dataTable;
+}
+
+function getC3Options() {
+  return {
     chartArea: {
       // leave room for y-axis labels
       width: "80%",
     },
     title: "Characteristic Energy (C3)",
     curveType: "function",
-    theme: "material",
+    // theme: "material",
     hAxis: {
       title: "Launch Energy / C3 (km²/s²)",
     },
@@ -967,244 +1238,7 @@ function drawC3Chart() {
       9: { color: "#7B7869", lineDashStyle: [10, 10] },
     },
   };
-
-  const chart = new GoogleCharts.api.visualization.LineChart(
-    document.getElementById("c3-chart")
-  );
-
-  chart.draw(dataTable, options);
 }
-
-function buildC3Tooltip(
-  title: string,
-  payload: number | string,
-  C3: number | null
-) {
-  return (
-    '<div style="padding:10px; white-space: nowrap;">' +
-    '<strong style="font-size: 120%;">' +
-    title +
-    "</strong><br />" +
-    "Payload: <strong>" +
-    payload +
-    " (mt)</strong><br />" +
-    "C3: <strong>" +
-    C3 +
-    " (km²/s²)</strong></div>"
-  );
-}
-
-function buildDeltaVTooltip(
-  title: string,
-  deltaV: number,
-  type?: string,
-  value?: number
-) {
-  let tooltipString =
-    '<div style="padding:10px; white-space: nowrap;">' +
-    '<strong style="font-size: 120%;">' +
-    title +
-    "</strong><br />";
-
-  if (type) {
-    tooltipString += type + ": <strong>" + value + " (mt)</strong><br />";
-  }
-
-  tooltipString += "Delta V: <strong>" + deltaV + " (m/s)</strong></div>";
-
-  return tooltipString;
-}
-
-function calcPayloadRowC3(payload: number) {
-  let deltaV = calcDeltaV(
-    payload + formData.value.rocketMass,
-    formData.value.fuelMass,
-    formData.value.exhaustVelocity,
-    true
-  );
-
-  if (formData.value.twoStage) {
-    const secondStageMass =
-      formData.value.rocketMass + payload + formData.value.fuelMass; // c3Payload
-    deltaV += calcDeltaV(
-      secondStageMass + formData.value.firstStageMass,
-      formData.value.firstStageFuel,
-      formData.value.seaLevelVelocity,
-      false
-    );
-  }
-
-  return calcC3(deltaV);
-}
-
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *  DATA FUNCTIONS
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- * */
-function deltaVDataTable() {
-  if (!GoogleCharts.api.visualization) return;
-
-  const dataTable = new GoogleCharts.api.visualization.DataTable();
-
-  dataTable.addColumn("number", "Delta V");
-  dataTable.addColumn("number", "Your Rocket");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "LEO");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Moon");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Mars (Aerobrake)");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Ceres");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Venus Orbit");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Mercury");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Jupiter");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Saturn");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  dataTable.addColumn("number", "Sun Escape");
-  dataTable.addColumn({
-    type: "string",
-    role: "tooltip",
-    p: { html: true },
-  });
-  return dataTable;
-}
-
-function getDestinationRows() {
-  return [
-    destinations.value[0].deltaV, // LEO
-    buildDeltaVTooltip(
-      destinations.value[0].name,
-      destinations.value[0].deltaV
-    ),
-    destinations.value[2].deltaV, // Moon
-    buildDeltaVTooltip(
-      destinations.value[2].name,
-      destinations.value[2].deltaV
-    ),
-    destinations.value[3].deltaV, // Mars
-    buildDeltaVTooltip(
-      destinations.value[3].name,
-      destinations.value[3].deltaV
-    ),
-    destinations.value[4].deltaV, // Ceres
-    buildDeltaVTooltip(
-      destinations.value[4].name,
-      destinations.value[4].deltaV
-    ),
-    destinations.value[5].deltaV, // Venus
-    buildDeltaVTooltip(
-      destinations.value[5].name,
-      destinations.value[5].deltaV
-    ),
-    destinations.value[6].deltaV, // Mercury
-    buildDeltaVTooltip(
-      destinations.value[6].name,
-      destinations.value[6].deltaV
-    ),
-    destinations.value[7].deltaV, // Jupiter
-    buildDeltaVTooltip(
-      destinations.value[7].name,
-      destinations.value[7].deltaV
-    ),
-    destinations.value[8].deltaV, // Saturn
-    buildDeltaVTooltip(
-      destinations.value[8].name,
-      destinations.value[8].deltaV
-    ),
-    destinations.value[9].deltaV, // Sun
-    buildDeltaVTooltip(
-      destinations.value[9].name,
-      destinations.value[9].deltaV
-    ),
-  ];
-}
-
-/*
-
-  watch: {
-    "formData.showC3": {
-      handler(newShowC3) {
-        $nextTick(() => {
-          drawC3Chart();
-        });
-      },
-    },
-    "formData.twoStage": {
-      handler(newTwoStage) {
-        if (!newTwoStage) formData.value.refill = false;
-      },
-    },
-    // formData: {
-    //   handler(newVal){
-    //     // Updating scene here to only update onces per watch.
-    //     if(needsUpdate){
-    //       setupScene();
-    //     }
-    //   },
-    //   deep: true
-    // }
-  },
-});
-*/
 </script>
 
 <style></style>
