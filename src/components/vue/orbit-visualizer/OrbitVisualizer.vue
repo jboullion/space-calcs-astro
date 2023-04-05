@@ -1,11 +1,363 @@
-<template></template>
+<template>
+  <div id="orbit__app" class="row mt-5" v-cloak>
+    <div id="orbit__form" class="col-lg-6">
+      <div class="calc-form col-12 mb-5">
+        <div>
+          <div id="mission" class="orbit__mission">
+            <div class="calc-toggle">
+              <!-- <div class="mb-3">
+            <label for="planetScale" class="form-label">Planet Scale
+              <i class="fas fa-question-circle" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="How much faster should the simulation run than real time?"></i></label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="planetScale" v-model.number="formData.planetScale" min="0.01" max="1" step="0.01" >
+            </div>
+          </div> -->
+
+              <div class="mb-3">
+                <label for="orbitHeight" class="form-label"
+                  >Orbit Height
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="How high above the surface is the orbit?"
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="orbitHeight"
+                    v-model.number="orbit.height"
+                    min="200"
+                    max="350000"
+                    @change="updateOrbitVelocity"
+                  />
+                  <span class="input-group-text">km</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="orbitVelocity" class="form-label"
+                  >Orbit Velocity
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="How fast is the object moving?"
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="orbitVelocity"
+                    v-model.number="orbit.velocity"
+                    min="100"
+                    max="100000"
+                    readonly
+                  />
+                  <span class="input-group-text">km/h</span>
+                </div>
+              </div>
+
+              <!-- <div class="mb-3">
+            <label for="inclination" class="form-label">Orbital Inclination
+              <i class="fas fa-question-circle" 
+              data-toggle="tooltip" 
+              data-placement="top" 
+              title="Orbital inclination is the angle between the plane of an orbit and the equator. An orbital inclination of 0° is directly above the equator, 90° crosses right above the pole, and 180° orbits above the equator in the opposite direction of Earth's spin."></i></label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="inclination" v-model.number="orbit.inclination" min="-180" max="180" >
+              <span class="input-group-text">&deg;</span>
+            </div>
+            <p class="description"><small class="text-muted">-180&deg; to 180&deg;</small></p>
+          </div> -->
+
+              <div class="mb-3">
+                <label for="inclination" class="form-label"
+                  >Orbital Inclination
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Orbital inclination is the angle between the plane of an orbit and the equator. An orbital inclination of 0° is directly above the equator, 90° crosses right above the pole, and 180° orbits above the equator in the opposite direction of Earth's spin."
+                  ></i
+                ></label>
+                <div class="d-flex">
+                  <input
+                    type="range"
+                    class="form-range mt-1 me-2"
+                    min="-180"
+                    max="180"
+                    id="inclination"
+                    v-model.number="orbit.inclination"
+                    @change="updateOrbitalInclination"
+                  />
+                  <span
+                    class="input-group-text justify-content-center"
+                    style="width: 80px"
+                    >{{ orbit.inclination }}&deg;</span
+                  >
+                  <!-- <input type="number" class="form-control" id="inclination" v-model.number="orbit.inclination" min="-180" max="180" > -->
+                </div>
+                <p class="description">
+                  <small class="text-muted">-180&deg; to 180&deg;</small>
+                </p>
+              </div>
+
+              <div class="mb-3">
+                <label for="location" class="form-label"
+                  >Location
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Update your environment and apply natural gravity if applicaible"
+                  ></i>
+                </label>
+                <select
+                  class="form-select"
+                  v-model="formData.location"
+                  @change="updatePlanet"
+                >
+                  <option v-for="location in locations" :value="location">
+                    {{ location.name }}
+                  </option>
+                </select>
+                <p class="description">
+                  <small class="text-muted">{{
+                    formData.location.description
+                  }}</small>
+                </p>
+              </div>
+
+              <div class="mb-3">
+                <label for="simulationSpeed" class="form-label"
+                  >Simulation Speed
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="How much faster should the simulation run than real time?"
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="simulationSpeed"
+                    v-model.number="formData.simulationSpeed"
+                    min="1"
+                    max="100000"
+                    @input="updateSimulationSpeed"
+                  />
+                </div>
+              </div>
+
+              <div class="form-check form-switch mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="pause"
+                  v-model="formData.pause"
+                />
+                <label class="form-check-label" for="pause">
+                  Pause Simulation
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Pause the simulation's movement"
+                  ></i>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="orbit__results" class="col-lg-6 calc-form">
+      <!-- <div id="orbit-2d" class="mb-3" style="position: relative; height: 400px;">
+  <img src="https://storage.googleapis.com/gweb-uniblog-publish-prod/images/New-global-view.max-1000x1000.jpeg" />
+</div> -->
+
+      <div
+        id="orbit-canvas"
+        class="mb-3"
+        style="position: relative; height: 400px"
+      >
+        <i v-if="loading" class="fas fa-cog fa-spin center-absolute"></i>
+      </div>
+
+      <button
+        id="launch-ball"
+        class="btn btn-primary btn-lg px-4 me-2"
+        @click="startTrace"
+        v-if="!orbit.tracing"
+      >
+        <i class="fas fa-play"></i>
+      </button>
+      <button
+        id="stop-ball"
+        class="btn btn-danger btn-lg px-4 me-2"
+        @click="stopTrace"
+        v-else
+      >
+        <i class="fas fa-pause"></i>
+      </button>
+
+      <button
+        id="clear-ball"
+        class="btn btn-dark btn-lg px-4"
+        @click="clearOrbit"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+
+      <!-- <div class="quick-details row text-center" @click="showCalcDetails = !showCalcDetails">
+  <div class="col-3">
+    <div class="alert py-1 px-1" :class="angularComfort" role="alert">
+      <i class="fas fa-undo"></i> {{ radsPerSec | twoDecimals }}
+    </div>
+  </div>
+
+  <div class="col-3">
+    <div class="alert py-1 px-1" :class="velocityComfort" role="alert">
+      <i class="fas fa-flip-horizontal fa-sync-alt"></i> {{ pointTangentialVelocity | twoDecimals }}<br />
+    </div>
+  </div>
+
+  <div class="col-3">
+    <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
+      <i class="fas fa-download"></i> {{ pointCentripetalAcceleration | twoDecimals }}
+    </div>
+  </div>
+
+  <div class="col-3">
+    <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
+      <i class="fas fa-cloud-download-alt"></i> {{ pointGravity | twoDecimals }}
+    </div>
+  </div>
+</div> -->
+      <div class="split-details mt-3">
+        <!-- <div class="alert py-2 mb-2" :class="" role="alert">
+    Planet Diameter (km): {{ planet.diameter }}<br />
+  </div>
+
+  <div class="alert py-2 mb-2" :class="" role="alert">
+    Planet Mass (kg): {{ planet.mass }}
+  </div> -->
+        <table class="table table-striped">
+          <tbody>
+            <tr>
+              <th>Planet Radius</th>
+              <td>{{ addCommas(formData.location.radius / 1000) }} km</td>
+            </tr>
+            <tr>
+              <th>Planet Mass</th>
+              <td>{{ formData.location.mass }} kg</td>
+            </tr>
+            <tr>
+              <th>Planet Gravity</th>
+              <td>{{ formData.location.gravity }} m/s</td>
+            </tr>
+            <tr>
+              <th>Planet Rotation Speed</th>
+              <td>{{ addCommas(formData.location.rotationSpeed) }} m/s</td>
+            </tr>
+            <tr>
+              <th>Circular Orbit Velocity</th>
+              <td>{{ addCommas(displayOrbitVelocity) }} m/s</td>
+            </tr>
+            <tr>
+              <th>Orbit Height</th>
+              <td>{{ addCommas(displayOrbitHeight) }} km</td>
+            </tr>
+            <tr>
+              <th>Orbtal Period</th>
+              <td>{{ displayOrbitPeriod }} hours</td>
+            </tr>
+            <tr
+              v-if="
+                orbit.decayDays &&
+                orbit.decayDays < 365 &&
+                orbit.height < orbit.maxHeight
+              "
+            >
+              <th>Orbital Decay</th>
+              <td>{{ orbit.decayDays }} days</td>
+            </tr>
+            <tr v-else-if="orbit.decayYears && orbit.decayYears < 1000">
+              <th>Orbital Decay</th>
+              <td>{{ orbit.decayYears }} years</td>
+            </tr>
+            <tr v-else-if="orbit.decayYears">
+              <th>Orbital Decay</th>
+              <td>Centuries</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- 
+      <button id="decay-ball" class="btn btn-nexus" @click="calcOrbitDecay">
+        Calculate Decay
+        <i
+          v-if="orbit.calculatingDecay"
+          class="fas fa-cog fa-spin center-absolute"
+        ></i>
+      </button>
+
+      <div
+        id="orbital-decay"
+        class="mt-3"
+        v-show="orbit.decayYears && orbit.decayYears <= 1000"
+      >
+        <h3>
+          Orbital Decay
+          <i
+            class="fas fa-question-circle"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="The rate of orbit decay. Object considered decayed if it can no longer maintain orbit. Ignores atmosphere."
+          ></i>
+        </h3>
+
+        <table class="table table-striped">
+          <tbody>
+            <tr>
+              <th v-if="orbit.decayDays && orbit.decayDays < 365">
+                Time (days)
+              </th>
+              <th v-else>Time (years)</th>
+              <th class="text-center">Height (km)</th>
+              <th class="text-end">Period (hours)</th>
+            </tr>
+            <tr v-for="(decay, index) in orbit.decay" :key="index">
+              <td v-if="orbit.decayDays && orbit.decayDays < 365">
+                {{ decay.days }}
+              </td>
+              <td v-else>{{ decay.years }}</td>
+              <td class="text-center">{{ decay.height }}</td>
+              <td class="text-end">{{ decay.period }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div> -->
+    </div>
+  </div>
+</template>
 <script setup lang="ts">
 // TODO: Must Dos!
 // ! BUGS
 
 // ? NOTE: Optional Improvements!
+// ? 0. Example Orbits
 // ? 1. Add more planets / custom planets?
-// ? 2. Creat a 2D projection of this orbit over a map?
+// ? 2. Create a 2D projection of this orbit over a map?
 // ? 3. Add a "tail" line to the tracer while the orbit tracer is on. To prevent the "flickering" that occurs when drawing new lines
 
 import * as THREE from "three";
@@ -14,6 +366,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { computed, onBeforeMount, onMounted, ref } from "vue";
 import { conversion, locations } from "./constants";
 import type { Object3D } from "three";
+import { addCommas } from "../utils";
 
 const loading = ref(true);
 const models = ref({});
@@ -102,7 +455,7 @@ const help = ref({
 
 const tracing = ref({
   previousPoint: null,
-  maxPoints: 500,
+  maxPoints: 700,
   positions: null,
   material: new THREE.Material(),
   line: [] as THREE.Line[],
@@ -115,7 +468,7 @@ const formData = ref({
   angle: 0,
   gravity: 1,
   pause: false,
-  simulationSpeed: 1000,
+  simulationSpeed: 2000,
   planetScale: 1,
 });
 
@@ -123,6 +476,8 @@ const animation = ref({
   FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
   prevTick: 0, // track the last tick timestamp
 });
+
+const textureDir = "/textures/";
 
 /**
  *
@@ -260,15 +615,9 @@ const displayOrbitPeriod = computed(() => {
 async function loadModels() {
   const textureLoader = new THREE.TextureLoader();
   // //this.textures.space = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_stars.jpg');
-  textures.earth = await textureLoader.load(
-    "/wp-content/themes/nexus-aurora/assets/images/2k_earth_daymap.jpg"
-  );
-  textures.mars = await textureLoader.load(
-    "/wp-content/themes/nexus-aurora/assets/images/2k_mars.jpg"
-  );
-  textures.moon = await textureLoader.load(
-    "/wp-content/themes/nexus-aurora/assets/images/2k_moon.jpg"
-  );
+  textures.earth = await textureLoader.load(textureDir + "2k_earth_daymap.jpg");
+  textures.mars = await textureLoader.load(textureDir + "2k_mars.jpg");
+  textures.moon = await textureLoader.load(textureDir + "2k_moon.jpg");
 
   loading.value = false;
   setupScene();
@@ -370,19 +719,20 @@ function updateCamera() {
   three.controls = new OrbitControls(three.camera, three.renderer.domElement);
 }
 
-// function updatePlanet() {
-//   planet.group.remove(planet.mesh);
-//   three.scene.remove(planet.group);
-//   ship.group.remove(ship.mesh);
-//   three.scene.remove(ship.group);
+function updatePlanet() {
+  planet.group.remove(planet.mesh);
+  three.scene.remove(planet.group);
+  ship.group.remove(ship.mesh);
+  three.scene.remove(ship.group);
 
-//   stopTrace();
-//   clearDecayInfo();
-//   setupPlanet();
-//   setupStarship();
-// }
+  stopTrace();
+  clearDecayInfo();
+  setupPlanet();
+  setupStarship();
+}
 
 function setupPlanet() {
+  planet.group = new THREE.Group();
   planet.axis = new THREE.Vector3(0, 1, 0); // TODO: formData.location.axis
 
   switch (formData.value.location.name) {
@@ -428,7 +778,7 @@ function setupStarship() {
     three.scene.remove(orbit.value.wireframe);
   }
 
-  ship.width = totalOrbitHeight.value * 0.01;
+  ship.width = totalOrbitHeight.value * 0.02;
 
   const starshipGeometry = new THREE.SphereGeometry(ship.width, 16, 16);
 
@@ -485,22 +835,28 @@ function animate() {
 
   requestAnimationFrame(animate);
 
-  if (ship.mesh) {
-    ship.mesh.rotation.y += 0.01;
-  }
-
-  if (orbit.value.wireframe) {
-    orbit.value.wireframe.rotation.y += 0.01;
-  }
-
-  if (orbit.value.decay.length > 0) {
-    orbit.value.decay.forEach((decay) => {
-      decay.rotation.y += 0.01;
-    });
-  }
-
   three.controls.update();
+
+  //this.three.camera.position.clamp(this.three.minMovement, this.three.maxMovement);
   three.renderer.render(three.scene, three.camera);
+
+  if (formData.value.pause) return;
+
+  // clamp to fixed framerate
+  const now = Math.round(
+    (animation.value.FPS * window.performance.now()) / 1000
+  );
+
+  if (now == animation.value.prevTick) return;
+
+  animation.value.prevTick = now;
+
+  planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
+
+  // console.log('this.planet.axis', this.planet.axis);
+  // console.log('this.rotationSpeed', this.rotationSpeed);
+
+  ship.group.rotateOnAxis(inclinationVector.value, orbitSpeed.value);
 }
 
 function startTrace() {
@@ -568,11 +924,11 @@ function traceOrbit() {
   if (line && tracing.value.line.length >= tracing.value.maxPoints) {
     const removePoint = tracing.value.pointIndex % tracing.value.maxPoints;
 
-    planet.group.remove(tracing.value.points[removePoint]);
     tracing.value.points[removePoint] = point;
-
-    planet.group.remove(tracing.value.line[removePoint]);
     tracing.value.line[removePoint] = line;
+
+    planet.group.remove(planet.group.children[1]);
+    planet.group.remove(planet.group.children[2]);
 
     // We don't want our pointIndex to skyrocket to crazy levels so lets limit it to 2x max points to allow our modulus above to work
     if (tracing.value.pointIndex >= tracing.value.maxPoints * 2) {
@@ -605,127 +961,130 @@ function stopTrace() {
 /**
  * @link https://www.lizard-tail.com/isana/lab/orbital_decay/
  */
-function calcOrbitDecay() {
-  orbit.value.calculatingDecay = true;
+// function calcOrbitDecay() {
+//   orbit.value.calculatingDecay = true;
 
-  // ? NOTE: These are extremely rough values.
-  orbit.value.maxHeight = Math.round(formData.value.location.radius / 1000 / 6);
-  orbit.value.minHeight = Math.round(
-    formData.value.location.radius / 1000 / 40
-  );
+//   // ? NOTE: These are extremely rough values.
+//   orbit.value.maxHeight = Math.round(formData.value.location.radius / 1000 / 6);
+//   orbit.value.minHeight = Math.round(
+//     formData.value.location.radius / 1000 / 40
+//   );
 
-  orbit.value.decayYears = 0;
-  orbit.value.decay = [];
+//   orbit.value.decayYears = 0;
+//   orbit.value.decay = [];
 
-  if (orbit.value.height >= orbit.value.maxHeight) {
-    orbit.value.calculatingDecay = false;
-    orbit.value.decayYears = 10000;
-    return;
-  }
+//   if (orbit.value.height >= orbit.value.maxHeight) {
+//     orbit.value.calculatingDecay = false;
+//     orbit.value.decayYears = 10000;
+//     return;
+//   }
 
-  const sat_mass = 100; // kg // TODO: Optional User enter value?
-  const sat_area = 1; // m^2 // TODO: Optional User enter value?
-  let sat_height = orbit.value.height;
-  const solar_radio_flux = 70; // TODO: Optional user value. https://www.swpc.noaa.gov/phenomena/f107-cm-radio-emissions
-  const geomagnetic_index = 10; // TODO: Optional value for user to enter. Set defaults for each planet. https://spawx.nwra.com/spawx/ap.html
+//   const sat_mass = 100; // kg // TODO: Optional User enter value?
+//   const sat_area = 1; // m^2 // TODO: Optional User enter value?
+//   let sat_height = orbit.value.height;
+//   const solar_radio_flux = 70; // TODO: Optional user value. https://www.swpc.noaa.gov/phenomena/f107-cm-radio-emissions
+//   const geomagnetic_index = 10; // TODO: Optional value for user to enter. Set defaults for each planet. https://spawx.nwra.com/spawx/ap.html
 
-  //var re = formData.value.location.radius; // 6378137
-  //var me = formData.value.location.mass; // 5.98e+24;//earth mass (all si units)
-  //var g = planet.gravityConstant; //6.67e-11;  //universal constant of gravitation
-  const pi = Math.PI;
-  let totalTime = 0;
+//   //var re = formData.value.location.radius; // 6378137
+//   //var me = formData.value.location.mass; // 5.98e+24;//earth mass (all si units)
+//   //var g = planet.gravityConstant; //6.67e-11;  //universal constant of gravitation
+//   const pi = Math.PI;
+//   let totalTime = 0;
 
-  // Orbits can decay VERY SLOWLY and we don't want to freeze the browser making these long calculations. So try to vary our time intervals based on a max orbit size
-  let incrementDays = actualOrbitHeight.value / 100;
-  if (orbit.value.height < orbit.value.maxHeight / 3) {
-    incrementDays = actualOrbitHeight.value / 100000;
-  } else if (orbit.value.height < orbit.value.maxHeight / 2) {
-    incrementDays = actualOrbitHeight.value / 1000;
-  }
+//   // Orbits can decay VERY SLOWLY and we don't want to freeze the browser making these long calculations. So try to vary our time intervals based on a max orbit size
+//   let incrementDays = actualOrbitHeight.value / 100;
+//   if (orbit.value.height < orbit.value.maxHeight / 3) {
+//     incrementDays = actualOrbitHeight.value / 100000;
+//   } else if (orbit.value.height < orbit.value.maxHeight / 2) {
+//     incrementDays = actualOrbitHeight.value / 1000;
+//   }
 
-  const incrementSeconds = incrementDays * 3600 * 24;
-  let radius = actualOrbitHeight.value * 1000; // radius in meters
-  let periodSeconds = orbit.value.period * 60 * 60;
+//   const incrementSeconds = incrementDays * 3600 * 24;
+//   let radius = actualOrbitHeight.value * 1000; // radius in meters
+//   let periodSeconds = orbit.value.period * 60 * 60;
 
-  const heightIncrement = 10;
-  let currentHeight = sat_height;
+//   const heightIncrement = 10;
+//   let currentHeight = sat_height;
 
-  let decaySafety = 0;
+//   let decaySafety = 0;
 
-  //now iterate satellite orbit with time
-  while (sat_height > orbit.value.minHeight) {
-    const spaceDrag =
-      (900 + 2.5 * (solar_radio_flux - 70) + 1.5 * geomagnetic_index) /
-      (27 - 0.012 * (sat_height - 200));
-    const atmosDensity = 6e-10 * Math.exp(-(sat_height - 175) / spaceDrag); //atmospheric density
-    const decrementPeriod =
-      ((3 * pi * sat_area) / sat_mass) *
-      radius *
-      atmosDensity *
-      incrementSeconds; //decrement in orbital period
+//   //now iterate satellite orbit with time
+//   while (sat_height > orbit.value.minHeight) {
+//     const spaceDrag =
+//       (900 + 2.5 * (solar_radio_flux - 70) + 1.5 * geomagnetic_index) /
+//       (27 - 0.012 * (sat_height - 200));
+//     const atmosDensity = 6e-10 * Math.exp(-(sat_height - 175) / spaceDrag); //atmospheric density
+//     const decrementPeriod =
+//       ((3 * pi * sat_area) / sat_mass) *
+//       radius *
+//       atmosDensity *
+//       incrementSeconds; //decrement in orbital period
 
-    const periodMinutes = periodSeconds / 60;
+//     const periodMinutes = periodSeconds / 60;
 
-    periodSeconds = periodSeconds - decrementPeriod;
-    totalTime = totalTime + incrementDays;
-    radius = Math.pow(
-      (planet.gravityConstant *
-        formData.value.location.mass *
-        periodSeconds *
-        periodSeconds) /
-        4 /
-        pi /
-        pi,
-      0.33333
-    ); //new orbital radius
-    sat_height = (radius - formData.value.location.radius) / 1000; //new altitude
+//     periodSeconds = periodSeconds - decrementPeriod;
+//     totalTime = totalTime + incrementDays;
+//     radius = Math.pow(
+//       (planet.gravityConstant *
+//         formData.value.location.mass *
+//         periodSeconds *
+//         periodSeconds) /
+//         4 /
+//         pi /
+//         pi,
+//       0.33333
+//     ); //new orbital radius
+//     sat_height = (radius - formData.value.location.radius) / 1000; //new altitude
 
-    // ? var meanMotion = 1440 / pm
-    // ? var decay = decrementPeriod / incrementDays / periodSeconds * meanMotion; //rev/day/day
-    if (sat_height <= currentHeight) {
-      orbit.value.decay.push({
-        days: totalTime.toFixed(2),
-        years: (totalTime / 365.25).toFixed(2),
-        height: sat_height.toFixed(2),
-        period: (periodMinutes / 60).toFixed(2),
-        rotation: {
-          x: 0,
-          y: 0,
-        },
-      });
+//     // ? var meanMotion = 1440 / pm
+//     // ? var decay = decrementPeriod / incrementDays / periodSeconds * meanMotion; //rev/day/day
+//     if (sat_height <= currentHeight) {
+//       orbit.value.decay.push({
+//         days: totalTime.toFixed(2),
+//         years: (totalTime / 365.25).toFixed(2),
+//         height: sat_height.toFixed(2),
+//         period: (periodMinutes / 60).toFixed(2),
+//         rotation: {
+//           x: 0,
+//           y: 0,
+//         },
+//       });
 
-      currentHeight = currentHeight - heightIncrement;
-    }
+//       currentHeight = currentHeight - heightIncrement;
+//     }
 
-    if (++decaySafety >= 10000) {
-      break;
-    }
+//     if (++decaySafety >= 10000) {
+//       break;
+//     }
 
-    // TODO: Do we need to await / async our calcs? Rare, but can be important for long decay times
-    // Lets pause for a few milliseconds in the loop to prevent blocking the thread entirely
-    ///await new Promise(r => setTimeout(r, 10));
-  }
+//     // TODO: Do we need to await / async our calcs? Rare, but can be important for long decay times
+//     // Lets pause for a few milliseconds in the loop to prevent blocking the thread entirely
+//     ///await new Promise(r => setTimeout(r, 10));
+//   }
 
-  orbit.value.calculatingDecay = false;
-  orbit.value.decayDays = parseFloat(totalTime.toFixed(2));
-  orbit.value.decayYears = parseFloat((totalTime / 365.25).toFixed(2));
-}
+//   orbit.value.calculatingDecay = false;
+//   orbit.value.decayDays = parseFloat(totalTime.toFixed(2));
+//   orbit.value.decayYears = parseFloat((totalTime / 365.25).toFixed(2));
+// }
 
 function clearOrbit() {
-  if (!planet.group) return;
+  stopTrace();
 
   if (tracing.value.points.length) {
-    for (let p = 0; p < tracing.value.points.length; p++) {
-      planet.group.remove(tracing.value.points[p]);
-    }
-
-    for (let l = 0; l < tracing.value.line.length; l++) {
-      planet.group.remove(tracing.value.line[l]);
-    }
+    clearLine();
 
     tracing.value.points = [];
     tracing.value.line = [];
     tracing.value.pointIndex = 0;
+  }
+}
+
+function clearLine() {
+  for (var i = planet.group.children.length - 1; i >= 0; i--) {
+    // @ts-ignore
+    if (planet.group.children[i].isMesh) continue;
+
+    planet.group.remove(planet.group.children[i]);
   }
 }
 
@@ -760,12 +1119,45 @@ function updateOrbitVelocity() {
     orbit.value.height = 100;
   }
 
+  // TODO: We may want even high numbers for values over 10000 orbit height
+  tracing.value.maxPoints = 600 + Math.floor(orbit.value.height / 200); //Math.max(Math.floor(orbit.value.height * 1.3), 600);
+
+  if (orbit.value.height > 10000) {
+    tracing.value.maxPoints += Math.floor(orbit.value.height / 200);
+  }
+
+  // always have an even number of points
+  // tracing.value.maxPoints += tracing.value.maxPoints % 2 ? 1 : 0;
+
   stopTrace();
   clearDecayInfo();
   calcOrbitalVelocity();
   calcOrbitPeriod();
   updateCamera();
   setupStarship();
+}
+
+function updateOrbitalInclination() {
+  if (orbit.value.inclination > 180) {
+    orbit.value.inclination = 180;
+  } else if (orbit.value.inclination < -180) {
+    orbit.value.inclination = -180;
+  }
+
+  stopTrace();
+  clearOrbit();
+  resetShipPosition();
+}
+
+function updateSimulationSpeed() {
+  if (formData.value.simulationSpeed > 10000) {
+    formData.value.simulationSpeed = 10000;
+  } else if (formData.value.simulationSpeed < 1) {
+    formData.value.simulationSpeed = 1;
+  }
+
+  stopTrace();
+  clearOrbit();
 }
 
 // CONVERSION FUNCTIONS
@@ -828,50 +1220,7 @@ function calcOrbitPeriod() {
     60;
 }
 
-// function mercator(x, y) {
-//   return [x, Math.log(Math.tan(Math.PI / 4 + y / 2))];
-// }
-
-//   filters: {
-//     addCommas(value) {
-//       return value.toLocaleString();
-//     },
-//   },
 //   watch: {
-//     "formData.simulationSpeed": {
-//       handler(newSpeed) {
-//         if (newSpeed > 10000) {
-//           formData.value.simulationSpeed = 10000;
-//         } else if (newSpeed < 1) {
-//           formData.value.simulationSpeed = 1;
-//         }
-
-//         this.stopTrace();
-//       },
-//     },
-//     // 'orbit.height': {
-//     //   handler(newHeight) {
-//     //     if(newHeight > 1000000){
-//     //       orbit.value.height = 1000000;
-//     //     }else if(newHeight < 100){
-//     //       orbit.value.height = 100;
-//     //     }
-
-//     //     this.stopTrace();
-//     //     this.clearDecayInfo();
-//     //   }
-//     // },
-//     "orbit.inclination": {
-//       handler(newInclination) {
-//         if (newInclination > 180) {
-//           orbit.value.inclination = 180;
-//         } else if (newInclination < -180) {
-//           orbit.value.inclination = -180;
-//         }
-
-//         this.stopTrace();
-//         this.resetShipPosition();
-//       },
 //     },
 //     // formData: {
 //     //   handler(newVal){
