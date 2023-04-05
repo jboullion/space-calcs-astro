@@ -15,4 +15,9 @@ export const categories: Category[] = [
     slug: "orbits",
     color: "secondary",
   },
+  {
+    name: "Habitats",
+    slug: "habitats",
+    color: "danger",
+  },
 ];

@@ -10,13 +10,42 @@ import References from "../../components/shared/References.astro";
 const title = "Orbit Visualizer";
 const description = "Visualize the orbit of a spacecraft around a planet.";
 
-const references: Reference[] = [];
+const references: Reference[] = [
+  {
+    title: "Orbital Calculator",
+    url: "https://www.satsig.net/orbit-research/orbit-height-and-speed.htm",
+  },
+  {
+    title: "Orbit Simulator",
+    url: "http://orbitsimulator.com/",
+  },
+  {
+    title: "Satellite ground track visualizer",
+    url: "https://observablehq.com/@jake-low/satellite-ground-track-visualizer",
+  },
+  {
+    title: "Orbital Mechanics Wiki",
+    url: "https://en.m.wikipedia.org/wiki/Orbital_mechanics",
+  },
+  {
+    title: "Orbit Decay Wiki",
+    url: "https://en.wikipedia.org/wiki/Orbital_decay",
+  },
+  {
+    title: "Satellite Orbit Decay",
+    url: "http://www.lizard-tail.com/isana/lab/orbital_decay/",
+  },
+  {
+    title: "Low Earth Orbit",
+    url: "https://en.wikipedia.org/wiki/Low_Earth_orbit",
+  },
+];
 ---
 
 <Layout title={title} description={description}>
   <div class="container">
     <Hero title={title} description={description} />
-    <div style="min-height: 600px;">
+    <div style="min-height: 700px;">
       <OrbitVisualizer client:only="vue" />
     </div>
 

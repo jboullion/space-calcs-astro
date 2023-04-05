@@ -1,0 +1,29 @@
+---
+import type { Reference } from "../../types/types";
+
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import RotationalGravity from "../../components/vue/rotational/RotationalGravity.vue";
+import References from "../../components/shared/References.astro";
+
+const title = "Rotational Gravity";
+const description =
+  "Calculate the rotation forces inside various space stations";
+
+const references: Reference[] = [];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+
+    <div style="min-height: 600px;">
+      <RotationalGravity client:only="vue" />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

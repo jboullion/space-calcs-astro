@@ -64,9 +64,9 @@ const tools: SpaceTool[] = [
   {
     name: "Rotational Gravity",
     description: "Calculate the forces on a rotating space station",
-    category: "orbits",
+    category: "habitats",
     image: "https://i.imgur.com/4ZQZQ2M.png",
-    link: "/calcs/hohmann-transfer",
+    link: "/calcs/rotational-gravity",
   },
 ];
 </script>
