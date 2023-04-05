@@ -1,4 +1,498 @@
-<template></template>
+<template>
+  <div id="rotational__app" class="row mt-5" v-cloak>
+    <div id="rotational__form" class="col-lg-6">
+      <div class="calc-form col-12 mb-5">
+        <div>
+          <div id="mission" class="rotational__mission">
+            <!-- <h4>Mission</h4> -->
+            <div class="calc-toggle">
+              <div class="mb-3">
+                <label for="location" class="form-label"
+                  >Structure Type
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="What type of object is rotating? Different structures provide different advantages."
+                  ></i>
+                </label>
+                <select class="form-select" v-model="formData.type">
+                  <option v-for="type in availableTypes" :value="type">
+                    {{ type.name }}
+                  </option>
+                </select>
+                <p class="description">
+                  <small class="text-muted">{{
+                    formData.type.description
+                  }}</small>
+                </p>
+              </div>
+
+              <div class="mb-3" v-if="formData.type.shape != 'can'">
+                <label for="shipLength" class="form-label"
+                  >{{ structureLengthName }}
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="The length of the structure. Platform length on funnels."
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="shipLength"
+                    v-model.number="formData.shipLength"
+                    min="0"
+                    @change="updateShipLength"
+                  />
+                  <span class="input-group-text">m</span>
+                </div>
+                <input
+                  id="radius-range"
+                  type="range"
+                  class="form-range"
+                  min="conversion.minLength"
+                  :max="conversion.maxLength"
+                  v-model.number="formData.shipLength"
+                  @change="updateShipLength"
+                />
+              </div>
+
+              <!-- <div class="mb-3">
+            <label for="gravityOption" class="form-label">Standard Gravity</label>
+            <select class="form-select" v-model="formData.gravity" id="gravityOption">
+              <option v-for="gravityOption in gravityOptions" :value="gravityOption">{{ gravityOption.name }}</option>
+            </select>
+          </div> -->
+
+              <div class="mb-3">
+                <label for="radius" class="form-label"
+                  >Radius
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Controls the radius of the stucture"
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="radius"
+                    v-model.number="formData.radius"
+                    min="0"
+                    @change="updateRadius"
+                  />
+                  <span class="input-group-text">m</span>
+                </div>
+                <input
+                  id="radius-range"
+                  type="range"
+                  class="form-range"
+                  min="conversion.minLength"
+                  :max="conversion.maxLength"
+                  v-model.number="formData.radius"
+                  @change="updateRadius"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="rpm" class="form-label"
+                  >Revolutions per minute
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Controls the speed of the structure"
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="rpm"
+                    v-model.number="formData.rpm"
+                    min="0"
+                    @change="updateRPM"
+                  />
+                  <span class="input-group-text">rpm</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="gravity" class="form-label"
+                  >Gravity
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="The apparent gravity applied by the centripetal acceleration."
+                  ></i
+                ></label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="gravity"
+                    v-model.number="formData.gravity"
+                    min="0"
+                    @change="updateGravity"
+                  />
+                  <span class="input-group-text">g</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="location" class="form-label"
+                  >Location
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Update your environment and apply natural gravity if applicaible"
+                  ></i>
+                </label>
+                <select class="form-select" v-model="formData.location">
+                  <option v-for="location in locations" :value="location">
+                    {{ location.name }}
+                  </option>
+                </select>
+                <p class="description" v-if="!formData.isSpace">
+                  <small class="text-muted">{{
+                    formData.location.description
+                  }}</small>
+                </p>
+              </div>
+
+              <div class="form-check form-switch mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="showEnvironment"
+                  v-model="formData.showEnvironment"
+                />
+                <label class="form-check-label" for="showEnvironment">
+                  Show environment?
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Show the planet at your location. Purely visual."
+                  ></i>
+                </label>
+              </div>
+
+              <div class="form-check form-switch mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="isSpace"
+                  v-model="formData.isSpace"
+                />
+                <label class="form-check-label" for="isSpace">
+                  In Space?
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="0g environment or on the surface of a planet?"
+                  ></i>
+                </label>
+              </div>
+
+              <div class="form-check form-switch mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="seeInside"
+                  v-model="formData.seeInside"
+                />
+                <label class="form-check-label" for="seeInside">
+                  Show Inside of Structure?
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Display the inside or outside of the structure. Purely visual."
+                  ></i>
+                </label>
+              </div>
+
+              <div
+                class="form-check form-switch mb-3"
+                v-if="
+                  formData.type.shape == 'cylinder' ||
+                  formData.type.shape == 'can'
+                "
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="hollow"
+                  v-model="formData.hollow"
+                />
+                <label class="form-check-label" for="hollow">
+                  Hollow Cylinder?
+                  <i
+                    class="fas fa-question-circle"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="Hollow cylinders provide a confined area of similar gravity.  Concentric cylinders with different levels of gravity are possible!"
+                  ></i>
+                </label>
+              </div>
+
+              <!-- <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="focusSuit" v-model="formData.focusSuit">
+            <label class="form-check-label" for="focusSuit">
+              Focus on suit?
+            </label>
+          </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="rotational__results" class="col-lg-6 calc-form">
+      <div class="control-instructions">
+        <!-- <div class="alert alert-info" role="alert">
+        <p class="mb-0"><small>left click to rotate</small></p>
+        <p class="mb-0"><small>right click to drag</small></p>
+        <p class="mb-0"><small>scroll to zoom</small></p>
+    </div> -->
+      </div>
+
+      <div
+        id="rotational-canvas"
+        class="mb-3"
+        style="position: relative; height: 400px"
+      >
+        <i v-if="loading" class="fas fa-cog fa-spin center-absolute"></i>
+      </div>
+
+      <div class="form-check form-switch mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="pause"
+          v-model="formData.pause"
+        />
+        <label class="form-check-label" for="pause">
+          Pause Movement?
+          <i
+            class="fas fa-question-circle"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Stop the motion of the estimator"
+          ></i>
+        </label>
+      </div>
+
+      <div class="form-check form-switch mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="showGravityRule"
+          v-model="formData.showGravityRule"
+        />
+        <label class="form-check-label" for="showGravityRule">
+          Show gravity ruler?
+          <i
+            class="fas fa-question-circle"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="Show a measurement tool for accurately finding the forces at any point along the structure's radius"
+          ></i>
+        </label>
+      </div>
+
+      <div class="mb-4" v-if="formData.showGravityRule">
+        <label for="point" class="form-label">Measurement Point</label>
+        <input
+          id="point"
+          type="range"
+          class="form-range"
+          min="0"
+          :max="formData.radius"
+          v-model.number="ruler.point"
+        />
+
+        <div class="input-group">
+          <input
+            type="number"
+            class="form-control"
+            id="point"
+            v-model.number="ruler.point"
+            min="0"
+            :max="formData.radius"
+          />
+          <span class="input-group-text">m</span>
+        </div>
+      </div>
+
+      <!-- <div class="quick-details row text-center" @click="showCalcDetails = !showCalcDetails">
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="angularComfort" role="alert">
+        <i class="fas fa-undo"></i> {{ radsPerSec | twoDecimals }}
+      </div>
+    </div>
+
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="velocityComfort" role="alert">
+        <i class="fas fa-flip-horizontal fa-sync-alt"></i> {{ pointTangentialVelocity | twoDecimals }}<br />
+      </div>
+    </div>
+
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
+        <i class="fas fa-download"></i> {{ pointCentripetalAcceleration | twoDecimals }}
+      </div>
+    </div>
+
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
+        <i class="fas fa-cloud-download-alt"></i> {{ pointGravity | twoDecimals }}
+      </div>
+    </div>
+  </div> -->
+      <div class="split-details" v-show="showCalcDetails">
+        <div class="alert py-2 mb-2" :class="angularComfort" role="alert">
+          <i class="fas fa-undo"></i> Angular Velocity (radians/s):
+          {{ formatNumber(radsPerSec) }}
+        </div>
+
+        <div class="alert py-2 mb-2" :class="velocityComfort" role="alert">
+          <i class="fas fa-flip-horizontal fa-sync-alt"></i> Tangential Velocity
+          (m/s): : {{ formatNumber(pointTangentialVelocity) }}<br />
+        </div>
+
+        <div class="alert py-2 mb-2" :class="gravityComfort" role="alert">
+          <i class="fas fa-download"></i> Centripetal Acceleration (m/s):
+          {{ formatNumber(pointCentripetalAcceleration) }}
+        </div>
+
+        <div class="alert py-2 mb-3" :class="gravityComfort" role="alert">
+          <i class="fas fa-cloud-download-alt"></i> Apparent Gravity (g):
+          {{ formatNumber(pointGravity) }}
+        </div>
+      </div>
+
+      <!-- <div id="coriolis" class="form-row" v-if="!formData.pause">
+    <div class="col-12 d-flex justify-content-between">
+      <button id="launch-ball" class="btn btn-nexus" @click="launchBall" v-if="!coriolis.tracing">Toss</button>
+      <button id="stop-ball" class="btn btn-danger" @click="stopTrace" v-else>Stop</button>
+
+      <button id="clear-ball" class="btn btn-dark" v-if="coriolis.ballGroup.length" @click="clearBalls">Clear</button>
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="applyGravity" v-model="coriolis.applyGravity">
+        <label class="form-check-label" for="applyGravity">
+          Apply Gravity? 
+        </label> 
+        <i class="fas fa-question-circle" 
+            data-toggle="tooltip" 
+            data-placement="top" 
+            title="While ball is in motion apply the apparent gravity aka centripetal acceleration"></i>
+      </div>
+    </div>
+    <div class="col-12 mt-3">
+      <label for="velocity" class="form-label">Ball Velocity 
+        <i class="fas fa-question-circle" 
+          data-toggle="tooltip" 
+          data-placement="top" 
+          title="What speed should the ball leave the ground? Ball only moves in the vertical direction"></i>
+        </label>
+      <div class="input-group">
+        <input type="number" class="form-control" id="velocity" v-model.number="coriolis.velocity" min="0" >
+        <span class="input-group-text">m/s</span>
+      </div>
+    </div>
+  </div> -->
+
+      <div
+        id="funnel-dimentions"
+        class="mt-3"
+        v-if="formData.type.shape === 'funnel'"
+      >
+        <h3>
+          Funnel Dimensions
+          <i
+            class="fas fa-question-circle"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="The funnel shape is generated based on comparing the planet graviy with the apparent gravity. Meaning that different levels of gravity require a different slope to provide a balanced amount of force."
+          ></i>
+        </h3>
+        <table class="table table-striped">
+          <tr>
+            <th>Incidence Angle</th>
+            <td><span class="h4">⦩</span></td>
+            <td>{{ funnel.angleOfIncidence }}</td>
+            <td>&deg;</td>
+          </tr>
+          <tr>
+            <th>Opposite Angle</th>
+            <td><span class="h4">⦮</span></td>
+            <td>{{ funnel.oppositeAngle }}</td>
+            <td>&deg;</td>
+          </tr>
+          <tr>
+            <th>Net Force</th>
+            <td><span class="h4">↥</span></td>
+            <td>{{ funnel.netCentripetalForce }}</td>
+            <td>m/s</td>
+          </tr>
+          <tr>
+            <th>Platform Width</th>
+            <td><span class="h4">c</span></td>
+            <td>{{ formData.shipLength }}</td>
+            <td>m</td>
+          </tr>
+          <tr>
+            <th>Width</th>
+            <td><span class="h4">a</span></td>
+            <td>{{ funnel.baseWidth }}</td>
+            <td>m</td>
+          </tr>
+          <tr>
+            <th>Height</th>
+            <td><span class="h4">b</span></td>
+            <td>{{ funnel.baseHeight }}</td>
+            <td>m</td>
+          </tr>
+          <tr>
+            <th>Inner Radius</th>
+            <td><i class="far fa-dot-circle"></i></td>
+            <td>{{ funnel.innerRadius }}</td>
+            <td>m</td>
+          </tr>
+          <tr>
+            <th>Outer Radius</th>
+            <td><i class="far fa-circle"></i></td>
+            <td>{{ funnel.outerRadius }}</td>
+            <td>m</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- <div>
+    force Vector
+    <svg style="width: 100px; height: 100px;" viewbox="0 0 100 100">
+      <line x1="0" y1="0" :x2="200" y2="0" style="stroke:rgb(255,0,0);stroke-width:2" />
+      <line x1="0" y1="0" :x2="100" :y2="centripetalAcceleration / 2" style="stroke:rgb(0,0,255);stroke-width:2" />
+      <line x1="0" y1="0" x2="0" :y2="centripetalAcceleration" style="stroke:rgb(0,255,0);stroke-width:2" />
+    </svg>
+  </div> -->
+
+      <!-- <div id="spaceman-gravity" class="mb-3" style="position: relative; height: 400px;">
+    <i v-if="loading" class="fas fa-cog fa-spin center-absolute"></i>
+  </div> -->
+    </div>
+  </div>
+</template>
 <script setup lang="ts">
 // TODO: Must Dos!
 
@@ -14,6 +508,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { computed, onBeforeMount, onMounted, ref } from "vue";
 import type { Location, StationType } from "./constants";
 import { locations, types, conversion, defaultThree } from "./constants";
+import { formatNumber } from "../utils";
 
 const loading = ref(true);
 const needsUpdate = ref(false);
@@ -284,23 +779,15 @@ async function loadModels() {
   const loader = new GLTFLoader();
 
   // TODO: DON'T USE SPACEMAN MODEL!? It is an awesome model, but pretty big. Just use a 6ft cylinder...or nothing
-  models.spaceman = await loader.loadAsync(
-    "/wp-content/themes/nexus-aurora/assets/models/lowres_spacex_suit.glb"
-  );
+  models.spaceman = await loader.loadAsync("/models/lowres_spacex_suit.glb");
 
   const textureLoader = new THREE.TextureLoader();
-  //textures.space = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_stars.jpg');
-  textures.earth = textureLoader.load(
-    "/wp-content/themes/nexus-aurora/assets/images/2k_earth_daymap.jpg"
-  );
-  textures.mars = textureLoader.load(
-    "/wp-content/themes/nexus-aurora/assets/images/2k_mars.jpg"
-  );
-  textures.moon = textureLoader.load(
-    "/wp-content/themes/nexus-aurora/assets/images/2k_moon.jpg"
-  );
-  // textures.earthClouds = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_earth_clouds.jpg');
-  // textures.earthNormal = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_earth_normal_map.jpg');
+  //textures.space = await textureLoader.load('/textures/2k_stars.jpg');
+  textures.earth = textureLoader.load("/textures/2k_earth_daymap.jpg");
+  textures.mars = textureLoader.load("/textures/2k_mars.jpg");
+  textures.moon = textureLoader.load("/textures/2k_moon.jpg");
+  // textures.earthClouds = await textureLoader.load('/textures/2k_earth_clouds.jpg');
+  // textures.earthNormal = await textureLoader.load('/textures/2k_earth_normal_map.jpg');
 
   loading.value = false;
   setupScene();
