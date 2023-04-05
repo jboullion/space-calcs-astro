@@ -363,7 +363,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
 import { conversion, locations } from "./constants";
 import type { Object3D } from "three";
 import { addCommas } from "../utils";
@@ -496,6 +496,11 @@ onBeforeMount(() => {
 
 onMounted(() => {
   loadModels();
+  window.addEventListener("resize", setupScene, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", setupScene);
 });
 
 /**
@@ -635,8 +640,21 @@ async function loadModels() {
 //   three.scene.add(axesHelper);
 // }
 
+function removeAllChildNodes(parent: HTMLElement) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}
+
 function setupScene() {
   if (loading.value) return;
+
+  if (three.scene && three.canvas) {
+    //three.scene.dispose();
+    removeAllChildNodes(three.canvas);
+    // NEW TODO: Might need to update defaultThree OR figure out how not to need this
+    //three.value = defaultThree;
+  }
 
   //needsUpdate.value = false;
 

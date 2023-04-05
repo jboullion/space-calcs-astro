@@ -154,7 +154,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { addCommas } from "../utils";
 
 import {
@@ -378,7 +378,19 @@ onMounted(() => {
 
   formData.value.startOrbit = locations[2];
   formData.value.endOrbit = locations[3];
+
+  window.addEventListener("resize", setupScene, { passive: true });
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", setupScene);
+});
+
+function removeAllChildNodes(parent: HTMLElement) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}
 
 /**
  *
@@ -434,6 +446,10 @@ async function loadModels() {
 
 function setupScene() {
   if (loading.value) return;
+
+  if (threeCanvas) {
+    removeAllChildNodes(threeCanvas);
+  }
 
   setupThreeJS();
 

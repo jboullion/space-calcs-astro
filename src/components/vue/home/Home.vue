@@ -10,7 +10,7 @@
             </div>
 
             <p class="lead my-4">
-              All the tools you need to calculate your mission to space.
+              All the tools you need to calculate your mission to space
             </p>
 
             <div class="input-group">

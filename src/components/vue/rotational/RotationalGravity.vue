@@ -1,6 +1,6 @@
 <template>
   <div id="rotational__app" class="row mt-5" v-cloak>
-    <div id="rotational__form" class="col-lg-6">
+    <div id="rotational__form" class="col-lg-4">
       <div class="calc-form col-12 mb-5">
         <div>
           <div id="mission" class="rotational__mission">
@@ -259,7 +259,7 @@
         </div>
       </div>
     </div>
-    <div id="rotational__results" class="col-lg-6 calc-form">
+    <div id="rotational__results" class="col-lg-8 calc-form">
       <div class="control-instructions">
         <!-- <div class="alert alert-info" role="alert">
         <p class="mb-0"><small>left click to rotate</small></p>
@@ -508,7 +508,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { computed, onBeforeMount, onMounted, ref } from "vue";
+import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
 import type { Location, StationType } from "./constants";
 import { locations, types, conversion, defaultThree } from "./constants";
 import { formatNumber } from "../utils";
@@ -647,6 +647,11 @@ onBeforeMount(() => {
 
 onMounted(() => {
   loadModels();
+  window.addEventListener("resize", setupScene, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", setupScene);
 });
 
 /**
