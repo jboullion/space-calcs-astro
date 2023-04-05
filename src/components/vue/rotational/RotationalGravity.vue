@@ -17,8 +17,11 @@
                   ></i>
                 </label>
                 <select class="form-select" v-model="formData.type">
-                  <option v-for="type in availableTypes" :value="type">
-                    {{ type.name }}
+                  <option
+                    v-for="stationType in availableTypes"
+                    :value="stationType"
+                  >
+                    {{ stationType.name }}
                   </option>
                 </select>
                 <p class="description">
@@ -526,7 +529,7 @@ const textures = {
   earthClouds: new THREE.Texture(),
 };
 
-const planet = ref({
+const planet = {
   mesh: new THREE.Mesh(),
   clouds: null,
   axis: new THREE.Vector3(0, 1, 0),
@@ -534,7 +537,7 @@ const planet = ref({
   radius: 6357000,
   geometry: null as THREE.CircleGeometry | THREE.SphereGeometry | null,
   material: new THREE.Material(),
-});
+};
 
 const three = {
   canvas: null as HTMLElement | HTMLCanvasElement | null,
@@ -553,14 +556,15 @@ const three = {
   maxMovement: null as THREE.Vector3 | null,
 };
 
-const ruler = ref({
+const ruler = {
   lineCylinder: new THREE.Mesh(),
   lineMaterial: new THREE.Material(),
   point: 0,
   dial: new THREE.Mesh(),
   dialMaterial: new THREE.Material(),
-});
-const coriolis = ref({
+};
+
+const coriolis = {
   // start: 0,
   // end: 0,
   tracing: false,
@@ -574,7 +578,7 @@ const coriolis = ref({
   interval: 0,
   geometry: new THREE.SphereGeometry(),
   material: new THREE.Material(),
-});
+};
 const help = ref({
   tooltipModal: null,
   tooltipTitle: null,
@@ -601,11 +605,11 @@ const formData = ref({
   showLocalAxis: true,
 });
 
-const forces = ref({
+const forces = {
   vector: 0,
   vectorMesh: new THREE.Mesh(),
-});
-const funnel = ref({
+};
+const funnel = {
   angleOfIncidence: 0,
   oppositeAngle: 0,
   netCentripetalForce: 0,
@@ -613,14 +617,14 @@ const funnel = ref({
   baseHeight: 0,
   innerRadius: 0,
   outerRadius: 0,
-});
+};
 
-const animation = ref({
+const animation = {
   FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
   prevTick: 0, // track the last tick timestamp
   rotationSpeed: 0.1, // This tells threeJS how fast to move and is based on the rpm
   radians: 6, // there are 6 radians in a circle. This helps us to calculate full rotations
-});
+};
 
 /**
  *
@@ -681,7 +685,7 @@ const availableTypes = computed(() => {
 });
 
 const pointGravity = computed(() => {
-  return calcGravityFromRadius(ruler.value.point);
+  return calcGravityFromRadius(ruler.point);
 });
 
 const pointCentripetalAcceleration = computed(() => {
@@ -690,7 +694,7 @@ const pointCentripetalAcceleration = computed(() => {
 });
 
 const pointTangentialVelocity = computed(() => {
-  return Math.sqrt(pointCentripetalAcceleration.value * ruler.value.point);
+  return Math.sqrt(pointCentripetalAcceleration.value * ruler.point);
 });
 
 const centripetalAcceleration = computed(() => {
@@ -794,23 +798,23 @@ async function loadModels() {
 }
 
 function displayPlanet() {
-  planet.value.axis = new THREE.Vector3(0, 1, 0);
-  planet.value.speed = 0.0001; // This is not a REAL speed. Sped up for appearance
+  planet.axis = new THREE.Vector3(0, 1, 0);
+  planet.speed = 0.0001; // This is not a REAL speed. Sped up for appearance
 
   //if(formData.value.location.name === "Space")
   switch (formData.value.location.name) {
     case "Earth":
-      planet.value.material = new THREE.MeshLambertMaterial({
+      planet.material = new THREE.MeshLambertMaterial({
         map: textures.earth,
       });
       break;
     case "Mars":
-      planet.value.material = new THREE.MeshLambertMaterial({
+      planet.material = new THREE.MeshLambertMaterial({
         map: textures.mars,
       });
       break;
     case "Moon":
-      planet.value.material = new THREE.MeshLambertMaterial({
+      planet.material = new THREE.MeshLambertMaterial({
         map: textures.moon,
       });
       break;
@@ -818,7 +822,7 @@ function displayPlanet() {
 
   let planetPositionY = -(formData.value.radius / 4) - 2;
   if (formData.value.isSpace) {
-    planet.value.geometry = new THREE.SphereGeometry(
+    planet.geometry = new THREE.SphereGeometry(
       formData.value.location.geomtry.radius,
       64,
       64
@@ -827,127 +831,19 @@ function displayPlanet() {
       -formData.value.location.geomtry.radius -
       Math.max(stationWidth.value * 2, 1000);
   } else {
-    planet.value.geometry = new THREE.CircleGeometry(
-      stationWidth.value * 10,
-      32
-    );
+    planet.geometry = new THREE.CircleGeometry(stationWidth.value * 10, 32);
   }
 
-  planet.value.material.transparent = true;
+  planet.material.transparent = true;
 
-  planet.value.mesh = new THREE.Mesh(
-    planet.value.geometry,
-    planet.value.material
-  );
-  planet.value.mesh.position.set(0, planetPositionY, 0);
+  planet.mesh = new THREE.Mesh(planet.geometry, planet.material);
+  planet.mesh.position.set(0, planetPositionY, 0);
 
   // Apply a random rotation. TODO: Might make this a more random rotation to see different sides of the planet each reload
-  planet.value.mesh.rotateZ(0);
-  planet.value.mesh.rotateX(-Math.PI / 2);
-  three.scene.add(planet.value.mesh);
+  planet.mesh.rotateZ(0);
+  planet.mesh.rotateX(-Math.PI / 2);
+  three.scene.add(planet.mesh);
   //}
-}
-
-function launchBall() {
-  if (!three.spaceman) return;
-
-  coriolis.value.startingVelocity = coriolis.value.velocity;
-
-  stopTrace();
-
-  const color = new THREE.Color(
-    Math.max(Math.random(), 0.5),
-    Math.max(Math.random(), 0.5),
-    Math.max(Math.random(), 0.5)
-  );
-
-  coriolis.value.geometry = new THREE.SphereGeometry(
-    Math.max(formData.value.radius / 100, 0.5),
-    4,
-    4
-  );
-  coriolis.value.material = new THREE.MeshBasicMaterial({ color: color });
-
-  coriolis.value.ball = new THREE.Mesh(
-    coriolis.value.geometry,
-    coriolis.value.material
-  );
-
-  // var target = new THREE.Vector3();
-  // three.spaceman.getWorldPosition( target );
-  const ballHeight = formData.value.type.shape === "can" ? 3 : 0;
-  coriolis.value.ball.position.set(
-    three.spaceman.position.x,
-    three.spaceman.position.y,
-    three.spaceman.position.z + ballHeight
-  );
-  three.group.add(coriolis.value.ball);
-
-  //coriolis.value.ballGroup = [];//new THREE.Group();
-
-  coriolis.value.tracing = true;
-  coriolis.value.tickTime = formData.value.type.shape === "can" ? 100 : 500;
-  // Updating in the animate loop would be more accurate, but this is simple and accomplishes the same goal
-  coriolis.value.interval = setInterval(traceBall, coriolis.value.tickTime);
-}
-
-function traceBall() {
-  // TODO: Could use InstanceMesh to get better performance? https://threejs.org/docs/#api/en/objects/InstancedMesh
-
-  // Updating in the animate loop would be more accurate, but this is simple and accomplishes the same goal
-  if (coriolis.value.applyGravity) {
-    // TODO: Can we update this using our force vector? Perhaps rotate the ball in it's own local reference frame?
-    // TODO: This doesn't seem right. Test out gravity stuff
-    // if( formData.value.type.shape === 'funnel' ){
-    //   coriolis.value.velocity -= funnel.value.netCentripetalForce * ( coriolis.value.tickTime / 1000 );
-    // }else{
-    coriolis.value.velocity -=
-      centripetalAcceleration.value * (coriolis.value.tickTime / 1000);
-    //}
-  }
-
-  var target = new THREE.Vector3();
-  coriolis.value.ball.getWorldPosition(target);
-
-  if (
-    coriolis.value.ballGroup.length > 80 ||
-    Math.abs(target.y) > formData.value.radius ||
-    Math.abs(target.x) > formData.value.radius ||
-    Math.abs(target.z) > formData.value.radius
-  ) {
-    stopTrace();
-    return;
-  }
-  const ball = new THREE.Mesh(coriolis.value.geometry, coriolis.value.material);
-  ball.position.set(target.x, target.y, target.z);
-  coriolis.value.ballGroup.push(ball);
-
-  three.scene.add(ball);
-}
-
-function clearBalls() {
-  if (coriolis.value.ballGroup.length) {
-    for (let b = 0; b < coriolis.value.ballGroup.length; b++) {
-      three.scene.remove(coriolis.value.ballGroup[b]);
-    }
-
-    coriolis.value.ballGroup = [];
-  }
-}
-
-function stopTrace() {
-  if (coriolis.value.interval) {
-    clearInterval(coriolis.value.interval);
-  }
-  // TODO: Try to allow users to see the balls between scenes
-  // HOLD: Try and clear station and spaceman on change. not entire scene.
-
-  if (coriolis.value.ball) {
-    three.group.remove(coriolis.value.ball);
-  }
-
-  coriolis.value.tracing = false;
-  coriolis.value.velocity = coriolis.value.startingVelocity;
 }
 
 function setupThreeJS() {
@@ -976,7 +872,7 @@ function setupThreeJS() {
     45,
     width / height,
     0.1,
-    planet.value.radius * 2
+    planet.radius * 2
   );
 
   three.camera.position.z = cameraDistance;
@@ -1021,26 +917,26 @@ function calcForceVector() {
 
   const apparentGravity = formData.value.gravity;
 
-  forces.value.vector = 0;
+  forces.vector = 0;
   if (apparentGravity == 0) {
-    forces.value.vector = Math.PI / 4;
+    forces.vector = Math.PI / 4;
   } else if (worldGravity.value < apparentGravity) {
     let percentApparent =
       getPercentageChange(apparentGravity, worldGravity.value) / 100;
-    forces.value.vector = -(Math.PI / 4) * Math.min(percentApparent, 1);
+    forces.vector = -(Math.PI / 4) * Math.min(percentApparent, 1);
   } else if (worldGravity.value > apparentGravity) {
     let percentApparent =
       getPercentageChange(worldGravity.value, apparentGravity) / 100;
-    forces.value.vector = (Math.PI / 4) * Math.min(percentApparent, 1);
+    forces.vector = (Math.PI / 4) * Math.min(percentApparent, 1);
   }
 
-  forces.value.vector -= Math.PI / 4;
+  forces.vector -= Math.PI / 4;
 }
 
 function setupForceVector() {
   const vectorGeometry = new THREE.CylinderGeometry(1, 0.1, 3, 3);
   const vectorColor = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  forces.value.vectorMesh = new THREE.Mesh(vectorGeometry, vectorColor);
+  forces.vectorMesh = new THREE.Mesh(vectorGeometry, vectorColor);
 
   if (
     formData.value.type.shape === "funnel" ||
@@ -1049,34 +945,30 @@ function setupForceVector() {
     calcForceVector();
 
     if (formData.value.type.shape === "funnel") {
-      forces.value.vectorMesh.rotation.set(0, 0, forces.value.vector);
+      forces.vectorMesh.rotation.set(0, 0, forces.vector);
     } else {
-      forces.value.vectorMesh.rotation.set(
-        forces.value.vector + Math.PI / 2,
-        0,
-        0
-      );
+      forces.vectorMesh.rotation.set(forces.vector + Math.PI / 2, 0, 0);
     }
 
-    forces.value.vectorMesh.position.set(
+    forces.vectorMesh.position.set(
       three.spaceman.position.x - 1.5,
       three.spaceman.position.y - 1.5,
       three.spaceman.position.z
     );
   } else {
-    forces.value.vectorMesh.position.set(
+    forces.vectorMesh.position.set(
       three.spaceman.position.x,
       three.spaceman.position.y - 2,
       three.spaceman.position.z
     );
   }
 
-  three.group.add(forces.value.vectorMesh);
+  three.group.add(forces.vectorMesh);
 
   // const rulerFolder = three.gui.addFolder('Ruler');
-  // rulerFolder.add(forces.value.vectorMesh.rotation, 'x', -Math.PI, Math.PI );
-  // rulerFolder.add(forces.value.vectorMesh.rotation, 'y', -Math.PI, Math.PI);
-  // rulerFolder.add(forces.value.vectorMesh.rotation, 'z', -Math.PI, Math.PI);
+  // rulerFolder.add(forces.vectorMesh.rotation, 'x', -Math.PI, Math.PI );
+  // rulerFolder.add(forces.vectorMesh.rotation, 'y', -Math.PI, Math.PI);
+  // rulerFolder.add(forces.vectorMesh.rotation, 'z', -Math.PI, Math.PI);
   // rulerFolder.open();
 }
 
@@ -1103,30 +995,27 @@ function setupRuler() {
     formData.value.radius,
     2
   );
-  ruler.value.lineMaterial = new THREE.MeshBasicMaterial({
+  ruler.lineMaterial = new THREE.MeshBasicMaterial({
     color: 0xffff00,
   });
 
-  ruler.value.lineCylinder = new THREE.Mesh(
-    linegeometry,
-    ruler.value.lineMaterial
-  );
+  ruler.lineCylinder = new THREE.Mesh(linegeometry, ruler.lineMaterial);
 
-  //ruler.value.lineCylinder.position.z = 1;
+  //ruler.lineCylinder.position.z = 1;
 
   // Setup measurement point
-  ruler.value.point = formData.value.radius;
+  ruler.point = formData.value.radius;
 
   const geometry = new THREE.CylinderGeometry(lineRadius, 0.01, lineRadius, 2);
-  ruler.value.dialMaterial = new THREE.MeshBasicMaterial({
+  ruler.dialMaterial = new THREE.MeshBasicMaterial({
     color: 0xff0000,
   });
 
-  ruler.value.dial = new THREE.Mesh(geometry, ruler.value.dialMaterial);
+  ruler.dial = new THREE.Mesh(geometry, ruler.dialMaterial);
 
   // if (!formData.value.showGravityRule) {
-  //   ruler.value.lineMaterial.opacity = 0;
-  //   ruler.value.dialMaterial.opacity = 0;
+  //   ruler.lineMaterial.opacity = 0;
+  //   ruler.dialMaterial.opacity = 0;
   // }
 
   // Adjust ruler for different structures
@@ -1134,26 +1023,26 @@ function setupRuler() {
     formData.value.type.shape === "can" ||
     formData.value.type.shape === "funnel"
   ) {
-    ruler.value.lineCylinder.rotation.z = Math.PI / 2;
-    ruler.value.lineCylinder.position.x = -(formData.value.radius / 2);
-    ruler.value.lineCylinder.position.y = 1;
+    ruler.lineCylinder.rotation.z = Math.PI / 2;
+    ruler.lineCylinder.position.x = -(formData.value.radius / 2);
+    ruler.lineCylinder.position.y = 1;
 
-    ruler.value.dial.rotation.z -= Math.PI / 2;
-    ruler.value.dial.position.x = -ruler.value.point + lineRadius + 2;
-    ruler.value.dial.position.y = 1.1;
+    ruler.dial.rotation.z -= Math.PI / 2;
+    ruler.dial.position.x = -ruler.point + lineRadius + 2;
+    ruler.dial.position.y = 1.1;
   } else {
-    ruler.value.lineCylinder.rotation.z = Math.PI;
-    ruler.value.lineCylinder.rotation.y -= Math.PI / 2;
-    ruler.value.lineCylinder.position.y = -(formData.value.radius / 2);
-    ruler.value.lineCylinder.position.z = 0.5;
+    ruler.lineCylinder.rotation.z = Math.PI;
+    ruler.lineCylinder.rotation.y -= Math.PI / 2;
+    ruler.lineCylinder.position.y = -(formData.value.radius / 2);
+    ruler.lineCylinder.position.z = 0.5;
 
-    ruler.value.dial.rotation.y = Math.PI / 2;
-    ruler.value.dial.position.y = -ruler.value.point + 2;
-    ruler.value.dial.position.z = 0.6;
+    ruler.dial.rotation.y = Math.PI / 2;
+    ruler.dial.position.y = -ruler.point + 2;
+    ruler.dial.position.z = 0.6;
   }
 
-  three.scene.add(ruler.value.dial);
-  three.scene.add(ruler.value.lineCylinder);
+  three.scene.add(ruler.dial);
+  three.scene.add(ruler.lineCylinder);
 }
 
 function buildCanStation(material: THREE.Material) {
@@ -1252,42 +1141,39 @@ function buildFunnelStation(material: THREE.Material) {
     const circleRadius = formData.value.radius + formData.value.shipLength / 2;
     funnelGeometry = new THREE.CircleGeometry(circleRadius, 32);
   } else {
-    funnel.value.angleOfIncidence = parseFloat(forces.value.vector.toFixed(2)); //-this.radiansToDegrees(forces.value.vector).toFixed(2);
-    funnel.value.oppositeAngle = parseFloat(
-      (Math.PI / 2 - funnel.value.angleOfIncidence).toFixed(2)
+    funnel.angleOfIncidence = parseFloat(forces.vector.toFixed(2)); //-this.radiansToDegrees(forces.vector).toFixed(2);
+    funnel.oppositeAngle = parseFloat(
+      (Math.PI / 2 - funnel.angleOfIncidence).toFixed(2)
     );
-    funnel.value.netCentripetalForce = -(
-      gTom2s(worldGravity.value) * Math.tan(forces.value.vector)
+    funnel.netCentripetalForce = -(
+      gTom2s(worldGravity.value) * Math.tan(forces.vector)
     ).toFixed(3);
     const hypotenuseSide = formData.value.shipLength;
 
-    const bRads = Math.sin(funnel.value.oppositeAngle) / Math.sin(Math.PI / 2);
+    const bRads = Math.sin(funnel.oppositeAngle) / Math.sin(Math.PI / 2);
     const bDegs = radiansToDegrees(
-      Math.sin(funnel.value.oppositeAngle) / Math.sin(90)
+      Math.sin(funnel.oppositeAngle) / Math.sin(90)
     );
 
-    const cRads =
-      Math.sin(funnel.value.angleOfIncidence) / Math.sin(Math.PI / 2);
+    const cRads = Math.sin(funnel.angleOfIncidence) / Math.sin(Math.PI / 2);
     const cDegs = radiansToDegrees(
-      Math.sin(funnel.value.angleOfIncidence) / Math.sin(90)
+      Math.sin(funnel.angleOfIncidence) / Math.sin(90)
     );
 
-    funnel.value.baseWidth = parseFloat(
+    funnel.baseWidth = parseFloat(
       Math.abs(hypotenuseSide * Math.abs(bRads)).toFixed(2)
     );
-    funnel.value.baseHeight = parseFloat(
+    funnel.baseHeight = parseFloat(
       Math.abs(hypotenuseSide * Math.abs(cRads)).toFixed(2)
     );
 
-    funnel.value.outerRadius =
-      formData.value.radius + funnel.value.baseWidth / 2;
-    funnel.value.innerRadius =
-      formData.value.radius - funnel.value.baseWidth / 2;
+    funnel.outerRadius = formData.value.radius + funnel.baseWidth / 2;
+    funnel.innerRadius = formData.value.radius - funnel.baseWidth / 2;
 
     funnelGeometry = new THREE.CylinderGeometry(
-      funnel.value.outerRadius,
-      funnel.value.innerRadius,
-      funnel.value.baseHeight,
+      funnel.outerRadius,
+      funnel.innerRadius,
+      funnel.baseHeight,
       32
     );
   }
@@ -1343,7 +1229,7 @@ function setupScene() {
     //three.value = defaultThree;
   }
 
-  stopTrace();
+  // stopTrace();
 
   // TODO: Ideally we wouldn't have to setup ThreeJS on each scene. Just update station + spaceman
   setupThreeJS();
@@ -1352,7 +1238,7 @@ function setupScene() {
 
   setupStation();
 
-  if (!animation.value.prevTick) {
+  if (!animation.prevTick) {
     animate();
   }
 }
@@ -1377,8 +1263,8 @@ function setupSpaceman() {
     three.spaceman.rotation.y = 1.8;
     three.spaceman.position.set(1, spacemanPosition, 0); // 6, if solid shape set Z to height of the extrusion
 
-    if (forces.value.vectorMesh) {
-      forces.value.vectorMesh.position.set(
+    if (forces.vectorMesh) {
+      forces.vectorMesh.position.set(
         three.spaceman.position.x - 1.5,
         three.spaceman.position.y - 1.5,
         three.spaceman.position.z
@@ -1437,7 +1323,7 @@ function setupSpaceman() {
   } else if (formData.value.type.shape === "funnel") {
     spacemanPosition += 1;
 
-    three.spaceman.rotation.z = forces.value.vector; //Math.PI / 2;
+    three.spaceman.rotation.z = forces.vector; //Math.PI / 2;
     //three.spaceman.rotation.y = 1.8;
     three.spaceman.position.set(spacemanPosition, 0, 0); // 6, if solid shape set Z to height of the extrusion
 
@@ -1456,15 +1342,15 @@ function setupSpaceman() {
       });
       const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
 
-      ringMesh.rotation.z = forces.value.vector;
+      ringMesh.rotation.z = forces.vector;
 
       ringMesh.position.set(spacemanPosition + 2, 0, 0);
 
       three.group.add(ringMesh);
     }
 
-    if (forces.value.vectorMesh) {
-      forces.value.vectorMesh.position.set(three.spaceman.position.x, -2, 0);
+    if (forces.vectorMesh) {
+      forces.vectorMesh.position.set(three.spaceman.position.x, -2, 0);
     }
   }
   // // Gui folder
@@ -1489,7 +1375,7 @@ function animate() {
 
   //three.controls.update();
 
-  var cameraZoomDistance = planet.value.radius; //stationWidth.value * 10;
+  var cameraZoomDistance = planet.radius; //stationWidth.value * 10;
   var minMovement = new THREE.Vector3(
     -cameraZoomDistance,
     -cameraZoomDistance,
@@ -1507,11 +1393,9 @@ function animate() {
   if (formData.value.pause) return;
 
   // clamp to fixed framerate
-  const now = Math.round(
-    (animation.value.FPS * window.performance.now()) / 1000
-  );
-  if (now == animation.value.prevTick) return;
-  animation.value.prevTick = now;
+  const now = Math.round((animation.FPS * window.performance.now()) / 1000);
+  if (now == animation.prevTick) return;
+  animation.prevTick = now;
 
   // three.group.rotation.z += this.rotationSpeed;
   if (formData.value.type.shape !== "funnel") {
@@ -1520,17 +1404,13 @@ function animate() {
     three.group.rotation.y += rotationSpeed.value;
   }
 
-  if (coriolis.value.tracing && coriolis.value.ball) {
+  if (coriolis.tracing && coriolis.ball) {
     if (formData.value.type.shape !== "funnel") {
-      coriolis.value.ball.position.y += velocityToUpdateSpeed(
-        coriolis.value.velocity
-      );
+      coriolis.ball.position.y += velocityToUpdateSpeed(coriolis.velocity);
     } else {
-      coriolis.value.ball.position.x += velocityToUpdateSpeed(
-        coriolis.value.velocity
-      );
-      if (coriolis.value.applyGravity) {
-        coriolis.value.ball.position.y -= velocityToUpdateSpeed(
+      coriolis.ball.position.x += velocityToUpdateSpeed(coriolis.velocity);
+      if (coriolis.applyGravity) {
+        coriolis.ball.position.y -= velocityToUpdateSpeed(
           gTom2s(worldGravity.value)
         );
       }
@@ -1538,8 +1418,8 @@ function animate() {
   }
 
   if (formData.value.showEnvironment && formData.value.isSpace) {
-    planet.value.mesh.rotateOnAxis(planet.value.axis, -planet.value.speed);
-    // planet.value.clouds.rotateOnAxis(planet.value.axis, planet.value.speed );
+    planet.mesh.rotateOnAxis(planet.axis, -planet.speed);
+    // planet.clouds.rotateOnAxis(planet.axis, planet.speed );
   }
 
   // three.stats.update();
@@ -1592,10 +1472,10 @@ function radiansPerSecToRpm(radians: number) {
   return radians / 0.10471975511965977; //(Math.PI / 30)
 }
 function rpmToUpdateSpeed(rpm: number) {
-  return (rpm / (animation.value.FPS * 60)) * animation.value.radians;
+  return (rpm / (animation.FPS * 60)) * animation.radians;
 }
 function velocityToUpdateSpeed(velocity: number) {
-  return velocity / animation.value.FPS;
+  return velocity / animation.FPS;
 }
 function relativeDifference(a: number, b: number) {
   return Math.abs((a - b) / ((a + b) / 2)); // 100 *
@@ -1623,18 +1503,129 @@ function updateRadius() {
 
   needsUpdate.value = true;
 
-  formData.value.gravity = calcGravityFromRadius(formData.value.radius);
+  formData.value.gravity = +calcGravityFromRadius(
+    formData.value.radius
+  ).toFixed(2);
 }
+
 function updateRPM() {
-  formData.value.gravity = calcGravityFromRadius(formData.value.radius);
+  formData.value.gravity = +calcGravityFromRadius(
+    formData.value.radius
+  ).toFixed(2);
 }
+
 function updateGravity() {
-  formData.value.rpm = parseFloat(
-    radiansPerSecToRpm(
-      Math.sqrt(gTom2s(formData.value.gravity) / formData.value.radius)
-    ).toFixed(4)
-  );
+  formData.value.rpm = +radiansPerSecToRpm(
+    Math.sqrt(gTom2s(formData.value.gravity) / formData.value.radius)
+  ).toFixed(4);
 }
+
+/**
+ *
+ *
+ * Toss Ball Simulation
+ * Depricated: I don't believe this was accurately simulating the coriolis force. Left in because it is neat
+ *
+ */
+
+//  function launchBall() {
+//   if (!three.spaceman) return;
+
+//   coriolis.startingVelocity = coriolis.velocity;
+
+//   stopTrace();
+
+//   const color = new THREE.Color(
+//     Math.max(Math.random(), 0.5),
+//     Math.max(Math.random(), 0.5),
+//     Math.max(Math.random(), 0.5)
+//   );
+
+//   coriolis.geometry = new THREE.SphereGeometry(
+//     Math.max(formData.value.radius / 100, 0.5),
+//     4,
+//     4
+//   );
+//   coriolis.material = new THREE.MeshBasicMaterial({ color: color });
+
+//   coriolis.ball = new THREE.Mesh(coriolis.geometry, coriolis.material);
+
+//   // var target = new THREE.Vector3();
+//   // three.spaceman.getWorldPosition( target );
+//   const ballHeight = formData.value.type.shape === "can" ? 3 : 0;
+//   coriolis.ball.position.set(
+//     three.spaceman.position.x,
+//     three.spaceman.position.y,
+//     three.spaceman.position.z + ballHeight
+//   );
+//   three.group.add(coriolis.ball);
+
+//   //coriolis.ballGroup = [];//new THREE.Group();
+
+//   coriolis.tracing = true;
+//   coriolis.tickTime = formData.value.type.shape === "can" ? 100 : 500;
+//   // Updating in the animate loop would be more accurate, but this is simple and accomplishes the same goal
+//   coriolis.interval = setInterval(traceBall, coriolis.tickTime);
+// }
+
+// function traceBall() {
+//   // TODO: Could use InstanceMesh to get better performance? https://threejs.org/docs/#api/en/objects/InstancedMesh
+
+//   // Updating in the animate loop would be more accurate, but this is simple and accomplishes the same goal
+//   if (coriolis.applyGravity) {
+//     // TODO: Can we update this using our force vector? Perhaps rotate the ball in it's own local reference frame?
+//     // TODO: This doesn't seem right. Test out gravity stuff
+//     // if( formData.value.type.shape === 'funnel' ){
+//     //   coriolis.velocity -= funnel.netCentripetalForce * ( coriolis.tickTime / 1000 );
+//     // }else{
+//     coriolis.velocity -=
+//       centripetalAcceleration.value * (coriolis.tickTime / 1000);
+//     //}
+//   }
+
+//   var target = new THREE.Vector3();
+//   coriolis.ball.getWorldPosition(target);
+
+//   if (
+//     coriolis.ballGroup.length > 80 ||
+//     Math.abs(target.y) > formData.value.radius ||
+//     Math.abs(target.x) > formData.value.radius ||
+//     Math.abs(target.z) > formData.value.radius
+//   ) {
+//     stopTrace();
+//     return;
+//   }
+//   const ball = new THREE.Mesh(coriolis.geometry, coriolis.material);
+//   ball.position.set(target.x, target.y, target.z);
+//   coriolis.ballGroup.push(ball);
+
+//   three.scene.add(ball);
+// }
+
+// function clearBalls() {
+//   if (coriolis.ballGroup.length) {
+//     for (let b = 0; b < coriolis.ballGroup.length; b++) {
+//       three.scene.remove(coriolis.ballGroup[b]);
+//     }
+
+//     coriolis.ballGroup = [];
+//   }
+// }
+
+// function stopTrace() {
+//   if (coriolis.interval) {
+//     clearInterval(coriolis.interval);
+//   }
+//   // TODO: Try to allow users to see the balls between scenes
+//   // HOLD: Try and clear station and spaceman on change. not entire scene.
+
+//   if (coriolis.ball) {
+//     three.group.remove(coriolis.ball);
+//   }
+
+//   coriolis.tracing = false;
+//   coriolis.velocity = coriolis.startingVelocity;
+// }
 
 /*
   watch: {
@@ -1645,10 +1636,10 @@ function updateGravity() {
         }
       },
     },
-    "ruler.value.point": {
+    "ruler.point": {
       handler(newPoint, oldPoint) {
-        if (newPoint < 0) ruler.value.point = 0;
-        if (newPoint > formData.value.radius) ruler.value.point = oldPoint;
+        if (newPoint < 0) ruler.point = 0;
+        if (newPoint > formData.value.radius) ruler.point = oldPoint;
 
         const lineRadius = formData.value.radius / 30;
 
@@ -1656,24 +1647,24 @@ function updateGravity() {
           formData.value.type.shape === "can" ||
           formData.value.type.shape === "funnel"
         ) {
-          ruler.value.dial.position.x = -newPoint + lineRadius / 2;
-          ruler.value.dial.position.x = -newPoint + lineRadius / 2;
+          ruler.dial.position.x = -newPoint + lineRadius / 2;
+          ruler.dial.position.x = -newPoint + lineRadius / 2;
         } else {
-          ruler.value.dial.position.y = -newPoint + lineRadius / 2;
+          ruler.dial.position.y = -newPoint + lineRadius / 2;
         }
       },
     },
     "formData.pause": {
       handler(newRuler) {
-        if (coriolis.value.tracing && coriolis.value.ball) {
+        if (coriolis.tracing && coriolis.ball) {
           this.stopTrace();
         }
       },
     },
     "formData.showGravityRule": {
       handler(newRuler) {
-        ruler.value.lineMaterial.opacity = newRuler ? 1 : 0;
-        ruler.value.dialMaterial.opacity = newRuler ? 1 : 0;
+        ruler.lineMaterial.opacity = newRuler ? 1 : 0;
+        ruler.dialMaterial.opacity = newRuler ? 1 : 0;
         this.needsUpdate = true;
       },
     },
@@ -1685,7 +1676,7 @@ function updateGravity() {
     },
     "formData.showEnvironment": {
       handler(newShowEnvironment) {
-        planet.value.material.opacity = newShowEnvironment ? 1 : 0;
+        planet.material.opacity = newShowEnvironment ? 1 : 0;
       },
     },
     "formData.seeInside": {
@@ -1720,14 +1711,14 @@ function updateGravity() {
     },
     "formData.gravity": {
       handler(newGravity) {
-        if (forces.value.vectorMesh) {
+        if (forces.vectorMesh) {
           this.calcForceVector();
 
           if (formData.value.type.shape === "funnel") {
-            forces.value.vectorMesh.rotation.set(0, 0, forces.value.vector);
+            forces.vectorMesh.rotation.set(0, 0, forces.vector);
           } else {
-            forces.value.vectorMesh.rotation.set(
-              forces.value.vector + Math.PI / 2,
+            forces.vectorMesh.rotation.set(
+              forces.vector + Math.PI / 2,
               0,
               0
             );
@@ -1762,16 +1753,16 @@ function updateGravity() {
           formData.value.type = this.types[3];
         }
 
-        if (planet.value.material) {
+        if (planet.material) {
           switch (newLocation.name) {
             case "Earth":
-              planet.value.material.map = textures.earth;
+              planet.material.map = textures.earth;
               break;
             case "Mars":
-              planet.value.material.map = textures.mars;
+              planet.material.map = textures.mars;
               break;
             case "Moon":
-              planet.value.material.map = textures.moon;
+              planet.material.map = textures.moon;
               break;
           }
         }

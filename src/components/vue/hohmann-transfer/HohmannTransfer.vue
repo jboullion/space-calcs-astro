@@ -658,7 +658,7 @@ function setupHohmannOrbit() {
   }
 
   axisMesh.position.set(hohmannCenter.value, 0, 0);
-  hohmannMesh.position.set(hohmannCenter.value, 0, 0);
+  hohmannMesh.position.set(hohmannCenter.value, 0, -1);
 
   hohmannOrbitGroup.add(axisMesh);
   hohmannOrbitGroup.add(hohmannMesh);
