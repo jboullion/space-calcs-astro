@@ -1,3 +1,5 @@
+import type { Category } from "../components/vue/home/constants";
+
 export interface Reference {
   title: string;
   url: string;
@@ -6,7 +8,7 @@ export interface Reference {
 export type SpaceTool = {
   name: string;
   description: string;
-  category: string;
+  category: Category;
   image: string;
   link: string;
 };

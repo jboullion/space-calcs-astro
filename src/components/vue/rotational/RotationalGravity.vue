@@ -52,7 +52,7 @@
                   />
                   <span class="input-group-text">m</span>
                 </div>
-                <input
+                <!-- <input
                   id="radius-range"
                   type="range"
                   class="form-range"
@@ -60,7 +60,7 @@
                   :max="conversion.maxLength"
                   v-model.number="formData.shipLength"
                   @change="updateShipLength"
-                />
+                /> -->
               </div>
 
               <!-- <div class="mb-3">
@@ -91,7 +91,7 @@
                   />
                   <span class="input-group-text">m</span>
                 </div>
-                <input
+                <!-- <input
                   id="radius-range"
                   type="range"
                   class="form-range"
@@ -99,7 +99,7 @@
                   :max="conversion.maxLength"
                   v-model.number="formData.radius"
                   @change="updateRadius"
-                />
+                /> -->
               </div>
 
               <div class="mb-3">
@@ -119,6 +119,8 @@
                     id="rpm"
                     v-model.number="formData.rpm"
                     min="0"
+                    max="1000"
+                    step="0.1"
                     @change="updateRPM"
                   />
                   <span class="input-group-text">rpm</span>
@@ -142,6 +144,7 @@
                     id="gravity"
                     v-model.number="formData.gravity"
                     min="0"
+                    step="0.01"
                     @change="updateGravity"
                   />
                   <span class="input-group-text">g</span>
@@ -158,7 +161,11 @@
                     title="Update your environment and apply natural gravity if applicaible"
                   ></i>
                 </label>
-                <select class="form-select" v-model="formData.location">
+                <select
+                  class="form-select"
+                  v-model="formData.location"
+                  @change="setupScene"
+                >
                   <option v-for="location in locations" :value="location">
                     {{ location.name }}
                   </option>
@@ -176,6 +183,7 @@
                   type="checkbox"
                   id="showEnvironment"
                   v-model="formData.showEnvironment"
+                  @change="setupScene"
                 />
                 <label class="form-check-label" for="showEnvironment">
                   Show environment?
@@ -188,12 +196,13 @@
                 </label>
               </div>
 
-              <div class="form-check form-switch mb-3">
+              <!-- <div class="form-check form-switch mb-3">
                 <input
                   class="form-check-input"
                   type="checkbox"
                   id="isSpace"
                   v-model="formData.isSpace"
+                  @change="setupScene"
                 />
                 <label class="form-check-label" for="isSpace">
                   In Space?
@@ -204,7 +213,7 @@
                     title="0g environment or on the surface of a planet?"
                   ></i>
                 </label>
-              </div>
+              </div> -->
 
               <div class="form-check form-switch mb-3">
                 <input
@@ -212,6 +221,7 @@
                   type="checkbox"
                   id="seeInside"
                   v-model="formData.seeInside"
+                  @change="setupScene"
                 />
                 <label class="form-check-label" for="seeInside">
                   Show Inside of Structure?
@@ -236,6 +246,7 @@
                   type="checkbox"
                   id="hollow"
                   v-model="formData.hollow"
+                  @change="setupScene"
                 />
                 <label class="form-check-label" for="hollow">
                   Hollow Cylinder?
@@ -270,7 +281,7 @@
 
       <div
         id="rotational-canvas"
-        class="mb-3"
+        class="mb-3 d-flex align-items-center justify-content-center"
         style="position: relative; height: 400px"
       >
         <i v-if="loading" class="fas fa-cog fa-spin center-absolute"></i>
@@ -300,6 +311,7 @@
           type="checkbox"
           id="showGravityRule"
           v-model="formData.showGravityRule"
+          @change="setupScene"
         />
         <label class="form-check-label" for="showGravityRule">
           Show gravity ruler?
@@ -321,6 +333,7 @@
           min="0"
           :max="formData.radius"
           v-model.number="ruler.point"
+          @input="updateMeasurementPoint"
         />
 
         <div class="input-group">
@@ -511,7 +524,15 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
 import type { Location, StationType } from "./constants";
 import { locations, types, conversion, defaultThree } from "./constants";
-import { formatNumber } from "../utils";
+import {
+  formatNumber,
+  clampNumber,
+  gTom2s,
+  m2sTog,
+  radiansPerSecToRpm,
+  radiansToDegrees,
+  rpmToRadians,
+} from "../utils";
 
 const loading = ref(true);
 const needsUpdate = ref(false);
@@ -992,6 +1013,8 @@ function getRandomInt(max: number) {
 }
 
 function setupRuler() {
+  if (!formData.value.showGravityRule) return;
+
   // Setup Ruler
   const lineRadius = formData.value.radius / 30;
   const linegeometry = new THREE.CylinderGeometry(
@@ -1228,6 +1251,7 @@ function setupScene() {
   needsUpdate.value = false;
 
   if (three.scene && three.canvas) {
+    three.scene = new THREE.Scene();
     //three.scene.dispose();
     removeAllChildNodes(three.canvas);
     // NEW TODO: Might need to update defaultThree OR figure out how not to need this
@@ -1436,54 +1460,11 @@ function removeAllChildNodes(parent: HTMLElement) {
   }
 }
 
-/**
- *
- *
- * Conversion Functions
- *
- *
- */
-function gTom2s(g: number) {
-  return g * conversion.g;
-}
-function m2sTog(m2s: number) {
-  return m2s / conversion.g;
-}
-function mTofeet(m: number) {
-  return m * conversion.foot;
-}
-function mToKm(m: number) {
-  return m * 1000;
-}
-function mToMiles(m: number) {
-  return m * conversion.foot * 5280;
-}
-function mpsToKph(m: number) {
-  return m * 0.277777778; // 1000 / 3600
-}
-function mpsToMph(m: number) {
-  return m * ((conversion.foot * 5280) / 3600);
-}
-function rpmToRadians(rpm: number) {
-  return rpm * (Math.PI / 30);
-}
-function rpmToDegrees(rpm: number) {
-  return radiansToDegrees(rpmToRadians(rpm));
-}
-function radiansToDegrees(radians: number) {
-  return radians / (Math.PI / 180);
-}
-function radiansPerSecToRpm(radians: number) {
-  return radians / 0.10471975511965977; //(Math.PI / 30)
-}
 function rpmToUpdateSpeed(rpm: number) {
   return (rpm / (animation.FPS * 60)) * animation.radians;
 }
 function velocityToUpdateSpeed(velocity: number) {
   return velocity / animation.FPS;
-}
-function relativeDifference(a: number, b: number) {
-  return Math.abs((a - b) / ((a + b) / 2)); // 100 *
 }
 
 /**
@@ -1514,6 +1495,8 @@ function updateRadius() {
 }
 
 function updateRPM() {
+  formData.value.rpm = clampNumber(formData.value.rpm, 0, 1000);
+
   formData.value.gravity = +calcGravityFromRadius(
     formData.value.radius
   ).toFixed(2);
@@ -1523,7 +1506,44 @@ function updateGravity() {
   formData.value.rpm = +radiansPerSecToRpm(
     Math.sqrt(gTom2s(formData.value.gravity) / formData.value.radius)
   ).toFixed(4);
+
+  if (forces.vectorMesh) {
+    calcForceVector();
+
+    if (formData.value.type.shape === "funnel") {
+      forces.vectorMesh.rotation.set(0, 0, forces.vector);
+    } else {
+      forces.vectorMesh.rotation.set(forces.vector + Math.PI / 2, 0, 0);
+    }
+  }
 }
+
+function updateMeasurementPoint() {
+  if (ruler.point < 0) ruler.point = 0;
+  if (ruler.point > formData.value.radius) ruler.point = formData.value.radius;
+
+  const lineRadius = formData.value.radius / 30;
+
+  if (
+    formData.value.type.shape === "can" ||
+    formData.value.type.shape === "funnel"
+  ) {
+    ruler.dial.position.x = -ruler.point + lineRadius / 2;
+    ruler.dial.position.x = -ruler.point + lineRadius / 2;
+  } else {
+    ruler.dial.position.y = -ruler.point + lineRadius / 2;
+  }
+}
+
+// "formData.isSpace": {
+//       handler(isSpace) {
+//         if (isSpace) {
+//           formData.value.type = this.types[0];
+//         } else {
+//           formData.value.type = this.types[3];
+//         }
+//       },
+//     },
 
 /**
  *
@@ -1631,177 +1651,6 @@ function updateGravity() {
 //   coriolis.tracing = false;
 //   coriolis.velocity = coriolis.startingVelocity;
 // }
-
-/*
-  watch: {
-    loading: {
-      handler(newLoading) {
-        if (newLoading) {
-          this.setupScene();
-        }
-      },
-    },
-    "ruler.point": {
-      handler(newPoint, oldPoint) {
-        if (newPoint < 0) ruler.point = 0;
-        if (newPoint > formData.value.radius) ruler.point = oldPoint;
-
-        const lineRadius = formData.value.radius / 30;
-
-        if (
-          formData.value.type.shape === "can" ||
-          formData.value.type.shape === "funnel"
-        ) {
-          ruler.dial.position.x = -newPoint + lineRadius / 2;
-          ruler.dial.position.x = -newPoint + lineRadius / 2;
-        } else {
-          ruler.dial.position.y = -newPoint + lineRadius / 2;
-        }
-      },
-    },
-    "formData.pause": {
-      handler(newRuler) {
-        if (coriolis.tracing && coriolis.ball) {
-          this.stopTrace();
-        }
-      },
-    },
-    "formData.showGravityRule": {
-      handler(newRuler) {
-        ruler.lineMaterial.opacity = newRuler ? 1 : 0;
-        ruler.dialMaterial.opacity = newRuler ? 1 : 0;
-        this.needsUpdate = true;
-      },
-    },
-    "formData.hollow": {
-      handler(newHallow) {
-        // TODO: are we able to update the geometry without reloading scene / mesh?
-        this.needsUpdate = true;
-      },
-    },
-    "formData.showEnvironment": {
-      handler(newShowEnvironment) {
-        planet.material.opacity = newShowEnvironment ? 1 : 0;
-      },
-    },
-    "formData.seeInside": {
-      handler(newSeeInside) {
-        three.station.material.side = newSeeInside
-          ? THREE.BackSide
-          : THREE.FrontSide;
-
-        // Since bola is made of multiple shapes we need can't just apply the update to the station
-        if (formData.value.type.shape === "bola") {
-          this.buildBolaStation(three.station.material);
-        }
-      },
-    },
-    // "formData.radius": {
-    //   handler(newRadius, oldRadius) {
-    //     if (newRadius < 1) formData.value.radius = 1;
-    //     if (newRadius > 1000000) {
-    //       formData.value.radius = oldRadius;
-    //     }
-    //     // TODO: Are we able to update the geometry?
-    //     this.needsUpdate = true;
-    //   },
-    // },
-    "formData.rpm": {
-      handler(newRPM, oldRPM) {
-        if (newRPM < 0) formData.value.rpm = 0;
-        if (newRPM > 1000) {
-          formData.value.rpm = oldRPM;
-        }
-      },
-    },
-    "formData.gravity": {
-      handler(newGravity) {
-        if (forces.vectorMesh) {
-          this.calcForceVector();
-
-          if (formData.value.type.shape === "funnel") {
-            forces.vectorMesh.rotation.set(0, 0, forces.vector);
-          } else {
-            forces.vectorMesh.rotation.set(
-              forces.vector + Math.PI / 2,
-              0,
-              0
-            );
-          }
-        }
-      },
-    },
-    // "formData.shipLength": {
-    //   handler(newLength, oldLength) {
-    //     if (newLength < 1) formData.value.shipLength = 1;
-    //     if (newLength > 100000) {
-    //       formData.value.shipLength = oldLength;
-    //     }
-    //     // TODO: Can we just update the geometry?
-    //     this.needsUpdate = true;
-    //   },
-    // },
-    "formData.isSpace": {
-      handler(isSpace) {
-        if (isSpace) {
-          formData.value.type = this.types[0];
-        } else {
-          formData.value.type = this.types[3];
-        }
-      },
-    },
-    "formData.location": {
-      handler(newLocation) {
-        if (formData.value.isSpace) {
-          formData.value.type = this.types[0];
-        } else {
-          formData.value.type = this.types[3];
-        }
-
-        if (planet.material) {
-          switch (newLocation.name) {
-            case "Earth":
-              planet.material.map = textures.earth;
-              break;
-            case "Mars":
-              planet.material.map = textures.mars;
-              break;
-            case "Moon":
-              planet.material.map = textures.moon;
-              break;
-          }
-        }
-      },
-    },
-    "formData.type": {
-      handler(newType) {
-        // if(newType.shape == 'funnel'){
-        //   formData.value.radius = formData.value.location.funnelDimentions.radius;
-        //   formData.value.rpm = formData.value.location.funnelDimentions.rpm;
-        // }else{
-        formData.value.radius = newType.defaults.radius;
-        formData.value.rpm = newType.defaults.rpm;
-        formData.value.shipLength = newType.defaults.length;
-        //}
-
-        this.updateRadius();
-      },
-    },
-    formData: {
-      handler(newVal) {
-        // Updating scene here to only update onces per watch.
-        if (this.needsUpdate) {
-          //this.$nextTick(() => {
-          this.setupScene();
-          //});
-        }
-      },
-      deep: true,
-    },
-  },
-});
-
-*/
 </script>
 
 <style></style>

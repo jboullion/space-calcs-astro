@@ -353,6 +353,7 @@
 <script setup lang="ts">
 // TODO: Must Dos!
 // ! BUGS
+// 1. Update the directional / ambient light to match the sun
 
 // ? NOTE: Optional Improvements!
 // ? 0. Example Orbits

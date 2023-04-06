@@ -5,14 +5,12 @@ Home
 3. Set up multiple categories. Category[]
 4. Get a better category toggle system in place / disable hover effects?
 
-Rotational Gravity
+Delta V
 
-1. Convert Old watchers into new functions and get the form in working order
-2. Loading icon is in upper left and should be in center
+1. Should we give this a different name?
 
 SiteWide
 
-1. Three JS Canvas update on window resize.
 2. About Page: Brief description of this site and its overall goal. Future plans.
 3. Contact Page? Do we even need this?
 4. Cookie / Privacy?

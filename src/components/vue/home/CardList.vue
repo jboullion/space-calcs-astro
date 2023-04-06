@@ -15,6 +15,7 @@
 import { computed } from "vue";
 import type { SpaceTool } from "../../../types/types";
 import Card from "./Card.vue";
+import { categories } from "./constants";
 
 const props = defineProps<{
   search: string;
@@ -32,7 +33,7 @@ const filteredTools = computed(() => {
 
   return tools.filter(
     (tool) =>
-      props.activeCategories.includes(tool.category) &&
+      props.activeCategories.includes(tool.category.slug) &&
       (tool.name.toLowerCase().includes(props.search.toLowerCase()) ||
         tool.description.toLowerCase().includes(props.search.toLowerCase()))
   );
@@ -43,28 +44,28 @@ const tools: SpaceTool[] = [
   {
     name: "Delta V",
     description: "Calculate the delta v required for a mission",
-    category: "rockets",
+    category: categories[0],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/delta-v",
   },
   {
     name: "Hohmann Transfer",
     description: "Calculate the delta v required for a Hohmann transfer",
-    category: "orbits",
+    category: categories[1],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/hohmann-transfer",
   },
   {
     name: "Orbit Visualizer",
     description: "Visualize the orbit of a satellite",
-    category: "orbits",
+    category: categories[1],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/orbit-visualizer",
   },
   {
     name: "Rotational Gravity",
     description: "Calculate the forces on a rotating space station",
-    category: "habitats",
+    category: categories[2],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/rotational-gravity",
   },
