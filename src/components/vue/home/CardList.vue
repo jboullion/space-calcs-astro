@@ -31,12 +31,14 @@ const filteredTools = computed(() => {
     );
   }
 
-  return tools.filter(
-    (tool) =>
-      props.activeCategories.includes(tool.category.slug) &&
+  return tools.filter((tool) => {
+    const catList = tool.categories.map((cat) => cat.slug);
+    return (
+      props.activeCategories.filter((value) => catList.includes(value)) &&
       (tool.name.toLowerCase().includes(props.search.toLowerCase()) ||
         tool.description.toLowerCase().includes(props.search.toLowerCase()))
-  );
+    );
+  });
 });
 
 // TODO: Is there a better way to do this? Maybe a JSON file?
@@ -44,30 +46,38 @@ const tools: SpaceTool[] = [
   {
     name: "Delta V",
     description: "Calculate the delta v required for a mission",
-    category: categories[0],
+    categories: [categories[0]],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/delta-v",
   },
   {
     name: "Hohmann Transfer",
     description: "Calculate the delta v required for a Hohmann transfer",
-    category: categories[1],
+    categories: [categories[1]],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/hohmann-transfer",
   },
   {
     name: "Orbit Visualizer",
     description: "Visualize the orbit of a satellite",
-    category: categories[1],
+    categories: [categories[1]],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/orbit-visualizer",
   },
   {
     name: "Rotational Gravity",
     description: "Calculate the forces on a rotating space station",
-    category: categories[2],
+    categories: [categories[3]],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/rotational-gravity",
+  },
+  {
+    name: "Habitat Requirements",
+    description:
+      "Esimate the energy, mass, crew, and volume requirements for a habitat",
+    categories: [categories[2]],
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/habitat-requirements",
   },
 ];
 </script>

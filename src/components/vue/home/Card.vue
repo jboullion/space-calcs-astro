@@ -4,9 +4,9 @@
       <h2 class="card-title fw-bold">{{ tool.name }}</h2>
       <p class="card-text flex-fill">{{ tool.description }}</p>
       <div class="d-flex justify-content-between align-items-center">
-        <small :class="'text-' + tool.category.color">{{
-          tool.category.name
-        }}</small>
+        <span v-for="category in tool.categories">
+          <small :class="'text-' + category.color">{{ category.name }}</small>
+        </span>
       </div>
     </a>
   </div>

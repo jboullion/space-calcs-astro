@@ -1,0 +1,27 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import HabitatRequirements from "../../components/vue/habitat-requirements/HabitatRequirements.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+const title = "Habitat Requirements";
+const description =
+  "Esimate the energy, mass, crew, and volume requirements for a habitat";
+
+const references: Reference[] = [];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;">
+      <HabitatRequirements client:only="vue" />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

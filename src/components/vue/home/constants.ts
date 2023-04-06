@@ -18,6 +18,11 @@ export const categories: Category[] = [
   {
     name: "Habitats",
     slug: "habitats",
+    color: "success",
+  },
+  {
+    name: "Stations",
+    slug: "stations",
     color: "danger",
   },
 ];

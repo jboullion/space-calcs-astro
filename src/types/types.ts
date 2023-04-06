@@ -8,7 +8,7 @@ export interface Reference {
 export type SpaceTool = {
   name: string;
   description: string;
-  category: Category;
+  categories: Category[];
   image: string;
   link: string;
 };
