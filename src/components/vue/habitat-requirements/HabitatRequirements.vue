@@ -9,7 +9,11 @@
           <div class="calc-toggle" v-show="showLocation">
             <div class="mb-3">
               <label for="location" class="form-label">Location</label>
-              <select class="form-select" v-model="formData.mission.location">
+              <select
+                class="form-select"
+                v-model="formData.mission.location"
+                @change="updateMission"
+              >
                 <option v-for="location in locations" :value="location">
                   {{ location.name }}
                 </option>
@@ -22,6 +26,7 @@
                 id="mission-shielding"
                 v-model="formData.mission.shielding"
                 :disabled="!isRegolithAvailable"
+                @change="updateMission"
               />
               <label class="form-check-label" for="mission-shielding">
                 Regolith for radiation shielding
@@ -34,6 +39,7 @@
                 id="mission-growing"
                 v-model="formData.mission.growing"
                 :disabled="!isRegolithAvailable"
+                @change="updateMission"
               />
               <label class="form-check-label" for="mission-growing">
                 Regolith for biomass growing medium
@@ -46,6 +52,7 @@
                 id="mission-atmosphere"
                 v-model="formData.mission.atmosphere"
                 :disabled="!isCO2Available"
+                @change="updateMission"
               />
               <label class="form-check-label" for="mission-atmosphere">
                 Use atmosphere for providing balance carbon dioxide?
@@ -59,6 +66,7 @@
                 class="form-control"
                 id="crew-num"
                 v-model.number="formData.mission.crew"
+                @change="updateMission"
                 min="0"
               />
             </div>
@@ -70,6 +78,7 @@
                   class="form-control"
                   id="duration"
                   v-model.number="formData.mission.duration"
+                  @change="updateMission"
                   min="0"
                 />
                 <span class="input-group-text">days</span>
@@ -83,6 +92,7 @@
                   class="form-control"
                   id="payload-mass"
                   v-model.number="formData.mission.mass"
+                  @change="updateMission"
                   min="0"
                 />
                 <span class="input-group-text">kg</span>
@@ -98,6 +108,7 @@
                   class="form-control"
                   id="payload-volume"
                   v-model.number="formData.mission.volume"
+                  @change="updateMission"
                   min="0"
                 />
                 <span class="input-group-text">m<sup>3</sup></span>
@@ -113,6 +124,7 @@
                   class="form-control"
                   id="payload-power"
                   v-model.number="formData.mission.power"
+                  @change="updateMission"
                   min="0"
                 />
                 <span class="input-group-text">W</span>
@@ -124,6 +136,7 @@
                 type="checkbox"
                 id="payload-night"
                 v-model="formData.mission.night"
+                @change="updateMission"
               />
               <label class="form-check-label" for="payload-night">
                 Does the payload run during local night?
@@ -145,6 +158,7 @@
                 class="form-select"
                 id="structure-type"
                 v-model="formData.structure.type"
+                @change="updateStructure"
               >
                 <option v-for="structure in structures" :value="structure">
                   {{ structure.type }}
@@ -161,6 +175,7 @@
                   class="form-control"
                   id="structure-volume"
                   v-model.number="formData.structure.volume"
+                  @change="updateStructure"
                   min="0"
                 />
                 <span class="input-group-text">m<sup>3</sup></span>
@@ -176,6 +191,7 @@
                   class="form-control"
                   id="structure-radiation"
                   v-model.number="formData.structure.radiation"
+                  @change="updateStructure"
                   min="0"
                 />
                 <span class="input-group-text">mSv/yr</span>
@@ -189,6 +205,7 @@
                 class="form-select"
                 id="structure-mass"
                 v-model="formData.structure.shielding"
+                @change="updateStructure"
               >
                 <option v-for="material in materials" :value="material">
                   {{ material.name }}
@@ -212,6 +229,7 @@
                 class="form-select"
                 id="support-air"
                 v-model="formData.support.air"
+                @change="calcResults"
               >
                 <option v-for="system in airSystems" :value="system">
                   {{ system.name }}
@@ -226,6 +244,7 @@
                 class="form-select"
                 id="support-food"
                 v-model="formData.support.food"
+                @change="calcResults"
               >
                 <option v-for="system in foodSystems" :value="system">
                   {{ system.name }}
@@ -240,6 +259,7 @@
                 class="form-select"
                 id="support-water"
                 v-model="formData.support.water"
+                @change="calcResults"
               >
                 <option v-for="system in waterSystems" :value="system">
                   {{ system.name }}
@@ -252,6 +272,7 @@
                 class="form-select"
                 id="support-eva"
                 v-model="formData.support.eva"
+                @change="calcResults"
               >
                 <option v-for="system in evaSystems" :value="system">
                   {{ system.name }}
@@ -270,6 +291,7 @@
                   v-model.number="formData.support.evaHours"
                   step="0.1"
                   min="0"
+                  @change="updateEvaHours"
                 />
                 <span class="input-group-text">hrs</span>
               </div>
@@ -282,6 +304,7 @@
                 class="form-select"
                 id="support-clothing"
                 v-model="formData.support.clothing"
+                @change="calcResults"
               >
                 <option v-for="clothing in clothingOptions" :value="clothing">
                   {{ clothing.name }}
@@ -305,6 +328,7 @@
                 class="form-select"
                 id="biomass-lighting"
                 v-model="formData.biomass.lighting"
+                @change="calcResults"
               >
                 <option v-for="system in lightingSystems" :value="system">
                   {{ system.name }}
@@ -318,6 +342,7 @@
                 type="checkbox"
                 id="biomass-inside"
                 v-model="formData.biomass.inside"
+                @change="calcResults"
               />
               <label class="form-check-label" for="biomass-inside"
                 >Biomass generation inside main structure?</label
@@ -330,6 +355,7 @@
                 type="checkbox"
                 id="biomass-destination"
                 v-model="formData.biomass.destination"
+                @change="calcResults"
               />
               <label class="form-check-label" for="biomass-destination"
                 >Growing at destination (not in transit)</label
@@ -342,6 +368,7 @@
                 type="checkbox"
                 id="biomass-revitalisation"
                 v-model="formData.biomass.revitalisation"
+                @change="calcResults"
               />
               <label class="form-check-label" for="biomass-revitalisation"
                 >Use biomass system for air revitalisation?</label
@@ -356,6 +383,7 @@
                 class="form-select"
                 id="biomass-lighting"
                 v-model="formData.biomass.growing"
+                @change="calcResults"
               >
                 <option v-for="system in growingSystems" :value="system">
                   {{ system.name }}
@@ -379,6 +407,7 @@
                 class="form-select"
                 id="electrical-primary"
                 v-model="formData.electrical.primary"
+                @change="updateElectrical"
               >
                 <option v-for="system in electricalSystems" :value="system">
                   {{ system.name }}
@@ -396,6 +425,7 @@
                 id="electrical-primary-elements"
                 v-model.number="formData.electrical.primaryElements"
                 min="0"
+                @change="updateElectrical"
               />
             </div>
 
@@ -407,6 +437,7 @@
                 class="form-select"
                 id="electrical-secondary"
                 v-model="formData.electrical.secondary"
+                @change="updateElectrical"
               >
                 <option
                   v-for="system in electricalSolarSystems"
@@ -425,6 +456,7 @@
                 class="form-select"
                 id="electrical-batteries"
                 v-model="formData.electrical.batteries"
+                @change="updateElectrical"
               >
                 <option v-for="battery in batteries" :value="battery">
                   {{ battery.name }}
@@ -442,6 +474,7 @@
                   class="form-control"
                   id="electrical-storage-percent"
                   v-model.number="formData.electrical.storage"
+                  @change="updateElectrical"
                   min="0"
                 />
                 <span class="input-group-text">%</span>
@@ -456,6 +489,7 @@
                 class="form-select"
                 id="electrical-cell"
                 v-model="formData.electrical.fuelCell"
+                @change="updateElectrical"
               >
                 <option v-for="cell in fuelCells" :value="cell">
                   {{ cell.name }}
@@ -479,6 +513,7 @@
                 class="form-select"
                 id="electrical-heat"
                 v-model="formData.electrical.heat"
+                @change="updateElectrical"
               >
                 <option v-for="radiator in radiators" :value="radiator">
                   {{ radiator.name }}
@@ -492,10 +527,26 @@
 
     <div class="col-lg-8">
       <div class="mb-4">
-        <button class="btn btn-primary me-2" @click="changeTab('results')">
+        <button
+          class="btn me-2"
+          :class="{
+            'btn-outline-primary': currentResultTab !== 'results',
+            'btn-primary': currentResultTab === 'results',
+          }"
+          @click="changeTab('results')"
+        >
           All Results
         </button>
-        <button class="btn btn-info" @click="changeTab('crew')">Crew</button>
+        <button
+          class="btn"
+          :class="{
+            'btn-outline-success': currentResultTab !== 'crew',
+            'btn-success': currentResultTab === 'crew',
+          }"
+          @click="changeTab('crew')"
+        >
+          Crew
+        </button>
       </div>
       <div
         id="habitat__results"
@@ -513,7 +564,7 @@
         <div class="text-center">
           <button
             id="detailed-results"
-            class="btn btn-nexus mb-4"
+            class="btn btn-primary mb-4"
             type="button"
             @click="showDetails = !showDetails"
           >
@@ -757,7 +808,7 @@
         <div class="text-center">
           <button
             id="detailed-results"
-            class="btn btn-nexus mb-4"
+            class="btn btn-primary mb-4"
             type="button"
             @click="showCrewDetails = !showCrewDetails"
           >
@@ -975,6 +1026,7 @@ function setupCharts() {
     document.getElementById("crew-commitments")
   );
 
+  calcResults();
   drawCharts();
 }
 
@@ -2147,58 +2199,67 @@ function drawCrewCommitments() {
   crewChartHTML.draw(view, options);
 }
 
-//   watch: {
-//     // TODO: I don't love this validation. Better validation for number fields would be great.
-//     'formData.mission': {
-//       handler(newVal) {
+/**
+ *
+ *
+ * UPDATE HANDLERS
+ *
+ *
+ */
+function updateMission() {
+  // Set our location options to false when unavailable
+  if (!isRegolithAvailable.value) {
+    formData.value.mission.shielding = false;
+    formData.value.mission.growing = false;
+  }
 
-//         // Set our location options to false when unavailable
-//         if(! isRegolithAvailable.value) {
-//           formData.value.mission.shielding = false;
-//           formData.value.mission.growing = false;
-//         }
+  if (!isCO2Available.value) {
+    formData.value.mission.atmosphere = false;
+  }
 
-//         if(! this.isCO2Available) {
-//           formData.value.mission.atmosphere = false;
-//         }
+  formData.value.mission.crew = minimumValue(formData.value.mission.crew);
+  formData.value.mission.duration = minimumValue(
+    formData.value.mission.duration
+  );
+  formData.value.mission.mass = minimumValue(formData.value.mission.mass);
+  formData.value.mission.volume = minimumValue(formData.value.mission.volume);
+  formData.value.mission.power = minimumValue(formData.value.mission.power);
 
-//         formData.value.mission.crew = this.minimumValue(newVal.crew);
-//         formData.value.mission.duration = this.minimumValue(newVal.duration);
-//         formData.value.mission.mass = this.minimumValue(newVal.mass);
-//         formData.value.mission.volume = this.minimumValue(newVal.volume);
-//         formData.value.mission.power = this.minimumValue(newVal.power);
-//       },
-//       deep: true
-//     },
-//     'formData.structure': {
-//       handler(newVal) {
-//         formData.value.structure.volume = this.minimumValue(newVal.volume);
-//         formData.value.structure.radiation = this.minimumValue(newVal.radiation);
-//       },
-//       deep: true
-//     },
-//     'formData.support.evaHours': {
-//       handler(newVal) {
-//         formData.value.support.evaHours = this.minimumValue(newVal);
-//       },
-//     },
-//     'formData.electrical': {
-//       handler(newVal) {
-//         formData.value.electrical.primaryElements = this.minimumValue(newVal.primaryElements);
-//         formData.value.electrical.storage = this.minimumValue(newVal.storage);
-//         formData.value.electrical.fuelCellStorage = this.minimumValue(newVal.fuelCellStorage);
-//       },
-//       deep: true
-//     },
-//     // Final watcher which updates values when pretty much anything changes. Must be run last.
-//     formData: {
-//       handler(newVal){
-//         this.calcResults();
-//       },
-//       deep: true
-//     }
-//   }
-// })
+  calcResults();
+}
+
+function updateStructure() {
+  formData.value.structure.volume = minimumValue(
+    formData.value.structure.volume
+  );
+  formData.value.structure.radiation = minimumValue(
+    formData.value.structure.radiation
+  );
+
+  calcResults();
+}
+
+function updateEvaHours() {
+  formData.value.support.evaHours = minimumValue(
+    formData.value.support.evaHours
+  );
+
+  calcResults();
+}
+
+function updateElectrical() {
+  formData.value.electrical.primaryElements = minimumValue(
+    formData.value.electrical.primaryElements
+  );
+  formData.value.electrical.storage = minimumValue(
+    formData.value.electrical.storage
+  );
+  formData.value.electrical.fuelCellStorage = minimumValue(
+    formData.value.electrical.fuelCellStorage
+  );
+
+  calcResults();
+}
 </script>
 
 <style></style>
