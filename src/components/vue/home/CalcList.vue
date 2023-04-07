@@ -35,8 +35,12 @@ const filteredCalcs = computed(() => {
 
   return calculators.filter((calculator) => {
     const catList = calculator.categories.map((cat) => cat.slug);
+
+    const intersection = props.activeCategories.filter((value) =>
+      catList.includes(value)
+    );
     return (
-      props.activeCategories.filter((value) => catList.includes(value)) &&
+      intersection.length &&
       (calculator.name.toLowerCase().includes(props.search.toLowerCase()) ||
         calculator.description
           .toLowerCase()
