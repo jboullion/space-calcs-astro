@@ -10,6 +10,11 @@ export function formatNumber(value: number, decimals: number = 0) {
 export const clampNumber = (num: number, min: number, max: number) =>
   Math.min(Math.max(num, min), max);
 
+// Used to deep clone an object. May want to use a more robust method in the future
+export function deepClone(obj: Object) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 /**
  *
  *

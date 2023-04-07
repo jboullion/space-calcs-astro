@@ -28,10 +28,8 @@
 }
 
 .calculator .form-section {
-  padding-bottom: 30px;
-  margin-bottom: 30px;
+  padding: 20px 0;
   border-bottom: 1px solid #000;
-  /* display: none; */
 }
 
 /* .calculator .form-section.active {

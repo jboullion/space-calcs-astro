@@ -4,6 +4,7 @@ export interface Category {
   color: string;
 }
 
+// TODO: We should probably move this to a DB or figure out a better way to do this.
 export const categories: Category[] = [
   {
     name: "Rockets",
@@ -24,5 +25,10 @@ export const categories: Category[] = [
     name: "Stations",
     slug: "stations",
     color: "danger",
+  },
+  {
+    name: "Advanced",
+    slug: "advancd",
+    color: "dark",
   },
 ];

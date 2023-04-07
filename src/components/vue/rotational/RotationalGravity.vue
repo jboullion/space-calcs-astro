@@ -1,7 +1,7 @@
 <template>
   <div id="rotational__app" class="row mt-5" v-cloak>
     <div id="rotational__form" class="col-lg-4">
-      <div class="calc-form col-12 mb-5">
+      <div class="calc-form col-12 mb-5 px-2 bg-light rounded border">
         <div>
           <div id="mission" class="rotational__mission">
             <!-- <h4>Mission</h4> -->

@@ -39,12 +39,12 @@
       </div>
     </section>
 
-    <CardList :search="search" :active-categories="activeCategories" />
+    <CalcList :search="search" :active-categories="activeCategories" />
   </div>
 </template>
 
 <script setup lang="ts">
-import CardList from "./CardList.vue";
+import CalcList from "./CalcList.vue";
 import { ref } from "vue";
 import type { Category } from "./constants";
 import { categories } from "./constants";

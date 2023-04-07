@@ -1,7 +1,7 @@
 <template>
   <div id="orbit__app" class="row mt-5" v-cloak>
-    <div id="orbit__form" class="col-lg-6">
-      <div class="calc-form col-12 mb-5">
+    <div id="orbit__form" class="col-lg-4">
+      <div class="calc-form col-12 mb-5 px-2 bg-light rounded border">
         <div>
           <div id="mission" class="orbit__mission">
             <div class="calc-toggle">
@@ -180,7 +180,7 @@
         </div>
       </div>
     </div>
-    <div id="orbit__results" class="col-lg-6 calc-form">
+    <div id="orbit__results" class="col-lg-8 calc-form">
       <!-- <div id="orbit-2d" class="mb-3" style="position: relative; height: 400px;">
   <img src="https://storage.googleapis.com/gweb-uniblog-publish-prod/images/New-global-view.max-1000x1000.jpeg" />
 </div> -->

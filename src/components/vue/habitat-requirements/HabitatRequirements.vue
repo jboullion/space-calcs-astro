@@ -1,6 +1,6 @@
 <template>
   <div id="habitat__app" class="row mt-5" v-cloak>
-    <div class="calc-form col-lg-4 mb-5">
+    <div class="calc-form col-lg-4 mb-5 p-2 bg-light rounded border">
       <div>
         <div id="mission" class="habitat__mission form-section active">
           <h4 @click="showLocation = !showLocation">
@@ -900,6 +900,9 @@
   </div>
 </template>
 <script setup lang="ts">
+// TODO:
+// BUGS
+// 1. Setting Food subsystem options to salad then salad + carbs then back to salad gives different results than packaged -> salad
 import {
   computed,
   nextTick,

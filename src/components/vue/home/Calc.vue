@@ -1,10 +1,10 @@
 <template>
   <div class="card shadow-sm h-100">
-    <a :href="tool.link" class="card-body d-flex flex-column">
-      <h2 class="card-title fw-bold">{{ tool.name }}</h2>
-      <p class="card-text flex-fill">{{ tool.description }}</p>
+    <a :href="calc.link" class="card-body d-flex flex-column">
+      <h2 class="card-title fw-bold">{{ calc.name }}</h2>
+      <p class="card-text flex-fill">{{ calc.description }}</p>
       <div class="d-flex justify-content-between align-items-center">
-        <span v-for="category in tool.categories">
+        <span v-for="category in calc.categories">
           <small :class="'text-' + category.color">{{ category.name }}</small>
         </span>
       </div>
@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import type { SpaceTool } from "../../../types/types";
+import type { SpaceCalc } from "../../../types/types";
 
 defineProps<{
-  tool: SpaceTool;
+  calc: SpaceCalc;
 }>();
 </script>
 

@@ -5,7 +5,7 @@ export interface Reference {
   url: string;
 }
 
-export type SpaceTool = {
+export type SpaceCalc = {
   name: string;
   description: string;
   categories: Category[];
