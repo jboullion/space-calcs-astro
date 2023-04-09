@@ -11,4 +11,5 @@ export type SpaceCalc = {
   categories: Category[];
   image: string;
   link: string;
+  advanced?: boolean;
 };

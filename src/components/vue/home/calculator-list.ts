@@ -1,6 +1,5 @@
 import type { SpaceCalc } from "../../../types/types";
 import {
-  ADVANCED_CAT,
   HABITAT_CAT,
   ORBIT_CAT,
   ROCKET_CAT,
@@ -43,7 +42,8 @@ export const calculators: SpaceCalc[] = [
     name: "Habitat Requirements",
     description:
       "Esimate the energy, mass, crew, and volume requirements for a habitat",
-    categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
+    categories: [categories[HABITAT_CAT]],
+    advanced: true,
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/habitat-requirements",
   },

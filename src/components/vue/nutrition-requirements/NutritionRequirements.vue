@@ -182,220 +182,129 @@
             </tr>
           </tfoot>
         </table>
-
-        <div id="nutrition__results" class="col-lg-4 col-xl-5 calc-form">
-          <!-- <TextInput
-      id="duration"
-      label="Duration"
-      v-model.number="duration"
-      @change=""
-      tooltip=""
-      description=""
-      Type="number"
-    ></TextInput> -->
-
-          <div class="performance-facts">
-            <header class="performance-facts__header">
-              <h1 class="performance-facts__title">Nutrition Facts</h1>
-              <!-- <p>Serving Size 1/2 cup (about 82g)
+      </div>
+    </div>
+    <div id="nutrition__results" class="col-lg-4 col-xl-5 calc-form">
+      <div class="performance-facts">
+        <header class="performance-facts__header">
+          <h1 class="performance-facts__title">Nutrition Facts</h1>
+          <!-- <p>Serving Size 1/2 cup (about 82g)
             <p>Serving Per Container 8</p> -->
-            </header>
-            <table class="performance-facts__table">
-              <tbody>
-                <tr>
-                  <th>
-                    <b>Calories</b>
-                    {{ formatNumber(nutrition.calories.total) }} kcal
-                  </th>
-                  <td>
-                    <!-- Calories from Fat {{ nutrition.fat.calories }} -->
-                    <b>{{ formatNumber(nutrition.calories.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr class="thick-row">
-                  <td colspan="2" class="small-info">
-                    <b>% Value*</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th>
-                    <b>Total Fat</b> {{ formatNumber(nutrition.fat.total) }}g
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.fat.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th class="ps-3">
-                    Saturated Fat {{ formatNumber(nutrition.fat.saturated) }}g
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.fat.saturatedPercent) }}%</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th class="ps-3">
-                    Trans Fat {{ formatNumber(nutrition.fat.trans) }}g
-                  </th>
-                  <td></td>
-                </tr>
-                <tr>
-                  <th>
-                    <b>Cholesterol</b>
-                    {{ formatNumber(nutrition.cholesterol.total) }}mg
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.cholesterol.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th>
-                    <b>Sodium</b> {{ formatNumber(nutrition.sodium.total) }}mg
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.sodium.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th>
-                    <b>Total Carbohydrate</b>
-                    {{ formatNumber(nutrition.carbs.total) }}g
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.carbs.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th class="ps-3">
-                    Dietary Fiber {{ formatNumber(nutrition.fiber.total) }}g
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.fiber.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr>
-                  <th class="ps-3">
-                    Sugars {{ formatNumber(nutrition.sugar.total) }}g
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.sugar.percent) }}%</b>
-                  </td>
-                </tr>
-                <tr class="thick-end">
-                  <th>
-                    <b>Protein</b> {{ formatNumber(nutrition.protein.total) }}g
-                  </th>
-                  <td>
-                    <b>{{ formatNumber(nutrition.protein.percent) }}%</b>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        </header>
+        <table class="performance-facts__table">
+          <tbody>
+            <tr>
+              <th>
+                <b>Calories</b>
+                {{ formatNumber(nutrition.calories.total) }} kcal
+              </th>
+              <td>
+                <!-- Calories from Fat {{ nutrition.fat.calories }} -->
+                <b>{{ formatNumber(nutrition.calories.percent) }}%</b>
+              </td>
+            </tr>
+            <tr class="thick-row">
+              <td colspan="2" class="small-info">
+                <b>% Value*</b>
+              </td>
+            </tr>
+            <tr>
+              <th><b>Total Fat</b> {{ formatNumber(nutrition.fat.total) }}g</th>
+              <td>
+                <b>{{ formatNumber(nutrition.fat.percent) }}%</b>
+              </td>
+            </tr>
+            <tr>
+              <th class="ps-3">
+                Saturated Fat {{ formatNumber(nutrition.fat.saturated) }}g
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.fat.saturatedPercent) }}%</b>
+              </td>
+            </tr>
+            <tr>
+              <th class="ps-3">
+                Trans Fat {{ formatNumber(nutrition.fat.trans) }}g
+              </th>
+              <td></td>
+            </tr>
+            <tr>
+              <th>
+                <b>Cholesterol</b>
+                {{ formatNumber(nutrition.cholesterol.total) }}mg
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.cholesterol.percent) }}%</b>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <b>Sodium</b> {{ formatNumber(nutrition.sodium.total) }}mg
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.sodium.percent) }}%</b>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <b>Total Carbohydrate</b>
+                {{ formatNumber(nutrition.carbs.total) }}g
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.carbs.percent) }}%</b>
+              </td>
+            </tr>
+            <tr>
+              <th class="ps-3">
+                Dietary Fiber {{ formatNumber(nutrition.fiber.total) }}g
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.fiber.percent) }}%</b>
+              </td>
+            </tr>
+            <tr>
+              <th class="ps-3">
+                Sugars {{ formatNumber(nutrition.sugar.total) }}g
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.sugar.percent) }}%</b>
+              </td>
+            </tr>
+            <tr class="thick-end">
+              <th>
+                <b>Protein</b> {{ formatNumber(nutrition.protein.total) }}g
+              </th>
+              <td>
+                <b>{{ formatNumber(nutrition.protein.percent) }}%</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <div v-if="nutrientTotals.length">
-              <div
-                v-for="(nutrient, nutrientId) in nutrientTotals"
-                :key="nutrientId"
-                class="thin-end py-1 d-flex justify-content-between"
-              >
-                {{ nutrient.name }}
-                <b
-                  >{{ formatNumber(nutrient.total)
-                  }}{{ nutrient.unit.toLowerCase() }}</b
-                >
-              </div>
-            </div>
-
-            <!-- <table class="performance-facts__table--grid">
-            <tbody>
-                <tr>
-                    <td>
-                        Calcium {{ formatNumber(nutrition.micro.calcium.total) }}%
-                    </td>
-                    <td>
-                        Iron {{ formatNumber(nutrition.micro.iron.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Potassium {{ formatNumber(nutrition.micro.potassium.total) }}%
-                    </td>
-                    <td>
-                        Manganese {{ formatNumber(nutrition.micro.manganese.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Riboflavin {{ formatNumber(nutrition.micro.riboflavin.total) }}%
-                    </td>
-                    <td>
-                        Niacin {{ formatNumber(nutrition.micro.niacin.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Thiamin {{ formatNumber(nutrition.micro.thiamin.total) }}%
-                    </td>
-                    <td>
-                        Zinc {{ formatNumber(nutrition.micro.zinc.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Sulfur {{ formatNumber(nutrition.micro.sulfur.total) }}%
-                    </td>
-                    <td>
-                        Magnesium {{ formatNumber(nutrition.micro.magnesium.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Vitamin A {{ formatNumber(nutrition.micro.vitaminA.total)  }}%
-                    </td>
-                    <td>
-                        Vitamin C {{ formatNumber(nutrition.micro.vitaminC.total) }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Vitamin B-6 {{ formatNumber(nutrition.micro.vitaminB6.total) }}%
-                    </td>
-                    <td>
-                        Vitamin B-12 {{ formatNumber(nutrition.micro.vitaminB12.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Vitamin D {{ formatNumber(nutrition.micro.vitaminD.total) }}%
-                    </td>
-                    <td>
-                        Vitamin K {{ formatNumber(nutrition.micro.vitaminK.total)  }}%
-                    </td>
-                </tr>
-                <tr class="thin-end">
-                    <td>
-                        Vitamin E {{ formatNumber(nutrition.micro.vitaminE.total) }}%
-                    </td>
-                    <td>
-                        Folate {{ formatNumber(nutrition.micro.folate.total)  }}%
-                    </td>
-                </tr>
-            </tbody>
-        </table> -->
-
-            <p class="small-info mt-2">
-              * Percent values are based on a {{ goals.calories }} calorie diet
-              for a population of {{ population }} for a period of
-              {{ duration }} days.
-            </p>
-            <br />
-
-            <p class="small-info">Calories per gram:</p>
-            <p class="small-info text-center">
-              Fat 9 &bull; Carbohydrate 4 &bull; Protein 4
-            </p>
+        <div v-if="nutrientTotals.length">
+          <div
+            v-for="(nutrient, nutrientId) in nutrientTotals"
+            :key="nutrientId"
+            class="thin-end py-1 d-flex justify-content-between"
+          >
+            {{ nutrient.name }}
+            <b
+              >{{ formatNumber(nutrient.total)
+              }}{{ nutrient.unit.toLowerCase() }}</b
+            >
           </div>
         </div>
+
+        <p class="small-info mt-2">
+          * Percent values are based on a {{ goals.calories }} calorie diet for
+          a population of {{ population }} for a period of {{ duration }} days.
+        </p>
+        <br />
+
+        <p class="small-info">Calories per gram:</p>
+        <p class="small-info text-center">
+          Fat 9 &bull; Carbohydrate 4 &bull; Protein 4
+        </p>
       </div>
     </div>
   </div>
@@ -461,7 +370,8 @@ const loading = ref(false);
  * Food Data
  **************************************************************************/
 // https://nexusaurora.org
-const USDA_API_URL = "/wp-content/themes/nexus-aurora/api/nutrition";
+const USDA_API_URL =
+  "https://nexusaurora.org/wp-content/themes/nexus-aurora/api/nutrition";
 const requestOptions: RequestInit = {
   method: "GET",
   redirect: "follow",
@@ -801,3 +711,265 @@ function showFoodModal(food: Food) {
  * END FOOD MODAL
  * *************************************************************************/
 </script>
+
+<style>
+/**
+ * Globals
+ */
+.btn.btn-sm {
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+.form-control {
+}
+
+/**
+ * Food Search
+ */
+.calc-form {
+  position: relative;
+}
+
+.form-list {
+  border: 1px solid black;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: white;
+  font-size: 14px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.form-list table {
+  margin: 0;
+}
+
+.form-list table tr {
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.form-list table tbody td {
+  text-align: center;
+}
+
+.form-list .ellipsis {
+  max-width: 200px;
+}
+
+/**
+ * FOOD ITEM
+ */
+.food__group {
+  /* border: 1px solid black;
+  border-radius: 5px; */
+}
+
+.food__group.list-group-item {
+  padding: 0;
+  border-color: #666;
+}
+
+.food__row {
+  /* display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center; */
+  vertical-align: middle;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.food__row .form-control {
+  line-height: 1;
+  font-size: 14px;
+}
+
+.food__name {
+  font-weight: 500;
+  max-width: 360px;
+}
+
+.food__qty {
+  width: 100px;
+}
+
+.food__info {
+}
+
+.food__info table {
+  margin: 0;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-collapse: collapse;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.food__info table th,
+.food__info table td {
+  padding: 5px 10px;
+}
+
+.food__table {
+  font-size: 14px;
+}
+
+.food__servings {
+  width: 100px;
+}
+
+.food__remove {
+  width: 56px;
+}
+
+@media screen and (max-width: 768px) {
+  .food__name {
+    max-width: 160px;
+  }
+}
+
+/**
+ * NUTRITION LABEL
+ */
+#nutrition {
+  padding: 100px 0;
+}
+
+.performance-facts {
+  border: 1px solid black;
+  padding: 0.5rem;
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 100px;
+}
+
+.performance-facts p {
+  margin: 0;
+}
+
+.performance-facts table {
+  border-collapse: collapse;
+}
+
+.performance-facts__title {
+  font-weight: bold;
+  font-size: 2rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.performance-facts__header {
+  border-bottom: 10px solid black;
+  padding: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
+}
+
+.performance-facts__header p {
+  margin: 0;
+}
+
+.performance-facts__table,
+.performance-facts__table--small,
+.performance-facts__table--grid {
+  width: 100%;
+}
+
+.performance-facts__table thead tr th,
+.performance-facts__table--small thead tr th,
+.performance-facts__table--grid thead tr th,
+.performance-facts__table thead tr td,
+.performance-facts__table--small thead tr td,
+.performance-facts__table--grid thead tr td {
+  border: 0;
+}
+
+.performance-facts__table th,
+.performance-facts__table--small th,
+.performance-facts__table--grid th,
+.performance-facts__table td,
+.performance-facts__table--small td,
+.performance-facts__table--grid td {
+  font-weight: normal;
+  text-align: left;
+  padding: 0.25rem 0;
+  border-top: 1px solid black;
+  white-space: nowrap;
+}
+
+.performance-facts__table td:last-child,
+.performance-facts__table--small td:last-child,
+.performance-facts__table--grid td:last-child {
+  text-align: right;
+}
+
+.performance-facts__table .blank-cell,
+.performance-facts__table--small .blank-cell,
+.performance-facts__table--grid .blank-cell {
+  width: 1rem;
+  border-top: 0;
+}
+
+.performance-facts__table .thick-row th,
+.performance-facts__table--small .thick-row th,
+.performance-facts__table--grid .thick-row th,
+.performance-facts__table .thick-row td,
+.performance-facts__table--small .thick-row td,
+.performance-facts__table--grid .thick-row td {
+  border-top-width: 5px;
+}
+
+.small-info {
+  font-size: 0.7rem;
+}
+
+.performance-facts__table--small {
+  border-bottom: 1px solid #999;
+  margin: 0 0 0.5rem 0;
+}
+
+.performance-facts__table--small thead tr {
+  border-bottom: 1px solid black;
+}
+
+.performance-facts__table--small td:last-child {
+  text-align: left;
+}
+
+.performance-facts__table--small th,
+.performance-facts__table--small td {
+  border: 0;
+  padding: 0;
+}
+
+.performance-facts__table--grid {
+  margin: 0 0 0.5rem 0;
+}
+
+.performance-facts__table--grid td:last-child {
+  text-align: left;
+}
+
+.performance-facts__table--grid td:last-child::before {
+  content: "•";
+  font-weight: bold;
+  margin: 0 0.25rem 0 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.thick-end {
+  border-bottom: 10px solid black;
+}
+.thin-end {
+  border-bottom: 1px solid black;
+}
+/*
+ * END NUTRITION LABEL
+ */
+</style>
