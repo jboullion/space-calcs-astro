@@ -5,7 +5,13 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <slot name="header"></slot>
+              <h5 class="modal-title">{{ title }}</h5>
+              <button
+                type="button"
+                class="btn-close"
+                aria-label="Close"
+                @click="emit('close')"
+              ></button>
             </div>
             <div class="modal-body">
               <slot></slot>
@@ -20,7 +26,15 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps<{
+  title: string;
+}>();
+
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+</script>
 
 <style scoped>
 .modal-mask {

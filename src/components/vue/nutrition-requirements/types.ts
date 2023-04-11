@@ -28,3 +28,8 @@ export type NutrientTotal = {
   unit: string;
   id: number;
 };
+
+export type NutritionResults = {
+  nutrition: any;
+  foodMass: number;
+};

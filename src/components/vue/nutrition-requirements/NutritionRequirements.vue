@@ -344,6 +344,19 @@ import type { Food, NutrientTotal, Nutrient } from "./types";
 import TextInput from "../forms/TextInput.vue";
 import FoodModal from "./FoodModal.vue";
 import TestModal from "../shared/BaseModal.vue";
+import {
+  CHOLESTEROL_ID,
+  FIBER_ID,
+  SATURATED_FAT_ID,
+  SODIUM_ID,
+  SUGAR_ID,
+  TRANS_FAT_ID,
+  calculateFoodNutrition,
+  calculateNutritionTotals,
+  getNutrient,
+  goals,
+  nutritionDefault,
+} from "./nutrition-util";
 
 const loading = ref(false);
 
@@ -366,19 +379,6 @@ const population = ref(1);
 
 const foodMenu = ref<Food[]>([]);
 const foodMass = ref(0);
-const nutrientTotals = ref<NutrientTotal[]>([]);
-
-const goals = ref({
-  calories: 2000,
-  protein: 50,
-  fat: 65,
-  saturated: 13,
-  carbs: 300,
-  fiber: 25,
-  sodium: 2400,
-  cholesterol: 300,
-  sugar: 50,
-});
 
 function searchUSDA() {
   if (loading.value || !search.value) return;
@@ -438,235 +438,47 @@ function clearResults() {
  * NUTRITION RESULTS
  **************************************************************************/
 
-const nutritionDefault = {
-  calories: {
-    total: 0,
-    percent: 0,
-  },
-  fat: {
-    total: 0,
-    percent: 0,
-    calories: 0,
-    saturated: 0,
-    saturatedPercent: 0,
-    trans: 0,
-  },
-  cholesterol: {
-    total: 0,
-    percent: 0,
-  },
-  sodium: {
-    total: 0,
-    percent: 0,
-  },
-  carbs: {
-    total: 0,
-    percent: 0,
-  },
-  fiber: {
-    total: 0,
-    percent: 0,
-  },
-  protein: {
-    total: 0,
-    percent: 0,
-  },
-  sugar: {
-    total: 0,
-    percent: 0,
-  },
-  micro: {
-    calcium: {
-      total: 0,
-      percent: 0,
-    },
-    fluoride: {
-      total: 0,
-      percent: 0,
-    },
-    folate: {
-      total: 0,
-      percent: 0,
-    },
-    iodine: {
-      total: 0,
-      percent: 0,
-    },
-    iron: {
-      total: 0,
-      percent: 0,
-    },
-    magnesium: {
-      total: 0,
-      percent: 0,
-    },
-    manganese: {
-      total: 0,
-      percent: 0,
-    },
-    phosphorus: {
-      total: 0,
-      percent: 0,
-    },
-    potassium: {
-      total: 0,
-      percent: 0,
-    },
-    sulfur: {
-      total: 0,
-      percent: 0,
-    },
-    thiamin: {
-      total: 0,
-      percent: 0,
-    },
-    riboflavin: {
-      total: 0,
-      percent: 0,
-    },
-    niacin: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminA: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminC: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminD: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminB6: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminB12: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminE: {
-      total: 0,
-      percent: 0,
-    },
-    vitaminK: {
-      total: 0,
-      percent: 0,
-    },
-    zinc: {
-      total: 0,
-      percent: 0,
-    },
-  },
-};
-
 const nutrition = ref({ ...nutritionDefault });
-
-// These are the nutrition label IDs. All nutrients will be listed in detailsst modal
-const CALORIES_ID = 1008;
-const FAT_ID = 1004;
-const SATURATED_FAT_ID = 1258;
-const TRANS_FAT_ID = 1257;
-const CARBS_ID = 1005;
-const PROTEIN_ID = 1003;
-const CHOLESTEROL_ID = 1253;
-const SODIUM_ID = 1093;
-const FIBER_ID = 1079;
-const SUGAR_ID = 2000;
-
-function getNutrient(food: Food, nutrientId: number): number {
-  if (food.nutrients) {
-    const nutrient = food.nutrients.find(
-      (nutrient: any) => nutrient.nutrientId === nutrientId
-    );
-
-    return nutrient ? nutrient.value : 0;
-  }
-
-  return 0;
-}
+const nutrientTotals = ref<NutrientTotal[]>([]);
 
 function calculateNutrition() {
-  nutrition.value = deepClone(nutritionDefault);
-  nutrientTotals.value = [];
-
-  foodMass.value = 0;
-
-  foodMenu.value.forEach((food) => {
-    food.servings = food.servings || 1;
-
-    nutrition.value.calories.total += food.calories * food.servings;
-    nutrition.value.protein.total += food.protein * food.servings;
-    nutrition.value.carbs.total += food.carbs * food.servings;
-    nutrition.value.fat.total += food.fat * food.servings;
-
-    nutrition.value.fat.saturated +=
-      getNutrient(food, SATURATED_FAT_ID) * food.servings;
-    nutrition.value.fat.trans +=
-      getNutrient(food, TRANS_FAT_ID) * food.servings;
-    nutrition.value.cholesterol.total +=
-      getNutrient(food, CHOLESTEROL_ID) * food.servings;
-    nutrition.value.sodium.total +=
-      getNutrient(food, SODIUM_ID) * food.servings;
-    nutrition.value.fiber.total += getNutrient(food, FIBER_ID) * food.servings;
-    nutrition.value.sugar.total += getNutrient(food, SUGAR_ID) * food.servings;
-
-    foodMass.value += food.servings * food.servingSize;
-
-    // Loop through each of our nutrients and add them to the total
-    food.nutrients.forEach((nutrient: Nutrient) => {
-      const nutrientIndex = nutrientTotals.value.findIndex(
-        (n: { id: number }) => n.id === nutrient.nutrientId
-      );
-
-      if (nutrientIndex === -1) {
-        nutrientTotals.value.push({
-          total: nutrient.value * (food.servings || 1),
-          percent: 0,
-          name: nutrient.nutrientName,
-          unit: nutrient.unitName,
-          id: nutrient.nutrientId,
-        });
-      } else {
-        nutrientTotals.value[nutrientIndex].total +=
-          nutrient.value * (food.servings || 1);
-      }
-    });
-  });
-
   const multiplier = population.value * duration.value;
 
-  nutrition.value.calories.percent =
-    (nutrition.value.calories.total / (goals.value.calories * multiplier)) *
-    100;
-  nutrition.value.fat.percent =
-    (nutrition.value.fat.total / (goals.value.fat * multiplier)) * 100;
-  nutrition.value.fat.saturatedPercent =
-    (nutrition.value.fat.saturated / (goals.value.saturated * multiplier)) *
-    100;
+  foodMenu.value.forEach((food) => {
+    const nutritionResult = calculateFoodNutrition(food, multiplier);
 
-  nutrition.value.protein.percent =
-    (nutrition.value.protein.total / (goals.value.protein * multiplier)) * 100;
+    foodMass.value += (food.servings || 0) * food.servingSize;
 
-  nutrition.value.carbs.percent =
-    (nutrition.value.carbs.total / (goals.value.carbs * multiplier)) * 100;
+    nutrition.value.calories.total += nutritionResult.nutrition.calories.total;
+    nutrition.value.protein.total += nutritionResult.nutrition.protein.total;
+    nutrition.value.carbs.total += nutritionResult.nutrition.carbs.total;
+    nutrition.value.fat.total += nutritionResult.nutrition.fat.total;
+    nutrition.value.fat.saturated += nutritionResult.nutrition.fat.saturated;
+    nutrition.value.fat.trans += nutritionResult.nutrition.fat.trans;
+    nutrition.value.cholesterol.total +=
+      nutritionResult.nutrition.cholesterol.total;
+    nutrition.value.sodium.total += nutritionResult.nutrition.sodium.total;
+    nutrition.value.fiber.total += nutritionResult.nutrition.fiber.total;
+    nutrition.value.sugar.total += nutritionResult.nutrition.sugar.total;
 
-  nutrition.value.cholesterol.percent =
-    (nutrition.value.cholesterol.total /
-      (goals.value.cholesterol * multiplier)) *
-    100;
-  nutrition.value.sodium.percent =
-    (nutrition.value.sodium.total / (goals.value.sodium * multiplier)) * 100;
-  nutrition.value.fiber.percent =
-    (nutrition.value.fiber.total / (goals.value.fiber * multiplier)) * 100;
-  nutrition.value.sugar.percent =
-    (nutrition.value.sugar.total / (goals.value.sugar * multiplier)) * 100;
+    nutrition.value.calories.percent =
+      nutritionResult.nutrition.calories.percent;
+    nutrition.value.protein.percent = nutritionResult.nutrition.protein.percent;
+    nutrition.value.carbs.percent = nutritionResult.nutrition.carbs.percent;
+    nutrition.value.fat.percent = nutritionResult.nutrition.fat.percent;
+    nutrition.value.fat.saturatedPercent =
+      nutritionResult.nutrition.fat.saturatedPercent;
+    //nutrition.value.fat.transPercent = nutritionResult.nutrition.fat.transPercent;
+    nutrition.value.cholesterol.percent =
+      nutritionResult.nutrition.cholesterol.percent;
+    nutrition.value.sodium.percent = nutritionResult.nutrition.sodium.percent;
+    nutrition.value.fiber.percent = nutritionResult.nutrition.fiber.percent;
+    nutrition.value.sugar.percent = nutritionResult.nutrition.sugar.percent;
 
-  // Sort our nutrients alphabetically
-  nutrientTotals.value.sort((a, b) => a.name.localeCompare(b.name));
+    nutrientTotals.value = calculateNutritionTotals(food, {
+      ...nutrientTotals.value,
+    });
+  });
 }
 
 /***************************************************************************
