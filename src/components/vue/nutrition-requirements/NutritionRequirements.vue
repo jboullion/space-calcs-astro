@@ -64,19 +64,19 @@
             :disabled="loading"
           >
             <template #append>
-              <div class="input-group-append">
+              <div class="input-group-append" v-if="foodResults.length">
+                <button class="btn btn-danger rounded-0" @click="clearResults">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+              <div class="input-group-append rounded-end bg-primary">
                 <button
-                  class="btn btn-primary"
+                  class="btn text-white rounded-start-0"
                   :class="{ 'rounded-0': foodResults.length }"
                   @click="searchUSDA"
                 >
                   <i v-if="loading" class="fa-solid fa-cog fa-spin"></i>
                   <i v-else class="fa fa-search"></i>
-                </button>
-              </div>
-              <div class="input-group-append" v-if="foodResults.length">
-                <button class="btn btn-danger" @click="clearResults">
-                  <i class="fa fa-times"></i>
                 </button>
               </div>
             </template>
@@ -101,7 +101,7 @@
                 v-for="food in foodResults"
                 :key="food.id"
                 :title="food.name"
-                @click="showFoodModal(food)"
+                @click="openFoodModal(food)"
               >
                 <td>
                   <button
@@ -141,7 +141,7 @@
               v-for="(food, index) in foodMenu"
               :key="food.id"
               :title="food.name"
-              @click="showFoodModal(food)"
+              @click="openFoodModal(food)"
               class="food__row"
             >
               <th class="food__name ellipsis">
@@ -307,13 +307,22 @@
         </p>
       </div>
     </div>
+    <Transition name="fade">
+      <FoodModal
+        v-if="modalFood && showFoodModal"
+        :show="showFoodModal"
+        :food="modalFood"
+        @close="closeFoodModal"
+        @addFood="addFood"
+      />
+    </Transition>
   </div>
 </template>
 <script setup lang="ts">
 /**
  * TODOS:
  * Needed:
- * Order foodmodal nutrients alphabetically
+ * Our food modal is a super hack job and needs to be redone.
  *
  *
  * Wanted:
@@ -331,38 +340,10 @@
 
 import { ref, onMounted } from "vue";
 import { deepClone, formatNumber } from "../utils";
+import type { Food, NutrientTotal, Nutrient } from "./types";
 import TextInput from "../forms/TextInput.vue";
-
-type Nutrient = {
-  nutrientId: number;
-  name: string;
-  nutrientName: string;
-  unitName: string;
-  amount: number;
-  unit: string;
-  value: number;
-};
-
-type Food = {
-  id?: number;
-  name: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
-  servingSize: number;
-  nutrients: Nutrient[];
-  show?: boolean;
-  servings?: number;
-};
-
-type nutrientTotal = {
-  total: number;
-  percent: number;
-  name: string;
-  unit: string;
-  id: number;
-};
+import FoodModal from "./FoodModal.vue";
+import TestModal from "../shared/BaseModal.vue";
 
 const loading = ref(false);
 
@@ -385,7 +366,7 @@ const population = ref(1);
 
 const foodMenu = ref<Food[]>([]);
 const foodMass = ref(0);
-const nutrientTotals = ref<nutrientTotal[]>([]);
+const nutrientTotals = ref<NutrientTotal[]>([]);
 
 const goals = ref({
   calories: 2000,
@@ -695,16 +676,24 @@ function calculateNutrition() {
 /***************************************************************************
  * FOOD MODAL
  * *************************************************************************/
-let foodModal = null;
+const showFoodModal = ref(false);
 const modalFood = ref<Food | null>(null);
 
 onMounted(() => {
   //foodModal = new bootstrap.Modal(document.getElementById("foodModal"));
 });
 
-function showFoodModal(food: Food) {
+function openFoodModal(food: Food) {
   modalFood.value = food;
+  showFoodModal.value = true;
+  console.log("openFoodModal", food);
   //foodModal.show();
+}
+
+function closeFoodModal() {
+  showFoodModal.value = false;
+  //foodModal.hide();
+  console.log("closeFoodModal");
 }
 
 /***************************************************************************
@@ -972,4 +961,37 @@ function showFoodModal(food: Food) {
 /*
  * END NUTRITION LABEL
  */
+
+/**
+  * FOOD MODAL
+  */
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+  transition: opacity 0.3s;
+}
+
+.modal-enter,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s;
+}
+
+.modal-enter-to,
+.modal-leave {
+  opacity: 1;
+}
 </style>

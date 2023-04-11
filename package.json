@@ -19,6 +19,14 @@
   },
   "devDependencies": {
     "@types/three": "^0.150.1",
-    "google-charts": "^2.0.0"
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "eslint": "^8.38.0",
+    "eslint-config-standard-with-typescript": "^34.0.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.10.0",
+    "google-charts": "^2.0.0",
+    "typescript": "^5.0.4"
   }
 }
