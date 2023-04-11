@@ -162,11 +162,10 @@ export function getNutrient(food: Food, nutrientId: number): number {
   return 0;
 }
 
-export function calculateFoodNutrition(
-  food: Food,
-  multiplier: number = 1
-): any {
-  const nutrition = deepClone(nutritionDefault);
+export function calculateFoodNutrition(food: Food, nutrition: any = {}): any {
+  if (!nutrition) {
+    nutrition = deepClone(nutritionDefault);
+  }
 
   food.servings = food.servings || 1;
 
@@ -184,6 +183,14 @@ export function calculateFoodNutrition(
   nutrition.fiber.total += getNutrient(food, FIBER_ID) * food.servings;
   nutrition.sugar.total += getNutrient(food, SUGAR_ID) * food.servings;
 
+  return nutrition;
+}
+
+export function calculateNutritionPercentages(
+  nutrition: any,
+  multiplier: number = 1
+) {
+  // TODO: These percentages should probably be calculated outside of this function after all the foods have been added
   nutrition.calories.percent =
     (nutrition.calories.total / (goals.calories * multiplier)) * 100;
   nutrition.fat.percent =

@@ -352,6 +352,7 @@ import {
   SUGAR_ID,
   TRANS_FAT_ID,
   calculateFoodNutrition,
+  calculateNutritionPercentages,
   calculateNutritionTotals,
   getNutrient,
   goals,
@@ -442,43 +443,21 @@ const nutrition = ref({ ...nutritionDefault });
 const nutrientTotals = ref<NutrientTotal[]>([]);
 
 function calculateNutrition() {
-  const multiplier = population.value * duration.value;
+  nutrition.value = deepClone(nutritionDefault);
+  nutrientTotals.value = [];
 
   foodMenu.value.forEach((food) => {
-    const nutritionResult = calculateFoodNutrition(food, multiplier);
+    nutrition.value = calculateFoodNutrition(food, {
+      ...nutrition.value,
+    });
 
     foodMass.value += (food.servings || 0) * food.servingSize;
 
-    nutrition.value.calories.total += nutritionResult.nutrition.calories.total;
-    nutrition.value.protein.total += nutritionResult.nutrition.protein.total;
-    nutrition.value.carbs.total += nutritionResult.nutrition.carbs.total;
-    nutrition.value.fat.total += nutritionResult.nutrition.fat.total;
-    nutrition.value.fat.saturated += nutritionResult.nutrition.fat.saturated;
-    nutrition.value.fat.trans += nutritionResult.nutrition.fat.trans;
-    nutrition.value.cholesterol.total +=
-      nutritionResult.nutrition.cholesterol.total;
-    nutrition.value.sodium.total += nutritionResult.nutrition.sodium.total;
-    nutrition.value.fiber.total += nutritionResult.nutrition.fiber.total;
-    nutrition.value.sugar.total += nutritionResult.nutrition.sugar.total;
-
-    nutrition.value.calories.percent =
-      nutritionResult.nutrition.calories.percent;
-    nutrition.value.protein.percent = nutritionResult.nutrition.protein.percent;
-    nutrition.value.carbs.percent = nutritionResult.nutrition.carbs.percent;
-    nutrition.value.fat.percent = nutritionResult.nutrition.fat.percent;
-    nutrition.value.fat.saturatedPercent =
-      nutritionResult.nutrition.fat.saturatedPercent;
-    //nutrition.value.fat.transPercent = nutritionResult.nutrition.fat.transPercent;
-    nutrition.value.cholesterol.percent =
-      nutritionResult.nutrition.cholesterol.percent;
-    nutrition.value.sodium.percent = nutritionResult.nutrition.sodium.percent;
-    nutrition.value.fiber.percent = nutritionResult.nutrition.fiber.percent;
-    nutrition.value.sugar.percent = nutritionResult.nutrition.sugar.percent;
-
-    nutrientTotals.value = calculateNutritionTotals(food, {
-      ...nutrientTotals.value,
-    });
+    nutrientTotals.value = calculateNutritionTotals(food, nutrientTotals.value);
   });
+
+  const multiplier = population.value * duration.value;
+  nutrition.value = calculateNutritionPercentages(nutrition.value, multiplier);
 }
 
 /***************************************************************************
