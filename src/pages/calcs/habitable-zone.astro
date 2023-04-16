@@ -1,0 +1,26 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import HabitableZone from "../../components/vue/habitable-zone/HabitableZone.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+const title = "Habitable Zone";
+const description = "Calculate the habitable zone of a star.";
+
+const references: Reference[] = [];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;" class="calculator">
+      <HabitableZone client:only="vue" />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

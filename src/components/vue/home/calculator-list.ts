@@ -54,4 +54,11 @@ export const calculators: SpaceCalc[] = [
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/nutrition-requirements",
   },
+  {
+    name: "Habitable Zone",
+    description: "Estimate the habitable zone of a star",
+    categories: [categories[ORBIT_CAT]],
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/habitable-zone",
+  },
 ];
