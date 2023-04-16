@@ -11,10 +11,19 @@
 </template>
 
 <script setup lang="ts">
+// TODO: BREAK THIS UP INTO MULTIPLE FILES. BUILD REUSABLE FUNCTIONS
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import type { HabitableZoneForm } from "./constants";
+
+type Zone = {
+  name: string;
+  color: number;
+  emissive: number;
+  innerRadius: number;
+  outerRadius: number;
+};
 
 interface PlanetTextures {
   sun: THREE.Texture | null;
@@ -70,6 +79,10 @@ const textureDir = "/textures/";
 const props = defineProps<{
   formData: HabitableZoneForm;
 }>();
+
+const animation = {
+  prevTick: 0,
+};
 
 /**
  *
@@ -142,7 +155,13 @@ function setupScene() {
   }
 
   setupThreeJS();
+  setupSun();
+  setupZones();
   // setupPlanet();
+
+  if (!animation.prevTick) {
+    animate();
+  }
 }
 
 function setupThreeJS() {
@@ -270,5 +289,89 @@ function setupSun() {
   mesh.rotation.set(Math.PI / 2, 0, 0);
 
   three.scene.add(mesh);
+}
+
+function setupZones() {
+  const hotZone: Zone = {
+    name: "Hot Zone",
+    color: 0xff0000,
+    emissive: 0x550000,
+    innerRadius: 0,
+    outerRadius: 1000,
+  };
+
+  const habitableZone: Zone = {
+    name: "Habitable Zone",
+    color: 0x00ff00,
+    emissive: 0x005500,
+    innerRadius: 1000,
+    outerRadius: 2000,
+  };
+
+  const coldZone: Zone = {
+    name: "Cold Zone",
+    color: 0x0000ff,
+    emissive: 0x000055,
+    innerRadius: 2000,
+    outerRadius: 3000,
+  };
+
+  createZone(hotZone);
+  createZone(habitableZone);
+  createZone(coldZone);
+}
+
+function createZone(zone: Zone) {
+  var extrudeSettings = {
+    depth: 1,
+    steps: 1,
+    bevelEnabled: false,
+    curveSegments: 24,
+  };
+
+  var arcShape = new THREE.Shape();
+  arcShape.absarc(0, 0, zone.outerRadius, 0, Math.PI * 2, false);
+
+  var holePath = new THREE.Path();
+  holePath.absarc(
+    0,
+    0,
+    zone.innerRadius, // This would be the radius of the smaller circle
+    0,
+    Math.PI * 2,
+    true
+  );
+  arcShape.holes.push(holePath);
+
+  const zoneMaterial = new THREE.MeshPhongMaterial({
+    color: zone.color,
+    emissive: zone.emissive,
+    side: THREE.FrontSide, // DoubleSide, BackSide
+  });
+
+  const zoneGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);
+
+  const zoneMesh = new THREE.Mesh(zoneGeometry, zoneMaterial);
+
+  three.scene.add(zoneMesh);
+}
+
+function animate() {
+  if (!three.renderer) return;
+  if (!three.controls) return;
+
+  requestAnimationFrame(animate);
+
+  three.controls.update();
+
+  //this.three.camera.position.clamp(this.three.minMovement, this.three.maxMovement);
+  three.renderer.render(three.scene, three.camera);
+
+  // clamp to fixed framerate
+  const now = Math.round((60 * window.performance.now()) / 1000);
+
+  if (now == animation.prevTick) return;
+
+  animation.prevTick = now;
 }
 </script>
