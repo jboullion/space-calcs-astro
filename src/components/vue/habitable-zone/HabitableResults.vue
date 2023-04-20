@@ -7,7 +7,11 @@
     >
       <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
     </div>
-
+    <p>
+      <strong>Note:</strong> Habitable zone is calculated for Earth like
+      planets. Planets with different albedos and atmospheres will have
+      different habitable zones.
+    </p>
     <table class="table table-striped">
       <tbody>
         <tr class="">
@@ -33,6 +37,8 @@
 
 <script setup lang="ts">
 // TODO: BREAK THIS UP INTO MULTIPLE FILES. BUILD REUSABLE FUNCTIONS
+// TODO: Must Dos!
+// 1.
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
@@ -389,7 +395,11 @@ function setupZones() {
     opacity: 0.5,
   };
 
-  const orbitWidth = 10 + Math.floor(props.formData.starRadius / 3);
+  // At large star sizes the orbit is too small to see
+  const orbitWidth = Math.max(
+    8 + Math.floor(props.formData.starRadius / 3),
+    20
+  );
 
   const planetOrbit: Zone = {
     name: "Planet Orbit",
@@ -400,42 +410,115 @@ function setupZones() {
     opacity: 1,
   };
 
-  const earthOrbit: Zone = {
-    name: "Planet Orbit",
-    color: 0x0000ff,
-    emissive: 0x0000ff,
-    innerRadius: 1 * AUtoDistance,
-    outerRadius: 1 * AUtoDistance + orbitWidth,
-    opacity: 1,
-  };
-
-  const marsOrbit: Zone = {
-    name: "Planet Orbit",
-    color: 0xff0000,
-    emissive: 0xff0000,
-    innerRadius: 1.5 * AUtoDistance,
-    outerRadius: 1.5 * AUtoDistance + orbitWidth,
-    opacity: 1,
-  };
-
-  const venusOrbit: Zone = {
-    name: "Planet Orbit",
-    color: 0xffff00,
-    emissive: 0xffff00,
-    innerRadius: 0.7 * AUtoDistance,
-    outerRadius: 0.7 * AUtoDistance + orbitWidth,
-    opacity: 1,
-  };
-
-  console.log("orbitWidth", orbitWidth);
-
   createZone(innerHZ);
   createOrbit(planetOrbit);
 
   if (props.formData.showExampleOrbits) {
+    const earthOrbit: Zone = {
+      name: "Earth Orbit",
+      color: 0x0000ff,
+      emissive: 0x0000ff,
+      innerRadius: 1 * AUtoDistance,
+      outerRadius: 1 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    const marsOrbit: Zone = {
+      name: "Mars Orbit",
+      color: 0xff0000,
+      emissive: 0xff0000,
+      innerRadius: 1.5 * AUtoDistance,
+      outerRadius: 1.5 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    const venusOrbit: Zone = {
+      name: "Venus Orbit",
+      color: 0xffff00,
+      emissive: 0xffff00,
+      innerRadius: 0.7 * AUtoDistance,
+      outerRadius: 0.7 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    const mercuryOrbit: Zone = {
+      name: "Mercury Orbit",
+      color: 0xcccccc,
+      emissive: 0xcccccc,
+      innerRadius: 0.4 * AUtoDistance,
+      outerRadius: 0.4 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
     createOrbit(earthOrbit);
     createOrbit(marsOrbit);
     createOrbit(venusOrbit);
+    createOrbit(mercuryOrbit);
+  }
+
+  if (hzOuter.value > 3) {
+    const jupiterOrbit: Zone = {
+      name: "Jupiter Orbit",
+      color: 0xffaa00,
+      emissive: 0xffaa00,
+      innerRadius: 5.2 * AUtoDistance,
+      outerRadius: 5.2 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    createOrbit(jupiterOrbit);
+  }
+
+  if (hzOuter.value > 7) {
+    const saturnOrbit: Zone = {
+      name: "Saturn Orbit",
+      color: 0xaaaa00,
+      emissive: 0xaaaa00,
+      innerRadius: 9.5 * AUtoDistance,
+      outerRadius: 9.5 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    createOrbit(saturnOrbit);
+  }
+
+  if (hzOuter.value > 15) {
+    const uranusOrbit: Zone = {
+      name: "Uranus Orbit",
+      color: 0x00aaff,
+      emissive: 0x00aaff,
+      innerRadius: 19.8 * AUtoDistance,
+      outerRadius: 19.8 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    createOrbit(uranusOrbit);
+  }
+
+  if (hzOuter.value > 25) {
+    const neptuneOrbit: Zone = {
+      name: "Neptune Orbit",
+      color: 0x0033ff,
+      emissive: 0x0033ff,
+      innerRadius: 30 * AUtoDistance,
+      outerRadius: 30 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    createOrbit(neptuneOrbit);
+  }
+
+  if (hzOuter.value > 30) {
+    const plutoOrbit: Zone = {
+      name: "Pluto Orbit",
+      color: 0xa020f0,
+      emissive: 0xa020f0,
+      innerRadius: 39 * AUtoDistance,
+      outerRadius: 39 * AUtoDistance + orbitWidth,
+      opacity: 1,
+    };
+
+    createOrbit(plutoOrbit);
   }
 }
 
@@ -543,33 +626,6 @@ function animate() {
 
   animation.prevTick = now;
 }
-
-// function calculateHabitableZone(): [number, number] {
-//   // Calculate the star's luminosity in W
-//   const luminosity =
-//     4 *
-//     Math.PI *
-//     (props.formData.starRadius * physicsConstants.solarRadius) ** 2 *
-//     physicsConstants.σ *
-//     props.formData.starTemperature ** 4;
-
-//   console.log(
-//     "starRadius",
-//     props.formData.starRadius * physicsConstants.solarRadius
-//   );
-//   console.log("starTemperature", props.formData.starTemperature);
-//   console.log("luminosity", luminosity);
-
-//   // Calculate the inner and outer edges of the habitable zone in AU
-//   const aInner = Math.sqrt(luminosity / 1.1) / physicsConstants.AU;
-//   const aOuter = Math.sqrt(luminosity / 0.53) / physicsConstants.AU;
-
-//   console.log("aInner", aInner);
-//   console.log("aOuter", aOuter);
-
-//   // Return the habitable zone as a tuple of distances in AU
-//   return [aInner, aOuter];
-// }
 
 /**
  * WATCHERS

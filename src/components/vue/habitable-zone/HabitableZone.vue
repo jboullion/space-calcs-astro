@@ -69,6 +69,7 @@
           label="Planet Orbit"
           v-model.number="formData.planetOrbit"
           unit="AU"
+          :step="0.1"
           tooltip="Distance from the star in astronomical units. Earth is ~1 AU"
           @change="
             formData.planetOrbit = clampNumber(formData.planetOrbit, 0.1, 100)
@@ -106,15 +107,13 @@
 
 <script setup lang="ts">
 // TODO: Must Dos!
-// 1. Get star showing, along with orbits for planets
-// 2. Get custom planet and orbit showing
-// 3. Show habitable zones
-// 4. Setup calculations to determine habitable zone size
+// 1. Setup calculations to determine habitable zone size
+// 2. Calculate temperature of planet orbit
+// 3. Get tooltips working
 
 // ! BUGS
 
 // ? NOTE: Optional Improvements!
-// 1. Change star color and size based on the mass and age?
 
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
