@@ -53,3 +53,20 @@ h1 {
 .bg-orange {
   background-color: var(--bs-orange);
 }
+
+/**
+  * Custom range input
+  */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  input[type="range"] {
+    overflow: hidden;
+    -webkit-appearance: none;
+    background-color: transparent;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: #fff;
+    height: 12px;
+    border: 1px solid #dee2e6;
+  }
+}

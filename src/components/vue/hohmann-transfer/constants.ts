@@ -3,6 +3,7 @@ import { ref } from "vue";
 
 export type Location = {
   name: string;
+  value: string;
   distance: number; // km
   au: number;
   orbitalPeriod: number; // days. Convert to seconds before use.
@@ -13,6 +14,7 @@ export type Location = {
 export const locations: Location[] = [
   {
     name: "Mercury",
+    value: "Mercury",
     distance: 57910000, // km
     au: 0.39,
     orbitalPeriod: 87.66, // days. Convert to seconds before use.
@@ -21,6 +23,7 @@ export const locations: Location[] = [
   },
   {
     name: "Venus",
+    value: "Venus",
     distance: 108210000, // km
     au: 0.72,
     orbitalPeriod: 224.701, // days. Convert to seconds before use.
@@ -29,6 +32,7 @@ export const locations: Location[] = [
   },
   {
     name: "Earth",
+    value: "Earth",
     distance: 149600000, // km
     au: 1,
     orbitalPeriod: 365.25636, // days. Convert to seconds before use.
@@ -37,6 +41,7 @@ export const locations: Location[] = [
   },
   {
     name: "Mars",
+    value: "Mars",
     distance: 227920000, // km
     au: 1.52,
     orbitalPeriod: 686.6812, // days. Convert to seconds before use.
@@ -45,6 +50,7 @@ export const locations: Location[] = [
   },
   {
     name: "Jupiter",
+    value: "Jupiter",
     distance: 778570000, // km
     au: 5.2,
     orbitalPeriod: 4332.71, // days. Convert to seconds before use.
@@ -53,6 +59,7 @@ export const locations: Location[] = [
   },
   {
     name: "Saturn",
+    value: "Saturn",
     distance: 1433530000, // km
     au: 9.58,
     orbitalPeriod: 10759.721, // days. Convert to seconds before use.
@@ -61,6 +68,7 @@ export const locations: Location[] = [
   },
   {
     name: "Uranus",
+    value: "Uranus",
     distance: 2872460000, // km
     au: 19.2,
     orbitalPeriod: 30685.1868, // days. Convert to seconds before use.
@@ -69,6 +77,7 @@ export const locations: Location[] = [
   },
   {
     name: "Neptune",
+    value: "Neptune",
     distance: 4495060000, // km
     au: 30.05,
     orbitalPeriod: 60190.5955, // days. Convert to seconds before use.

@@ -10,7 +10,8 @@
         :value.number="modelValue"
         :min="min"
         :max="max"
-        @change="($event) => $emit('update:modelValue', parseInt(($event.target as HTMLInputElement).value))"
+        :step="step"
+        @change="($event) => $emit('update:modelValue', parseFloat(($event.target as HTMLInputElement).value))"
       />
       <span v-if="unit" class="input-group-text bg-dark text-white">{{
         unit
@@ -36,5 +37,6 @@ defineProps<{
   description?: string;
   min?: number;
   max?: number;
+  step?: number;
 }>();
 </script>

@@ -5,10 +5,14 @@
     <select
       :id="id"
       class="form-select"
-      :value="modelValue.name"
+      :value="modelValue.value"
       @change="($event) => emitOption(($event.target as HTMLInputElement).value)"
     >
-      <option v-for="option in options" :value="option.name">
+      <option
+        v-for="option in options"
+        :value="option.value"
+        :selected="option.value == modelValue.value"
+      >
         {{ option.name }}
       </option>
     </select>
