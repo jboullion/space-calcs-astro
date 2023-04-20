@@ -32,15 +32,29 @@
           label="Star Radius"
           v-model.number="formData.starRadius"
           :step="0.1"
+          :max="1000"
+          :min="0.1"
           unit="R☉"
           tooltip="Radius of the star in solar radii. Our sun is ~1 R☉"
+          @change="
+            formData.starRadius = clampNumber(formData.starRadius, 0.1, 1000)
+          "
         />
         <NumberInput
           id="star-temperature"
           label="Star Temperature"
           v-model.number="formData.starTemperature"
           unit="K"
+          :min="1000"
+          :max="20000"
           tooltip="Temperature of the star in Kelvin. Our sun is ~5778 K"
+          @change="
+            formData.starTemperature = clampNumber(
+              formData.starTemperature,
+              1000,
+              20000
+            )
+          "
         />
         <!-- <NumberInput
           id="star-luminosity"
@@ -52,12 +66,24 @@
 
         <NumberInput
           id="orbit"
-          label="Orbit"
+          label="Planet Orbit"
           v-model.number="formData.planetOrbit"
           unit="AU"
           tooltip="Distance from the star in astronomical units. Earth is ~1 AU"
+          @change="
+            formData.planetOrbit = clampNumber(formData.planetOrbit, 0.1, 100)
+          "
         />
-        <NumberInput
+
+        <CheckboxInput
+          id="example-orbits"
+          label="Show example orbits?"
+          v-model="formData.showExampleOrbits"
+          :value="true"
+          tooltip="Show Venus, Earth, and Mars orbits"
+        />
+
+        <!-- <NumberInput
           id="albedo"
           label="Albedo"
           v-model.number="formData.planetAlbedo"
@@ -70,7 +96,7 @@
           v-model.number="formData.planetAtmosphere"
           unit="atm"
           tooltip="Density of the atmosphere in atmospheres. Earth is ~1"
-        />
+        /> -->
       </div>
     </div>
 
@@ -94,6 +120,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import NumberInput from "../forms/NumberInput.vue";
+import CheckboxInput from "../forms/CheckboxInput.vue";
 
 // import {
 //   locations,
@@ -107,6 +134,7 @@ import SelectInput from "../forms/SelectInput.vue";
 import HabitableResults from "./HabitableResults.vue";
 //import HabitableForm from "./OLD-HabitableForm.vue";
 import type { HabitableZoneForm, StarType } from "./constants";
+import { clampNumber } from "../utils";
 
 const loading = ref(true);
 const textureDir = "/textures/";
@@ -130,6 +158,7 @@ const formData = ref<HabitableZoneForm>({
   planetOrbit: 1, // In AU
   planetAlbedo: 0.37, // Percentage
   planetAtmosphere: 1, // In atmospheres
+  showExampleOrbits: false,
 });
 
 /**

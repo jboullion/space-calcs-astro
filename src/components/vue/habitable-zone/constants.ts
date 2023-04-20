@@ -8,6 +8,7 @@ export type HabitableZoneForm = {
   planetOrbit: number; // AU
   planetAlbedo: number; // 0-100% of light reflected
   planetAtmosphere: number; // 0-X% Earth atmosphere
+  showExampleOrbits: boolean;
 };
 
 export type StarType = { value: string; name: string };

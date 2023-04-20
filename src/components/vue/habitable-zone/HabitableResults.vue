@@ -3,10 +3,31 @@
     <div
       id="habitable-canvas"
       class="mb-3"
-      style="position: relative; height: 600px; width: 100%"
+      style="position: relative; height: 500px; width: 100%"
     >
       <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
     </div>
+
+    <table class="table table-striped">
+      <tbody>
+        <tr class="">
+          <th>Luminosity (L☉)</th>
+          <td class="text-end">{{ luminosity }} L☉</td>
+        </tr>
+        <tr class="">
+          <th>Flux (kT)</th>
+          <td class="text-end">{{ formatNumber(energyFlux) }} kT</td>
+        </tr>
+        <tr class="">
+          <th>Inner Radius (AU)</th>
+          <td class="text-end">{{ formatNumber(hzInner) }} AU</td>
+        </tr>
+        <tr class="">
+          <th>Outer Radius (AU)</th>
+          <td class="text-end">{{ formatNumber(hzOuter) }} AU</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -16,6 +37,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { physicsConstants, removeAllChildNodes } from "../utils";
+import { formatNumber } from "../utils";
 import type { HabitableZoneForm } from "./constants";
 
 type Zone = {
@@ -71,8 +93,8 @@ const three = {
   // gui: null, // used for debugging
   // raycaster: null,
   // mouse: null,
-  minMovement: null as THREE.Vector3 | null,
-  maxMovement: null as THREE.Vector3 | null,
+  // minMovement: null as THREE.Vector3 | null,
+  // maxMovement: null as THREE.Vector3 | null,
 };
 
 const loading = ref(true);
@@ -94,6 +116,35 @@ const AUtoDistance = 1000; // Turn AU into on screen distance
  *
  * @link https://www.planetarybiology.com/calculating_habitable_zone.html
  */
+
+const starArea = computed(() => {
+  const radius = props.formData.starRadius * physicsConstants.solarRadius;
+  return 4 * Math.PI * radius ** 2;
+});
+
+const starTemperature = computed(() => {
+  return props.formData.starTemperature ** 4;
+});
+
+const energyFlux = computed(() => {
+  return physicsConstants.stefanBoltzmann * starTemperature.value;
+});
+
+const luminosity = computed(() => {
+  return energyFlux.value * starArea.value * 1000000; // TODO: WHY 1000000? 1e6? What is causing us to need to add this value?
+});
+
+const L_rel = computed(() => {
+  return luminosity.value / physicsConstants.L_sun;
+});
+
+const hzInner = computed(() => {
+  return Math.sqrt(L_rel.value / 1.1); // / physicsConstants.AU;
+});
+
+const hzOuter = computed(() => {
+  return Math.sqrt(L_rel.value / 0.53); // / physicsConstants.AU;
+});
 
 /*
 function log5(val: number) {
@@ -227,7 +278,7 @@ function setupThreeJS() {
   three.canvas.appendChild(three.renderer.domElement);
 
   const width = three.canvas.getBoundingClientRect().width;
-  const height = 400;
+  const height = 500;
 
   three.renderer.setSize(width, height);
 
@@ -249,8 +300,10 @@ function updateCamera() {
   if (!three.renderer) return;
 
   // Camera
-  const cameraPositionDistance = props.formData.planetOrbit * AUtoDistance * 6;
-  const cameraZoomDistance = props.formData.planetOrbit * AUtoDistance * 12;
+  const baseDistance = Math.max(props.formData.planetOrbit, hzOuter.value);
+  const cameraPositionDistance = baseDistance * AUtoDistance * 2;
+  const cameraZoomDistance = baseDistance * AUtoDistance * 4;
+
   let rendererSize = new THREE.Vector2();
   three.renderer.getSize(rendererSize);
   three.camera = new THREE.PerspectiveCamera(
@@ -260,71 +313,33 @@ function updateCamera() {
     cameraZoomDistance * 2
   );
 
-  three.minMovement = new THREE.Vector3(
-    -cameraZoomDistance,
-    -cameraZoomDistance,
-    -cameraZoomDistance
-  );
-  three.maxMovement = new THREE.Vector3(
-    cameraZoomDistance,
-    cameraZoomDistance,
-    cameraZoomDistance
-  );
-
   three.camera.position.z = cameraPositionDistance;
+
   // this.three.controls.enableZoom = false;
 
   // Controls
   three.controls = new OrbitControls(three.camera, three.renderer.domElement);
+  // three.controls.enableDamping = true;
+  // three.controls.dampingFactor = 0.05;
+  three.controls.maxDistance = cameraZoomDistance;
+  three.controls.minDistance = 100;
 }
 
-/**
- * SETUP OBJECTS
- */
-// function getMaterial(name: string) {
-//   switch (name) {
-//     case "Mercury":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.mercury,
-//         side: THREE.FrontSide,
-//       });
-//     case "Venus":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.venus,
-//         side: THREE.FrontSide,
-//       });
-//     case "Earth":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.earth,
-//         side: THREE.FrontSide,
-//       });
-//     case "Mars":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.mars,
-//         side: THREE.FrontSide,
-//       });
-//     case "Jupiter":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.jupiter,
-//         side: THREE.FrontSide,
-//       });
-//     case "Saturn":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.saturn,
-//         side: THREE.FrontSide,
-//       });
-//     case "Uranus":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.uranus,
-//         side: THREE.FrontSide,
-//       });
-//     case "Neptune":
-//       return new THREE.MeshLambertMaterial({
-//         map: planetTextures.neptune,
-//         side: THREE.FrontSide,
-//       });
-//   }
-// }
+function getSunColor() {
+  if (props.formData.starTemperature > 11000) {
+    return 0x5555ff;
+  } else if (props.formData.starTemperature > 7500) {
+    return 0xffffff;
+  } else if (props.formData.starTemperature > 5000) {
+    return 0xffff00;
+  } else if (props.formData.starTemperature > 3600) {
+    return 0xffa500;
+  } else if (props.formData.starTemperature > 2500) {
+    return 0xaa0000;
+  } else {
+    return 0x220000;
+  }
+}
 
 function setupSun() {
   if (!three.scene) return;
@@ -332,11 +347,15 @@ function setupSun() {
   const material = new THREE.MeshLambertMaterial({
     map: planetTextures.sun,
     side: THREE.FrontSide,
+    color: getSunColor(),
+    emissive: getSunColor(),
+    emissiveIntensity: 0.8,
   });
-  material.emissive = new THREE.Color(0xffff00);
-  material.emissiveIntensity = 0.5;
 
-  const geometry = new THREE.SphereGeometry(10, 32, 32);
+  // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
+  const sunRadius = 4.7 * props.formData.starRadius;
+
+  const geometry = new THREE.SphereGeometry(sunRadius, 32, 32);
   const mesh = new THREE.Mesh(geometry, material);
   mesh.rotation.set(Math.PI / 2, 0, 0);
 
@@ -348,85 +367,76 @@ function clearZones() {
     // @ts-ignore
     if (!three.scene.children[i].geometry) continue;
 
-    // @ts-ignore
-    if (three.scene.children[i].geometry.type !== "ExtrudeGeometry") continue;
+    if (
+      // @ts-ignore
+      three.scene.children[i].geometry.type !== "ExtrudeGeometry" &&
+      // @ts-ignore
+      three.scene.children[i].geometry.type !== "SphereGeometry"
+    )
+      continue;
 
     three.scene.remove(three.scene.children[i]);
   }
 }
 
 function setupZones() {
-  clearZones();
-
-  // const hotZone: Zone = {
-  //   name: "Hot Zone",
-  //   color: 0xff0000,
-  //   emissive: 0xdd0000,
-  //   innerRadius: 0,
-  //   outerRadius: 1 * AUtoDistance,
-  //   opacity: 0.5,
-  // };
-
-  // const innerHabitableZone: Zone = {
-  //   name: "Inner Habitable Zone",
-  //   color: 0x00ff00,
-  //   emissive: 0x00ff00,
-  //   innerRadius: 1 * AUtoDistance,
-  //   outerRadius: 1.5 * AUtoDistance,
-  //   opacity: 0.5,
-  // };
-
-  // const outerHabitableZone: Zone = {
-  //   name: "Outer Habitable Zone",
-  //   color: 0x00ff00,
-  //   emissive: 0x005500,
-  //   innerRadius: 1.5 * AUtoDistance,
-  //   outerRadius: 2 * AUtoDistance,
-  //   opacity: 0.5,
-  // };
-
-  // const coldZone: Zone = {
-  //   name: "Cold Zone",
-  //   color: 0x0000ff,
-  //   emissive: 0x000055,
-  //   innerRadius: 2 * AUtoDistance,
-  //   outerRadius: 3 * AUtoDistance,
-  //   opacity: 0.5,
-  // };
-
-  const starRadius = props.formData.starRadius * physicsConstants.solarRadius;
-  const [aInner, aOuter] = calculateHabitableZone(
-    starRadius,
-    props.formData.starTemperature
-  );
-
-  console.log("aInner", aInner);
-  console.log("aOuter", aOuter);
-
   const innerHZ: Zone = {
     name: "Inner Habitable Zone",
     color: 0x00ff00,
     emissive: 0x00ff00,
-    innerRadius: aInner * AUtoDistance,
-    outerRadius: aOuter * AUtoDistance,
+    innerRadius: hzInner.value * AUtoDistance,
+    outerRadius: hzOuter.value * AUtoDistance,
     opacity: 0.5,
   };
 
-  const earthOrbit: Zone = {
-    name: "Earth Orbit",
+  const orbitWidth = 10 + Math.floor(props.formData.starRadius / 3);
+
+  const planetOrbit: Zone = {
+    name: "Planet Orbit",
     color: 0xffffff,
     emissive: 0xffffff,
     innerRadius: props.formData.planetOrbit * AUtoDistance,
-    outerRadius: props.formData.planetOrbit * AUtoDistance + 10,
+    outerRadius: props.formData.planetOrbit * AUtoDistance + orbitWidth,
     opacity: 1,
   };
 
+  const earthOrbit: Zone = {
+    name: "Planet Orbit",
+    color: 0x0000ff,
+    emissive: 0x0000ff,
+    innerRadius: 1 * AUtoDistance,
+    outerRadius: 1 * AUtoDistance + orbitWidth,
+    opacity: 1,
+  };
+
+  const marsOrbit: Zone = {
+    name: "Planet Orbit",
+    color: 0xff0000,
+    emissive: 0xff0000,
+    innerRadius: 1.5 * AUtoDistance,
+    outerRadius: 1.5 * AUtoDistance + orbitWidth,
+    opacity: 1,
+  };
+
+  const venusOrbit: Zone = {
+    name: "Planet Orbit",
+    color: 0xffff00,
+    emissive: 0xffff00,
+    innerRadius: 0.7 * AUtoDistance,
+    outerRadius: 0.7 * AUtoDistance + orbitWidth,
+    opacity: 1,
+  };
+
+  console.log("orbitWidth", orbitWidth);
+
   createZone(innerHZ);
-  // createZone(hotZone);
-  // createZone(innerHabitableZone);
-  // createZone(outerHabitableZone);
-  // createZone(coldZone);
-  createOrbit(earthOrbit);
+  createOrbit(planetOrbit);
+
+  if (props.formData.showExampleOrbits) {
+    createOrbit(earthOrbit);
+    createOrbit(marsOrbit);
+    createOrbit(venusOrbit);
+  }
 }
 
 let renderOrder = 1;
@@ -534,33 +544,6 @@ function animate() {
   animation.prevTick = now;
 }
 
-/**
- * CONVERSIONS and CALCULATIONS
- */
-function calculateHabitableZone(
-  radius: number,
-  temperature: number
-): [number, number] {
-  // Calculate the star's luminosity in W
-  const starArea = 4 * Math.PI * radius ** 2;
-  const starTemperature = temperature ** 4;
-  const energyFlux = physicsConstants.stefanBoltzmann * starTemperature;
-  const luminosity = energyFlux * starArea * 1000000; // TODO: WHY 1000000? 1e6? What is causing us to need to add this value?
-
-  const L_rel = luminosity / physicsConstants.L_sun;
-
-  console.log("starArea", starArea);
-  console.log("starTemperature", starTemperature);
-  console.log("luminosity", luminosity);
-  console.log("L_rel", L_rel);
-
-  // Calculate the inner and outer edges of the habitable zone in AU
-  const aInner = Math.sqrt(L_rel / 1.1); // / physicsConstants.AU;
-  const aOuter = Math.sqrt(L_rel / 0.53); // / physicsConstants.AU;
-
-  // Return the habitable zone as a tuple of distances in AU
-  return [aInner, aOuter];
-}
 // function calculateHabitableZone(): [number, number] {
 //   // Calculate the star's luminosity in W
 //   const luminosity =
@@ -592,6 +575,17 @@ function calculateHabitableZone(
  * WATCHERS
  */
 watch(props.formData, (newValue, oldValue) => {
+  //updateCamera();
+  const baseDistance = Math.max(props.formData.planetOrbit, hzOuter.value);
+  const cameraZoomDistance = baseDistance * AUtoDistance * 4;
+  three.camera.far = cameraZoomDistance * 2;
+  three.camera.updateProjectionMatrix();
+  if (three.controls) {
+    three.controls.maxDistance = cameraZoomDistance;
+  }
+
+  clearZones();
+  setupSun();
   setupZones();
 });
 </script>
