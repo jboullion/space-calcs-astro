@@ -77,11 +77,18 @@
         />
 
         <CheckboxInput
-          id="example-orbits"
+          id="show-orbits"
           label="Show example orbits?"
           v-model="formData.showExampleOrbits"
-          :value="true"
+          :value="false"
           tooltip="Show Venus, Earth, and Mars orbits"
+        />
+
+        <CheckboxInput
+          id="show-labels"
+          label="Show labels?"
+          v-model="formData.showLabels"
+          :value="false"
         />
 
         <!-- <NumberInput
@@ -158,6 +165,7 @@ const formData = ref<HabitableZoneForm>({
   planetAlbedo: 0.37, // Percentage
   planetAtmosphere: 1, // In atmospheres
   showExampleOrbits: false,
+  showLabels: false,
 });
 
 /**

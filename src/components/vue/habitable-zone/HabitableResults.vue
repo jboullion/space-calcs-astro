@@ -41,6 +41,10 @@
 // 1.
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import {
+  CSS2DRenderer,
+  CSS2DObject,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { physicsConstants, removeAllChildNodes } from "../utils";
 import { formatNumber } from "../utils";
@@ -92,6 +96,8 @@ const three = {
   canvas: null as HTMLElement | HTMLCanvasElement | null,
   renderer: null as THREE.WebGLRenderer | null,
   scene: new THREE.Scene(),
+  labelRenderer: new CSS2DRenderer(),
+  renderOrder: 0,
   camera: new THREE.PerspectiveCamera(),
   controls: null as OrbitControls | null,
   // group: null,
@@ -137,7 +143,7 @@ const energyFlux = computed(() => {
 });
 
 const luminosity = computed(() => {
-  return energyFlux.value * starArea.value * 1000000; // TODO: WHY 1000000? 1e6? What is causing us to need to add this value?
+  return energyFlux.value * starArea.value * 900000; // TODO: WHY 1000000? 1e6? What is causing us to need to add this value?
 });
 
 const L_rel = computed(() => {
@@ -288,6 +294,12 @@ function setupThreeJS() {
 
   three.renderer.setSize(width, height);
 
+  three.labelRenderer.setSize(width, height);
+  three.labelRenderer.domElement.style.position = "absolute";
+  three.labelRenderer.domElement.style.top = "0px";
+  three.labelRenderer.domElement.style.pointerEvents = "none";
+  three.canvas.appendChild(three.labelRenderer.domElement);
+
   updateCamera();
 
   // Lights
@@ -307,8 +319,8 @@ function updateCamera() {
 
   // Camera
   const baseDistance = Math.max(props.formData.planetOrbit, hzOuter.value);
-  const cameraPositionDistance = baseDistance * AUtoDistance * 2;
-  const cameraZoomDistance = baseDistance * AUtoDistance * 4;
+  const cameraPositionDistance = baseDistance * AUtoDistance * 2.5;
+  const cameraZoomDistance = baseDistance * AUtoDistance * 5;
 
   let rendererSize = new THREE.Vector2();
   three.renderer.getSize(rendererSize);
@@ -369,6 +381,9 @@ function setupSun() {
 }
 
 function clearZones() {
+  three.renderOrder = 0;
+  three.labelRenderer.domElement.innerHTML = "";
+
   for (var i = three.scene.children.length - 1; i >= 0; i--) {
     // @ts-ignore
     if (!three.scene.children[i].geometry) continue;
@@ -397,8 +412,8 @@ function setupZones() {
 
   // At large star sizes the orbit is too small to see
   const orbitWidth = Math.max(
-    8 + Math.floor(props.formData.starRadius / 3),
-    20
+    4 + Math.floor(props.formData.starRadius / 3),
+    10
   );
 
   const planetOrbit: Zone = {
@@ -454,75 +469,73 @@ function setupZones() {
     createOrbit(marsOrbit);
     createOrbit(venusOrbit);
     createOrbit(mercuryOrbit);
-  }
 
-  if (hzOuter.value > 3) {
-    const jupiterOrbit: Zone = {
-      name: "Jupiter Orbit",
-      color: 0xffaa00,
-      emissive: 0xffaa00,
-      innerRadius: 5.2 * AUtoDistance,
-      outerRadius: 5.2 * AUtoDistance + orbitWidth,
-      opacity: 1,
-    };
+    if (hzOuter.value > 3) {
+      const jupiterOrbit: Zone = {
+        name: "Jupiter Orbit",
+        color: 0xffaa00,
+        emissive: 0xffaa00,
+        innerRadius: 5.2 * AUtoDistance,
+        outerRadius: 5.2 * AUtoDistance + orbitWidth,
+        opacity: 1,
+      };
 
-    createOrbit(jupiterOrbit);
-  }
+      createOrbit(jupiterOrbit);
+    }
 
-  if (hzOuter.value > 7) {
-    const saturnOrbit: Zone = {
-      name: "Saturn Orbit",
-      color: 0xaaaa00,
-      emissive: 0xaaaa00,
-      innerRadius: 9.5 * AUtoDistance,
-      outerRadius: 9.5 * AUtoDistance + orbitWidth,
-      opacity: 1,
-    };
+    if (hzOuter.value > 7) {
+      const saturnOrbit: Zone = {
+        name: "Saturn Orbit",
+        color: 0xaaaa00,
+        emissive: 0xaaaa00,
+        innerRadius: 9.5 * AUtoDistance,
+        outerRadius: 9.5 * AUtoDistance + orbitWidth,
+        opacity: 1,
+      };
 
-    createOrbit(saturnOrbit);
-  }
+      createOrbit(saturnOrbit);
+    }
 
-  if (hzOuter.value > 15) {
-    const uranusOrbit: Zone = {
-      name: "Uranus Orbit",
-      color: 0x00aaff,
-      emissive: 0x00aaff,
-      innerRadius: 19.8 * AUtoDistance,
-      outerRadius: 19.8 * AUtoDistance + orbitWidth,
-      opacity: 1,
-    };
+    if (hzOuter.value > 15) {
+      const uranusOrbit: Zone = {
+        name: "Uranus Orbit",
+        color: 0x00aaff,
+        emissive: 0x00aaff,
+        innerRadius: 19.8 * AUtoDistance,
+        outerRadius: 19.8 * AUtoDistance + orbitWidth,
+        opacity: 1,
+      };
 
-    createOrbit(uranusOrbit);
-  }
+      createOrbit(uranusOrbit);
+    }
 
-  if (hzOuter.value > 25) {
-    const neptuneOrbit: Zone = {
-      name: "Neptune Orbit",
-      color: 0x0033ff,
-      emissive: 0x0033ff,
-      innerRadius: 30 * AUtoDistance,
-      outerRadius: 30 * AUtoDistance + orbitWidth,
-      opacity: 1,
-    };
+    if (hzOuter.value > 25) {
+      const neptuneOrbit: Zone = {
+        name: "Neptune Orbit",
+        color: 0x0033ff,
+        emissive: 0x0033ff,
+        innerRadius: 30 * AUtoDistance,
+        outerRadius: 30 * AUtoDistance + orbitWidth,
+        opacity: 1,
+      };
 
-    createOrbit(neptuneOrbit);
-  }
+      createOrbit(neptuneOrbit);
+    }
 
-  if (hzOuter.value > 30) {
-    const plutoOrbit: Zone = {
-      name: "Pluto Orbit",
-      color: 0xa020f0,
-      emissive: 0xa020f0,
-      innerRadius: 39 * AUtoDistance,
-      outerRadius: 39 * AUtoDistance + orbitWidth,
-      opacity: 1,
-    };
+    if (hzOuter.value > 30) {
+      const plutoOrbit: Zone = {
+        name: "Pluto Orbit",
+        color: 0xa020f0,
+        emissive: 0xa020f0,
+        innerRadius: 39 * AUtoDistance,
+        outerRadius: 39 * AUtoDistance + orbitWidth,
+        opacity: 1,
+      };
 
-    createOrbit(plutoOrbit);
+      createOrbit(plutoOrbit);
+    }
   }
 }
-
-let renderOrder = 1;
 
 function createZone(zone: Zone) {
   var extrudeSettings = {
@@ -558,7 +571,6 @@ function createZone(zone: Zone) {
   const zoneGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);
 
   const zoneMesh = new THREE.Mesh(zoneGeometry, zoneMaterial);
-  zoneMesh.renderOrder = renderOrder++;
 
   three.scene.add(zoneMesh);
 }
@@ -600,9 +612,36 @@ function createOrbit(orbit: Zone) {
   const zoneGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);
 
   const zoneMesh = new THREE.Mesh(zoneGeometry, zoneMaterial);
-  zoneMesh.renderOrder = renderOrder++;
+  three.renderOrder++;
 
   three.scene.add(zoneMesh);
+
+  if (props.formData.showLabels) {
+    zoneMesh.layers.enableAll();
+
+    const labelDiv = document.createElement("div");
+    labelDiv.className = "label";
+    labelDiv.textContent = orbit.name;
+    labelDiv.style.backgroundColor = "transparent";
+    labelDiv.style.color = "white";
+    labelDiv.style.fontSize = "12px";
+    labelDiv.style.fontFamily = "sans-serif";
+    labelDiv.style.padding = "0.5em";
+    labelDiv.style.borderRadius = "0.5em";
+    labelDiv.style.pointerEvents = "none";
+    labelDiv.style.textAlign = "center";
+    labelDiv.style.opacity = "0.8";
+    // labelDiv.style.border = "1px solid white";
+
+    const label = new CSS2DObject(labelDiv);
+    //const side = zoneMesh.renderOrder % 2 == 0 ? 1 : -1;
+    const upOrDown = three.renderOrder % 2 == 0 ? 1 : -1;
+    label.position.set(0, upOrDown * orbit.outerRadius - 80, 0);
+    // @ts-ignore
+    label.center.set(0, 1);
+    zoneMesh.add(label);
+    label.layers.set(0);
+  }
 }
 
 /**
@@ -618,6 +657,7 @@ function animate() {
 
   //this.three.camera.position.clamp(this.three.minMovement, this.three.maxMovement);
   three.renderer.render(three.scene, three.camera);
+  three.labelRenderer.render(three.scene, three.camera);
 
   // clamp to fixed framerate
   const now = Math.round((30 * window.performance.now()) / 1000);
