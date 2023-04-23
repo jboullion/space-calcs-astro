@@ -1,0 +1,33 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import SolarEnergy from "../../components/vue/solar-energy/SolarEnergy.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+// TODO: Pull in calculator-list and get the name and description from there?
+const title = "Solar Energy";
+const description =
+  "Estimate the available power from a solar panel anywhere in the solar system";
+
+const references: Reference[] = [
+  // {
+  //   title: "Habitable Zone Wiki",
+  //   url: "https://en.wikipedia.org/wiki/Habitable_zone",
+  // },
+];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;" class="calculator">
+      <SolarEnergy client:only="vue" />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

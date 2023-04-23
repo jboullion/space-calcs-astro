@@ -114,9 +114,6 @@
 
 <script setup lang="ts">
 // TODO: Must Dos!
-// 1. Setup calculations to determine habitable zone size
-// 2. Calculate temperature of planet orbit
-// 3. Get tooltips working
 
 // ! BUGS
 

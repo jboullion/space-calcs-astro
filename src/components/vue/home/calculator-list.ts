@@ -9,7 +9,7 @@ import {
 
 // TODO: Figure out a better way to create calculators...may need a DB. For now, just hardcode them.
 // At the very least share / pass this to the pages so they can display the name and description the same as these strings
-export const calculators: SpaceCalc[] = [
+export const unOrderedCalculators: SpaceCalc[] = [
   {
     name: "Delta V",
     description: "Calculate the delta v required for a mission",
@@ -61,4 +61,16 @@ export const calculators: SpaceCalc[] = [
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/habitable-zone",
   },
+  {
+    name: "Solar Energy",
+    description:
+      "Estimate the available power from a solar panel anywhere in the solar system",
+    categories: [categories[HABITAT_CAT], categories[STATION_CAT]],
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/solar-energy",
+  },
 ];
+
+export const calculators = unOrderedCalculators.sort((a, b) =>
+  a.name.localeCompare(b.name)
+);
