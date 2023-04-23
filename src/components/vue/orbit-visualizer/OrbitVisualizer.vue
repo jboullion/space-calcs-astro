@@ -698,6 +698,7 @@ function setupThreeJS() {
   // Lights
   three.scene.add(new THREE.AmbientLight(0x404040));
   const light = new THREE.DirectionalLight(0xffffff, 0.5);
+  light.position.set(0, 0, 1);
   three.scene.add(light);
 
   // // GUI

@@ -247,6 +247,7 @@ const formData = ref<DeltaVForm>({
   fuelType: null,
   engine: {
     name: "-",
+    value: "-",
     ispVacuum: 0,
     ispSeaLevel: 0,
   },

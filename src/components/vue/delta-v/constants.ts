@@ -133,36 +133,43 @@ export const destinations = ref<Destination[]>([
 export const defaultEngines: Engine[] = [
   {
     name: "Merlin, Falcon 9",
+    value: "Merlin, Falcon 9",
     ispVacuum: 348,
     ispSeaLevel: 311,
   },
   {
     name: "Raptor, Starship",
+    value: "Raptor, Starship",
     ispVacuum: 350,
     ispSeaLevel: 330,
   },
   {
     name: "RD-107, Soyuz-FG",
+    value: "RD-107, Soyuz-FG",
     ispVacuum: 320,
     ispSeaLevel: 263,
   },
   {
     name: "RS-25, Space Shuttle",
+    value: "RS-25, Space Shuttle",
     ispVacuum: 452,
     ispSeaLevel: 366,
   },
   {
     name: "Rutherford, Electron",
+    value: "Rutherford, Electron",
     ispVacuum: 343,
     ispSeaLevel: 311,
   },
   {
     name: "Vulcain 2, Ariane 5",
+    value: "Vulcain 2, Ariane 5",
     ispVacuum: 429,
     ispSeaLevel: 318,
   },
   {
     name: "YF-100, Long March 7",
+    value: "YF-100, Long March 7",
     ispVacuum: 335,
     ispSeaLevel: 300,
   },

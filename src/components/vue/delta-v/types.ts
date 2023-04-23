@@ -31,6 +31,7 @@ export type Destination = {
 
 export type Engine = {
   name: string;
+  value: string;
   ispVacuum: number;
   ispSeaLevel: number;
 };

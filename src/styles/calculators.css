@@ -16,6 +16,7 @@
 
 .calculator .calc-form .form-label {
   margin-bottom: 2px;
+  user-select: none;
 }
 
 .calculator .calc-form .form-label .fa-question-circle {
