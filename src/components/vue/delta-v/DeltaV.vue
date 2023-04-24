@@ -500,17 +500,7 @@ function round(num: number, digit: number) {
  *
  *
  *
- *
- *
- *
- *
- *
  *  DRAWING FUNCTIONS
- *
- *
- *
- *
- *
  *
  *
  *
@@ -672,18 +662,7 @@ function calcPayloadRowC3(payload: number) {
  *
  *
  *
- *
- *
- *
- *
- *
  *  DATA FUNCTIONS
- *
- *
- *
- *
- *
- *
  *
  *
  *

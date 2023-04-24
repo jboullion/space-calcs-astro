@@ -1,6 +1,6 @@
 <template>
-  <div id="habitable-transfer__app" class="row">
-    <div id="habitable__form" class="col-lg-4">
+  <div id="solar-energy__app" class="row">
+    <div id="solar-energy__form" class="col-lg-4">
       <div class="calc-form mb-5 p-2 bg-light rounded border">
         <NumberInput
           id="efficiency"
@@ -87,8 +87,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import NumberInput from "../forms/NumberInput.vue";
 import CheckboxInput from "../forms/CheckboxInput.vue";
 
-// import HabitableResults from "./HabitableResults.vue";
-//import HabitableForm from "./OLD-HabitableForm.vue";
+import SolarEnergyResults from "./SolarEnergyResults.vue";
 import type { SolarEnergyForm } from "./constants";
 import { clampNumber } from "../utils";
 
