@@ -4,7 +4,7 @@
       <div class="calc-form mb-5 p-2 bg-light rounded border">
         <NumberInput
           id="efficiency"
-          label="Solar Efficiency"
+          label="Solar Panel Efficiency"
           v-model.number="formData.solarEfficiency"
           unit="%"
           :step="0.1"

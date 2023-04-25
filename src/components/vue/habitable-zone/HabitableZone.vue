@@ -36,6 +36,7 @@
           :min="0.1"
           unit="R☉"
           tooltip="Radius of the star in solar radii. Our sun is ~1 R☉"
+          :description="`${formatNumber(starKilometers)} km`"
           @change="
             formData.starRadius = clampNumber(formData.starRadius, 0.1, 1000)
           "
@@ -48,6 +49,9 @@
           :min="1000"
           :max="20000"
           tooltip="Temperature of the star in Kelvin. Our sun is ~5778 K"
+          :description="`${formatNumber(starCelsius)} °C<br /> ${formatNumber(
+            starFahrenheit
+          )} °F`"
           @change="
             formData.starTemperature = clampNumber(
               formData.starTemperature,
@@ -71,6 +75,7 @@
           unit="AU"
           :step="0.1"
           tooltip="Distance from the star in astronomical units. Earth is ~1 AU"
+          :description="`${formatNumber(planetKm)} km`"
           @change="
             formData.planetOrbit = clampNumber(formData.planetOrbit, 0.1, 100)
           "
@@ -119,28 +124,16 @@
 
 // ? NOTE: Optional Improvements!
 
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import NumberInput from "../forms/NumberInput.vue";
 import CheckboxInput from "../forms/CheckboxInput.vue";
 
-// import {
-//   locations,
-//   physicsConstants,
-//   scaleConversions,
-//   animationConstants,
-// } from "./constants";
-// import type { Location } from "./constants";
-
-import SelectInput from "../forms/SelectInput.vue";
 import HabitableResults from "./HabitableResults.vue";
 //import HabitableForm from "./OLD-HabitableForm.vue";
 import type { HabitableZoneForm, StarType } from "./constants";
-import { clampNumber } from "../utils";
+import { clampNumber, formatNumber, kToC, physicsConstants } from "../utils";
 
 const loading = ref(true);
-const textureDir = "/textures/";
 
 const starTypes: StarType[] = [
   { value: "G", name: "G" },
@@ -162,38 +155,27 @@ const formData = ref<HabitableZoneForm>({
   planetAlbedo: 0.37, // Percentage
   planetAtmosphere: 1, // In atmospheres
   showExampleOrbits: false,
-  showLabels: false,
+  showLabels: true,
 });
 
-/**
- *
- *
- * COMPUTED
- *
- *
- */
+const starKilometers = computed(() => {
+  return formData.value.starRadius * physicsConstants.sunRadius;
+});
 
-/**
- *
- *
- * SETUP
- *
- *
- */
-onMounted(() => {});
+const starCelsius = computed(() => {
+  return kToC(formData.value.starTemperature);
+});
 
-// function removeAllChildNodes(parent: HTMLElement) {
-//   while (parent.firstChild) {
-//     parent.removeChild(parent.firstChild);
-//   }
-// }
+const starFahrenheit = computed(() => {
+  return (starCelsius.value * 9) / 5 + 32;
+});
 
-/**
- *
- *
- * METHODS
- *
- *
- */
+const planetKm = computed(() => {
+  return formData.value.planetOrbit * physicsConstants.AU;
+});
+
+onMounted(() => {
+  loading.value = false;
+});
 </script>
 <style></style>

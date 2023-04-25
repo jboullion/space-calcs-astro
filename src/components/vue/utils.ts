@@ -31,9 +31,10 @@ export const physicsConstants = {
   foot: 0.3048, // m
   mile: 5280, // ft
   quarterPI: Math.PI / 4, // radians
-  AU: 149_597_870.7, // km
-  solarRadius: 696340, // km
-  L_sun: 3.828e26, // W
+  AU: 149597870.7, // km
+  sunRadius: 696340, // km
+  sunLuminosity: 3.828e26, // W
+  sunTemp: 5778, // K
   stefanBoltzmann: 5.670367e-8, // Stefan-Boltzmann constant in W/m²K⁴
 };
 
@@ -83,6 +84,10 @@ export function radiansPerSecToRpm(radians: number) {
 
 export function relativeDifference(a: number, b: number) {
   return Math.abs((a - b) / ((a + b) / 2)); // 100 *
+}
+
+export function kToC(k: number) {
+  return k - 273.15;
 }
 
 /**
