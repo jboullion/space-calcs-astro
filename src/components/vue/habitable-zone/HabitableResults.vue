@@ -8,7 +8,7 @@
       <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
     </div>
     <p>
-      <strong>Note:</strong> Habitable zone is calculated for Earth like
+      <strong>Note:</strong> Habitable zone is calculated for Earth-like
       planets. Planets with different albedos and atmospheres will have
       different habitable zones.
     </p>

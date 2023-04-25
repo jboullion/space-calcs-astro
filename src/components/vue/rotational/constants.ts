@@ -111,14 +111,14 @@ export const types: StationType[] = [
     useInSpace: true,
     useOnGround: false,
     defaults: {
-      radius: 100, // meters
-      rpm: 1.84,
-      length: 10,
+      radius: 1000, // meters
+      rpm: 0.9,
+      length: 100,
     },
   },
   {
     id: 2,
-    name: "Orbital Can",
+    name: "Can",
     shape: "can",
     description:
       "Good for providing a periodic source of gravity on long trips through space.",
@@ -126,7 +126,7 @@ export const types: StationType[] = [
     useOnGround: true,
     defaults: {
       radius: 8, // meters
-      rpm: 9,
+      rpm: 8,
       length: 3,
     },
   },
@@ -139,9 +139,9 @@ export const types: StationType[] = [
     useInSpace: true,
     useOnGround: false,
     defaults: {
-      radius: 100, // meters
-      rpm: 1.84,
-      length: 30,
+      radius: 200, // meters
+      rpm: 1.3,
+      length: 50,
     },
   },
   {

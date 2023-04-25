@@ -86,7 +86,7 @@
           label="Show example orbits?"
           v-model="formData.showExampleOrbits"
           :value="false"
-          tooltip="Show Venus, Earth, and Mars orbits"
+          tooltip="Show Venus, Earth, Mars, and other orbits"
         />
 
         <CheckboxInput
