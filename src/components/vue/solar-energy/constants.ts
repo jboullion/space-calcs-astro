@@ -3,5 +3,5 @@ export type SolarEnergyForm = {
   starTemperature: number; // K
   planetOrbit: number; // AU
   atmosphereAbsorption: number; // 0-X% Earth atmosphere
-  solarEfficiency: number; // 0-100% of light reflected
+  solarPanelEfficiency: number; // 0-100% of light reflected
 };

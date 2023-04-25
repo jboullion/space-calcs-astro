@@ -17,18 +17,18 @@
       <tbody>
         <tr class="" :title="luminosityEquation">
           <th>Luminosity (L)</th>
-          <td class="text-end">{{ luminosity }} L</td>
+          <td class="text-end">{{ luminosity.toExponential(4) }} W</td>
         </tr>
         <!-- <tr class="">
           <th>Flux (kT)</th>
           <td class="text-end">{{ formatNumber(energyFlux) }} kT</td>
         </tr> -->
         <tr class="" :title="hzInnerEquation">
-          <th>Inner Radius (AU)</th>
+          <th>Inner Radius</th>
           <td class="text-end">{{ formatNumber(hzInner) }} AU</td>
         </tr>
         <tr class="" :title="hzOuterEquation">
-          <th>Outer Radius (AU)</th>
+          <th>Outer Radius</th>
           <td class="text-end">{{ formatNumber(hzOuter) }} AU</td>
         </tr>
       </tbody>

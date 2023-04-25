@@ -1,21 +1,31 @@
 <template>
   <div id="solar-energy__results" class="col-lg-8 calc-form">
-    <!-- <table class="table table-striped">
+    <table class="table table-striped">
       <tbody>
-        <tr v-if="formData.twoStage" class="">
-          <th>First Stage ΔV</th>
-          <td class="text-end">{{ addCommas(firstStageDeltaV) }} m/s</td>
+        <tr class="">
+          <th>Luminosity</th>
+          <td class="text-end">{{ luminosity.toExponential(4) }} W</td>
         </tr>
-        <tr v-if="formData.twoStage" class="">
-          <th>Second Stage ΔV</th>
-          <td class="text-end">{{ addCommas(secondStageDeltaV) }} m/s</td>
+        <tr class="">
+          <th>Sun Sphere Size</th>
+          <td class="text-end">{{ sunSphereSize.toExponential(4) }} m2</td>
         </tr>
-        <tr class="table-success">
-          <th>Total ΔV</th>
-          <td class="text-end">{{ addCommas(totalDeltaV) }} m/s</td>
+        <tr class="">
+          <th>Energy Reaching Planet</th>
+          <td class="text-end">{{ formatNumber(planetInsolation) }} W/m2</td>
+        </tr>
+        <tr class="">
+          <th>Available Energy at Surface</th>
+          <td class="text-end">
+            {{ formatNumber(availableEnergyOnSurface) }} W/m2
+          </td>
+        </tr>
+        <tr class="">
+          <th>Solar Panel Potential</th>
+          <td class="text-end">{{ formatNumber(solarPanelPotential) }} W/m2</td>
         </tr>
       </tbody>
-    </table> -->
+    </table>
 
     <!-- <div class="btn-group w-100" role="group" aria-label="Basic example">
       <button
@@ -71,11 +81,20 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeMount,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from "vue";
 
 // @ts-ignore
 import { GoogleCharts } from "google-charts";
 import { rockets } from "../delta-v/constants";
+import type { SolarEnergyForm } from "./constants";
+import { physicsConstants, formatNumber } from "../utils";
 
 type ResultTabs = "efficiency";
 
@@ -85,16 +104,14 @@ let efficiencyChartHTML: GoogleCharts.api.visualization.LineChart;
 // let fuelChartHTML: GoogleCharts.api.visualization.LineChart;
 // let c3ChartHTML: GoogleCharts.api.visualization.LineChart;
 
+const props = defineProps<{
+  formData: SolarEnergyForm;
+}>();
+
 /**
  *
  *
- *
- *
- *
  * SETUP
- *
- *
- *
  *
  *
  */
@@ -112,6 +129,56 @@ onBeforeUnmount(() => {
   //window.removeEventListener("resize", drawCharts);
 });
 
+/**
+ *
+ *
+ * COMPUTED
+ *
+ *
+ */
+
+// const starTemperature = computed(() => {
+//   return props.formData.starTemperature ** 4;
+// });
+
+const luminosity = computed(() => {
+  // L = L☉ * (R / R☉)² * (T / T☉)⁴
+  return (
+    physicsConstants.sunLuminosity *
+    ((props.formData.starRadius * physicsConstants.sunRadius) /
+      physicsConstants.sunRadius) **
+      2 *
+    (props.formData.starTemperature / physicsConstants.sunTemp) ** 4
+  );
+
+  // alternative L = σ * A * T⁴
+  // return (
+  //   physicsConstants.stefanBoltzmann * starArea.value * starTemperature.value
+  // );
+});
+
+const sunSphereSize = computed(() => {
+  return (
+    4 * Math.PI * (props.formData.planetOrbit * physicsConstants.AU * 1000) ** 2
+  );
+});
+
+const planetInsolation = computed(() => {
+  return luminosity.value / sunSphereSize.value;
+});
+
+const availableEnergyOnSurface = computed(() => {
+  return (
+    planetInsolation.value * ((100 - props.formData.atmosphereAbsorption) / 100)
+  );
+});
+
+const solarPanelPotential = computed(() => {
+  return (
+    availableEnergyOnSurface.value * (props.formData.solarPanelEfficiency / 100)
+  );
+});
+
 function showResultChart(chart: ResultTabs) {
   showResult.value = chart;
 
@@ -123,12 +190,7 @@ function showResultChart(chart: ResultTabs) {
 /*
  *
  *
- *
- *
  *  DRAWING FUNCTIONS
- *
- *
- *
  *
  *
  * */

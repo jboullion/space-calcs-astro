@@ -5,13 +5,13 @@
         <NumberInput
           id="efficiency"
           label="Solar Panel Efficiency"
-          v-model.number="formData.solarEfficiency"
+          v-model.number="formData.solarPanelEfficiency"
           unit="%"
           :step="0.1"
           tooltip="How efficient are the solar panels at converting sunlight into electricity?"
           @change="
-            formData.solarEfficiency = clampNumber(
-              formData.solarEfficiency,
+            formData.solarPanelEfficiency = clampNumber(
+              formData.solarPanelEfficiency,
               1,
               100
             )
@@ -81,11 +81,8 @@
 
 // ? NOTE: Optional Improvements!
 
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import NumberInput from "../forms/NumberInput.vue";
-import CheckboxInput from "../forms/CheckboxInput.vue";
 
 import SolarEnergyResults from "./SolarEnergyResults.vue";
 import type { SolarEnergyForm } from "./constants";
@@ -98,7 +95,7 @@ const formData = ref<SolarEnergyForm>({
   starTemperature: 5778, // In Kelvin
   planetOrbit: 1, // In AU
   atmosphereAbsorption: 37, // 0-100%
-  solarEfficiency: 20, // 0-100%
+  solarPanelEfficiency: 20, // 0-100%
 });
 
 /**
