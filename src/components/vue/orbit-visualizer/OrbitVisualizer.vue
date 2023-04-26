@@ -805,6 +805,7 @@ function setupStarship() {
   const starshipMetalMaterial = new THREE.MeshBasicMaterial({
     color: 0xea6730,
   });
+
   ship.mesh = new THREE.Mesh(starshipGeometry, starshipMetalMaterial); // this.models.starship
 
   ship.group.add(ship.mesh);
@@ -816,9 +817,10 @@ function setupStarship() {
   // Orbit tracers
   orbit.value.geometry = new THREE.SphereGeometry(ship.width, 3, 3);
   orbit.value.material = new THREE.MeshBasicMaterial({ color: 0xea6730 });
+
   tracing.value.material = new THREE.LineBasicMaterial({
     color: 0xea6730,
-    linewidth: ship.width,
+    linewidth: 1,
   });
 }
 
@@ -872,9 +874,6 @@ function animate() {
   animation.value.prevTick = now;
 
   planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
-
-  // console.log('this.planet.axis', this.planet.axis);
-  // console.log('this.rotationSpeed', this.rotationSpeed);
 
   ship.group.rotateOnAxis(inclinationVector.value, orbitSpeed.value);
 }

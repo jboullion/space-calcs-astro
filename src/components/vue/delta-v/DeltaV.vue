@@ -299,11 +299,11 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-  //window.addEventListener("resize", drawCharts, { passive: true });
+  window.addEventListener("resize", drawCharts, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  //window.removeEventListener("resize", drawCharts);
+  window.removeEventListener("resize", drawCharts);
 });
 
 function showResultChart(chart: ResultTabs) {

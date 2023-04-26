@@ -24,7 +24,7 @@
           v-model.number="formData.planetOrbit"
           unit="AU"
           :step="0.1"
-          tooltip="Distance from the star in astronomical units. Earth is ~1 AU"
+          tooltip="Distance from the star in astronomical units. Earth is ~1 AU. Mars is ~1.5 AU."
           @change="
             formData.planetOrbit = clampNumber(formData.planetOrbit, 0.1, 100)
           "
@@ -35,7 +35,7 @@
           label="Atmosphere Absorption"
           v-model.number="formData.atmosphereAbsorption"
           unit="atm"
-          tooltip="Earth's atmosphere absorbs ~37% of the solar energy."
+          tooltip="Earth's atmosphere absorbs ~37% of the solar energy. Mars atmosphere absorbs ~7%."
         />
 
         <NumberInput

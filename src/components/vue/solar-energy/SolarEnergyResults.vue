@@ -2,63 +2,30 @@
   <div id="solar-energy__results" class="col-lg-8 calc-form">
     <table class="table table-striped">
       <tbody>
-        <tr class="">
-          <th>Luminosity</th>
+        <tr class="" title="L = L☉ * (R / R☉)² * (T / T☉)⁴">
+          <th>Star Luminosity</th>
           <td class="text-end">{{ luminosity.toExponential(4) }} W</td>
         </tr>
-        <tr class="">
-          <th>Sun Sphere Size</th>
-          <td class="text-end">{{ sunSphereSize.toExponential(4) }} m2</td>
+        <tr class="" title="A = 4𝝅R²">
+          <th>Orbit Sphere Size</th>
+          <td class="text-end">{{ orbitSphereSize.toExponential(4) }} m²</td>
         </tr>
-        <tr class="">
-          <th>Energy Reaching Planet</th>
-          <td class="text-end">{{ formatNumber(planetInsolation) }} W/m2</td>
+        <tr class="" title="E1 = L / A">
+          <th>Energy Reaching Planet (Insolation)</th>
+          <td class="text-end">{{ formatNumber(planetInsolation) }} W/m²</td>
         </tr>
-        <tr class="">
+        <tr class="" title="E2 = E1 * (100 - Atm%)">
           <th>Available Energy at Surface</th>
           <td class="text-end">
-            {{ formatNumber(availableEnergyOnSurface) }} W/m2
+            {{ formatNumber(availableEnergyOnSurface) }} W/m²
           </td>
         </tr>
-        <tr class="">
+        <tr class="" title="P = E2 * Eff%">
           <th>Solar Panel Potential</th>
-          <td class="text-end">{{ formatNumber(solarPanelPotential) }} W/m2</td>
+          <td class="text-end">{{ formatNumber(solarPanelPotential) }} W/m²</td>
         </tr>
       </tbody>
     </table>
-
-    <!-- <div class="btn-group w-100" role="group" aria-label="Basic example">
-      <button
-        class="btn"
-        :class="{
-          'btn-primary': showResult == 'payload',
-          'btn-outline-primary': showResult != 'payload',
-        }"
-        @click="showResultChart('payload')"
-      >
-        Payload &amp; Delta V
-      </button>
-      <button
-        class="btn"
-        :class="{
-          'btn-primary': showResult == 'fuel',
-          'btn-outline-primary': showResult != 'fuel',
-        }"
-        @click="showResultChart('fuel')"
-      >
-        Fuel &amp; Delta V
-      </button>
-      <button
-        class="btn"
-        :class="{
-          'btn-primary': showResult == 'c3',
-          'btn-outline-primary': showResult != 'c3',
-        }"
-        @click="showResultChart('c3')"
-      >
-        Payload &amp; C3
-      </button>
-    </div> -->
 
     <div class="result-chart my-4">
       <div
@@ -122,11 +89,11 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-  //window.addEventListener("resize", drawCharts, { passive: true });
+  window.addEventListener("resize", drawCharts, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  //window.removeEventListener("resize", drawCharts);
+  window.removeEventListener("resize", drawCharts);
 });
 
 /**
@@ -157,14 +124,14 @@ const luminosity = computed(() => {
   // );
 });
 
-const sunSphereSize = computed(() => {
+const orbitSphereSize = computed(() => {
   return (
     4 * Math.PI * (props.formData.planetOrbit * physicsConstants.AU * 1000) ** 2
   );
 });
 
 const planetInsolation = computed(() => {
-  return luminosity.value / sunSphereSize.value;
+  return luminosity.value / orbitSphereSize.value;
 });
 
 const availableEnergyOnSurface = computed(() => {
@@ -174,9 +141,15 @@ const availableEnergyOnSurface = computed(() => {
 });
 
 const solarPanelPotential = computed(() => {
-  return (
-    availableEnergyOnSurface.value * (props.formData.solarPanelEfficiency / 100)
-  );
+  const solarPotential =
+    availableEnergyOnSurface.value *
+    (props.formData.solarPanelEfficiency / 100);
+
+  if (GoogleCharts.api?.visualization) {
+    nextTick(drawCharts);
+  }
+
+  return solarPotential;
 });
 
 function showResultChart(chart: ResultTabs) {
@@ -221,18 +194,39 @@ function drawCharts() {
 function drawEfficiencyChart() {
   if (!GoogleCharts.api.visualization) return;
 
-  var data = GoogleCharts.api.visualization.arrayToDataTable([
-    ["Power", "Potential Energy"],
-    [0, 0],
-    [25, 25],
-    [50, 50],
-    [75, 75],
-    [100, 100],
-  ]);
+  const dataTable = new GoogleCharts.api.visualization.DataTable();
+
+  dataTable.addColumn("number", "Power");
+  dataTable.addColumn("number", "Potential Energy");
+  dataTable.addColumn({
+    type: "string",
+    role: "tooltip",
+    p: { html: true },
+  });
+
+  const solarPotentialRows: [number, number, string][] = [];
+
+  for (let i = 0; i <= 100; i += 10) {
+    const power = availableEnergyOnSurface.value * (i / 100);
+    solarPotentialRows.push([power, i, buildEfficiencyTooltip(power, i)]);
+  }
+
+  dataTable.addRows(solarPotentialRows);
 
   var options = getEfficiencyChartOptions();
 
-  efficiencyChartHTML.draw(data, options);
+  efficiencyChartHTML.draw(dataTable, options);
+}
+
+function buildEfficiencyTooltip(power: number, efficiency: number) {
+  let tooltipString = '<div style="padding:10px; white-space: nowrap;">';
+
+  tooltipString +=
+    "Potential Energy: <strong>" + power.toFixed(2) + " (W/m²)</strong><br />";
+
+  tooltipString += "Efficiency: <strong>" + efficiency + "%</strong></div>";
+
+  return tooltipString;
 }
 
 /*
@@ -252,7 +246,7 @@ function getEfficiencyChartOptions() {
       // leave room for y-axis labels
       width: "80%",
     },
-    title: "Solar Power Efficiency",
+    title: "Solar Power Potential",
     curveType: "function",
     //theme: "maximized",
     hAxis: {
@@ -265,9 +259,9 @@ function getEfficiencyChartOptions() {
     },
     orientation: "vertical", // show C3 at bottom and payload on right
     legend: { position: "top", maxLines: 3 },
-    // tooltip: {
-    //   isHtml: true,
-    // },
+    tooltip: {
+      isHtml: true,
+    },
     series: {
       0: { color: "#c6582a" },
       // 1: { color: "black" },
