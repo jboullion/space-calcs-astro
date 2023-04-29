@@ -13,29 +13,60 @@
               All the tools you need to calculate your mission to space
             </p>
 
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search for a tool"
-                aria-label="Search for a tool"
-                v-model="search"
-              />
+            <div class="row">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search for a tool"
+                    aria-label="Search for a tool"
+                    v-model="search"
+                  />
+                  <span class="input-group-text"
+                    ><i class="fas fa-search"></i
+                  ></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <select
+                  class="form-select"
+                  placeholder="Select Category"
+                  aria-label="Select Category"
+                  v-model="selectedCategory"
+                  @change="toggleCategory()"
+                >
+                  <option value="" selected>All</option>
+                  <option
+                    v-for="category in categories"
+                    :key="category.slug"
+                    :value="category.slug"
+                  >
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
-        <div class="category-filter mt-3">
-          <button
-            v-for="category in categories"
-            :key="category.slug"
-            type="button"
-            class="btn mx-2"
-            :class="getCategoryClass(category)"
-            @click="toggleCategory(category.slug)"
-          >
-            {{ category.name }}
-          </button>
-        </div>
+        <!-- <div class="category-filter mt-3 d-flex justify-content-center">
+          <div v-for="category in categories" :key="category.slug">
+            <input
+              type="checkbox"
+              class="btn-check"
+              :id="`category-${category.slug}`"
+              autocomplete="off"
+              @change="toggleCategory(category.slug)"
+            />
+            <label
+              class="btn mx-2"
+              :class="getCategoryClass(category)"
+              :for="`category-${category.slug}`"
+            >
+              {{ category.name }}</label
+            >
+          </div>
+        </div> -->
       </div>
     </section>
 
@@ -52,26 +83,34 @@ import { categories } from "./constants";
 const search = ref("");
 
 const activeCategories = ref<string[]>([]);
+const selectedCategory = ref<string>("");
 
-function toggleCategory(slug: string): void {
-  if (activeCategories.value.includes(slug)) {
-    activeCategories.value = activeCategories.value.filter(
-      (category) => category !== slug
-    );
+// function toggleCategory(slug: string): void {
+//   if (activeCategories.value.includes(slug)) {
+//     activeCategories.value = activeCategories.value.filter(
+//       (category) => category !== slug
+//     );
+//   } else {
+//     activeCategories.value.push(slug);
+//   }
+// }
+function toggleCategory() {
+  if (selectedCategory.value === "") {
+    activeCategories.value = [];
   } else {
-    activeCategories.value.push(slug);
+    activeCategories.value = [selectedCategory.value];
   }
 }
 
-function getCategoryClass(category: Category): string {
-  let btnClasses = [];
+// function getCategoryClass(category: Category): string {
+//   let btnClasses = [];
 
-  if (activeCategories.value.includes(category.slug)) {
-    btnClasses.push("btn-" + category.color);
-  } else {
-    btnClasses.push("btn-outline-" + category.color);
-  }
+//   if (activeCategories.value.includes(category.slug)) {
+//     btnClasses.push("btn-" + category.color);
+//   } else {
+//     btnClasses.push("btn-outline-" + category.color);
+//   }
 
-  return btnClasses.join(" ");
-}
+//   return btnClasses.join(" ");
+// }
 </script>
