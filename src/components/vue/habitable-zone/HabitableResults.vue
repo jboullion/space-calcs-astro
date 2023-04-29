@@ -8,26 +8,27 @@
       <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
     </div>
     <p>
-      <strong>Note:</strong> Habitable zone is calculated for Earth like
+      <strong>Note:</strong> Habitable zone is calculated for Earth-like
       planets. Planets with different albedos and atmospheres will have
       different habitable zones.
     </p>
+
     <table class="table table-striped">
       <tbody>
-        <tr class="">
-          <th>Luminosity (L☉)</th>
-          <td class="text-end">{{ luminosity }} L☉</td>
+        <tr class="" :title="luminosityEquation">
+          <th>Luminosity (L)</th>
+          <td class="text-end">{{ luminosity.toExponential(4) }} W</td>
         </tr>
-        <tr class="">
+        <!-- <tr class="">
           <th>Flux (kT)</th>
           <td class="text-end">{{ formatNumber(energyFlux) }} kT</td>
-        </tr>
-        <tr class="">
-          <th>Inner Radius (AU)</th>
+        </tr> -->
+        <tr class="" :title="hzInnerEquation">
+          <th>Inner Radius</th>
           <td class="text-end">{{ formatNumber(hzInner) }} AU</td>
         </tr>
-        <tr class="">
-          <th>Outer Radius (AU)</th>
+        <tr class="" :title="hzOuterEquation">
+          <th>Outer Radius</th>
           <td class="text-end">{{ formatNumber(hzOuter) }} AU</td>
         </tr>
       </tbody>
@@ -41,73 +42,18 @@
 // 1.
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import {
-  CSS2DRenderer,
-  CSS2DObject,
-} from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { physicsConstants, removeAllChildNodes } from "../utils";
 import { formatNumber } from "../utils";
-import type { HabitableZoneForm } from "./constants";
-
-type Zone = {
-  name: string;
-  color: number;
-  emissive: number;
-  innerRadius: number;
-  outerRadius: number;
-  opacity: number;
-};
-
-interface PlanetTextures {
-  sun: THREE.Texture | null;
-  mercury: THREE.Texture | null;
-  venus: THREE.Texture | null;
-  earth: THREE.Texture | null;
-  mars: THREE.Texture | null;
-  jupiter: THREE.Texture | null;
-  saturn: THREE.Texture | null;
-  uranus: THREE.Texture | null;
-  neptune: THREE.Texture | null;
-}
-
-const planetTextures: PlanetTextures = {
-  sun: null,
-  mercury: null,
-  venus: null,
-  earth: null,
-  mars: null,
-  jupiter: null,
-  saturn: null,
-  uranus: null,
-  neptune: null,
-};
-
-const planet = {
-  mesh: new THREE.Mesh(),
-  clouds: new THREE.Mesh(),
-  axis: new THREE.Vector3(),
-  geometry: new THREE.SphereGeometry(),
-  material: new THREE.Material(),
-  group: new THREE.Group() as THREE.Group,
-};
-
-const three = {
-  canvas: null as HTMLElement | HTMLCanvasElement | null,
-  renderer: null as THREE.WebGLRenderer | null,
-  scene: new THREE.Scene(),
-  labelRenderer: new CSS2DRenderer(),
-  renderOrder: 0,
-  camera: new THREE.PerspectiveCamera(),
-  controls: null as OrbitControls | null,
-  // group: null,
-  // stats: null, // used for debugging
-  // gui: null, // used for debugging
-  // raycaster: null,
-  // mouse: null,
-  // minMovement: null as THREE.Vector3 | null,
-  // maxMovement: null as THREE.Vector3 | null,
-};
+import {
+  HabitableZoneForm,
+  Zone,
+  planet,
+  planetTextures,
+  three,
+} from "./constants";
 
 const loading = ref(true);
 const textureDir = "/textures/";
@@ -130,7 +76,7 @@ const AUtoDistance = 1000; // Turn AU into on screen distance
  */
 
 const starArea = computed(() => {
-  const radius = props.formData.starRadius * physicsConstants.solarRadius;
+  const radius = props.formData.starRadius * physicsConstants.sunRadius * 1000;
   return 4 * Math.PI * radius ** 2;
 });
 
@@ -143,63 +89,45 @@ const energyFlux = computed(() => {
 });
 
 const luminosity = computed(() => {
-  return energyFlux.value * starArea.value * 900000; // TODO: WHY 1000000? 1e6? What is causing us to need to add this value?
+  // L = L☉ * (R / R☉)² * (T / T☉)⁴
+  return (
+    physicsConstants.sunLuminosity *
+    ((props.formData.starRadius * physicsConstants.sunRadius) /
+      physicsConstants.sunRadius) **
+      2 *
+    (props.formData.starTemperature / physicsConstants.sunTemp) ** 4
+  );
+
+  // alternative L = σ * A * T⁴
+  // return (
+  //   physicsConstants.stefanBoltzmann * starArea.value * starTemperature.value
+  // );
+});
+
+const luminosityEquation = computed(() => {
+  return `L = L☉ * (R / R☉)² * (T / T☉)⁴`;
 });
 
 const L_rel = computed(() => {
-  return luminosity.value / physicsConstants.L_sun;
+  return luminosity.value / physicsConstants.sunLuminosity;
 });
 
 const hzInner = computed(() => {
   return Math.sqrt(L_rel.value / 1.1); // / physicsConstants.AU;
 });
 
+const hzInnerEquation = computed(() => {
+  return `sqrt((L / L☉) / 1.1)`;
+});
+
 const hzOuter = computed(() => {
   return Math.sqrt(L_rel.value / 0.53); // / physicsConstants.AU;
 });
 
-/*
-function log5(val: number) {
-  return Math.log(val) / Math.log(5);
-}
-// Stage 1: Estimate the host star’s absolute luminosity based on the star’s apparent visual magnitude
-// First Step (stage 1)  – Calculate the absolute visual magnitude of the host star based on the star’s apparent magnitude.
-const visualMagnitude = computed(() => {
-  const parsecs = 4.84814e-6 * props.formData.planetOrbit;
-  console.log("visualMagnitude", 5 * log5(parsecs) - 5);
-  return 5 * log5(parsecs) - 5;
+const hzOuterEquation = computed(() => {
+  return `sqrt((L / L☉) / 0.53)`;
 });
 
-// Second Step (stage 1)  – Calculate bolometric magnitude of the host star.
-const bolometricMagnitude = computed(() => {
-  const BC = bolometricCorrection.find(
-    (bc) => bc.starType === props.formData.starType.value
-  );
-
-  if (!BC) return visualMagnitude.value + -0.4;
-  console.log("bolometricMagnitude", visualMagnitude.value + BC.value);
-  return visualMagnitude.value + BC.value;
-});
-
-// Third Step (stage 1) – Calculate the absolute luminosity of the host star
-const absoluteLuminosity = computed(() => {
-  const Mbol = 4.72;
-  const pogsonsRatio = -2.5; // "Pogson's Ratio."
-  console.log(
-    "absoluteLuminosity",
-    Math.pow(10, (bolometricMagnitude.value - Mbol) / pogsonsRatio)
-  );
-  return Math.pow(10, (bolometricMagnitude.value - Mbol) / pogsonsRatio);
-});
-
-// Stage 2: Approximate the radii of the boundaries of the host star’s habitable zone
-const innerHabitableZone = computed(() => {
-  return Math.sqrt(absoluteLuminosity.value / 1.1);
-});
-const outerHabitableZone = computed(() => {
-  return Math.sqrt(absoluteLuminosity.value / 0.53);
-});
-*/
 /**
  *
  *
@@ -262,6 +190,7 @@ function setupScene() {
 
   if (three.scene && three.canvas) {
     removeAllChildNodes(three.canvas);
+    clearZones();
   }
 
   setupThreeJS();
