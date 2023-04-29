@@ -1,0 +1,41 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import SolarEnergy from "../../components/vue/solar-energy/SolarEnergy.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+// TODO: Pull in calculator-list and get the name and description from there?
+const title = "Solar Energy";
+const description =
+  "Estimate the available power from a solar panel in any star system.";
+
+const references: Reference[] = [
+  {
+    title: "Calculating Planetary Energy Balance & Temperature",
+    url: "https://web.archive.org/web/20210605120431/https://scied.ucar.edu/earth-system/planetary-energy-balance-temperature-calculate",
+  },
+  {
+    title: "Physics Stack Exchange",
+    url: "https://physics.stackexchange.com/questions/36279/what-is-the-luminosity-per-square-meter-hitting-the-earths-surface-from-the-sun",
+  },
+  {
+    title: "Wikipedia: Luminosity",
+    url: "https://en.wikipedia.org/wiki/Luminosity",
+  },
+];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;" class="calculator">
+      <SolarEnergy client:only="vue" />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

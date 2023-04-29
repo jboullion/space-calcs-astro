@@ -3,8 +3,8 @@ export function addCommas(value: number, decimals: number = 0) {
   return formatNumber(value, decimals);
 }
 
-export function formatNumber(value: number, decimals: number = 0) {
-  return value.toLocaleString(undefined, { minimumFractionDigits: decimals });
+export function formatNumber(value: number, decimals: number = 2) {
+  return value.toLocaleString(undefined, { maximumFractionDigits: decimals });
 }
 
 export const clampNumber = (num: number, min: number, max: number) =>
@@ -31,10 +31,12 @@ export const physicsConstants = {
   foot: 0.3048, // m
   mile: 5280, // ft
   quarterPI: Math.PI / 4, // radians
-  AU: 149_597_870.7, // km
-  solarRadius: 696340, // km
-  L_sun: 3.828e26, // W
+  AU: 149597870.7, // km
+  sunRadius: 696340, // km
+  sunLuminosity: 3.828e26, // W
+  sunTemp: 5778, // K
   stefanBoltzmann: 5.670367e-8, // Stefan-Boltzmann constant in W/m²K⁴
+  solarConstant: 1361, // W/m² Energy absorbed per square meter at the top of the atmosphere
 };
 
 export function gTom2s(g: number) {
@@ -83,6 +85,10 @@ export function radiansPerSecToRpm(radians: number) {
 
 export function relativeDifference(a: number, b: number) {
   return Math.abs((a - b) / ((a + b) / 2)); // 100 *
+}
+
+export function kToC(k: number) {
+  return k - 273.15;
 }
 
 /**

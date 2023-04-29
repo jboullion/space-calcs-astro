@@ -16,7 +16,11 @@
                     title="What type of object is rotating? Different structures provide different advantages."
                   ></i>
                 </label>
-                <select class="form-select" v-model="formData.type">
+                <select
+                  class="form-select"
+                  v-model="formData.type"
+                  @change="updateType"
+                >
                   <option
                     v-for="stationType in availableTypes"
                     :value="stationType"
@@ -332,7 +336,7 @@
           class="form-range"
           min="0"
           :max="formData.radius"
-          v-model.number="ruler.point"
+          v-model.number="formData.rulerPoint"
           @input="updateMeasurementPoint"
         />
 
@@ -341,9 +345,10 @@
             type="number"
             class="form-control"
             id="point"
-            v-model.number="ruler.point"
+            v-model.number="formData.rulerPoint"
             min="0"
             :max="formData.radius"
+            @input="updateMeasurementPoint"
           />
           <span class="input-group-text">m</span>
         </div>
@@ -580,7 +585,6 @@ const three = {
 const ruler = {
   lineCylinder: new THREE.Mesh(),
   lineMaterial: new THREE.Material(),
-  point: 0,
   dial: new THREE.Mesh(),
   dialMaterial: new THREE.Material(),
 };
@@ -600,24 +604,27 @@ const coriolis = {
   geometry: new THREE.SphereGeometry(),
   material: new THREE.Material(),
 };
+
 const help = ref({
   tooltipModal: null,
   tooltipTitle: null,
   tooltipDescription: "",
 });
+
 const formData = ref({
   location: locations[0],
   type: types[0],
   isSpace: true,
   //gravityOption: null,
   gravity: 1,
-  radius: 12,
-  rpm: 10,
+  radius: 1000,
+  rpm: 1,
   angularVelocity: 0, // aka rpm
   tangentialVelocity: 0,
   centripetalAcceleration: 0,
   shipLength: 30,
   shipWidth: 9,
+  rulerPoint: 1000,
   hollow: true,
   showEnvironment: true,
   seeInside: true,
@@ -668,6 +675,7 @@ onBeforeMount(() => {
 
 onMounted(() => {
   loadModels();
+
   window.addEventListener("resize", setupScene, { passive: true });
 });
 
@@ -711,7 +719,7 @@ const availableTypes = computed(() => {
 });
 
 const pointGravity = computed(() => {
-  return calcGravityFromRadius(ruler.point);
+  return calcGravityFromRadius(formData.value.rulerPoint);
 });
 
 const pointCentripetalAcceleration = computed(() => {
@@ -720,7 +728,9 @@ const pointCentripetalAcceleration = computed(() => {
 });
 
 const pointTangentialVelocity = computed(() => {
-  return Math.sqrt(pointCentripetalAcceleration.value * ruler.point);
+  return Math.sqrt(
+    pointCentripetalAcceleration.value * formData.value.rulerPoint
+  );
 });
 
 const centripetalAcceleration = computed(() => {
@@ -1032,7 +1042,7 @@ function setupRuler() {
   //ruler.lineCylinder.position.z = 1;
 
   // Setup measurement point
-  ruler.point = formData.value.radius;
+  formData.value.rulerPoint = formData.value.radius;
 
   const geometry = new THREE.CylinderGeometry(lineRadius, 0.01, lineRadius, 2);
   ruler.dialMaterial = new THREE.MeshBasicMaterial({
@@ -1056,7 +1066,7 @@ function setupRuler() {
     ruler.lineCylinder.position.y = 1;
 
     ruler.dial.rotation.z -= Math.PI / 2;
-    ruler.dial.position.x = -ruler.point + lineRadius + 2;
+    ruler.dial.position.x = -formData.value.rulerPoint + lineRadius + 2;
     ruler.dial.position.y = 1.1;
   } else {
     ruler.lineCylinder.rotation.z = Math.PI;
@@ -1065,7 +1075,7 @@ function setupRuler() {
     ruler.lineCylinder.position.z = 0.5;
 
     ruler.dial.rotation.y = Math.PI / 2;
-    ruler.dial.position.y = -ruler.point + 2;
+    ruler.dial.position.y = -formData.value.rulerPoint + 2;
     ruler.dial.position.z = 0.6;
   }
 
@@ -1472,6 +1482,20 @@ function velocityToUpdateSpeed(velocity: number) {
  * Form Actions
  *
  */
+function updateType() {
+  const newType = types.find(
+    (type) => type.shape === formData.value.type.shape
+  );
+
+  if (!newType) return;
+
+  formData.value.radius = newType.defaults.radius;
+  formData.value.rpm = newType.defaults.rpm;
+  formData.value.shipLength = newType.defaults.length;
+
+  updateRadius();
+}
+
 function updateShipLength() {
   formData.value.shipLength = Math.min(
     Math.max(formData.value.shipLength, conversion.minLength),
@@ -1481,6 +1505,7 @@ function updateShipLength() {
   // Ship length doesn't affect anything else so we can run it without "needs update"
   setupScene();
 }
+
 function updateRadius() {
   formData.value.radius = Math.min(
     Math.max(formData.value.radius, conversion.minLength),
@@ -1492,6 +1517,11 @@ function updateRadius() {
   formData.value.gravity = +calcGravityFromRadius(
     formData.value.radius
   ).toFixed(2);
+
+  formData.value.rulerPoint = formData.value.radius;
+  updateMeasurementPoint();
+
+  setupScene();
 }
 
 function updateRPM() {
@@ -1519,8 +1549,9 @@ function updateGravity() {
 }
 
 function updateMeasurementPoint() {
-  if (ruler.point < 0) ruler.point = 0;
-  if (ruler.point > formData.value.radius) ruler.point = formData.value.radius;
+  if (formData.value.rulerPoint < 0) formData.value.rulerPoint = 0;
+  if (formData.value.rulerPoint > formData.value.radius)
+    formData.value.rulerPoint = formData.value.radius;
 
   const lineRadius = formData.value.radius / 30;
 
@@ -1528,10 +1559,10 @@ function updateMeasurementPoint() {
     formData.value.type.shape === "can" ||
     formData.value.type.shape === "funnel"
   ) {
-    ruler.dial.position.x = -ruler.point + lineRadius / 2;
-    ruler.dial.position.x = -ruler.point + lineRadius / 2;
+    ruler.dial.position.x = -formData.value.rulerPoint + lineRadius / 2;
+    ruler.dial.position.x = -formData.value.rulerPoint + lineRadius / 2;
   } else {
-    ruler.dial.position.y = -ruler.point + lineRadius / 2;
+    ruler.dial.position.y = -formData.value.rulerPoint + lineRadius / 2;
   }
 }
 

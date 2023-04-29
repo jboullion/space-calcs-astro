@@ -299,11 +299,11 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-  //window.addEventListener("resize", drawCharts, { passive: true });
+  window.addEventListener("resize", drawCharts, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  //window.removeEventListener("resize", drawCharts);
+  window.removeEventListener("resize", drawCharts);
 });
 
 function showResultChart(chart: ResultTabs) {
@@ -500,17 +500,7 @@ function round(num: number, digit: number) {
  *
  *
  *
- *
- *
- *
- *
- *
  *  DRAWING FUNCTIONS
- *
- *
- *
- *
- *
  *
  *
  *
@@ -672,18 +662,7 @@ function calcPayloadRowC3(payload: number) {
  *
  *
  *
- *
- *
- *
- *
- *
  *  DATA FUNCTIONS
- *
- *
- *
- *
- *
- *
  *
  *
  *
