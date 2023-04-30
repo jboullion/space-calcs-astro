@@ -1,6 +1,7 @@
 import type { SpaceCalc } from "../../../types/types";
 import {
   HABITAT_CAT,
+  LIFE_CAT,
   ORBIT_CAT,
   ROCKET_CAT,
   STATION_CAT,
@@ -68,6 +69,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
     categories: [categories[HABITAT_CAT], categories[STATION_CAT]],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/solar-energy",
+  },
+  {
+    name: "Drake Equation",
+    description:
+      "Estimate the number of intelligent civilizations in the Milky Way galaxy",
+    categories: [categories[LIFE_CAT]],
+    image: "https://i.imgur.com/4ZQZQ2M.png",
+    link: "/calcs/drake-equation",
   },
 ];
 

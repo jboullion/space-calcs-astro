@@ -1,0 +1,34 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import DrakeEquation from "../../components/vue/drake-equation/DrakeEquation.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+const title = "Drake Equation";
+const description =
+  "A probabilistic argument used to estimate the number of active, communicative extraterrestrial civilizations in the Milky Way Galaxy.";
+
+const references: Reference[] = [
+  {
+    title: "Wiki: Drake Equation",
+    url: "https://en.wikipedia.org/wiki/Drake_equation",
+  },
+  {
+    title: "SETI: Drake Equation",
+    url: "https://www.seti.org/drake-equation-index",
+  },
+];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <DrakeEquation client:only="vue" />
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>
