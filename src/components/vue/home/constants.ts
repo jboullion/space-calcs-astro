@@ -9,6 +9,7 @@ export const ROCKET_CAT = 0;
 export const ORBIT_CAT = 1;
 export const HABITAT_CAT = 2;
 export const STATION_CAT = 3;
+export const LIFE_CAT = 4;
 // export const ADVANCED_CAT = 4;
 
 export const categories: Category[] = [
@@ -31,6 +32,11 @@ export const categories: Category[] = [
     name: "Stations",
     slug: "stations",
     color: "danger",
+  },
+  {
+    name: "Life",
+    slug: "life",
+    color: "success",
   },
   // TODO: Perhaps split this into a different thing. IE Give each calculator a boolean of "advanced" instead of a category. Possibly hide by deafult until it is toggled on
   // {

@@ -1,110 +1,112 @@
 <template>
   <div id="delta-v__app" class="row" v-if="formData" v-cloak>
-    <div id="delta-v__form" class="col-lg-4 py-2 bg-light rounded border">
-      <div class="calc-form mb-5">
-        <NumberInput
-          id="payload-mass"
-          label="Payload Mass"
-          v-model="formData.payloadMass"
-          unit="mt"
-        />
+    <div id="delta-v__form" class="col-lg-4">
+      <div class="p-2 bg-light rounded border mb-5">
+        <div class="calc-form">
+          <NumberInput
+            id="payload-mass"
+            label="Payload Mass"
+            v-model="formData.payloadMass"
+            unit="mt"
+          />
 
-        <CheckboxInput
-          id="reusable"
-          label="Is the rocket reusable?"
-          v-model="formData.reusable"
-          :value="true"
-          tooltip="Save 8% of fuel for landing. Very rough estimate for the boostback burn, reentry burn, landing burn, and remaining fuel combined"
-        />
-
-        <CheckboxInput
-          id="two-stage"
-          label="Is This a Two Stage Rocket?"
-          v-model="formData.twoStage"
-          :value="true"
-          tooltip="Will this rocket have two stages?"
-          @change="updateTwoStage"
-        />
-
-        <div v-show="formData.twoStage">
           <CheckboxInput
-            id="refill"
-            label="Refill second stage in orbit?"
-            v-model="formData.refill"
+            id="reusable"
+            label="Is the rocket reusable?"
+            v-model="formData.reusable"
             :value="true"
-            tooltip="Add a full tank of fuel to a 2nd stage in orbit. Greatly extends ΔV."
+            tooltip="Save 8% of fuel for landing. Very rough estimate for the boostback burn, reentry burn, landing burn, and remaining fuel combined"
           />
 
+          <CheckboxInput
+            id="two-stage"
+            label="Is This a Two Stage Rocket?"
+            v-model="formData.twoStage"
+            :value="true"
+            tooltip="Will this rocket have two stages?"
+            @change="updateTwoStage"
+          />
+
+          <div v-show="formData.twoStage">
+            <CheckboxInput
+              id="refill"
+              label="Refill second stage in orbit?"
+              v-model="formData.refill"
+              :value="true"
+              tooltip="Add a full tank of fuel to a 2nd stage in orbit. Greatly extends ΔV."
+            />
+
+            <NumberInput
+              id="first-stage"
+              label="First Stage Dry Mass"
+              v-model="formData.firstStageMass"
+              unit="mt"
+              tooltip="How massive is the first stage?"
+            />
+
+            <NumberInput
+              id="first-stage-fuel"
+              label="First Stage Fuel Mass"
+              v-model="formData.firstStageFuel"
+              unit="mt"
+              tooltip="How much fuel is in the first stage?"
+            />
+
+            <NumberInput
+              id="specific-impulse-sea"
+              label="Sea Level Specific Impulse"
+              v-model="formData.seaLevelSpecificImpulse"
+              unit="s"
+              @update:modelValue="calcExhaustVelocity"
+              tooltip="Sea Level Specific Impulse."
+              :description="
+                addCommas(formData.seaLevelVelocity) +
+                ' m/s Exhaust Velocity (V<sub>e</sub>)'
+              "
+            />
+          </div>
+
           <NumberInput
-            id="first-stage"
-            label="First Stage Dry Mass"
-            v-model="formData.firstStageMass"
+            id="rocket-mass"
+            :label="(formData.twoStage ? 'Second Stage ' : '') + 'Rocket Mass'"
+            v-model="formData.rocketMass"
             unit="mt"
-            tooltip="How massive is the first stage?"
+            tooltip="Rocket mass is the mass of the rocket without fuel or payload."
           />
 
           <NumberInput
-            id="first-stage-fuel"
-            label="First Stage Fuel Mass"
-            v-model="formData.firstStageFuel"
+            id="fuel-mass"
+            :label="(formData.twoStage ? 'Second Stage ' : '') + 'Fuel Mass'"
+            v-model="formData.fuelMass"
             unit="mt"
-            tooltip="How much fuel is in the first stage?"
           />
 
           <NumberInput
-            id="specific-impulse-sea"
-            label="Sea Level Specific Impulse"
-            v-model="formData.seaLevelSpecificImpulse"
+            id="specific-impulse"
+            :label="
+              (formData.twoStage ? 'Second Stage ' : '') +
+              'Specific Impulse (I<sub>sp</sub>)'
+            "
+            v-model="formData.specificImpulse"
             unit="s"
             @update:modelValue="calcExhaustVelocity"
-            tooltip="Sea Level Specific Impulse."
+            tooltip="How efficiently an engine creates thrust. Directly related to exhaust velocity."
             :description="
-              addCommas(formData.seaLevelVelocity) +
+              addCommas(formData.exhaustVelocity) +
               ' m/s Exhaust Velocity (V<sub>e</sub>)'
             "
           />
+
+          <SelectInput
+            id="engine"
+            label="Example Rocket Engine"
+            v-model="formData.engine"
+            :options="defaultEngines"
+            tooltip="Select a Common Rocket Engine to set example Specific Impulse"
+            description="Specific Impulse values are estimates"
+            @update:modelValue="updateEngine"
+          />
         </div>
-
-        <NumberInput
-          id="rocket-mass"
-          :label="(formData.twoStage ? 'Second Stage ' : '') + 'Rocket Mass'"
-          v-model="formData.rocketMass"
-          unit="mt"
-          tooltip="Rocket mass is the mass of the rocket without fuel or payload."
-        />
-
-        <NumberInput
-          id="fuel-mass"
-          :label="(formData.twoStage ? 'Second Stage ' : '') + 'Fuel Mass'"
-          v-model="formData.fuelMass"
-          unit="mt"
-        />
-
-        <NumberInput
-          id="specific-impulse"
-          :label="
-            (formData.twoStage ? 'Second Stage ' : '') +
-            'Specific Impulse (I<sub>sp</sub>)'
-          "
-          v-model="formData.specificImpulse"
-          unit="s"
-          @update:modelValue="calcExhaustVelocity"
-          tooltip="How efficiently an engine creates thrust. Directly related to exhaust velocity."
-          :description="
-            addCommas(formData.exhaustVelocity) +
-            ' m/s Exhaust Velocity (V<sub>e</sub>)'
-          "
-        />
-
-        <SelectInput
-          id="engine"
-          label="Example Rocket Engine"
-          v-model="formData.engine"
-          :options="defaultEngines"
-          tooltip="Select a Common Rocket Engine to set example Specific Impulse"
-          description="Specific Impulse values are estimates"
-          @update:modelValue="updateEngine"
-        />
       </div>
     </div>
     <div id="delta-v__results" class="col-lg-8 calc-form">
