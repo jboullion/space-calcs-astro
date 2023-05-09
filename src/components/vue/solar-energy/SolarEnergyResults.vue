@@ -28,11 +28,11 @@
     </table>
 
     <div class="result-chart my-4">
-      <div
+      <!-- <div
         id="efficiency-chart"
         v-show="showResult == 'efficiency'"
         style="width: 100%; height: 400px"
-      ></div>
+      ></div> -->
       <!-- <div
         id="fuel-chart"
         v-show="showResult == 'fuel'"
@@ -178,6 +178,9 @@ function setupCharts() {
 }
 
 function drawCharts() {
+  // TODO: Deprecated until we have a better chart to show
+  return;
+
   switch (showResult.value) {
     case "efficiency":
       drawEfficiencyChart();

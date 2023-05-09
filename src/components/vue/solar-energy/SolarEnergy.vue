@@ -34,7 +34,7 @@
           id="atmosphere"
           label="Atmosphere Absorption"
           v-model.number="formData.atmosphereAbsorption"
-          unit="atm"
+          unit="%"
           tooltip="Earth's atmosphere absorbs ~37% of the solar energy. Mars atmosphere absorbs ~7%."
         />
 

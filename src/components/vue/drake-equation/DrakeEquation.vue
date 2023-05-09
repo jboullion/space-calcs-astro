@@ -16,7 +16,7 @@
             prefix="R<sub>∗</sub>"
             :step="0.1"
             :min="0"
-            description="Current Estimates are between 1.5 and 3"
+            description="Current Estimate: 1.5 - 3"
           />
           <NumberInput
             id="fractionOfStarsWithPlanets"
@@ -26,7 +26,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Current Estimates are about 1"
+            description="Current Estimate: ~1"
           />
           <NumberInput
             id="averageNumberOfPlanetsThatCanSupportLife"
@@ -35,7 +35,7 @@
             :prefix="'n<sub>e</sub>'"
             :step="0.01"
             :min="0"
-            description="Current Estimates are about 0.4"
+            description="Current Estimate: ~0.4"
           />
           <NumberInput
             id="fractionOfPlanetsThatLifeAppears"
@@ -45,7 +45,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Unknown"
+            description="Current Estiamte: Unknown"
           />
           <NumberInput
             id="fractionOfPlanetsThatCanSupportIntelligentLife"
@@ -57,7 +57,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Unknown"
+            description="Current Estiamte: Unknown"
           />
           <NumberInput
             id="fractionOfPlanetsThatHaveCommunicativeLife"
@@ -67,7 +67,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Unknown"
+            description="Current Estiamte: Unknown"
           />
           <NumberInput
             id="averageLifetimeOfCommunicativeCivilizations"
@@ -78,7 +78,7 @@
             prefix="L"
             :step="0.1"
             :min="0"
-            description="Unknown"
+            description="Current Estiamte: Unknown"
           />
         </div>
       </div>
