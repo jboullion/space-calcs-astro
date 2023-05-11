@@ -49,24 +49,6 @@
             </div>
           </div>
         </div>
-        <!-- <div class="category-filter mt-3 d-flex justify-content-center">
-          <div v-for="category in categories" :key="category.slug">
-            <input
-              type="checkbox"
-              class="btn-check"
-              :id="`category-${category.slug}`"
-              autocomplete="off"
-              @change="toggleCategory(category.slug)"
-            />
-            <label
-              class="btn mx-2"
-              :class="getCategoryClass(category)"
-              :for="`category-${category.slug}`"
-            >
-              {{ category.name }}</label
-            >
-          </div>
-        </div> -->
       </div>
     </section>
 
@@ -85,15 +67,6 @@ const search = ref("");
 const activeCategories = ref<string[]>([]);
 const selectedCategory = ref<string>("");
 
-// function toggleCategory(slug: string): void {
-//   if (activeCategories.value.includes(slug)) {
-//     activeCategories.value = activeCategories.value.filter(
-//       (category) => category !== slug
-//     );
-//   } else {
-//     activeCategories.value.push(slug);
-//   }
-// }
 function toggleCategory() {
   if (selectedCategory.value === "") {
     activeCategories.value = [];
@@ -101,16 +74,4 @@ function toggleCategory() {
     activeCategories.value = [selectedCategory.value];
   }
 }
-
-// function getCategoryClass(category: Category): string {
-//   let btnClasses = [];
-
-//   if (activeCategories.value.includes(category.slug)) {
-//     btnClasses.push("btn-" + category.color);
-//   } else {
-//     btnClasses.push("btn-outline-" + category.color);
-//   }
-
-//   return btnClasses.join(" ");
-// }
 </script>
