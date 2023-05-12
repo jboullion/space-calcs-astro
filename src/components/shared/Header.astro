@@ -1,5 +1,9 @@
 ---
+import DarkMode from "../vue/shared/DarkMode.vue";
 import Logo from "./Logo.astro";
+
+// TODO: Do we want to set up a bootswatch theme switcher?
+// TODO: https://stackoverflow.com/questions/19192747/how-to-dynamically-change-themes-after-clicking-a-drop-down-menu-of-themes
 ---
 
 <header>
@@ -14,15 +18,7 @@ import Logo from "./Logo.astro";
         </div>
         Space Calcs
       </a>
-
-      <!-- <ul class="nav text-white">
-        <li class="nav-item">
-          <a href="/about" class="nav-link px-4 py-2 link-light">About</a>
-        </li>
-        <li class="nav-item">
-          <a href="/contact" class="nav-link px-4 py-2 link-light">Contact</a>
-        </li>
-      </ul> -->
+      <DarkMode client:only />
     </div>
   </div>
 </header>

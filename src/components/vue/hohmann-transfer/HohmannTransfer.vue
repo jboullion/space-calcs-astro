@@ -1,7 +1,7 @@
 <template>
   <div id="hohmann-transfer__app" class="row">
     <div id="hohmann__form" class="col-lg-4">
-      <div class="calc-form mb-5 p-2 bg-light rounded border">
+      <div class="calc-form mb-5 p-2 rounded border">
         <SelectInput
           id="start-orbit"
           label="Starting Orbit"

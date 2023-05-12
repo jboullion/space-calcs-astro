@@ -1,6 +1,6 @@
 <template>
   <div id="habitat__app" class="row mt-5" v-cloak>
-    <div class="calc-form col-lg-4 mb-5 p-2 bg-light rounded border">
+    <div class="calc-form col-lg-4 mb-5 p-2 rounded border">
       <div>
         <div id="mission" class="habitat__mission form-section active">
           <h4 @click="showLocation = !showLocation">
