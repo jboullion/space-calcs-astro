@@ -7,7 +7,7 @@
         >
         &bull; f<sub>i</sub> &bull; f<sub>c</sub> &bull; L = N
       </h2> -->
-      <div class="p-2 bg-light rounded border mb-5">
+      <div class="p-2 rounded border mb-5">
         <div class="calc-form">
           <NumberInput
             id="averageRateOfStarFormation"
