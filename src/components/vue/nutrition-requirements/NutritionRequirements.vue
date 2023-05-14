@@ -129,7 +129,7 @@
       <div id="food" v-if="foodMenu.length">
         <h3>Food List</h3>
 
-        <table class="table table-striped food__table">
+        <table class="table table-striped border food__table">
           <thead>
             <tr>
               <th>Name</th>

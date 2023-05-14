@@ -110,7 +110,7 @@
       </div>
     </div>
     <div id="delta-v__results" class="col-lg-8 calc-form">
-      <table class="table table-striped">
+      <table class="table table-striped border">
         <tbody>
           <tr v-if="formData.twoStage" class="">
             <th>First Stage ΔV</th>

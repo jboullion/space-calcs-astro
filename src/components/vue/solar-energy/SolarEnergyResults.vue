@@ -1,6 +1,6 @@
 <template>
   <div id="solar-energy__results" class="col-lg-8 calc-form">
-    <table class="table table-striped">
+    <table class="table table-striped border">
       <tbody>
         <tr class="" title="L = L☉ * (R / R☉)² * (T / T☉)⁴">
           <th>Star Luminosity</th>

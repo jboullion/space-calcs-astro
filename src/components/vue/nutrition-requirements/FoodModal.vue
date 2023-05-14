@@ -1,7 +1,7 @@
 <template>
   <BaseModal :title="food.name" @close="emit('close')">
     <!-- <div class="food__info">
-      <table class="table table-striped">
+      <table class="table table-striped border">
         <tbody>
           <tr class="food__nutrients" v-for="nutrient in orderedNutrients">
             <th>{{ nutrient.nutrientName }}</th>

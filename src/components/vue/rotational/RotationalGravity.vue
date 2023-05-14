@@ -447,7 +447,7 @@
             title="The funnel shape is generated based on comparing the planet graviy with the apparent gravity. Meaning that different levels of gravity require a different slope to provide a balanced amount of force."
           ></i>
         </h3>
-        <table class="table table-striped">
+        <table class="table table-striped border">
           <tr>
             <th>Incidence Angle</th>
             <td><span class="h4">⦩</span></td>
