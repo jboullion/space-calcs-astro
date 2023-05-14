@@ -5,7 +5,8 @@
         <div class="row">
           <div class="col-lg-6 col-md-8 mx-auto">
             <div class="d-flex justify-content-center gap-3">
-              <img src="/logo.svg" alt="Space Calcs" height="70" width="30" />
+              <!-- <img src="/logo.svg" alt="Space Calcs" height="70" width="30" /> -->
+              <Logo />
               <h1 class="fw-light">Space Calcs</h1>
             </div>
 
@@ -61,6 +62,7 @@ import CalcList from "./CalcList.vue";
 import { ref } from "vue";
 import type { Category } from "./constants";
 import { categories } from "./constants";
+import Logo from "../shared/Logo.vue";
 
 const search = ref("");
 

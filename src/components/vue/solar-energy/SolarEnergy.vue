@@ -1,7 +1,7 @@
 <template>
   <div id="solar-energy__app" class="row">
     <div id="solar-energy__form" class="col-lg-4">
-      <div class="calc-form mb-5 p-2 bg-light rounded border">
+      <div class="calc-form mb-5 p-2 rounded border">
         <NumberInput
           id="efficiency"
           label="Solar Panel Efficiency"

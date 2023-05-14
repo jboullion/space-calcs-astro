@@ -16,12 +16,12 @@ export const categories: Category[] = [
   {
     name: "Rockets",
     slug: "rockets",
-    color: "primary",
+    color: "danger",
   },
   {
     name: "Orbits",
     slug: "orbits",
-    color: "secondary",
+    color: "warning",
   },
   {
     name: "Habitats",
@@ -31,7 +31,7 @@ export const categories: Category[] = [
   {
     name: "Stations",
     slug: "stations",
-    color: "danger",
+    color: "primary",
   },
   {
     name: "Life",
