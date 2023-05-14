@@ -84,7 +84,7 @@
         </div>
 
         <div class="form-list" v-if="foodResults.length">
-          <table class="table table-striped">
+          <table class="table table-striped table-light">
             <thead>
               <tr>
                 <th>Add</th>

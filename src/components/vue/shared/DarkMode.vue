@@ -1,5 +1,5 @@
 <template>
-  <button type="button" @click="changeTheme()" class="btn btn-dark">
+  <button type="button" @click="changeTheme()" class="btn btn-dark fs-4">
     <i v-if="theme === 'light'" class="fa-solid fa-fw fa-moon"></i>
     <i v-if="theme === 'dark'" class="fa-solid fa-fw fa-sun"></i>
   </button>
