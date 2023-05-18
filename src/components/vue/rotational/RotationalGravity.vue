@@ -816,10 +816,10 @@ function toggleClass(on: boolean) {
 }
 
 async function loadModels() {
-  const loader = new GLTFLoader();
+  //const loader = new GLTFLoader();
 
   // TODO: DON'T USE SPACEMAN MODEL!? It is an awesome model, but pretty big. Just use a 6ft cylinder...or nothing
-  models.spaceman = await loader.loadAsync("/models/lowres_spacex_suit.glb");
+  //models.spaceman = await loader.loadAsync("/models/lowres_spacex_suit.glb");
 
   const textureLoader = new THREE.TextureLoader();
   //textures.space = await textureLoader.load('/textures/2k_stars.jpg');
@@ -930,6 +930,8 @@ function setupThreeJS() {
   // // GUI
   // three.gui = new dat.GUI( { autoPlace: false } );
   // three.canvas.appendChild(three.gui.domElement);
+
+  three.scene.add(three.group);
 }
 
 function setupAxesHelper() {
@@ -986,17 +988,17 @@ function setupForceVector() {
       forces.vectorMesh.rotation.set(forces.vector + Math.PI / 2, 0, 0);
     }
 
-    forces.vectorMesh.position.set(
-      three.spaceman.position.x - 1.5,
-      three.spaceman.position.y - 1.5,
-      three.spaceman.position.z
-    );
+    // forces.vectorMesh.position.set(
+    //   three.spaceman.position.x - 1.5,
+    //   three.spaceman.position.y - 1.5,
+    //   three.spaceman.position.z
+    // );
   } else {
-    forces.vectorMesh.position.set(
-      three.spaceman.position.x,
-      three.spaceman.position.y - 2,
-      three.spaceman.position.z
-    );
+    // forces.vectorMesh.position.set(
+    //   three.spaceman.position.x,
+    //   three.spaceman.position.y - 2,
+    //   three.spaceman.position.z
+    // );
   }
 
   three.group.add(forces.vectorMesh);
@@ -1246,9 +1248,10 @@ function setupStation() {
     buildCylinderStation(stationMaterial);
   } else if (formData.value.type.shape === "bola") {
     buildBolaStation(stationMaterial);
-  } else if (formData.value.type.shape === "funnel") {
-    buildFunnelStation(stationMaterial);
   }
+  // else if (formData.value.type.shape === "funnel") {
+  //   buildFunnelStation(stationMaterial);
+  // }
 
   if (formData.value.showGravityRule) {
     setupRuler();
@@ -1273,7 +1276,8 @@ function setupScene() {
   // TODO: Ideally we wouldn't have to setup ThreeJS on each scene. Just update station + spaceman
   setupThreeJS();
 
-  setupSpaceman();
+  //setupSpaceman();
+  setupRing();
 
   setupStation();
 
@@ -1282,42 +1286,17 @@ function setupScene() {
   }
 }
 
-function setupSpaceman() {
-  if (!models.spaceman) return;
+function setupRing() {
+  // if (!formData.value.isSpace) {
+  //   setupForceVector();
+  // }
 
-  if (!formData.value.isSpace) {
-    setupForceVector();
-  }
-
-  let spacemanPosition = -formData.value.radius;
-
-  three.spaceman = models.spaceman.scene;
-  three.spaceman.scale.set(0.04, 0.04, 0.04); // scales to ~2 meters
-  three.spaceman.rotation.set(0, 0, 0);
+  let ringPosition = -formData.value.radius;
 
   // Build shape
   if (formData.value.type.shape === "can") {
-    spacemanPosition += 0.5;
-    three.spaceman.rotation.x = Math.PI / 2;
-    three.spaceman.rotation.y = 1.8;
-    three.spaceman.position.set(1, spacemanPosition, 0); // 6, if solid shape set Z to height of the extrusion
-
-    if (forces.vectorMesh) {
-      forces.vectorMesh.position.set(
-        three.spaceman.position.x - 1.5,
-        three.spaceman.position.y - 1.5,
-        three.spaceman.position.z
-      );
-    }
+    //ringPosition += 0.5;
   } else if (formData.value.type.shape === "cylinder") {
-    three.spaceman.rotation.y = -Math.PI / 2;
-    three.spaceman.position.set(
-      0,
-      spacemanPosition,
-      formData.value.shipLength / 2
-    );
-
-    // If the radius of the structure is too big our spaceman becomes tiny! let's highlight him with a ring.
     if (formData.value.radius > 30) {
       const ringGeometry = new THREE.RingGeometry(
         3,
@@ -1330,19 +1309,11 @@ function setupSpaceman() {
       });
       const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
 
-      ringMesh.position.set(
-        0,
-        spacemanPosition + 2,
-        formData.value.shipLength / 2
-      );
+      ringMesh.position.set(0, ringPosition + 2, formData.value.shipLength / 2);
 
       three.group.add(ringMesh);
     }
   } else if (formData.value.type.shape === "bola") {
-    three.spaceman.rotation.y = -Math.PI / 2;
-    three.spaceman.position.set(0, spacemanPosition, 0);
-
-    // If the radius of the structure is too big our spaceman becomes tiny! let's highlight him with a ring.
     if (stationWidth.value > 30) {
       const ringGeometry = new THREE.RingGeometry(
         3,
@@ -1355,57 +1326,139 @@ function setupSpaceman() {
       });
       const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
 
-      ringMesh.position.set(0, spacemanPosition + 2, 0);
+      ringMesh.position.set(0, ringPosition + 2, 0);
 
       three.group.add(ringMesh);
     }
   } else if (formData.value.type.shape === "funnel") {
-    spacemanPosition += 1;
-
-    three.spaceman.rotation.z = forces.vector; //Math.PI / 2;
-    //three.spaceman.rotation.y = 1.8;
-    three.spaceman.position.set(spacemanPosition, 0, 0); // 6, if solid shape set Z to height of the extrusion
-
-    //three.group.rotation.x = -Math.PI / 2.5;
-
-    // If the radius of the structure is too big our spaceman becomes tiny! let's highlight him with a ring.
-    if (formData.value.radius > 30) {
-      const ringGeometry = new THREE.RingGeometry(
-        formData.value.shipLength,
-        formData.value.shipLength * 1.3,
-        32
-      );
-      const ringMaterial = new THREE.MeshBasicMaterial({
-        color: 0xba3700,
-        side: THREE.DoubleSide,
-      });
-      const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
-
-      ringMesh.rotation.z = forces.vector;
-
-      ringMesh.position.set(spacemanPosition + 2, 0, 0);
-
-      three.group.add(ringMesh);
-    }
-
-    if (forces.vectorMesh) {
-      forces.vectorMesh.position.set(three.spaceman.position.x, -2, 0);
-    }
+    // ringPosition += 1;
   }
-  // // Gui folder
-  // const spacemanFolder = three.gui.addFolder('Spaceman');
-  // spacemanFolder.add(three.spaceman.position, 'x', 0, stationWidth.value).name("px");
-  // spacemanFolder.add(three.spaceman.position, 'y', -stationWidth.value * 2, stationWidth.value * 2).name("py");
-  // spacemanFolder.add(three.spaceman.position, 'z', 0, stationWidth.value).name("pz");
-
-  // spacemanFolder.add(three.spaceman.rotation, 'x', -Math.PI / 2, 0).name("rx");
-  // spacemanFolder.add(three.spaceman.rotation, 'y', -Math.PI / 2, 0).name("ry");
-  // spacemanFolder.add(three.spaceman.rotation, 'z', -Math.PI / 2, 0).name("rz");
-  // spacemanFolder.open();
-
-  three.group.add(three.spaceman);
-  three.scene.add(three.group);
 }
+
+// function setupSpaceman() {
+//   if (!models.spaceman) return;
+
+//   if (!formData.value.isSpace) {
+//     setupForceVector();
+//   }
+
+//   let spacemanPosition = -formData.value.radius;
+
+//   three.spaceman = models.spaceman.scene;
+//   three.spaceman.scale.set(0.04, 0.04, 0.04); // scales to ~2 meters
+//   three.spaceman.rotation.set(0, 0, 0);
+
+//   // Build shape
+//   if (formData.value.type.shape === "can") {
+//     spacemanPosition += 0.5;
+//     three.spaceman.rotation.x = Math.PI / 2;
+//     three.spaceman.rotation.y = 1.8;
+//     three.spaceman.position.set(1, spacemanPosition, 0); // 6, if solid shape set Z to height of the extrusion
+
+//     if (forces.vectorMesh) {
+//       forces.vectorMesh.position.set(
+//         three.spaceman.position.x - 1.5,
+//         three.spaceman.position.y - 1.5,
+//         three.spaceman.position.z
+//       );
+//     }
+//   } else if (formData.value.type.shape === "cylinder") {
+//     three.spaceman.rotation.y = -Math.PI / 2;
+//     three.spaceman.position.set(
+//       0,
+//       spacemanPosition,
+//       formData.value.shipLength / 2
+//     );
+
+//     // If the radius of the structure is too big our spaceman becomes tiny! let's highlight him with a ring.
+//     if (formData.value.radius > 30) {
+//       const ringGeometry = new THREE.RingGeometry(
+//         3,
+//         formData.value.radius / 20,
+//         32
+//       );
+//       const ringMaterial = new THREE.MeshBasicMaterial({
+//         color: 0xba3700,
+//         side: THREE.DoubleSide,
+//       });
+//       const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+
+//       ringMesh.position.set(
+//         0,
+//         spacemanPosition + 2,
+//         formData.value.shipLength / 2
+//       );
+
+//       three.group.add(ringMesh);
+//     }
+//   } else if (formData.value.type.shape === "bola") {
+//     three.spaceman.rotation.y = -Math.PI / 2;
+//     three.spaceman.position.set(0, spacemanPosition, 0);
+
+//     // If the radius of the structure is too big our spaceman becomes tiny! let's highlight him with a ring.
+//     if (stationWidth.value > 30) {
+//       const ringGeometry = new THREE.RingGeometry(
+//         3,
+//         Math.max(formData.value.shipWidth - 2, 4),
+//         32
+//       );
+//       const ringMaterial = new THREE.MeshBasicMaterial({
+//         color: 0xba3700,
+//         side: THREE.DoubleSide,
+//       });
+//       const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+
+//       ringMesh.position.set(0, spacemanPosition + 2, 0);
+
+//       three.group.add(ringMesh);
+//     }
+//   } else if (formData.value.type.shape === "funnel") {
+//     spacemanPosition += 1;
+
+//     three.spaceman.rotation.z = forces.vector; //Math.PI / 2;
+//     //three.spaceman.rotation.y = 1.8;
+//     three.spaceman.position.set(spacemanPosition, 0, 0); // 6, if solid shape set Z to height of the extrusion
+
+//     //three.group.rotation.x = -Math.PI / 2.5;
+
+//     // If the radius of the structure is too big our spaceman becomes tiny! let's highlight him with a ring.
+//     if (formData.value.radius > 30) {
+//       const ringGeometry = new THREE.RingGeometry(
+//         formData.value.shipLength,
+//         formData.value.shipLength * 1.3,
+//         32
+//       );
+//       const ringMaterial = new THREE.MeshBasicMaterial({
+//         color: 0xba3700,
+//         side: THREE.DoubleSide,
+//       });
+//       const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+
+//       ringMesh.rotation.z = forces.vector;
+
+//       ringMesh.position.set(spacemanPosition + 2, 0, 0);
+
+//       three.group.add(ringMesh);
+//     }
+
+//     if (forces.vectorMesh) {
+//       forces.vectorMesh.position.set(three.spaceman.position.x, -2, 0);
+//     }
+//   }
+//   // // Gui folder
+//   // const spacemanFolder = three.gui.addFolder('Spaceman');
+//   // spacemanFolder.add(three.spaceman.position, 'x', 0, stationWidth.value).name("px");
+//   // spacemanFolder.add(three.spaceman.position, 'y', -stationWidth.value * 2, stationWidth.value * 2).name("py");
+//   // spacemanFolder.add(three.spaceman.position, 'z', 0, stationWidth.value).name("pz");
+
+//   // spacemanFolder.add(three.spaceman.rotation, 'x', -Math.PI / 2, 0).name("rx");
+//   // spacemanFolder.add(three.spaceman.rotation, 'y', -Math.PI / 2, 0).name("ry");
+//   // spacemanFolder.add(three.spaceman.rotation, 'z', -Math.PI / 2, 0).name("rz");
+//   // spacemanFolder.open();
+
+//   three.group.add(three.spaceman);
+
+// }
 
 function animate() {
   if (!three.renderer) return;
