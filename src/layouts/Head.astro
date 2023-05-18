@@ -34,7 +34,42 @@ const { title, description } = Astro.props;
 
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Orbitron&family=Montserrat&display=swap"
   media="print"
   onload="this.media='all'"
 />
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5QDKHJTWSC"
+></script>
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+
+  gtag("config", "G-5QDKHJTWSC");
+</script>
+
+<!-- Store / Load darkmode -->
+<script is:inline>
+  // Credit: https://www.kevinzunigacuellar.com/blog/dark-mode-in-astro/
+  const theme = (() => {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+      return localStorage.getItem("theme");
+    }
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+    return "light";
+  })();
+
+  if (theme === "light") {
+    document.documentElement.setAttribute("data-bs-theme", "light");
+  } else {
+    document.documentElement.setAttribute("data-bs-theme", "dark");
+  }
+
+  window.localStorage.setItem("theme", theme);
+</script>
