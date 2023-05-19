@@ -1,7 +1,7 @@
 <template>
   <div id="orbit__app" class="row mt-5" v-cloak>
     <div id="orbit__form" class="col-lg-4">
-      <div class="calc-form col-12 mb-5 px-2 rounded border">
+      <div class="calc-form col-12 mb-5 px-2 rounded border bg-light text-dark">
         <div>
           <div id="mission" class="orbit__mission">
             <div class="calc-toggle">

@@ -1,11 +1,11 @@
 <template>
   <div id="habitat__app" class="row mt-5" v-cloak>
-    <div class="calc-form col-lg-4 mb-5 p-2 rounded border">
-      <div>
+    <div class="calc-form col-lg-4">
+      <div class="mb-5 p-2 rounded border bg-light text-dark">
         <div id="mission" class="habitat__mission form-section active">
-          <h4 @click="showLocation = !showLocation">
+          <h5 @click="showLocation = !showLocation">
             <i class="fas" :class="toggleClass(showLocation)"></i> Mission
-          </h4>
+          </h5>
           <div class="calc-toggle" v-show="showLocation">
             <div class="mb-3">
               <label for="location" class="form-label">Location</label>
@@ -146,9 +146,9 @@
         </div>
 
         <div id="structure" class="habitat__structure form-section">
-          <h4 @click="showStructure = !showStructure">
+          <h5 @click="showStructure = !showStructure">
             <i class="fas" :class="toggleClass(showStructure)"></i> Structure
-          </h4>
+          </h5>
           <div class="calc-toggle" v-show="showStructure">
             <div class="mb-3">
               <label for="structure-type" class="form-label"
@@ -216,10 +216,10 @@
         </div>
 
         <div id="support" class="habitat__life-support form-section">
-          <h4 @click="showSupport = !showSupport">
+          <h5 @click="showSupport = !showSupport">
             <i class="fas" :class="toggleClass(showSupport)"></i> Life support
             system
-          </h4>
+          </h5>
           <div class="calc-toggle" v-show="showSupport">
             <div class="mb-3">
               <label for="support-air" class="form-label"
@@ -315,10 +315,10 @@
         </div>
 
         <div id="biomass" class="habitat__biomass form-section">
-          <h4 @click="showBiomass = !showBiomass">
+          <h5 @click="showBiomass = !showBiomass">
             <i class="fas" :class="toggleClass(showBiomass)"></i> Biomass
             generation system
-          </h4>
+          </h5>
           <div class="calc-toggle" v-show="showBiomass">
             <div class="mb-3">
               <label for="biomass-lighting" class="form-label"
@@ -394,10 +394,10 @@
         </div>
 
         <div id="electrical" class="habitat__life-support form-section">
-          <h4 @click="showElectrical = !showElectrical">
+          <h5 @click="showElectrical = !showElectrical">
             <i class="fas" :class="toggleClass(showElectrical)"></i> Electrical
             and thermal systems
-          </h4>
+          </h5>
           <div class="calc-toggle" v-show="showElectrical">
             <div class="mb-3">
               <label for="electrical-primary" class="form-label"

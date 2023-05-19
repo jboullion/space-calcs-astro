@@ -59,13 +59,13 @@
   border-bottom: 0;
 } */
 
-.calculator h4 {
+.calculator h5 {
   cursor: pointer;
   margin: 0;
   user-select: none;
 }
 
-.calculator h4 i {
+.calculator h5 i {
   color: var(--bs-primary);
 }
 

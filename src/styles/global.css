@@ -70,3 +70,12 @@ h1 {
     border: 1px solid #dee2e6;
   }
 }
+
+.card {
+  color: #111;
+  background-color: white;
+}
+
+.text-dark .text-muted {
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+}

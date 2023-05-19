@@ -1,32 +1,35 @@
 <template>
   <div id="solar-energy__results" class="col-lg-8 calc-form">
-    <table class="table table-striped">
-      <tbody>
-        <tr class="" title="L = L☉ * (R / R☉)² * (T / T☉)⁴">
-          <th>Star Luminosity</th>
-          <td class="text-end">{{ luminosity.toExponential(4) }} W</td>
-        </tr>
-        <tr class="" title="A = 4𝝅R²">
-          <th>Orbit Sphere Size</th>
-          <td class="text-end">{{ orbitSphereSize.toExponential(4) }} m²</td>
-        </tr>
-        <tr class="" title="E1 = L / A">
-          <th>Energy Reaching Planet (Insolation)</th>
-          <td class="text-end">{{ formatNumber(planetInsolation) }} W/m²</td>
-        </tr>
-        <tr class="" title="E2 = E1 * (100 - Atm%)">
-          <th>Available Energy at Surface</th>
-          <td class="text-end">
-            {{ formatNumber(availableEnergyOnSurface) }} W/m²
-          </td>
-        </tr>
-        <tr class="" title="P = E2 * Eff%">
-          <th>Solar Panel Potential</th>
-          <td class="text-end">{{ formatNumber(solarPanelPotential) }} W/m²</td>
-        </tr>
-      </tbody>
-    </table>
-
+    <div class="p-2 rounded border bg-light text-dark">
+      <table class="table text-dark">
+        <tbody>
+          <tr class="" title="L = L☉ * (R / R☉)² * (T / T☉)⁴">
+            <th>Star Luminosity</th>
+            <td class="text-end">{{ luminosity.toExponential(4) }} W</td>
+          </tr>
+          <tr class="" title="A = 4𝝅R²">
+            <th>Orbit Sphere Size</th>
+            <td class="text-end">{{ orbitSphereSize.toExponential(4) }} m²</td>
+          </tr>
+          <tr class="" title="E1 = L / A">
+            <th>Energy Reaching Planet (Insolation)</th>
+            <td class="text-end">{{ formatNumber(planetInsolation) }} W/m²</td>
+          </tr>
+          <tr class="" title="E2 = E1 * (100 - Atm%)">
+            <th>Available Energy at Surface</th>
+            <td class="text-end">
+              {{ formatNumber(availableEnergyOnSurface) }} W/m²
+            </td>
+          </tr>
+          <tr class="" title="P = E2 * Eff%">
+            <th>Solar Panel Potential</th>
+            <td class="text-end">
+              {{ formatNumber(solarPanelPotential) }} W/m²
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="result-chart my-4">
       <!-- <div
         id="efficiency-chart"
