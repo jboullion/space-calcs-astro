@@ -1,7 +1,7 @@
 <template>
   <div id="nutrition__app" class="row mt-5" v-cloak>
     <div id="nutrition__form" class="col-lg-8 col-xl-7 mb-5">
-      <div class="calc-form mb-5 p-2 rounded border">
+      <div class="calc-form mb-5 p-2 rounded border bg-light text-dark">
         <div class="row">
           <div class="col-lg-4 mb-3">
             <TextInput
@@ -129,59 +129,61 @@
       <div id="food" v-if="foodMenu.length">
         <h3>Food List</h3>
 
-        <table class="table table-striped border food__table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th colspan="3">Serving Size</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(food, index) in foodMenu"
-              :key="food.id"
-              :title="food.name"
-              @click="openFoodModal(food)"
-              class="food__row"
-            >
-              <th class="food__name ellipsis">
-                <b>{{ food.name }}</b>
-              </th>
+        <div class="p-2 rounded border bg-light text-dark">
+          <table class="table food__table text-dark">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th colspan="3">Serving Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(food, index) in foodMenu"
+                :key="food.id"
+                :title="food.name"
+                @click="openFoodModal(food)"
+                class="food__row"
+              >
+                <th class="food__name ellipsis">
+                  <b>{{ food.name }}</b>
+                </th>
 
-              <td class="food__servings">{{ food.servingSize }}g</td>
-              <td class="food__qty">
-                <input
-                  type="number"
-                  class="form-control"
-                  @click.stop
-                  @change="calculateNutrition"
-                  @input="
-                    food.servings && food.servings < 1
-                      ? (food.servings = 1)
-                      : null
-                  "
-                  v-model.number="food.servings"
-                />
-              </td>
-              <td class="food__remove">
-                <button
-                  class="btn btn-danger btn-sm"
-                  @click.stop="removeFood(index)"
-                >
-                  <i class="fa fa-times"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td></td>
-              <td class="text-right" colspan="3">
-                <strong>Total Mass: {{ foodMass.toLocaleString() }}g</strong>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+                <td class="food__servings">{{ food.servingSize }}g</td>
+                <td class="food__qty">
+                  <input
+                    type="number"
+                    class="form-control"
+                    @click.stop
+                    @change="calculateNutrition"
+                    @input="
+                      food.servings && food.servings < 1
+                        ? (food.servings = 1)
+                        : null
+                    "
+                    v-model.number="food.servings"
+                  />
+                </td>
+                <td class="food__remove">
+                  <button
+                    class="btn btn-danger btn-sm"
+                    @click.stop="removeFood(index)"
+                  >
+                    <i class="fa fa-times"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td></td>
+                <td class="text-right" colspan="3">
+                  <strong>Total Mass: {{ foodMass.toLocaleString() }}g</strong>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
     </div>
     <div id="nutrition__results" class="col-lg-4 col-xl-5 calc-form">

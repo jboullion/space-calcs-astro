@@ -1,7 +1,7 @@
 <template>
   <div id="oneill__app" class="row justify-content-center">
     <div id="oneill__form" class="col-md-8 col-lg-6">
-      <div class="p-2 rounded border mb-5">
+      <div class="p-2 rounded border mb-5 bg-light text-dark">
         <div class="calc-form">
           <NumberInput
             id="radius"

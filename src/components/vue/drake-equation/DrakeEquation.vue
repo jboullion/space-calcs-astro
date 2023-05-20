@@ -7,7 +7,7 @@
         >
         &bull; f<sub>i</sub> &bull; f<sub>c</sub> &bull; L = N
       </h2> -->
-      <div class="p-2 rounded border mb-5">
+      <div class="p-2 rounded border mb-5 bg-light text-dark">
         <div class="calc-form">
           <NumberInput
             id="averageRateOfStarFormation"
@@ -156,4 +156,9 @@ onMounted(() => {});
  *
  */
 </script>
-<style></style>
+<style>
+[data-bs-theme="dark"] #drake__results img {
+  -webkit-filter: invert(100%); /* Safari/Chrome */
+  filter: invert(100%);
+}
+</style>
