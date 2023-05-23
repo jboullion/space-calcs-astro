@@ -6,7 +6,7 @@ export interface ONeillCylinderForm {
     internalPressure: number; // kpa
     internalTemperature?: number; // K
     airMix: AtmosphereComposition;
-    material: Material;
+    material: StationMaterial;
     safetyFactor: number;
     shellWallThickness: number; // m
     minShieldingShellMass: number; // kg/m2
@@ -16,7 +16,7 @@ export interface ONeillCylinderForm {
   internal: {
     roofHeight: number; // m
     levels: number;
-    floorMaterial: Material;
+    floorMaterial: StationMaterial;
   };
   land: {
     urbanDensity: number; // %
@@ -30,6 +30,7 @@ export interface ONeillCylinderForm {
 
 export type AtmosphereComposition = {
   name: string;
+  value?: string;
   M: number; // pa
   P: number; // pa O2
   O2: number; // %
@@ -43,6 +44,7 @@ export type AtmosphereComposition = {
 export const atmosphereCompositions: AtmosphereComposition[] = [
   {
     name: "Std Air Mix",
+    value: "stdAirMix",
     M: 101000,
     P: 21210,
     O2: 21.0,
@@ -54,6 +56,7 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
   },
   {
     name: "Adjusted O2",
+    value: "adjustedO2",
     M: 50000,
     P: 10500,
     O2: 42.42,
@@ -65,6 +68,7 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
   },
   {
     name: "1500 eq",
+    value: "1500eq",
     M: 85000,
     P: 17850,
     O2: 24.95,
@@ -79,6 +83,7 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
   // Armstrong	6,180 pa	1297.8	100.00%	0	0.96%	0.04%	0.0324
   {
     name: "3500 eq",
+    value: "3500eq",
     M: 65000,
     P: 13650,
     O2: 32.63,
@@ -90,6 +95,7 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
   },
   {
     name: "5500 eq",
+    value: "5500eq",
     M: 50000,
     P: 10500,
     O2: 42.42,
@@ -101,6 +107,7 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
   },
   {
     name: "Armstrong",
+    value: "armstrong",
     M: 6180,
     P: 1297.8,
     O2: 99.0,
@@ -112,8 +119,9 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
   },
 ];
 
-export type Material = {
+export type StationMaterial = {
   name: string;
+  value?: string;
   yieldStress: number;
   tensileStrength: number;
   density: number;
@@ -121,9 +129,10 @@ export type Material = {
   possionRatio: number;
 };
 
-export const materials: Material[] = [
+export const materials: StationMaterial[] = [
   {
     name: "Unobtanium",
+    value: "unobtanium",
     yieldStress: 1000000,
     tensileStrength: 1000000,
     density: 1000,
@@ -132,6 +141,7 @@ export const materials: Material[] = [
   },
   {
     name: "Aluminium Alloy (T6)",
+    value: "aluminium",
     yieldStress: 480,
     tensileStrength: 530,
     density: 2700,
@@ -140,6 +150,7 @@ export const materials: Material[] = [
   },
   {
     name: "Nickel Alloy",
+    value: "nickel",
     yieldStress: 1100,
     tensileStrength: 1200,
     density: 8830,
@@ -148,6 +159,7 @@ export const materials: Material[] = [
   },
   {
     name: "Low C steel",
+    value: "lowCsteel",
     yieldStress: 395,
     tensileStrength: 580,
     density: 7800,
@@ -156,6 +168,7 @@ export const materials: Material[] = [
   },
   {
     name: "Medium C steel",
+    value: "mediumCsteel",
     yieldStress: 900,
     tensileStrength: 1200,
     density: 7800,
@@ -164,6 +177,7 @@ export const materials: Material[] = [
   },
   {
     name: "High C steel",
+    value: "highCsteel",
     yieldStress: 1155,
     tensileStrength: 1200,
     density: 7800,
@@ -172,6 +186,7 @@ export const materials: Material[] = [
   },
   {
     name: "Titanium",
+    value: "titanium",
     yieldStress: 1245,
     tensileStrength: 1620,
     density: 4600,
@@ -180,6 +195,7 @@ export const materials: Material[] = [
   },
   {
     name: "Silica Glass",
+    value: "silicaGlass",
     yieldStress: 1600,
     tensileStrength: 155,
     density: 2220,
@@ -188,6 +204,7 @@ export const materials: Material[] = [
   },
   {
     name: "Glass Ceramic",
+    value: "glassCeramic",
     yieldStress: 2100,
     tensileStrength: 177,
     density: 2800,
@@ -196,6 +213,7 @@ export const materials: Material[] = [
   },
   {
     name: "Granite",
+    value: "granite",
     yieldStress: 248,
     tensileStrength: 17,
     density: 3000,
@@ -204,6 +222,7 @@ export const materials: Material[] = [
   },
   {
     name: "Concrete",
+    value: "concrete",
     yieldStress: 60,
     tensileStrength: 5,
     density: 2600,
@@ -212,6 +231,7 @@ export const materials: Material[] = [
   },
   {
     name: "Nylon",
+    value: "nylon",
     yieldStress: 94,
     tensileStrength: 165,
     density: 1140,
@@ -220,6 +240,7 @@ export const materials: Material[] = [
   },
   {
     name: "Carbon Fibre",
+    value: "carbonFibre",
     yieldStress: 0,
     tensileStrength: 1600,
     density: 2000,
@@ -228,6 +249,7 @@ export const materials: Material[] = [
   },
   {
     name: "Kevlar",
+    value: "kevlar",
     yieldStress: 0,
     tensileStrength: 3000,
     density: 1440,
@@ -236,6 +258,7 @@ export const materials: Material[] = [
   },
   {
     name: "Graphene",
+    value: "graphene",
     yieldStress: 0,
     tensileStrength: 130000,
     density: 2270,
@@ -244,6 +267,7 @@ export const materials: Material[] = [
   },
   {
     name: "Soil",
+    value: "soil",
     yieldStress: 0,
     tensileStrength: 0,
     density: 1500,
@@ -252,6 +276,7 @@ export const materials: Material[] = [
   },
   {
     name: "Polyethylene",
+    value: "polyethylene",
     yieldStress: 29,
     tensileStrength: 30,
     density: 920,
