@@ -90,6 +90,15 @@
   text-align: center;
 }
 
+.calculator .canvas-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
 @media screen and (max-width: 991px) {
   /* .calculator .calc-form {
 

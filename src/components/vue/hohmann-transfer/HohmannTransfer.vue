@@ -128,10 +128,10 @@
 
       <div
         id="hohmann-canvas"
-        class="mb-3"
-        style="position: relative; height: 600px; width: 100%"
+        class="canvas-wrapper"
+        style="position: relative; height: 500px; width: 100%"
       >
-        <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
+        <i v-if="loading" class="fas fa-cog fa-spin h1"></i>
       </div>
     </div>
   </div>

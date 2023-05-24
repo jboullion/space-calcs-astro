@@ -164,7 +164,7 @@
 
       <div
         id="orbit-canvas"
-        class="mb-3 d-flex justify-content-center align-items-center"
+        class="canvas-wrapper"
         style="position: relative; height: 400px"
       >
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>

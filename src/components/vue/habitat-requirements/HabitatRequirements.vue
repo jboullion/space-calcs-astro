@@ -564,7 +564,7 @@
         <div class="text-center">
           <button
             id="detailed-results"
-            class="btn btn-primary mb-4"
+            class="btn btn-primary my-4"
             type="button"
             @click="showDetails = !showDetails"
           >
@@ -808,7 +808,7 @@
         <div class="text-center">
           <button
             id="detailed-results"
-            class="btn btn-primary mb-4"
+            class="btn btn-primary my-4"
             type="button"
             @click="showCrewDetails = !showCrewDetails"
           >

@@ -2,7 +2,7 @@
   <div id="habitable__results" class="col-lg-8 calc-form">
     <div
       id="habitable-canvas"
-      class="mb-3 d-flex align-items-center justify-content-center"
+      class="canvas-wrapper"
       style="position: relative; height: 500px; width: 100%"
     >
       <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
@@ -316,7 +316,8 @@ function setupSun() {
 
 function clearZones() {
   three.renderOrder = 0;
-  three.labelRenderer.domElement.innerHTML = "";
+
+  if (three.labelRenderer) three.labelRenderer.domElement.innerHTML = "";
 
   for (var i = three.scene.children.length - 1; i >= 0; i--) {
     // @ts-ignore
@@ -591,7 +592,8 @@ function animate() {
 
   //this.three.camera.position.clamp(this.three.minMovement, this.three.maxMovement);
   three.renderer.render(three.scene, three.camera);
-  three.labelRenderer.render(three.scene, three.camera);
+  if (three.labelRenderer)
+    three.labelRenderer.render(three.scene, three.camera);
 
   // clamp to fixed framerate
   const now = Math.round((30 * window.performance.now()) / 1000);
