@@ -1,5 +1,5 @@
 <template>
-  <div id="nutrition__app" class="row mt-5" v-cloak>
+  <div id="nutrition__app" class="row" v-cloak>
     <div id="nutrition__form" class="col-lg-8 col-xl-7 mb-5">
       <div class="calc-form mb-5 p-2 rounded border">
         <div class="row">
