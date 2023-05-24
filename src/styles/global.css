@@ -7,7 +7,7 @@
 }
 
 body {
-  font-family: "Montserrat", sans-serif !important;
+  font-family: "Inter", sans-serif !important;
 }
 
 /* .btn-primary {
@@ -69,11 +69,6 @@ h1 {
     height: 12px;
     border: 1px solid #dee2e6;
   }
-}
-
-.card {
-  color: #111;
-  background-color: white;
 }
 
 .text-dark .text-muted {

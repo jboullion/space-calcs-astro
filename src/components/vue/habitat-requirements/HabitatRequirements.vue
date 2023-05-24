@@ -1,7 +1,7 @@
 <template>
   <div id="habitat__app" class="row mt-5" v-cloak>
     <div class="calc-form col-lg-4">
-      <div class="mb-5 p-2 rounded border">
+      <div class="mb-5 px-2 rounded border">
         <div id="mission" class="habitat__mission form-section active">
           <h5 @click="showLocation = !showLocation">
             <i class="fas" :class="toggleClass(showLocation)"></i> Mission
