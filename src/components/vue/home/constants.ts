@@ -21,7 +21,7 @@ export const categories: Category[] = [
   {
     name: "Orbits",
     slug: "orbits",
-    color: "warning",
+    color: "info",
   },
   {
     name: "Habitats",

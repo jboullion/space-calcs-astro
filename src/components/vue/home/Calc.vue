@@ -4,9 +4,11 @@
       <h2 class="card-title fw-bold">{{ calc.name }}</h2>
       <p class="card-text flex-fill">{{ calc.description }}</p>
       <div class="d-flex justify-content-between align-items-center">
-        <span v-for="category in calc.categories">
-          <small :class="'text-' + category.color">{{ category.name }}</small>
-        </span>
+        <span
+          v-for="category in calc.categories"
+          :class="`badge bg-${category.color}`"
+          >{{ category.name }}</span
+        >
       </div>
     </a>
   </div>
