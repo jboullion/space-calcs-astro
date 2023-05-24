@@ -86,17 +86,17 @@ const props = defineProps<{
  *
  */
 onBeforeMount(() => {
-  GoogleCharts.load("52", {
-    packages: ["line", "corechart"],
-  }).then(setupCharts);
+  // GoogleCharts.load("52", {
+  //   packages: ["line", "corechart"],
+  // }).then(setupCharts);
 });
 
 onMounted(() => {
-  window.addEventListener("resize", drawCharts, { passive: true });
+  //window.addEventListener("resize", drawCharts, { passive: true });
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", drawCharts);
+  //window.removeEventListener("resize", drawCharts);
 });
 
 /**
