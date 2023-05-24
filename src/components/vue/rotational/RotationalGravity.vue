@@ -6,199 +6,77 @@
           <div id="mission" class="rotational__mission">
             <!-- <h4>Mission</h4> -->
             <div class="calc-toggle">
-              <div class="mb-3">
-                <label for="location" class="form-label"
-                  >Structure Type
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="What type of object is rotating? Different structures provide different advantages."
-                  ></i>
-                </label>
-                <select
-                  class="form-select"
-                  v-model="formData.type"
-                  @change="updateType"
-                >
-                  <option
-                    v-for="stationType in availableTypes"
-                    :value="stationType"
-                  >
-                    {{ stationType.name }}
-                  </option>
-                </select>
-                <p class="description">
-                  <small class="text-muted">{{
-                    formData.type.description
-                  }}</small>
-                </p>
-              </div>
+              <SelectInput
+                id="structureType"
+                label="Structure Type"
+                v-model="formData.type"
+                :options="availableTypes"
+                tooltip="What type of object is rotating? Different structures provide different advantages."
+                @update:modelValue="updateType"
+                :description="formData.type.description"
+              />
 
-              <div class="mb-3" v-if="formData.type.shape != 'can'">
-                <label for="shipLength" class="form-label"
-                  >{{ structureLengthName }}
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="The length of the structure. Platform length on funnels."
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="shipLength"
-                    v-model.number="formData.shipLength"
-                    min="0"
-                    @change="updateShipLength"
-                  />
-                  <span class="input-group-text">m</span>
-                </div>
-                <!-- <input
-                  id="radius-range"
-                  type="range"
-                  class="form-range"
-                  min="conversion.minLength"
-                  :max="conversion.maxLength"
-                  v-model.number="formData.shipLength"
-                  @change="updateShipLength"
-                /> -->
-              </div>
+              <NumberInput
+                v-if="formData.type.shape != 'can'"
+                id="shipLength"
+                :label="structureLengthName"
+                v-model="formData.shipLength"
+                tooltip="The length of the structure. This is only visual and does not affect the results."
+                :min="1"
+                unit="m"
+                @change="updateShipLength"
+              />
 
-              <!-- <div class="mb-3">
-            <label for="gravityOption" class="form-label">Standard Gravity</label>
-            <select class="form-select" v-model="formData.gravity" id="gravityOption">
-              <option v-for="gravityOption in gravityOptions" :value="gravityOption">{{ gravityOption.name }}</option>
-            </select>
-          </div> -->
+              <NumberInput
+                id="radius"
+                label="Radius"
+                v-model="formData.radius"
+                tooltip="The distance from the center of rotation to the outer edge of the structure."
+                :min="0"
+                unit="m"
+                @change="updateRadius"
+              />
 
-              <div class="mb-3">
-                <label for="radius" class="form-label"
-                  >Radius
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Controls the radius of the stucture"
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="radius"
-                    v-model.number="formData.radius"
-                    min="0"
-                    @change="updateRadius"
-                  />
-                  <span class="input-group-text">m</span>
-                </div>
-                <!-- <input
-                  id="radius-range"
-                  type="range"
-                  class="form-range"
-                  min="conversion.minLength"
-                  :max="conversion.maxLength"
-                  v-model.number="formData.radius"
-                  @change="updateRadius"
-                /> -->
-              </div>
+              <NumberInput
+                id="rpm"
+                label="Revolutions per minute"
+                v-model="formData.rpm"
+                tooltip="The rotation speed of the structure"
+                :min="0"
+                :max="1000"
+                :step="0.1"
+                unit="rpm"
+                @change="updateRPM"
+              />
 
-              <div class="mb-3">
-                <label for="rpm" class="form-label"
-                  >Revolutions per minute
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Controls the speed of the structure"
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="rpm"
-                    v-model.number="formData.rpm"
-                    min="0"
-                    max="1000"
-                    step="0.1"
-                    @change="updateRPM"
-                  />
-                  <span class="input-group-text">rpm</span>
-                </div>
-              </div>
+              <NumberInput
+                id="gravity"
+                label="Gravity"
+                v-model="formData.gravity"
+                tooltip="The apparent gravity applied by the centripetal acceleration."
+                :min="0"
+                :step="0.01"
+                unit="g"
+                @change="updateGravity"
+              />
 
-              <div class="mb-3">
-                <label for="gravity" class="form-label"
-                  >Gravity
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="The apparent gravity applied by the centripetal acceleration."
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="gravity"
-                    v-model.number="formData.gravity"
-                    min="0"
-                    step="0.01"
-                    @change="updateGravity"
-                  />
-                  <span class="input-group-text">g</span>
-                </div>
-              </div>
+              <SelectInput
+                id="location"
+                label="Location"
+                v-model="formData.location"
+                :options="locations"
+                tooltip="Update your environment and apply natural gravity if applicaible"
+                @update:modelValue="setupScene"
+                :description="formData.location.description"
+              />
 
-              <div class="mb-3">
-                <label for="location" class="form-label"
-                  >Location
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Update your environment and apply natural gravity if applicaible"
-                  ></i>
-                </label>
-                <select
-                  class="form-select"
-                  v-model="formData.location"
-                  @change="setupScene"
-                >
-                  <option v-for="location in locations" :value="location">
-                    {{ location.name }}
-                  </option>
-                </select>
-                <p class="description" v-if="!formData.isSpace">
-                  <small class="text-muted">{{
-                    formData.location.description
-                  }}</small>
-                </p>
-              </div>
-
-              <div class="form-check form-switch mb-3">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="showEnvironment"
-                  v-model="formData.showEnvironment"
-                  @change="setupScene"
-                />
-                <label class="form-check-label" for="showEnvironment">
-                  Show environment?
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Show the planet at your location. Purely visual."
-                  ></i>
-                </label>
-              </div>
+              <CheckboxInput
+                id="showEnvironment"
+                label="Show environment?"
+                v-model="formData.showEnvironment"
+                tooltip="Show the planet at your location. Purely visual."
+                @change="setupScene"
+              />
 
               <!-- <div class="form-check form-switch mb-3">
                 <input
@@ -219,49 +97,25 @@
                 </label>
               </div> -->
 
-              <div class="form-check form-switch mb-3">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="seeInside"
-                  v-model="formData.seeInside"
-                  @change="setupScene"
-                />
-                <label class="form-check-label" for="seeInside">
-                  Show Inside of Structure?
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Display the inside or outside of the structure. Purely visual."
-                  ></i>
-                </label>
-              </div>
+              <CheckboxInput
+                id="seeInside"
+                label="Show Inside of Structure?"
+                v-model="formData.seeInside"
+                tooltip="Display the inside or outside of the structure. Purely visual."
+                @change="setupScene"
+              />
 
-              <div
-                class="form-check form-switch mb-3"
+              <CheckboxInput
                 v-if="
                   formData.type.shape == 'cylinder' ||
                   formData.type.shape == 'can'
                 "
-              >
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="hollow"
-                  v-model="formData.hollow"
-                  @change="setupScene"
-                />
-                <label class="form-check-label" for="hollow">
-                  Hollow Cylinder?
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Hollow cylinders provide a confined area of similar gravity.  Concentric cylinders with different levels of gravity are possible!"
-                  ></i>
-                </label>
-              </div>
+                id="hollow"
+                label="Hollow Cylinder?"
+                v-model="formData.hollow"
+                tooltip="Should the structure be hollow? Purely visual."
+                @change="setupScene"
+              />
 
               <!-- <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" id="focusSuit" v-model="formData.focusSuit">
@@ -526,7 +380,13 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
+
+import SelectInput from "../forms/SelectInput.vue";
+import NumberInput from "../forms/NumberInput.vue";
+import CheckboxInput from "../forms/CheckboxInput.vue";
+
 import type { Location, StationType } from "./constants";
 import { locations, types, conversion, defaultThree } from "./constants";
 import {
@@ -1539,6 +1399,8 @@ function updateType() {
   const newType = types.find(
     (type) => type.shape === formData.value.type.shape
   );
+
+  console.log("newType", newType);
 
   if (!newType) return;
 

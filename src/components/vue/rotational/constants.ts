@@ -25,6 +25,7 @@ export const defaultThree = {
 export type Location = {
   id: number;
   name: string;
+  value: string;
   description: string;
   g: number;
   geomtry: {
@@ -48,6 +49,7 @@ export const locations: Location[] = [
   {
     id: 2,
     name: "Mars",
+    value: "mars",
     description: "Baseline gravity: 0.375",
     g: 0.375,
     geomtry: {
@@ -62,6 +64,7 @@ export const locations: Location[] = [
   {
     id: 3,
     name: "Moon",
+    value: "moon",
     description: "Baseline gravity: 0.16",
     g: 0.16,
     geomtry: {
@@ -75,6 +78,7 @@ export const locations: Location[] = [
   {
     id: 4,
     name: "Earth",
+    value: "earth",
     description: "Baseline gravity: 1",
     g: 1,
     geomtry: {
@@ -90,6 +94,7 @@ export const locations: Location[] = [
 export type StationType = {
   id: number;
   name: string;
+  value: string;
   shape: string;
   description: string;
   useInSpace: boolean;
@@ -105,6 +110,7 @@ export const types: StationType[] = [
   {
     id: 1,
     name: "Cylinder", // Torus /
+    value: "cylinder",
     shape: "cylinder",
     description:
       "Good for providing a permanent source of arificial gravity for an entire station.",
@@ -119,6 +125,7 @@ export const types: StationType[] = [
   {
     id: 2,
     name: "Can",
+    value: "can",
     shape: "can",
     description:
       "Good for providing a periodic source of gravity on long trips through space.",
@@ -133,6 +140,7 @@ export const types: StationType[] = [
   {
     id: 3,
     name: "Bola",
+    value: "bola",
     shape: "bola",
     description:
       "Good for providing a long term, but not permanent, source of arificial gravity for an entire station",
@@ -147,6 +155,7 @@ export const types: StationType[] = [
   {
     id: 4,
     name: "Funnel",
+    value: "funnel",
     shape: "funnel",
     description:
       "Good for providing a supplemental source gravity on bodies with limited gravity. ie: Moon or Mars",

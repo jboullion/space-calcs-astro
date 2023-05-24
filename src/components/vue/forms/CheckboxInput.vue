@@ -23,7 +23,7 @@ const props = defineProps<{
   id: string;
   label: string;
   modelValue: [] | boolean;
-  value: boolean | object;
+  value?: boolean | object;
   tooltip?: string;
   description?: string;
 }>();
