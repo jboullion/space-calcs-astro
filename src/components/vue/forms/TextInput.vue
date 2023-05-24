@@ -2,14 +2,8 @@
   <div>
     <label :for="id" class="form-label">
       {{ label }}
-      <i
-        class="fas fa-question-circle"
-        v-if="tooltip"
-        data-toggle="tooltip"
-        data-placement="top"
-        :title="tooltip"
-      ></i>
     </label>
+    <tooltip v-if="tooltip" :tooltip="tooltip" />
     <div class="input-group">
       <slot name="prepend"></slot>
 
@@ -32,6 +26,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import Tooltip from "./Tooltip.vue";
+
 defineProps<{
   modelValue: string | number;
   id: string;

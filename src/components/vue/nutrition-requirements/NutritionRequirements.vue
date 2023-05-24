@@ -1,7 +1,7 @@
 <template>
   <div id="nutrition__app" class="row mt-5" v-cloak>
     <div id="nutrition__form" class="col-lg-8 col-xl-7 mb-5">
-      <div class="calc-form mb-5 p-2 rounded border bg-light text-dark">
+      <div class="calc-form mb-5 p-2 rounded border">
         <div class="row">
           <div class="col-lg-4 mb-3">
             <TextInput
@@ -84,7 +84,7 @@
         </div>
 
         <div class="form-list" v-if="foodResults.length">
-          <table class="table table-striped table-light">
+          <table class="table table-striped">
             <thead>
               <tr>
                 <th>Add</th>
@@ -129,8 +129,8 @@
       <div id="food" v-if="foodMenu.length">
         <h3>Food List</h3>
 
-        <div class="p-2 rounded border bg-light text-dark">
-          <table class="table food__table text-dark">
+        <div class="p-2 rounded border">
+          <table class="table food__table">
             <thead>
               <tr>
                 <th>Name</th>
@@ -514,13 +514,11 @@ function closeFoodModal() {
 }
 
 .form-list {
-  border: 1px solid black;
-  position: absolute;
-  top: 100%;
-  left: 0;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 5px;
+
   width: 100%;
   z-index: 100;
-  background-color: white;
   font-size: 14px;
   max-height: 300px;
   overflow-y: auto;
@@ -623,11 +621,15 @@ function closeFoodModal() {
 }
 
 .performance-facts {
-  border: 1px solid black;
+  border: 1px solid var(--bs-dark);
   padding: 0.5rem;
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 100px;
+}
+
+[data-bs-theme="dark"] .performance-facts {
+  border: 1px solid var(--bs-border-color);
 }
 
 .performance-facts p {
@@ -645,9 +647,13 @@ function closeFoodModal() {
 }
 
 .performance-facts__header {
-  border-bottom: 10px solid black;
+  border-bottom: 10px solid var(--bs-dark);
   padding: 0 0 0.25rem 0;
   margin: 0 0 0.5rem 0;
+}
+
+[data-bs-theme="dark"] .performance-facts__header {
+  border-bottom: 10px solid var(--bs-border-color);
 }
 
 .performance-facts__header p {
@@ -678,8 +684,17 @@ function closeFoodModal() {
   font-weight: normal;
   text-align: left;
   padding: 0.25rem 0;
-  border-top: 1px solid black;
+  border-top: 1px solid var(--bs-dark);
   white-space: nowrap;
+}
+
+[data-bs-theme="dark"] .performance-facts__table th,
+[data-bs-theme="dark"] .performance-facts__table--small th,
+[data-bs-theme="dark"] .performance-facts__table--grid th,
+[data-bs-theme="dark"] .performance-facts__table td,
+[data-bs-theme="dark"] .performance-facts__table--small td,
+[data-bs-theme="dark"] .performance-facts__table--grid td {
+  border-top: 1px solid var(--bs-border-color);
 }
 
 .performance-facts__table td:last-child,
@@ -714,7 +729,11 @@ function closeFoodModal() {
 }
 
 .performance-facts__table--small thead tr {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--bs-dark);
+}
+
+[data-bs-theme="dark"] .performance-facts__table--small thead tr {
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .performance-facts__table--small td:last-child {
@@ -746,10 +765,18 @@ function closeFoodModal() {
 }
 
 .thick-end {
-  border-bottom: 10px solid black;
+  border-bottom: 10px solid var(--bs-dark);
 }
 .thin-end {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid var(--bs-dark);
+}
+
+[data-bs-theme="dark"] .thick-end {
+  border-bottom: 10px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .thin-end {
+  border-bottom: 1px solid var(--bs-border-color);
 }
 /*
  * END NUTRITION LABEL

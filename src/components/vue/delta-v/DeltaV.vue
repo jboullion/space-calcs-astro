@@ -1,7 +1,7 @@
 <template>
   <div id="delta-v__app" class="row" v-if="formData" v-cloak>
     <div id="delta-v__form" class="col-lg-4">
-      <div class="p-2 rounded border mb-5 bg-light text-dark">
+      <div class="p-2 rounded mb-5 border">
         <div class="calc-form">
           <NumberInput
             id="payload-mass"
@@ -131,8 +131,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'payload',
-            'btn-outline-primary': showResult != 'payload',
+            'btn-secondary': showResult == 'payload',
+            'btn-outline-secondary': showResult != 'payload',
           }"
           @click="showResultChart('payload')"
         >
@@ -141,8 +141,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'fuel',
-            'btn-outline-primary': showResult != 'fuel',
+            'btn-secondary': showResult == 'fuel',
+            'btn-outline-secondary': showResult != 'fuel',
           }"
           @click="showResultChart('fuel')"
         >
@@ -151,8 +151,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'c3',
-            'btn-outline-primary': showResult != 'c3',
+            'btn-secondary': showResult == 'c3',
+            'btn-outline-secondary': showResult != 'c3',
           }"
           @click="showResultChart('c3')"
         >
@@ -161,8 +161,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'map',
-            'btn-outline-primary': showResult != 'map',
+            'btn-secondary': showResult == 'map',
+            'btn-outline-secondary': showResult != 'map',
           }"
           @click="showResultChart('map')"
         >
@@ -293,14 +293,14 @@ onBeforeMount(() => {
   // Default selected options
   formData.value.engine = defaultEngines[1];
 
-  calcExhaustVelocity();
-
   GoogleCharts.load("52", {
     packages: ["line", "corechart"],
   }).then(setupCharts);
 });
 
 onMounted(() => {
+  calcExhaustVelocity();
+
   window.addEventListener("resize", drawCharts, { passive: true });
 });
 

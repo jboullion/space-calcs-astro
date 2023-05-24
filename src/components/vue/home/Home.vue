@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="py-4 py-lg-5 text-center border-bottom">
+    <section class="py-5 text-center border-bottom">
       <div class="container">
         <div class="row">
           <div class="col-lg-6 col-md-8 mx-auto">

@@ -2,10 +2,10 @@
   <div id="habitable__results" class="col-lg-8 calc-form">
     <div
       id="habitable-canvas"
-      class="mb-3"
+      class="canvas-wrapper"
       style="position: relative; height: 500px; width: 100%"
     >
-      <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
+      <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
     </div>
     <p>
       <strong>Note:</strong> Habitable zone is calculated for Earth-like
@@ -42,7 +42,10 @@
 // 1.
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import {
+  CSS2DObject,
+  CSS2DRenderer,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { physicsConstants, removeAllChildNodes } from "../utils";
@@ -223,6 +226,8 @@ function setupThreeJS() {
 
   three.renderer.setSize(width, height);
 
+  three.labelRenderer = new CSS2DRenderer();
+
   three.labelRenderer.setSize(width, height);
   three.labelRenderer.domElement.style.position = "absolute";
   three.labelRenderer.domElement.style.top = "0px";
@@ -311,7 +316,8 @@ function setupSun() {
 
 function clearZones() {
   three.renderOrder = 0;
-  three.labelRenderer.domElement.innerHTML = "";
+
+  if (three.labelRenderer) three.labelRenderer.domElement.innerHTML = "";
 
   for (var i = three.scene.children.length - 1; i >= 0; i--) {
     // @ts-ignore
@@ -586,7 +592,8 @@ function animate() {
 
   //this.three.camera.position.clamp(this.three.minMovement, this.three.maxMovement);
   three.renderer.render(three.scene, three.camera);
-  three.labelRenderer.render(three.scene, three.camera);
+  if (three.labelRenderer)
+    three.labelRenderer.render(three.scene, three.camera);
 
   // clamp to fixed framerate
   const now = Math.round((30 * window.performance.now()) / 1000);

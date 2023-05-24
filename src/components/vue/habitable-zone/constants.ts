@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import type { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 // @ts-ignore
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
@@ -63,7 +63,7 @@ export const three = {
   canvas: null as HTMLElement | HTMLCanvasElement | null,
   renderer: null as THREE.WebGLRenderer | null,
   scene: new THREE.Scene(),
-  labelRenderer: new CSS2DRenderer(),
+  labelRenderer: null as CSS2DRenderer | null,
   renderOrder: 0,
   camera: new THREE.PerspectiveCamera(),
   controls: null as OrbitControls | null,

@@ -1,7 +1,7 @@
 <template>
   <div id="habitable-transfer__app" class="row">
     <div id="habitable__form" class="col-lg-4">
-      <div class="calc-form mb-5 p-2 rounded border bg-light text-dark">
+      <div class="calc-form mb-5 p-2 rounded border">
         <!-- <SelectInput
           id="star-type"
           label="Star Type"

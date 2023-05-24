@@ -1,7 +1,7 @@
 <template>
   <div id="hohmann-transfer__app" class="row">
     <div id="hohmann__form" class="col-lg-4">
-      <div class="calc-form mb-5 p-2 rounded border bg-light text-dark">
+      <div class="calc-form mb-5 p-2 rounded border">
         <SelectInput
           id="start-orbit"
           label="Starting Orbit"
@@ -128,10 +128,10 @@
 
       <div
         id="hohmann-canvas"
-        class="mb-3"
-        style="position: relative; height: 600px; width: 100%"
+        class="canvas-wrapper"
+        style="position: relative; height: 500px; width: 100%"
       >
-        <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
+        <i v-if="loading" class="fas fa-cog fa-spin h1"></i>
       </div>
     </div>
   </div>

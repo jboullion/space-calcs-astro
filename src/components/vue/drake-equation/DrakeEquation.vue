@@ -7,7 +7,7 @@
         >
         &bull; f<sub>i</sub> &bull; f<sub>c</sub> &bull; L = N
       </h2> -->
-      <div class="p-2 rounded border mb-5 bg-light text-dark">
+      <div class="p-2 rounded border mb-5">
         <div class="calc-form">
           <NumberInput
             id="averageRateOfStarFormation"
@@ -45,7 +45,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Current Estiamte: Unknown"
+            description="Current Estimate: Unknown"
           />
           <NumberInput
             id="fractionOfPlanetsThatCanSupportIntelligentLife"
@@ -57,7 +57,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Current Estiamte: Unknown"
+            description="Current Estimate: Unknown"
           />
           <NumberInput
             id="fractionOfPlanetsThatHaveCommunicativeLife"
@@ -67,7 +67,7 @@
             :step="0.01"
             :min="0"
             :max="1"
-            description="Current Estiamte: Unknown"
+            description="Current Estimate: Unknown"
           />
           <NumberInput
             id="averageLifetimeOfCommunicativeCivilizations"
@@ -78,7 +78,7 @@
             prefix="L"
             :step="0.1"
             :min="0"
-            description="Current Estiamte: Unknown"
+            description="Current Estimate: Unknown"
           />
         </div>
       </div>

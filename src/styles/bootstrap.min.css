@@ -130,13 +130,13 @@
 }
 [data-bs-theme="dark"] {
   color-scheme: dark;
-  --bs-body-color: #adb5bd;
+  --bs-body-color: #efefef;
   --bs-body-color-rgb: 173, 181, 189;
   --bs-body-bg: #111;
   --bs-body-bg-rgb: 17, 17, 17;
   --bs-emphasis-color: #fff;
   --bs-emphasis-color-rgb: 255, 255, 255;
-  --bs-secondary-color: rgba(173, 181, 189, 0.75);
+  --bs-secondary-color: rgba(173, 181, 189, 0.9);
   --bs-secondary-color-rgb: 173, 181, 189;
   --bs-secondary-bg: #343a40;
   --bs-secondary-bg-rgb: 52, 58, 64;

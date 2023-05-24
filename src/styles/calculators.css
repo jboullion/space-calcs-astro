@@ -30,7 +30,11 @@
 
 .calculator .form-section {
   padding: 20px 0;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.calculator .form-section:last-child {
+  border-bottom: none;
 }
 
 /* .calculator .form-section.active {
@@ -84,6 +88,15 @@
 .calculator .table-responsive thead th,
 .calculator .table-responsive td {
   text-align: center;
+}
+
+.calculator .canvas-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 @media screen and (max-width: 991px) {

@@ -39,7 +39,7 @@ const props = defineProps<{
 }>();
 
 function emitOption(value?: any) {
-  const result = props.options.find((option) => option.name === value);
+  const result = props.options.find((option) => option.value === value);
   emit("update:modelValue", result);
 }
 </script>
