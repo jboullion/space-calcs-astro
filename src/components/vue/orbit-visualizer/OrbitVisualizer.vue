@@ -870,7 +870,7 @@ function startTrace() {
   orbit.value.tracing = true;
   orbit.value.tickTime = 100000 / formData.value.simulationSpeed; //orbit.value.period / formData.value.simulationSpeed * (100 * formData.value.simulationSpeed) //orbit.valueSpeed * 1000; //300; //this.;
 
-  orbit.value.interval = setInterval(traceOrbit, orbit.value.tickTime);
+  orbit.value.interval = window.setInterval(traceOrbit, orbit.value.tickTime);
 
   traceOrbit();
 }
