@@ -1,68 +1,45 @@
 <template>
   <div id="orbit__app" class="row mt-5" v-cloak>
     <div id="orbit__form" class="col-lg-4">
-      <div class="calc-form col-12 mb-5 px-2 rounded border bg-light text-dark">
+      <div class="calc-form col-12 mb-5 px-2 rounded border">
         <div>
           <div id="mission" class="orbit__mission">
             <div class="calc-toggle">
               <!-- <div class="mb-3">
-            <label for="planetScale" class="form-label">Planet Scale
-              <i class="fas fa-question-circle" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="How much faster should the simulation run than real time?"></i></label>
-            <div class="input-group">
-              <input type="number" class="form-control" id="planetScale" v-model.number="formData.planetScale" min="0.01" max="1" step="0.01" >
-            </div>
-          </div> -->
+                    <label for="planetScale" class="form-label">Planet Scale
+                      <i class="fas fa-question-circle" 
+                      data-toggle="tooltip" 
+                      data-placement="top" 
+                      title="How much faster should the simulation run than real time?"></i></label>
+                    <div class="input-group">
+                      <input type="number" class="form-control" id="planetScale" v-model.number="formData.planetScale" min="0.01" max="1" step="0.01" >
+                    </div>
+                  </div> -->
+              <NumberInput
+                id="orbitHeight"
+                label="Orbit Height"
+                v-model.number="orbit.height"
+                :step="1"
+                :min="200"
+                :max="350000"
+                description=""
+                unit="km"
+                @change="updateOrbitVelocity"
+                tooltip="How high above the surface is the orbit?"
+              />
 
-              <div class="mb-3">
-                <label for="orbitHeight" class="form-label"
-                  >Orbit Height
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="How high above the surface is the orbit?"
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="orbitHeight"
-                    v-model.number="orbit.height"
-                    min="200"
-                    max="350000"
-                    @change="updateOrbitVelocity"
-                  />
-                  <span class="input-group-text">km</span>
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label for="orbitVelocity" class="form-label"
-                  >Orbit Velocity
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="How fast is the object moving?"
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="orbitVelocity"
-                    v-model.number="orbit.velocity"
-                    min="100"
-                    max="100000"
-                    readonly
-                  />
-                  <span class="input-group-text">km/h</span>
-                </div>
-              </div>
+              <!-- <NumberInput
+                id="orbitVelocity"
+                label="Orbit Velocity"
+                v-model.number="orbit.velocity"
+                :step="1"
+                :min="100"
+                :max="100000"
+                description=""
+                unit="km/h"
+                @change="updateOrbitVelocity"
+                tooltip="How fast is the object moving?"
+              /> -->
 
               <!-- <div class="mb-3">
             <label for="inclination" class="form-label">Orbital Inclination
@@ -187,10 +164,10 @@
 
       <div
         id="orbit-canvas"
-        class="mb-3"
+        class="mb-3 d-flex justify-content-center align-items-center"
         style="position: relative; height: 400px"
       >
-        <i v-if="loading" class="fas fa-cog fa-spin center-absolute"></i>
+        <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
       </div>
 
       <button
@@ -207,7 +184,7 @@
         @click="stopTrace"
         v-else
       >
-        <i class="fas fa-pause"></i>
+        <i class="fas fa-stop"></i>
       </button>
 
       <button
@@ -363,6 +340,7 @@
 
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import NumberInput from "../forms/NumberInput.vue";
 
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
 import { conversion, locations } from "./constants";

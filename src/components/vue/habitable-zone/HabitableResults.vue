@@ -2,10 +2,10 @@
   <div id="habitable__results" class="col-lg-8 calc-form">
     <div
       id="habitable-canvas"
-      class="mb-3"
+      class="mb-3 d-flex align-items-center justify-content-center"
       style="position: relative; height: 500px; width: 100%"
     >
-      <i v-if="loading" class="fas fa-cog fa-spin center-absolute h1"></i>
+      <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
     </div>
     <p>
       <strong>Note:</strong> Habitable zone is calculated for Earth-like
@@ -42,7 +42,10 @@
 // 1.
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import {
+  CSS2DObject,
+  CSS2DRenderer,
+} from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { physicsConstants, removeAllChildNodes } from "../utils";
@@ -222,6 +225,8 @@ function setupThreeJS() {
   const height = 500;
 
   three.renderer.setSize(width, height);
+
+  three.labelRenderer = new CSS2DRenderer();
 
   three.labelRenderer.setSize(width, height);
   three.labelRenderer.domElement.style.position = "absolute";

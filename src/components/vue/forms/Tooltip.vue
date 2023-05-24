@@ -20,7 +20,8 @@ const props = defineProps({
 .sc-tooltip .sc-tooltip-inner {
   visibility: hidden;
   border: 1px solid var(--bs-dark);
-  background-color: white;
+  background-color: #fefefe;
+  color: var(--bs-dark);
   width: 200px;
   font-size: 14px;
   line-height: 1.4;

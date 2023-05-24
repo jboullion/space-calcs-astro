@@ -1,7 +1,7 @@
 <template>
   <div id="rotational__app" class="row mt-5" v-cloak>
     <div id="rotational__form" class="col-lg-4">
-      <div class="calc-form col-12 mb-5 px-2 rounded border bg-light text-dark">
+      <div class="calc-form col-12 mb-5 px-2 rounded border">
         <div>
           <div id="mission" class="rotational__mission">
             <!-- <h4>Mission</h4> -->
@@ -288,7 +288,7 @@
         class="mb-3 d-flex align-items-center justify-content-center"
         style="position: relative; height: 400px"
       >
-        <i v-if="loading" class="fas fa-cog fa-spin center-absolute"></i>
+        <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
       </div>
 
       <div class="form-check form-switch mb-3">

@@ -1,7 +1,7 @@
 <template>
   <div id="solar-energy__results" class="col-lg-8 calc-form">
-    <div class="p-2 rounded border bg-light text-dark">
-      <table class="table text-dark">
+    <div class="p-2 rounded border">
+      <table class="table mb-0">
         <tbody>
           <tr class="" title="L = L☉ * (R / R☉)² * (T / T☉)⁴">
             <th>Star Luminosity</th>
@@ -21,9 +21,9 @@
               {{ formatNumber(availableEnergyOnSurface) }} W/m²
             </td>
           </tr>
-          <tr class="" title="P = E2 * Eff%">
-            <th>Solar Panel Potential</th>
-            <td class="text-end">
+          <tr class="border-0" title="P = E2 * Eff%">
+            <th class="border-0">Solar Panel Potential</th>
+            <td class="text-end border-0">
               {{ formatNumber(solarPanelPotential) }} W/m²
             </td>
           </tr>

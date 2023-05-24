@@ -31,7 +31,7 @@ const references: Reference[] = [
   <div class="container">
     <Hero title={title} description={description} />
     <div style="min-height: 600px;" class="calculator">
-      <SolarEnergy client:only="vue" />
+      <SolarEnergy client:load />
     </div>
 
     <References references={references} />

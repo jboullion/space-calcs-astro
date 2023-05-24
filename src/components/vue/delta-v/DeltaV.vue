@@ -1,7 +1,7 @@
 <template>
   <div id="delta-v__app" class="row" v-if="formData" v-cloak>
     <div id="delta-v__form" class="col-lg-4">
-      <div class="p-2 rounded border mb-5 bg-light text-dark">
+      <div class="p-2 rounded mb-5">
         <div class="calc-form">
           <NumberInput
             id="payload-mass"
@@ -293,14 +293,14 @@ onBeforeMount(() => {
   // Default selected options
   formData.value.engine = defaultEngines[1];
 
-  calcExhaustVelocity();
-
   GoogleCharts.load("52", {
     packages: ["line", "corechart"],
   }).then(setupCharts);
 });
 
 onMounted(() => {
+  calcExhaustVelocity();
+
   window.addEventListener("resize", drawCharts, { passive: true });
 });
 

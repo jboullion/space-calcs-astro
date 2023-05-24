@@ -1,7 +1,7 @@
 <template>
   <div id="nutrition__app" class="row mt-5" v-cloak>
     <div id="nutrition__form" class="col-lg-8 col-xl-7 mb-5">
-      <div class="calc-form mb-5 p-2 rounded border bg-light text-dark">
+      <div class="calc-form mb-5 p-2 rounded border">
         <div class="row">
           <div class="col-lg-4 mb-3">
             <TextInput
@@ -129,7 +129,7 @@
       <div id="food" v-if="foodMenu.length">
         <h3>Food List</h3>
 
-        <div class="p-2 rounded border bg-light text-dark">
+        <div class="p-2 rounded border">
           <table class="table food__table text-dark">
             <thead>
               <tr>
