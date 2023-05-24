@@ -19,8 +19,7 @@ const references: Reference[] = [];
 <Layout title={calculator.name} description={calculator.description}>
   <div class="container">
     <Hero title={calculator.name} description={calculator.description} />
-    <ONeillCylinder client:only="vue" />
-
+    <ONeillCylinder client:load />
     <References references={references} />
   </div>
 </Layout>

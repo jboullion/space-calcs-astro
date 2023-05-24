@@ -287,6 +287,7 @@ export const materials: StationMaterial[] = [
 
 export type PopulationDensity = {
   name: string;
+  value?: string;
   popKm2: number;
   // popM2: number; // TODO: Setup conversion rather than hard code?
   // popAcre: number; // TODO: Setup conversion rather than hard code?
@@ -295,35 +296,45 @@ export type PopulationDensity = {
 export const populationDensityExamples: PopulationDensity[] = [
   {
     name: "New York",
+    value: "newYork",
     popKm2: 1800,
   },
   {
     name: "Kowloon",
+    value: "kowloon",
     popKm2: 43000,
   },
   {
     name: "Manhattan",
+    value: "manhattan",
     popKm2: 28000,
   },
   {
     name: "Singapore",
+    value: "singapore",
     popKm2: 10500,
   },
   {
     name: "London",
+    value: "london",
     popKm2: 5800,
   },
   {
     name: "Paris",
+    value: "paris",
     popKm2: 3900,
   },
   {
     name: "Melbourne",
+    value: "melbourne",
     popKm2: 516,
   },
 ];
 
 // TODO: What is this?
-function convertSurfaceForce(material: Material, airPressure: number): number {
+export function convertSurfaceForce(
+  material: StationMaterial,
+  airPressure: number
+): number {
   return (material.tensileStrength * 1000000) / airPressure;
 }
