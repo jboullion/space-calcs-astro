@@ -131,8 +131,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'payload',
-            'btn-outline-primary': showResult != 'payload',
+            'btn-secondary': showResult == 'payload',
+            'btn-outline-secondary': showResult != 'payload',
           }"
           @click="showResultChart('payload')"
         >
@@ -141,8 +141,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'fuel',
-            'btn-outline-primary': showResult != 'fuel',
+            'btn-secondary': showResult == 'fuel',
+            'btn-outline-secondary': showResult != 'fuel',
           }"
           @click="showResultChart('fuel')"
         >
@@ -151,8 +151,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'c3',
-            'btn-outline-primary': showResult != 'c3',
+            'btn-secondary': showResult == 'c3',
+            'btn-outline-secondary': showResult != 'c3',
           }"
           @click="showResultChart('c3')"
         >
@@ -161,8 +161,8 @@
         <button
           class="btn"
           :class="{
-            'btn-primary': showResult == 'map',
-            'btn-outline-primary': showResult != 'map',
+            'btn-secondary': showResult == 'map',
+            'btn-outline-secondary': showResult != 'map',
           }"
           @click="showResultChart('map')"
         >
