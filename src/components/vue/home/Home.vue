@@ -238,6 +238,8 @@ function animate() {
 
   requestAnimationFrame(animate);
 
+  if (window.screen.width > 768) return;
+
   //threeCamera.position.clamp(three.value.minMovement, three.value.maxMovement);
   threeRenderer.render(threeScene, threeCamera);
 
