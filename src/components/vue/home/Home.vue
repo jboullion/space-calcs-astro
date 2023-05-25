@@ -1,6 +1,9 @@
 <template>
   <div>
-    <section class="py-5 text-center border-bottom bg-black" id="home-canvas">
+    <section
+      class="py-5 text-center border-bottom bg-black text-light"
+      id="home-canvas"
+    >
       <div class="container">
         <div class="row">
           <div class="col-lg-6 col-md-8 mx-auto">
