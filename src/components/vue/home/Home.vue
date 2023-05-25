@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="py-5 text-center border-bottom" id="home-canvas">
+    <section class="py-5 text-center border-bottom bg-black" id="home-canvas">
       <div class="container">
         <div class="row">
           <div class="col-lg-6 col-md-8 mx-auto">
@@ -238,7 +238,7 @@ function animate() {
 
   requestAnimationFrame(animate);
 
-  if (window.screen.width > 768) return;
+  if (window.screen.width < 768) return;
 
   //threeCamera.position.clamp(three.value.minMovement, three.value.maxMovement);
   threeRenderer.render(threeScene, threeCamera);
