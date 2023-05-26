@@ -448,6 +448,8 @@ function calculateNutrition() {
   nutrition.value = deepClone(nutritionDefault);
   nutrientTotals.value = [];
 
+  foodMass.value = 0;
+
   foodMenu.value.forEach((food) => {
     nutrition.value = calculateFoodNutrition(food, {
       ...nutrition.value,

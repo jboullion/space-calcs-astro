@@ -128,7 +128,7 @@
 
       <div
         id="hohmann-canvas"
-        class="canvas-wrapper"
+        class="canvas-wrapper border"
         style="position: relative; height: 500px; width: 100%"
       >
         <i v-if="loading" class="fas fa-cog fa-spin h1"></i>

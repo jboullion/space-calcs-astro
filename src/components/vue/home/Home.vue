@@ -4,6 +4,10 @@
       class="py-5 text-center border-bottom bg-black text-light"
       id="home-canvas"
     >
+      <div id="homeAccents">
+        <img src="/images/sun.jpg" id="homeSun" alt="" />
+        <img src="/images/earth.jpg" id="homeEarth" alt="" />
+      </div>
       <div class="container">
         <div class="row">
           <div class="col-lg-6 col-md-8 mx-auto">
@@ -68,6 +72,7 @@ import Logo from "../shared/Logo.vue";
 
 import { onMounted, ref } from "vue";
 import { categories } from "./constants";
+import { debounce } from "../../../utils/utils";
 
 const loading = ref(true);
 const textureDir = "/textures/";
@@ -112,8 +117,6 @@ function toggleCategory() {
 
 onMounted(() => {
   loadModels();
-
-  window.addEventListener("resize", setupScene, { passive: true });
 });
 
 async function loadModels() {
@@ -133,7 +136,7 @@ function setupScene() {
   if (loading.value) return;
 
   if (threeCanvas) {
-    threeCanvas.removeChild(threeCanvas.children[1]);
+    threeCanvas.removeChild(threeCanvas.children[2]);
   }
 
   setupThreeJS();
@@ -146,14 +149,45 @@ function setupScene() {
   }
 }
 
+// function resizeScene() {
+//   if (!threeCanvas || !threeRenderer || !sunMesh || !earthMesh) return;
+
+//   let rendererSize = new THREE.Vector2();
+//   threeRenderer.getSize(rendererSize);
+
+//   sunMesh.position.set(0, rendererSize.height / 2, 0);
+//   earthMesh.position.set(rendererSize.width, rendererSize.height / 2, 0);
+
+//   const sunGeometry = new THREE.SphereGeometry(rendererSize.height / 2, 64, 64);
+//   sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+
+//   const earthGeometry = new THREE.SphereGeometry(
+//     rendererSize.height / 6,
+//     32,
+//     32
+//   );
+//   earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+
+//   const width = threeCanvas.getBoundingClientRect().width;
+//   const height = threeCanvas.getBoundingClientRect().height;
+
+//   threeRenderer.setSize(width, height);
+// }
+
 function setupThreeJS() {
   threeScene = new THREE.Scene();
+
+  if (threeRenderer) {
+    threeRenderer.dispose();
+    threeRenderer.forceContextLoss();
+  }
 
   // Renderer
   threeRenderer = new THREE.WebGLRenderer({
     antialias: true,
     logarithmicDepthBuffer: true,
   }); // { alpha: true }
+
   threeCanvas = document.getElementById("home-canvas");
   if (!threeCanvas) return;
 
@@ -164,12 +198,14 @@ function setupThreeJS() {
 
   threeRenderer.setSize(width, height);
 
-  updateCamera();
-
   // Lights
   threeScene.add(new THREE.AmbientLight(0xffffff));
   const light = new THREE.PointLight(0xffffff, 1, 0, 1);
   threeScene.add(light);
+
+  updateCamera();
+
+  window.addEventListener("resize", setupScene, { passive: true });
 }
 
 function updateCamera() {
@@ -265,6 +301,15 @@ function animate() {
   position: relative;
 }
 
+#home-canvas #homeAccents {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  height: 100%;
+}
+
 #home-canvas .container {
   position: relative;
   z-index: 2;
@@ -281,7 +326,8 @@ function animate() {
 }
 
 @media (max-width: 768px) {
-  #home-canvas canvas {
+  #home-canvas canvas,
+  #home-canvas #homeAccents {
     display: none !important;
   }
 }

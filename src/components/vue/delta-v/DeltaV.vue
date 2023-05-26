@@ -110,22 +110,24 @@
       </div>
     </div>
     <div id="delta-v__results" class="col-lg-8 calc-form">
-      <table class="table table-striped">
-        <tbody>
-          <tr v-if="formData.twoStage" class="">
-            <th>First Stage ΔV</th>
-            <td class="text-end">{{ addCommas(firstStageDeltaV) }} m/s</td>
-          </tr>
-          <tr v-if="formData.twoStage" class="">
-            <th>Second Stage ΔV</th>
-            <td class="text-end">{{ addCommas(secondStageDeltaV) }} m/s</td>
-          </tr>
-          <tr class="table-success">
-            <th>Total ΔV</th>
-            <td class="text-end">{{ addCommas(totalDeltaV) }} m/s</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="border rounded overflow-hidden mb-3">
+        <table class="table table-striped mb-0">
+          <tbody>
+            <tr v-if="formData.twoStage" class="">
+              <th>First Stage ΔV</th>
+              <td class="text-end">{{ addCommas(firstStageDeltaV) }} m/s</td>
+            </tr>
+            <tr v-if="formData.twoStage" class="">
+              <th>Second Stage ΔV</th>
+              <td class="text-end">{{ addCommas(secondStageDeltaV) }} m/s</td>
+            </tr>
+            <tr class="table-success">
+              <th>Total ΔV</th>
+              <td class="text-end">{{ addCommas(totalDeltaV) }} m/s</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="btn-group w-100" role="group" aria-label="Basic example">
         <button
@@ -170,7 +172,7 @@
         </button>
       </div>
 
-      <div class="result-chart my-4">
+      <div class="result-chart rounded overflow-hidden my-4">
         <div
           id="delta-v-chart"
           v-show="showResult == 'payload'"

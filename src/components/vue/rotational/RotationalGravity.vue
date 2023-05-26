@@ -139,7 +139,7 @@
 
       <div
         id="rotational-canvas"
-        class="canvas-wrapper"
+        class="canvas-wrapper border"
         style="position: relative; height: 400px"
       >
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
