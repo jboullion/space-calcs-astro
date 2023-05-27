@@ -9,6 +9,7 @@ export const conversion = {
 export type OrbitLocations = {
   id: number;
   name: string;
+  value: string;
   description: string;
   g: number;
   gravity: number;
@@ -22,6 +23,7 @@ export const locations: OrbitLocations[] = [
   {
     id: 1,
     name: "Earth",
+    value: "earth",
     description: "Gravity: 1g",
     g: 1,
     gravity: 9.807,
@@ -33,6 +35,7 @@ export const locations: OrbitLocations[] = [
   {
     id: 2,
     name: "Mars",
+    value: "mars",
     description: "Gravity: 0.376g",
     g: 0.376,
     gravity: 3.721,
@@ -44,6 +47,7 @@ export const locations: OrbitLocations[] = [
   {
     id: 3,
     name: "Moon",
+    value: "moon",
     description: "Gravity: 0.16g",
     g: 0.16,
     gravity: 1.62,
