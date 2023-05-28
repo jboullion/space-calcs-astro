@@ -1,14 +1,11 @@
 <template>
   <div>
-    <section
-      class="py-5 text-center border-bottom bg-black text-light"
-      id="home-canvas"
-    >
+    <section class="py-5 text-center bg-black text-light" id="home-canvas">
       <div id="homeAccents">
         <img src="/images/sun.jpg" id="homeSun" alt="" />
         <img src="/images/earth.jpg" id="homeEarth" alt="" />
       </div>
-      <div class="container">
+      <div class="container position-relative">
         <div class="row">
           <div class="col-lg-6 col-md-8 mx-auto">
             <div class="d-flex justify-content-center gap-3">

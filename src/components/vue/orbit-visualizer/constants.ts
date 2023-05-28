@@ -17,6 +17,8 @@ export type OrbitLocations = {
   mass: number;
   rotationSpeed: number;
   axis: null;
+  stationaryOrbit: number;
+  hillSphere: number;
 };
 
 export const locations: OrbitLocations[] = [
@@ -31,6 +33,8 @@ export const locations: OrbitLocations[] = [
     mass: 5.98e24, // kg
     rotationSpeed: 460, // m/s
     axis: null, // TODO ? Do we want to tilt the planets? Might be more hassle than it is worth...or it might just be a single group rotation
+    stationaryOrbit: 35786, // km
+    hillSphere: 1471400, // km
   },
   {
     id: 2,
@@ -41,8 +45,10 @@ export const locations: OrbitLocations[] = [
     gravity: 3.721,
     radius: 3389439,
     mass: 6.39e23,
-    rotationSpeed: 241.2, // m/s
+    rotationSpeed: 238, // m/s
     axis: null,
+    stationaryOrbit: 17031, // km
+    hillSphere: 982700, // km
   },
   {
     id: 3,
@@ -55,5 +61,7 @@ export const locations: OrbitLocations[] = [
     mass: 7.34767309e22,
     rotationSpeed: 4.7, // m/s // 10916701.4624 / 2333000 days in seconds
     axis: null,
+    stationaryOrbit: 88441, // km
+    hillSphere: 66100, // km
   },
 ];

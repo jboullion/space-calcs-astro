@@ -172,16 +172,30 @@
               <td>{{ addCommas(formData.location.rotationSpeed) }} m/s</td>
             </tr>
             <tr>
-              <th>Circular Orbit Velocity</th>
-              <td>{{ addCommas(displayOrbitVelocity) }} m/s</td>
-            </tr>
-            <tr>
               <th>Orbit Height</th>
               <td>{{ addCommas(displayOrbitHeight) }} km</td>
             </tr>
             <tr>
+              <th>Orbit Velocity</th>
+              <td>{{ addCommas(displayOrbitVelocity) }} m/s</td>
+            </tr>
+            <tr>
               <th>Orbtal Period</th>
               <td>{{ displayOrbitPeriod }} hours</td>
+            </tr>
+            <tr
+              :class="
+                formData.location.hillSphere < formData.location.stationaryOrbit
+                  ? 'table-warning'
+                  : ''
+              "
+            >
+              <th>Stationary Orbit</th>
+              <td>{{ addCommas(formData.location.stationaryOrbit) }} km</td>
+            </tr>
+            <tr>
+              <th>Hill Sphere</th>
+              <td>{{ addCommas(formData.location.hillSphere) }} km</td>
             </tr>
             <tr
               v-if="
@@ -203,6 +217,16 @@
             </tr>
           </tbody>
         </table>
+
+        <div
+          class="alert alert-warning"
+          v-if="
+            formData.location.hillSphere < formData.location.stationaryOrbit
+          "
+        >
+          This body does not have stable stationary orbit because its Hill
+          Sphere is smaller than its stationary orbit.
+        </div>
       </div>
       <!-- 
       <button id="decay-ball" class="btn btn-nexus" @click="calcOrbitDecay">
