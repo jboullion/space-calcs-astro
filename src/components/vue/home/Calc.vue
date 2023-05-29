@@ -3,11 +3,13 @@
     <a :href="calc.link" class="card-body d-flex flex-column">
       <h2 class="card-title fw-bold">{{ calc.name }}</h2>
       <p class="card-text flex-fill">{{ calc.description }}</p>
-      <div class="d-flex justify-content-between align-items-center">
-        <span v-for="category in calc.categories">
-          <small :class="'text-' + category.color">{{ category.name }}</small>
-        </span>
-      </div>
+      <!-- <div class="d-flex align-items-center">
+        <span
+          v-for="category in calc.categories"
+          :class="`badge bg-${category.color} me-1`"
+          >{{ category.name }}</span
+        >
+      </div> -->
     </a>
   </div>
 </template>

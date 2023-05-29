@@ -1,5 +1,5 @@
 <template>
-  <div id="habitat__app" class="row mt-5" v-cloak>
+  <div id="habitat__app" class="row" v-cloak>
     <div class="calc-form col-lg-4">
       <div class="mb-5 px-2 rounded border">
         <div id="mission" class="habitat__mission form-section active">

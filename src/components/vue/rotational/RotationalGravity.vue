@@ -1,5 +1,5 @@
 <template>
-  <div id="rotational__app" class="row mt-5" v-cloak>
+  <div id="rotational__app" class="row" v-cloak>
     <div id="rotational__form" class="col-lg-4">
       <div class="calc-form col-12 mb-5 px-2 rounded border">
         <div>
@@ -139,7 +139,7 @@
 
       <div
         id="rotational-canvas"
-        class="canvas-wrapper"
+        class="canvas-wrapper border"
         style="position: relative; height: 400px"
       >
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>

@@ -14,7 +14,7 @@ import {
 export const unOrderedCalculators: SpaceCalc[] = [
   {
     id: "delta-v",
-    name: "Delta V",
+    name: "Rocket Potential Delta V",
     description: "Calculate the delta v required for a mission",
     categories: [categories[ROCKET_CAT], categories[ORBIT_CAT]],
     image: "https://i.imgur.com/4ZQZQ2M.png",

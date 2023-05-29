@@ -10,6 +10,10 @@ body {
   font-family: "Inter", sans-serif !important;
 }
 
+[data-bs-theme="dark"] body {
+  background-color: black;
+}
+
 /* .btn-primary {
   --bs-btn-color: #fff;
   --bs-btn-bg: var(--bs-primary);

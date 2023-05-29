@@ -1,20 +1,10 @@
 <template>
-  <div id="orbit__app" class="row mt-5" v-cloak>
+  <div id="orbit__app" class="row" v-cloak>
     <div id="orbit__form" class="col-lg-4">
       <div class="calc-form col-12 mb-5 px-2 rounded border">
         <div>
           <div id="mission" class="orbit__mission">
             <div class="calc-toggle">
-              <!-- <div class="mb-3">
-                    <label for="planetScale" class="form-label">Planet Scale
-                      <i class="fas fa-question-circle" 
-                      data-toggle="tooltip" 
-                      data-placement="top" 
-                      title="How much faster should the simulation run than real time?"></i></label>
-                    <div class="input-group">
-                      <input type="number" class="form-control" id="planetScale" v-model.number="formData.planetScale" min="0.01" max="1" step="0.01" >
-                    </div>
-                  </div> -->
               <NumberInput
                 id="orbitHeight"
                 label="Orbit Height"
@@ -27,32 +17,6 @@
                 @change="updateOrbitVelocity"
                 tooltip="How high above the surface is the orbit?"
               />
-
-              <!-- <NumberInput
-                id="orbitVelocity"
-                label="Orbit Velocity"
-                v-model.number="orbit.velocity"
-                :step="1"
-                :min="100"
-                :max="100000"
-                description=""
-                unit="km/h"
-                @change="updateOrbitVelocity"
-                tooltip="How fast is the object moving?"
-              /> -->
-
-              <!-- <div class="mb-3">
-            <label for="inclination" class="form-label">Orbital Inclination
-              <i class="fas fa-question-circle" 
-              data-toggle="tooltip" 
-              data-placement="top" 
-              title="Orbital inclination is the angle between the plane of an orbit and the equator. An orbital inclination of 0° is directly above the equator, 90° crosses right above the pole, and 180° orbits above the equator in the opposite direction of Earth's spin."></i></label>
-            <div class="input-group">
-              <input type="number" class="form-control" id="inclination" v-model.number="orbit.inclination" min="-180" max="180" >
-              <span class="input-group-text">&deg;</span>
-            </div>
-            <p class="description"><small class="text-muted">-180&deg; to 180&deg;</small></p>
-          </div> -->
 
               <div class="mb-3">
                 <label for="inclination" class="form-label"
@@ -86,72 +50,33 @@
                 </p>
               </div>
 
-              <div class="mb-3">
-                <label for="location" class="form-label"
-                  >Location
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Update your environment and apply natural gravity if applicaible"
-                  ></i>
-                </label>
-                <select
-                  class="form-select"
-                  v-model="formData.location"
-                  @change="updatePlanet"
-                >
-                  <option v-for="location in locations" :value="location">
-                    {{ location.name }}
-                  </option>
-                </select>
-                <p class="description">
-                  <small class="text-muted">{{
-                    formData.location.description
-                  }}</small>
-                </p>
-              </div>
+              <SelectInput
+                id="location"
+                label="Location"
+                v-model="formData.location"
+                :options="locations"
+                tooltip="Update your environment and apply natural gravity if applicaible"
+                :description="formData.location.description"
+                @update:modelValue="updatePlanet"
+              />
 
-              <div class="mb-3">
-                <label for="simulationSpeed" class="form-label"
-                  >Simulation Speed
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="How much faster should the simulation run than real time?"
-                  ></i
-                ></label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="simulationSpeed"
-                    v-model.number="formData.simulationSpeed"
-                    min="1"
-                    max="100000"
-                    @input="updateSimulationSpeed"
-                  />
-                </div>
-              </div>
+              <NumberInput
+                id="simulationSpeed"
+                label="Simulation Speed"
+                v-model.number="formData.simulationSpeed"
+                :step="1"
+                :min="1"
+                :max="100000"
+                @change="updateSimulationSpeed"
+                tooltip="How much faster should the simulation run than real time?"
+              />
 
-              <div class="form-check form-switch mb-3">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="pause"
-                  v-model="formData.pause"
-                />
-                <label class="form-check-label" for="pause">
-                  Pause Simulation
-                  <i
-                    class="fas fa-question-circle"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title="Pause the simulation's movement"
-                  ></i>
-                </label>
-              </div>
+              <CheckboxInput
+                id="pause"
+                label="Pause Simulation"
+                v-model="formData.pause"
+                tooltip="Pause the simulation's movement"
+              />
             </div>
           </div>
         </div>
@@ -164,7 +89,7 @@
 
       <div
         id="orbit-canvas"
-        class="canvas-wrapper"
+        class="canvas-wrapper border"
         style="position: relative; height: 400px"
       >
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
@@ -247,16 +172,30 @@
               <td>{{ addCommas(formData.location.rotationSpeed) }} m/s</td>
             </tr>
             <tr>
-              <th>Circular Orbit Velocity</th>
-              <td>{{ addCommas(displayOrbitVelocity) }} m/s</td>
-            </tr>
-            <tr>
               <th>Orbit Height</th>
               <td>{{ addCommas(displayOrbitHeight) }} km</td>
             </tr>
             <tr>
+              <th>Orbit Velocity</th>
+              <td>{{ addCommas(displayOrbitVelocity) }} m/s</td>
+            </tr>
+            <tr>
               <th>Orbtal Period</th>
               <td>{{ displayOrbitPeriod }} hours</td>
+            </tr>
+            <tr
+              :class="
+                formData.location.hillSphere < formData.location.stationaryOrbit
+                  ? 'table-warning'
+                  : ''
+              "
+            >
+              <th>Stationary Orbit</th>
+              <td>{{ addCommas(formData.location.stationaryOrbit) }} km</td>
+            </tr>
+            <tr>
+              <th>Hill Sphere</th>
+              <td>{{ addCommas(formData.location.hillSphere) }} km</td>
             </tr>
             <tr
               v-if="
@@ -278,6 +217,16 @@
             </tr>
           </tbody>
         </table>
+
+        <div
+          class="alert alert-warning"
+          v-if="
+            formData.location.hillSphere < formData.location.stationaryOrbit
+          "
+        >
+          This body does not have stable stationary orbit because its Hill
+          Sphere is smaller than its stationary orbit.
+        </div>
       </div>
       <!-- 
       <button id="decay-ball" class="btn btn-nexus" @click="calcOrbitDecay">
@@ -341,6 +290,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import NumberInput from "../forms/NumberInput.vue";
+import SelectInput from "../forms/SelectInput.vue";
+import CheckboxInput from "../forms/CheckboxInput.vue";
 
 import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from "vue";
 import { conversion, locations } from "./constants";
@@ -870,7 +821,7 @@ function startTrace() {
   orbit.value.tracing = true;
   orbit.value.tickTime = 100000 / formData.value.simulationSpeed; //orbit.value.period / formData.value.simulationSpeed * (100 * formData.value.simulationSpeed) //orbit.valueSpeed * 1000; //300; //this.;
 
-  orbit.value.interval = setInterval(traceOrbit, orbit.value.tickTime);
+  orbit.value.interval = window.setInterval(traceOrbit, orbit.value.tickTime);
 
   traceOrbit();
 }

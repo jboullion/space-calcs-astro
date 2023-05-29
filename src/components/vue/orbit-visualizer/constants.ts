@@ -9,6 +9,7 @@ export const conversion = {
 export type OrbitLocations = {
   id: number;
   name: string;
+  value: string;
   description: string;
   g: number;
   gravity: number;
@@ -16,12 +17,15 @@ export type OrbitLocations = {
   mass: number;
   rotationSpeed: number;
   axis: null;
+  stationaryOrbit: number;
+  hillSphere: number;
 };
 
 export const locations: OrbitLocations[] = [
   {
     id: 1,
     name: "Earth",
+    value: "earth",
     description: "Gravity: 1g",
     g: 1,
     gravity: 9.807,
@@ -29,21 +33,27 @@ export const locations: OrbitLocations[] = [
     mass: 5.98e24, // kg
     rotationSpeed: 460, // m/s
     axis: null, // TODO ? Do we want to tilt the planets? Might be more hassle than it is worth...or it might just be a single group rotation
+    stationaryOrbit: 35786, // km
+    hillSphere: 1471400, // km
   },
   {
     id: 2,
     name: "Mars",
+    value: "mars",
     description: "Gravity: 0.376g",
     g: 0.376,
     gravity: 3.721,
     radius: 3389439,
     mass: 6.39e23,
-    rotationSpeed: 241.2, // m/s
+    rotationSpeed: 238, // m/s
     axis: null,
+    stationaryOrbit: 17031, // km
+    hillSphere: 982700, // km
   },
   {
     id: 3,
     name: "Moon",
+    value: "moon",
     description: "Gravity: 0.16g",
     g: 0.16,
     gravity: 1.62,
@@ -51,5 +61,7 @@ export const locations: OrbitLocations[] = [
     mass: 7.34767309e22,
     rotationSpeed: 4.7, // m/s // 10916701.4624 / 2333000 days in seconds
     axis: null,
+    stationaryOrbit: 88441, // km
+    hillSphere: 66100, // km
   },
 ];
