@@ -1,45 +1,8 @@
-export interface ONeillCylinderForm {
-  structure: {
-    radius: number; // km
-    cylinderLength: number; // km
-    surfaceGravity: number; // G
-    internalPressure: number; // kpa
-    internalTemperature?: number; // K
-    airMix: AtmosphereComposition;
-    material: StationMaterial;
-    safetyFactor: number;
-    shellWallThickness: number; // m
-    minShieldingShellMass: number; // kg/m2
-    internalStructureMass: number; // kg/m2
-    caps: "flat" | "convex" | "concave";
-  };
-  internal: {
-    roofHeight: number; // m
-    levels: number;
-    floorMaterial: StationMaterial;
-  };
-  land: {
-    urbanDensity: number; // %
-    agriculturalDensity: number; // %
-    industrialDensity: number; // %
-    // unusedDensity: number; // % calculated
-    urbanDensityExample: PopulationDensity;
-  };
-  diet: {};
-}
-
-export type AtmosphereComposition = {
-  name: string;
-  value?: string;
-  M: number; // pa
-  P: number; // pa O2
-  O2: number; // %
-  N2: number; // %
-  CO2: number; // %
-  Ar: number; // %
-  H2O: number; // %
-  molarMass: number; // kg/mol
-};
+import type {
+  AtmosphereComposition,
+  StationMaterial,
+  PopulationDensity,
+} from "./types";
 
 export const atmosphereCompositions: AtmosphereComposition[] = [
   {
@@ -118,16 +81,6 @@ export const atmosphereCompositions: AtmosphereComposition[] = [
     molarMass: 0.0324,
   },
 ];
-
-export type StationMaterial = {
-  name: string;
-  value?: string;
-  yieldStress: number;
-  tensileStrength: number;
-  density: number;
-  youngsModulus: number;
-  possionRatio: number;
-};
 
 export const materials: StationMaterial[] = [
   {
@@ -284,14 +237,6 @@ export const materials: StationMaterial[] = [
     possionRatio: 0.45,
   },
 ];
-
-export type PopulationDensity = {
-  name: string;
-  value?: string;
-  popKm2: number;
-  // popM2: number; // TODO: Setup conversion rather than hard code?
-  // popAcre: number; // TODO: Setup conversion rather than hard code?
-};
 
 export const populationDensityExamples: PopulationDensity[] = [
   {

@@ -2,10 +2,14 @@
   <div id="oneill__app" class="row justify-content-center">
     <div id="oneill__form" class="col-lg-4">
       <div class="p-2 rounded border mb-5">
-        <ONeillForm />
+        <ONeillForm :formData="formData" />
       </div>
     </div>
-    <div id="oneill__results" class="col-lg-8"></div>
+    <div id="oneill__results" class="col-lg-8">
+      <div class="p-2 rounded border mb-5">
+        <ONeillResults :formData="formData" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -17,26 +21,25 @@
 // ? NOTE: Optional Improvements!
 
 import { computed, onMounted, ref } from "vue";
-import NumberInput from "../forms/NumberInput.vue";
-import SelectInput from "../forms/SelectInput.vue";
 import ONeillForm from "./ONeillForm.vue";
+import ONeillResults from "./ONeillResults.vue";
 
 import type {
   AtmosphereComposition,
   StationMaterial,
   ONeillCylinderForm,
-} from "./constants";
+} from "./types";
 import {
   atmosphereCompositions,
   materials,
   populationDensityExamples,
 } from "./constants";
-import { clampNumber, formatNumber } from "../utils";
 
+// TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ONeillCylinderForm>({
   structure: {
-    radius: 225,
-    cylinderLength: 338,
+    radius: 1,
+    cylinderLength: 10,
     surfaceGravity: 0.6,
     internalPressure: 50,
     airMix: atmosphereCompositions[1],
@@ -48,11 +51,11 @@ const formData = ref<ONeillCylinderForm>({
     caps: "flat",
   },
   internal: {
-    roofHeight: 1000,
+    levelHeight: 10, // m
     levels: 1,
     floorMaterial: materials[1],
   },
-  land: {
+  landUse: {
     urbanDensity: 10,
     agriculturalDensity: 60,
     industrialDensity: 10,
@@ -62,45 +65,6 @@ const formData = ref<ONeillCylinderForm>({
   diet: {},
 });
 
-/**
- *
- *
- * COMPUTED
- *
- *
- */
-
-/**
- *
- *
- * SETUP
- *
- *
- */
 onMounted(() => {});
-
-/**
- *
- *
- * METHODS
- *
- *
- */
-
-function updateAirMix(newMix: AtmosphereComposition) {
-  formData.value.structure.airMix = newMix;
-  // formData.value.specificImpulse = formData.value.engine.ispVacuum;
-  // formData.value.seaLevelSpecificImpulse = formData.value.engine.ispSeaLevel;
-  // formData.value.exhaustVelocity = convertIspToVe(
-  //   formData.value.specificImpulse
-  // );
-  // formData.value.seaLevelVelocity = convertIspToVe(
-  //   formData.value.seaLevelSpecificImpulse
-  // );
-}
-
-function updateMaterial(newMaterial: StationMaterial) {
-  formData.value.structure.material = newMaterial;
-}
 </script>
 <style></style>
