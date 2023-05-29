@@ -1,5 +1,5 @@
 <template>
-  <div id="structureTab">
+  <div id="structureTab" class="py-2">
     <NumberInput
       id="radius"
       label="Radius"
@@ -22,40 +22,12 @@
       unit="km"
     />
 
-    <NumberInput
-      id="surfaceGravity"
-      label="Surface Gravity"
-      v-model.number="structure.surfaceGravity"
-      :step="0.1"
-      :min="0.1"
-      :max="10"
-      description=""
-      unit="G"
-    />
-
-    <NumberInput
-      id="internalPressure"
-      label="Internal Pressure"
-      v-model.number="structure.internalPressure"
-      :step="1"
-      :min="1"
-      :max="1000"
-      description=""
-      unit="kpa"
-    />
-
-    <SelectInput
-      id="airMix"
-      label="Air Mix"
-      v-model="structure.airMix"
-      :options="atmosphereCompositions"
-    />
-
     <SelectInput
       id="material"
       label="Material"
       v-model="structure.material"
       :options="materials"
+      :description="`Tensile Strength: ${structureTensileStrength} MPa`"
     />
 
     <NumberInput
@@ -66,6 +38,42 @@
       :min="1"
       :max="10"
       description=""
+    />
+
+    <NumberInput
+      id="surfaceGravity"
+      label="Surface Gravity"
+      v-model.number="structure.surfaceGravity"
+      :step="0.1"
+      :min="0.1"
+      :max="10"
+      description="RPM: TODO"
+      unit="G"
+    />
+
+    <NumberInput
+      id="internalPressure"
+      label="Internal Air Pressure"
+      v-model.number="structure.internalPressure"
+      :step="1"
+      :min="1"
+      :max="1000"
+      description=""
+      tooltip="Earth sea level pressure is ~101 kPa"
+      unit="kpa"
+    />
+
+    <div class="alert alert-warning" v-if="structure.internalPressure < 65">
+      <strong>Warning:</strong> The internal pressure is low. Please use
+      Adjusted O2 Mix.
+    </div>
+
+    <SelectInput
+      id="airMix"
+      label="Air Mix"
+      v-model="structure.airMix"
+      :options="atmosphereCompositions"
+      description="TODO % O2"
     />
 
     <NumberInput
@@ -112,17 +120,20 @@
 <script setup lang="ts">
 import { defineProps, ref, computed } from "vue";
 
-import type {
-  AtmosphereComposition,
-  StationMaterial,
-  Structure,
-} from "./types";
+import type { Structure } from "./types";
 import { atmosphereCompositions, materials } from "./constants";
 
 import NumberInput from "../forms/NumberInput.vue";
 import SelectInput from "../forms/SelectInput.vue";
+import { formatNumber } from "../utils";
 
 const props = defineProps<{
   structure: Structure;
 }>();
+
+const structureTensileStrength = computed(() => {
+  return formatNumber(
+    props.structure.material.tensileStrength / props.structure.safetyFactor
+  );
+});
 </script>

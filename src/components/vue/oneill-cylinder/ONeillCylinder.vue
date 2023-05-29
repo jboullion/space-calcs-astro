@@ -24,11 +24,7 @@ import { computed, onMounted, ref } from "vue";
 import ONeillForm from "./ONeillForm.vue";
 import ONeillResults from "./ONeillResults.vue";
 
-import type {
-  AtmosphereComposition,
-  StationMaterial,
-  ONeillCylinderForm,
-} from "./types";
+import type { ONeillCylinderForm } from "./types";
 import {
   atmosphereCompositions,
   materials,
@@ -40,11 +36,11 @@ const formData = ref<ONeillCylinderForm>({
   structure: {
     radius: 1,
     cylinderLength: 10,
-    surfaceGravity: 0.6,
-    internalPressure: 50,
+    surfaceGravity: 1,
+    internalPressure: 101,
     airMix: atmosphereCompositions[1],
-    material: materials[5],
-    safetyFactor: 1.1,
+    material: materials[1],
+    safetyFactor: 1.3,
     shellWallThickness: 5000.0,
     minShieldingShellMass: 5000.0,
     internalStructureMass: 1000.0,

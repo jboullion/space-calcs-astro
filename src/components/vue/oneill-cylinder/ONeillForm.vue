@@ -1,29 +1,26 @@
 <template>
+  <div
+    class="btn-group w-100 mb-2"
+    role="group"
+    aria-label="Vertical radio toggle button group"
+  >
+    <template v-for="(tab, index) in tabs">
+      <input
+        type="radio"
+        class="btn-check"
+        name="vbtn-radio"
+        :value="tab.id"
+        v-model="currentTab"
+        :id="tab.id"
+        autocomplete="off"
+        :checked="index == 0"
+      />
+      <label class="btn btn-outline-secondary" :for="tab.id">{{
+        tab.label
+      }}</label>
+    </template>
+  </div>
   <div class="calc-form">
-    <div
-      class="btn-group w-100"
-      role="group"
-      aria-label="Vertical radio toggle button group"
-    >
-      <template v-for="(tab, index) in tabs">
-        <input
-          type="radio"
-          class="btn-check"
-          name="vbtn-radio"
-          :value="tab.id"
-          v-model="currentTab"
-          :id="tab.id"
-          autocomplete="off"
-          :checked="index == 0"
-        />
-        <label
-          class="btn btn-outline-secondary rounded-bottom-0"
-          :for="tab.id"
-          >{{ tab.label }}</label
-        >
-      </template>
-    </div>
-
     <StructureTab
       v-show="currentTab == 'structureTab'"
       :structure="formData.structure"

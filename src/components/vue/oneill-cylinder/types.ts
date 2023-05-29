@@ -39,8 +39,8 @@ export type AtmosphereComposition = {
   value?: string;
   M: number; // pa
   P: number; // pa O2
-  O2: number; // %
-  N2: number; // %
+  // O2: number; // %
+  // N2: number; // %
   CO2: number; // %
   Ar: number; // %
   H2O: number; // %
@@ -51,8 +51,8 @@ export type StationMaterial = {
   name: string;
   value?: string;
   yieldStress: number;
-  tensileStrength: number;
-  density: number;
+  tensileStrength: number; //Mpa
+  density: number; // kg/m3
   youngsModulus: number;
   possionRatio: number;
 };

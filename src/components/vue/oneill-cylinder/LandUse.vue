@@ -1,5 +1,5 @@
 <template>
-  <div id="landAllocation">
+  <div id="landAllocation" class="py-2">
     <NumberInput
       id="urbanDensity"
       label="Urban Density"

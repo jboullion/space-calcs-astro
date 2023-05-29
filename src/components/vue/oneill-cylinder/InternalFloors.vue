@@ -1,5 +1,5 @@
 <template>
-  <div id="internalFloors">
+  <div id="internalFloors" class="py-2">
     <NumberInput
       id="levelHeight"
       label="Level Height"
@@ -45,10 +45,11 @@ const props = defineProps<{
 }>();
 
 const maxLevels = computed(() => {
-  //const defaultMax = 100;
+  const defaultMax = 100;
 
-  return Math.floor(
-    (props.structure.radius * 1000) / props.internal.levelHeight
+  return Math.min(
+    Math.floor((props.structure.radius * 1000) / props.internal.levelHeight),
+    defaultMax
   );
 });
 </script>

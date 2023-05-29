@@ -13,7 +13,20 @@ if (!calculator) {
   throw new Error("Calculator not found");
 }
 
-const references: Reference[] = [];
+const references: Reference[] = [
+  {
+    title: "The High Frontier: Human Colonies in Space",
+    url: "https://en.wikipedia.org/wiki/The_High_Frontier:_Human_Colonies_in_Space",
+  },
+  {
+    title: "Wiki: O'Neill Cylinder",
+    url: "https://en.wikipedia.org/wiki/O%27Neill_cylinder",
+  },
+  {
+    title: "Materials Data Book",
+    url: "http://www-mdp.eng.cam.ac.uk/web/library/enginfo/cueddatabooks/materials.pdf",
+  },
+];
 ---
 
 <Layout title={calculator.name} description={calculator.description}>

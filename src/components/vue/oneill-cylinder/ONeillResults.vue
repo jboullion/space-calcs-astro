@@ -2,10 +2,60 @@
   <div>
     <div>
       <table class="table">
+        <thead>
+          <tr>
+            <th class="bg-dark text-white" colspan="2">Area</th>
+          </tr>
+        </thead>
         <tbody>
           <tr>
-            <th class="bg-secondary" colspan="2">Structure Results</th>
+            <td>Shell Floor Area</td>
+            <td class="text-end">{{ formatNumber(shellFloorArea) }} km</td>
           </tr>
+          <tr>
+            <td>Total Floor Area</td>
+            <td class="text-end">{{ formatNumber(totalFloorArea) }} km</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="bg-dark text-white" colspan="2">Mass</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Structure</td>
+            <td class="text-end">km</td>
+          </tr>
+          <tr>
+            <td>Material</td>
+            <td class="text-end">km</td>
+          </tr>
+          <tr>
+            <td>Sheidling</td>
+            <td class="text-end">km</td>
+          </tr>
+          <tr>
+            <td>Air Mass</td>
+            <td class="text-end">km</td>
+          </tr>
+          <tr>
+            <th>Total Mass</th>
+            <td class="text-end">km</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="bg-dark text-white" colspan="2">Mass</th>
+          </tr>
+        </thead>
+        <tbody>
           <tr>
             <td>Shell Floor Area</td>
             <td class="text-end">{{ formatNumber(shellFloorArea) }} km</td>
