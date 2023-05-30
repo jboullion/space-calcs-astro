@@ -26,6 +26,17 @@
         v-html="unit"
       ></span>
     </div>
+    <input
+      v-if="showRange"
+      :id="id + '-range'"
+      type="range"
+      class="form-range"
+      :min="min"
+      :max="max"
+      :step="step"
+      :value="internalValue"
+      @input="($event) => updateValue($event)"
+    />
     <p v-if="description" class="description">
       <small class="text-muted" v-html="description"></small>
     </p>
@@ -50,6 +61,7 @@ const props = defineProps<{
   min?: number;
   max?: number;
   step?: number;
+  showRange?: boolean;
   attrs?: Record<string, unknown>;
 }>();
 

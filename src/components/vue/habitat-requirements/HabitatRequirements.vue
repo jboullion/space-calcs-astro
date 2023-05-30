@@ -573,7 +573,7 @@
         </div>
 
         <div id="results-table" class="table-responsive">
-          <table class="table">
+          <table class="table border">
             <thead>
               <tr>
                 <th></th>

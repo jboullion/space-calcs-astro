@@ -78,3 +78,7 @@ h1 {
 .text-dark .text-muted {
   color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}

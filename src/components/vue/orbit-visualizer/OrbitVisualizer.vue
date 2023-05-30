@@ -153,7 +153,7 @@
   <div class="alert py-2 mb-2" :class="" role="alert">
     Planet Mass (kg): {{ planet.mass }}
   </div> -->
-        <table class="table table-striped">
+        <table class="table table-striped border">
           <tbody>
             <tr>
               <th>Planet Radius</th>
@@ -252,7 +252,7 @@
           ></i>
         </h3>
 
-        <table class="table table-striped">
+        <table class="table table-striped border">
           <tbody>
             <tr>
               <th v-if="orbit.decayDays && orbit.decayDays < 365">

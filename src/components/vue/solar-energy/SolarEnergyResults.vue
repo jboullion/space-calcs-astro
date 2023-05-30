@@ -30,6 +30,7 @@
         </tbody>
       </table>
     </div>
+
     <div class="result-chart my-4">
       <!-- <div
         id="efficiency-chart"

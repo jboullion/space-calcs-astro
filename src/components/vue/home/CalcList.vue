@@ -15,7 +15,7 @@
 import { computed } from "vue";
 
 import Calc from "./Calc.vue";
-import { calculators } from "./calculator-list";
+import { calculators } from "../../../utils/calculator-list";
 
 const props = defineProps<{
   search: string;

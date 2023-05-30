@@ -8,6 +8,7 @@
           v-model.number="formData.solarPanelEfficiency"
           unit="%"
           :step="0.1"
+          showRange
           tooltip="How efficient are the solar panels at converting sunlight into electricity?"
           @change="
             formData.solarPanelEfficiency = clampNumber(
@@ -34,6 +35,10 @@
           id="atmosphere"
           label="Atmosphere Absorption"
           v-model.number="formData.atmosphereAbsorption"
+          showRange
+          :min="0"
+          :max="100"
+          :step="0.1"
           unit="%"
           tooltip="Earth's atmosphere absorbs ~37% of the solar energy. Mars atmosphere absorbs ~7%."
         />

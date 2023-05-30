@@ -1,21 +1,15 @@
 <template>
   <div id="oneill__app" class="row justify-content-center">
-    <div id="oneill__form" class="col-md-8 col-lg-6">
-      <div class="p-2 rounded border mb-5 bg-light text-dark">
-        <div class="calc-form">
-          <NumberInput
-            id="radius"
-            label="Radius"
-            v-model.number="formData.structure.radius"
-            :step="1"
-            :min="10"
-            :max="1000000"
-            description=""
-          />
-        </div>
+    <div id="oneill__form" class="col-lg-4">
+      <div class="p-2 rounded border mb-5">
+        <ONeillForm :formData="formData" />
       </div>
     </div>
-    <div id="oneill__results" class="col-md-4 col-lg-6 text-center"></div>
+    <div id="oneill__results" class="col-lg-8">
+      <div class="p-2 rounded border mb-5">
+        <ONeillResults :formData="formData" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,36 +21,41 @@
 // ? NOTE: Optional Improvements!
 
 import { computed, onMounted, ref } from "vue";
-import NumberInput from "../forms/NumberInput.vue";
+import ONeillForm from "./ONeillForm.vue";
+import ONeillResults from "./ONeillResults.vue";
 
-import type { ONeillCylinderForm } from "./constants";
+import type { ONeillCylinderForm } from "./types";
 import {
   atmosphereCompositions,
   materials,
   populationDensityExamples,
 } from "./constants";
-import { clampNumber, formatNumber } from "../utils";
 
+// TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ONeillCylinderForm>({
   structure: {
-    radius: 225,
-    cylinderLength: 338,
-    surfaceGravity: 0.6,
-    internalPressure: 50,
+    radius: 100, // km
+    cylinderLength: 100, // km
+    surfaceGravity: 0.3, // g
+    internalPressure: 101, // kPa
+    internalTemperature: 0, // C
     airMix: atmosphereCompositions[1],
-    material: materials[5],
-    safetyFactor: 1.1,
-    shellWallThickness: 5000.0,
-    minShieldingShellMass: 5000.0,
-    internalStructureMass: 1000.0,
-    caps: "flat",
+    material: materials[1],
+    safetyFactor: 1.3,
+    shellWallThickness: 1000.0, // m
+    minShieldingShellMass: 0.0, // kg/m2
+    internalStructureMass: 200.0, // kg/m2
+    caps: {
+      name: "Flat",
+      value: "flat",
+    },
   },
   internal: {
-    roofHeight: 1000,
-    levels: 1,
+    levelHeight: 50, // m
+    levels: 100,
     floorMaterial: materials[1],
   },
-  land: {
+  landUse: {
     urbanDensity: 10,
     agriculturalDensity: 60,
     industrialDensity: 10,
@@ -66,29 +65,6 @@ const formData = ref<ONeillCylinderForm>({
   diet: {},
 });
 
-/**
- *
- *
- * COMPUTED
- *
- *
- */
-
-/**
- *
- *
- * SETUP
- *
- *
- */
 onMounted(() => {});
-
-/**
- *
- *
- * METHODS
- *
- *
- */
 </script>
 <style></style>

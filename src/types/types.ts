@@ -6,6 +6,7 @@ export interface Reference {
 }
 
 export type SpaceCalc = {
+  id: string;
   name: string;
   description: string;
   categories: Category[];

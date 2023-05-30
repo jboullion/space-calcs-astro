@@ -13,7 +13,7 @@
       different habitable zones.
     </p>
 
-    <table class="table table-striped">
+    <table class="table table-striped border">
       <tbody>
         <tr class="" :title="luminosityEquation">
           <th>Luminosity (L)</th>
