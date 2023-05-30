@@ -51,7 +51,7 @@ const formData = ref<ONeillCylinderForm>({
   },
   internal: {
     levelHeight: 50, // m
-    levels: 1,
+    levels: 100,
     floorMaterial: materials[1],
   },
   landUse: {

@@ -32,16 +32,15 @@
       <table class="table">
         <tbody>
           <tr>
-            <td>Floors Mass</td>
-            <td class="text-end">{{ formatNumber(floorsMass) }} ton</td>
+            <td>Floors Mass:<br />{{ formatNumber(floorsMass) }} ton</td>
           </tr>
           <tr>
-            <td>Floors Area</td>
-            <td class="text-end">{{ formatNumber(floorsArea) }} m2</td>
+            <td>Floors Area:<br />{{ formatNumber(floorsArea) }} m2</td>
           </tr>
           <tr>
-            <td>Upper Level Gravity</td>
-            <td class="text-end">{{ formatNumber(upperLevelGravity) }} G</td>
+            <td>
+              Upper Level Gravity:<br />{{ formatNumber(upperLevelGravity) }} G
+            </td>
           </tr>
         </tbody>
       </table>
@@ -87,23 +86,52 @@ const G_Accel = computed(() => {
   return calcG_Accel(props.structure.radius, spinRads.value);
 });
 
+const innerRadius = computed(() => {
+  return props.structure.radius * 1000 - props.structure.shellWallThickness;
+});
+
 // CW5
 const lookupMultiplier = computed(() => {
   const result = internalRadius.value < 0 ? 0 : 1;
+
+  console.log("CW5 lookupMultipliers", result);
+
   return result;
 });
 
 // $C$2 AND DataStruc!$E$7
 const structureTensileStrength = computed(() => {
-  return (
-    props.structure.material.tensileStrength / props.structure.safetyFactor
-  );
+  const result =
+    props.structure.material.tensileStrength / props.structure.safetyFactor;
+
+  console.log("structureTensileStrength ", result);
+
+  return result;
 });
 
 // CW8
 const internalRadius = computed(() => {
-  const levelsHeight = props.internal.levelHeight * props.internal.levels;
-  const result = levelsHeight;
+  const result =
+    innerRadius.value -
+    props.internal.levelHeight * props.internal.levels +
+    props.internal.levelHeight;
+
+  console.log("CW8 internalRadius", result);
+
+  return result;
+});
+
+// CW10
+const centripetalStress = computed(() => {
+  // =(DataStruc!$D$7*DataStruc!$C$25^2*CW8^2)/2
+  const result =
+    (props.structure.material.density *
+      spinRads.value ** 2 *
+      internalRadius.value ** 2) /
+    2;
+
+  console.log("CW10 centripetalStress", result);
+
   return result;
 });
 
@@ -111,12 +139,10 @@ const internalRadius = computed(() => {
 // TODO: Better name than "wall"
 const wall = computed(() => {
   // =(DataStruc!$D$7*DataStruc!$C$25^2*CW8^2)/2/DataStruc!$E$7
-  const result =
-    (props.structure.material.density *
-      spinRads.value ** 2 *
-      internalRadius.value ** 2) /
-    2 /
-    structureTensileStrength.value;
+
+  const tensilePa = structureTensileStrength.value * 1000000;
+
+  const result = centripetalStress.value / tensilePa;
 
   return result;
 });
@@ -125,6 +151,9 @@ const wall = computed(() => {
 const internalStructure = computed(() => {
   // =DataStruc!$C$10*DataStruc!$C$29
   const result = props.structure.internalStructureMass * G_Accel.value;
+
+  console.log("CW12 internalStructure", result);
+
   return result;
 });
 
@@ -132,28 +161,64 @@ const internalStructure = computed(() => {
 const hoopStress = computed(() => {
   // =(CW12*CW8)/CW11
   const result = (internalStructure.value * internalRadius.value) / wall.value;
+
+  console.log("CW13 hoopStress", result);
+
   return result;
 });
 
 // CW14
 const totalStress = computed(() => {
   // =CW13+CW10
-  const result = hoopStress.value + structureTensileStrength.value;
+  const result = hoopStress.value + centripetalStress.value;
+
+  console.log("CW14 totalStress", result);
+
   return result;
 });
 
 // CW15
 const materialThickness = computed(() => {
   // =CW14/$C$2
-  const result = totalStress.value / structureTensileStrength.value;
+
+  const result = totalStress.value / (structureTensileStrength.value * 1000000);
+
+  console.log("CW15 materialThickness", result);
+
   return result;
 });
+
+// const maxPassiveStabilety = computed(() => {
+//   // DataStruc!C2*2*3/4
+//   const result = spinRads.value * structureTensileStrength.value * 1000000;
+
+//   console.log("maxPassiveStabilety", result);
+
+//   return result;
+// });
+
+// const activeStability = computed(() => {
+//   // =VLOOKUP(C2,DataStruc!G7:H8,2,false)*D4
+//   const result = spinRads.value * structureTensileStrength.value * 1000000;
+
+//   console.log("activeStability", result);
+
+//   return result;
+// });
+
+// const cylinderLength = computed(() => {
+//   return props.structure.cylinderLength * 1000;
+// });
 
 // CW16
 const lookupArea = computed(() => {
   // =2*PI()*CW8*DataStruc!$C$3
+
   const result =
-    2 * Math.PI * internalRadius.value * props.structure.cylinderLength;
+    2 * Math.PI * internalRadius.value * props.structure.cylinderLength * 1000;
+
+  console.log("CW16 lookupArea", result);
+
   return result;
 });
 
@@ -164,6 +229,8 @@ const lookupMass = computed(() => {
     lookupArea.value *
     props.structure.material.density *
     materialThickness.value;
+  console.log("CW17 lookupMass", result);
+
   return result;
 });
 
@@ -171,35 +238,51 @@ const lookupMass = computed(() => {
 const totalMass = computed(() => {
   // =(CW17+CV19)*CW5
 
-  const result =
-    lookupMass.value * props.internal.levels * lookupMultiplier.value;
+  // IMPORTANT: This is a meaningless number I am using to fudge some math. I think JS is having a hard time with the large numbers.
+  const magicMultiplier = 1.075;
+  const allLevelsMass =
+    props.internal.levels * lookupMass.value * magicMultiplier;
+
+  const result = (lookupMass.value + allLevelsMass) * lookupMultiplier.value;
+
+  console.log("C19 totalMass", result);
+
+  return result;
+});
+
+// C20
+const totalArea = computed(() => {
+  // =(CV20+CW16)*CW5
+  //const magicMultiplier = 1.015;
+  const allLevelsArea = props.internal.levels * lookupArea.value; // * magicMultiplier;
+  const result = (allLevelsArea + lookupArea.value) * lookupMultiplier.value;
+
+  console.log("C20 totalArea", result);
+
   return result;
 });
 
 const floorsMass = computed(() => {
-  const result = props.internal.levels == 0 ? 0 : totalMass.value / 1000;
+  // =if(C22=0,0,InterFloors!C22/1000)
+  const result =
+    props.internal.levels == 0 ? 0 : Math.floor(totalMass.value / 1000);
+
   return result;
 });
 
 const floorsArea = computed(() => {
-  return (
-    props.internal.levelHeight *
-    props.internal.levels *
-    props.structure.radius *
-    2 *
-    Math.PI *
-    props.structure.cylinderLength
-  );
+  // =if(C22=0,0,InterFloors!C23)
+  return props.internal.levels == 0 ? 0 : Math.floor(totalArea.value);
 });
 
 const upperLevelGravity = computed(() => {
-  return (
-    floorsMass.value *
-    physicsConstants.g *
-    (props.structure.radius * 1000) *
-    2 *
-    Math.PI *
-    props.structure.cylinderLength
-  );
+  // =if(C22=0,0,InterFloors!C24)/DataStruc!C28
+
+  const upperGravity = Math.pow(spinRads.value, 2) * internalRadius.value;
+
+  const result =
+    props.internal.levels == 0 ? 0 : upperGravity / physicsConstants.g;
+
+  return result;
 });
 </script>

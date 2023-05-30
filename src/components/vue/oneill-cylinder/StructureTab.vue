@@ -7,7 +7,6 @@
       :step="0.1"
       :min="0.1"
       :max="1000000"
-      description=""
       unit="km"
     />
 
@@ -18,7 +17,9 @@
       :step="1"
       :min="10"
       :max="1000000"
-      description=""
+      :description="`Max Passive Stability: ${formatNumber(
+        maxPassiveStabilty
+      )} km`"
       unit="km"
     />
 
@@ -146,6 +147,19 @@ import { calcG_Accel, calcSpinRads } from "./functions";
 const props = defineProps<{
   structure: Structure;
 }>();
+
+const maxPassiveStabilty = computed(() => {
+  // DataStruc!C2*2*3/4
+  const result = (props.structure.radius * 2 * 3) / 4;
+
+  console.log("maxPassiveStabilety", result);
+
+  return result;
+});
+
+const cylinderLength = computed(() => {
+  return props.structure.cylinderLength * 1000;
+});
 
 const structureTensileStrength = computed(() => {
   return (
