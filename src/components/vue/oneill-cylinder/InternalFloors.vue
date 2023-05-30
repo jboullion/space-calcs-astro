@@ -1,8 +1,8 @@
 <template>
   <div id="internalFloors" class="py-2">
     <NumberInput
-      id="levelHeight"
-      label="Level Height"
+      id="floorHeight"
+      label="Floor Height"
       v-model.number="internal.levelHeight"
       :step="1"
       :min="10"
@@ -12,8 +12,8 @@
     />
 
     <NumberInput
-      id="levels"
-      label="Levels"
+      id="floors"
+      label="# Floors"
       v-model.number="internal.levels"
       :step="1"
       :min="1"
