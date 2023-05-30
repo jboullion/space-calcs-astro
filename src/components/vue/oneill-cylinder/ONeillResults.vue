@@ -38,10 +38,6 @@
         </thead>
         <tbody v-show="showMass">
           <tr>
-            <td>Internal Floors Mass</td>
-            <td class="text-end">{{ formatNumber(floorsMass, 0) }} ton</td>
-          </tr>
-          <tr>
             <td>{{ formData.structure.material.name }} Mass</td>
             <td class="text-end">
               {{ formatNumber(materialMass / 1000, 0) }} ton
@@ -60,6 +56,16 @@
           <tr>
             <td>Air Mass</td>
             <td class="text-end">{{ formatNumber(airMass, 0) }} ton</td>
+          </tr>
+          <tr class="">
+            <th>Total Structure Mass</th>
+            <th class="text-end">
+              {{ formatNumber(totalStructureMass, 0) }} ton
+            </th>
+          </tr>
+          <tr>
+            <td>Internal Floors Mass</td>
+            <td class="text-end">{{ formatNumber(floorsMass, 0) }} ton</td>
           </tr>
           <tr class="">
             <th>Total Mass</th>
@@ -159,13 +165,24 @@ const lookupMultiplier = computed(() => {
   return result;
 });
 
-// $C$2 AND DataStruc!$E$7
+// DataStruc!$E$7
 const structureTensileStrength = computed(() => {
   const result =
     props.formData.structure.material.tensileStrength /
     props.formData.structure.safetyFactor;
 
   // console.log("structureTensileStrength ", result);
+
+  return result;
+});
+
+// InterFloors C2
+const floorsTensileStrength = computed(() => {
+  const result =
+    props.formData.internal.floorMaterial.tensileStrength /
+    props.formData.structure.safetyFactor;
+
+  // console.log("floorsTensileStrength ", result);
 
   return result;
 });
@@ -242,7 +259,7 @@ const totalStress = computed(() => {
 const materialThickness = computed(() => {
   // =CW14/$C$2
 
-  const result = totalStress.value / (structureTensileStrength.value * 1000000);
+  const result = totalStress.value / (floorsTensileStrength.value * 1000000);
 
   // console.log("CW15 materialThickness", result);
 
@@ -265,7 +282,7 @@ const lookupMass = computed(() => {
   // =CW16*$D$2*CW15
   const result =
     lookupArea.value *
-    props.formData.structure.material.density *
+    props.formData.internal.floorMaterial.density *
     materialThickness.value;
   // console.log("CW17 lookupMass", result);
 
@@ -482,14 +499,19 @@ const airMass = computed(() => {
   return result;
 });
 
-const finalTotalMass = computed(() => {
+const totalStructureMass = computed(() => {
   // =C42+E42+CV19
 
   const result =
-    materialMass.value +
-    internalStructureMass.value +
-    //floorsMass.value +
-    airMass.value;
+    materialMass.value + internalStructureMass.value + airMass.value;
+
+  return result;
+});
+
+const finalTotalMass = computed(() => {
+  // =C42+E42+CV19
+
+  const result = totalStructureMass.value + floorsMass.value;
 
   return result;
 });
