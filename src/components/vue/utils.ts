@@ -43,8 +43,9 @@ export const physicsConstants = {
   stefanBoltzmann: 5.670367e-8, // Stefan-Boltzmann constant in W/m²K⁴
   solarConstant: 1361, // W/m² Energy absorbed per square meter at the top of the atmosphere
   amstrongLimit: 6.3,
-  radiansPerSecToRpm: 9.549296585513721, // 30 / Math.PI
-  rpmToRadiansPerSec: 0.10471975511965977, // Math.PI / 30
+  radiansPerSecToRpm: 9.54929, // 30 / Math.PI
+  rpmToRadiansPerSec: 0.10471, // Math.PI / 30
+  idealGasConstant: 8.3144, // J/(mol·K)
 };
 
 export function gTom2s(g: number) {

@@ -15,7 +15,7 @@
         autocomplete="off"
         :checked="index == 0"
       />
-      <label class="btn btn-outline-secondary" :for="tab.id">{{
+      <label class="btn btn-outline-primary" :for="tab.id">{{
         tab.label
       }}</label>
     </template>
@@ -24,6 +24,7 @@
     <StructureTab
       v-show="currentTab == 'structureTab'"
       :structure="formData.structure"
+      :internal="formData.internal"
     />
 
     <InternalFloors

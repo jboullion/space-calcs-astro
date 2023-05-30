@@ -12,7 +12,7 @@ export type Structure = {
   cylinderLength: number; // km
   surfaceGravity: number; // G
   internalPressure: number; // kpa
-  internalTemperature?: number; // K
+  internalTemperature: number; // C
   airMix: AtmosphereComposition;
   material: StationMaterial;
   safetyFactor: number;

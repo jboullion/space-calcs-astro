@@ -51,7 +51,9 @@
       :step="0.1"
       :min="0.1"
       :max="10"
-      :description="`RPM: ${rpm}`"
+      :description="`RPM: ${rpm}<br />Inner Gravity: ${formatNumber(
+        upperLevelGravity
+      )}G`"
       unit="G"
     />
 
@@ -76,6 +78,18 @@
     >
       <strong>Warning:</strong> The internal pressure is high.
     </div>
+
+    <NumberInput
+      id="internalTemperature"
+      label="Internal Temperature"
+      v-model.number="structure.internalTemperature"
+      :step="1"
+      :min="-273"
+      :max="1000"
+      description=""
+      tooltip=""
+      unit="C"
+    />
 
     <!-- <SelectInput
       id="airMix"
@@ -111,7 +125,7 @@
       :min="1"
       :max="1000000"
       description=""
-      unit="kg/m2"
+      unit="kg/m<sup>2</sup>"
     />
 
     <NumberInput
@@ -122,7 +136,7 @@
       :min="1"
       :max="1000000"
       description=""
-      unit="kg/m2"
+      unit="kg/m<sup>2</sup>"
     />
 
     <SelectInput
@@ -136,7 +150,7 @@
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
 
-import type { Structure } from "./types";
+import type { InternalFloors, Structure } from "./types";
 import { materials, structureCaps } from "./constants";
 
 import NumberInput from "../forms/NumberInput.vue";
@@ -146,14 +160,12 @@ import { calcG_Accel, calcSpinRads } from "./functions";
 
 const props = defineProps<{
   structure: Structure;
+  internal: InternalFloors;
 }>();
 
 const maxPassiveStabilty = computed(() => {
   // DataStruc!C2*2*3/4
   const result = (props.structure.radius * 2 * 3) / 4;
-
-  console.log("maxPassiveStabilety", result);
-
   return result;
 });
 
@@ -309,5 +321,27 @@ const shellTooThin = computed(() => {
 // TODO: Left in place for now, but not used.
 const shellTooThick = computed(() => {
   return false; // requiredThickness.value < props.structure.shellWallThickness;
+});
+
+const levelsRadius = computed(() => {
+  const result =
+    innerRadius.value -
+    props.internal.levelHeight * props.internal.levels +
+    props.internal.levelHeight;
+
+  // console.log("CW8 internalRadius", result);
+
+  return result;
+});
+
+const upperLevelGravity = computed(() => {
+  // =if(C22=0,0,InterFloors!C24)/DataStruc!C28
+
+  const upperGravity = Math.pow(spinRads.value, 2) * levelsRadius.value;
+
+  const result =
+    props.internal.levels == 0 ? 0 : upperGravity / physicsConstants.g;
+
+  return result;
 });
 </script>

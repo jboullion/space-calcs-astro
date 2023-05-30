@@ -38,6 +38,7 @@ const formData = ref<ONeillCylinderForm>({
     cylinderLength: 100, // km
     surfaceGravity: 0.3, // g
     internalPressure: 101, // kPa
+    internalTemperature: 0, // C
     airMix: atmosphereCompositions[1],
     material: materials[1],
     safetyFactor: 1.3,
