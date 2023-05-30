@@ -96,7 +96,7 @@
     />
 
     <div class="alert alert-danger" v-if="shellTooThin">
-      <strong>Warning:</strong> The shell wall thickness is too thin.
+      <strong>Warning:</strong> The shell wall is too thin.
     </div>
     <div class="alert alert-danger" v-else-if="shellTooThick">
       <strong>Warning:</strong> The shell wall is too thick
@@ -141,6 +141,7 @@ import { materials, structureCaps } from "./constants";
 import NumberInput from "../forms/NumberInput.vue";
 import SelectInput from "../forms/SelectInput.vue";
 import { formatNumber, physicsConstants, roundToDecimal } from "../utils";
+import { calcG_Accel, calcSpinRads } from "./functions";
 
 const props = defineProps<{
   structure: Structure;
@@ -175,19 +176,13 @@ const innerRadius = computed(() => {
 const spinRads = computed(() => {
   const { radius, surfaceGravity } = props.structure;
 
-  const radiusM = radius * 1000;
-
-  const result = Math.sqrt((surfaceGravity * physicsConstants.g) / radiusM);
+  const result = calcSpinRads(radius, surfaceGravity);
 
   return roundToDecimal(result, 4);
 });
 
 const G_Accel = computed(() => {
-  const { radius } = props.structure;
-
-  const radiusM = radius * 1000;
-
-  return Math.pow(spinRads.value, 2) * radiusM;
+  return calcG_Accel(props.structure.radius, spinRads.value);
 });
 
 const rpm = computed(() => {
