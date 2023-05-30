@@ -5,10 +5,7 @@
       <table class="table">
         <thead class="cursor-pointer">
           <tr @click="showArea = !showArea">
-            <th class="bg-dark text-white" colspan="2">
-              <i class="fa-solid fa-caret-up" v-if="showArea"></i>
-              <i class="fa-solid fa-caret-down" v-else></i> Area
-            </th>
+            <th class="bg-dark text-white" colspan="2">Area</th>
           </tr>
         </thead>
         <tbody v-show="showArea">
@@ -36,10 +33,7 @@
       <table class="table">
         <thead class="cursor-pointer">
           <tr @click="showMass = !showMass">
-            <th class="bg-dark text-white" colspan="2">
-              <i class="fa-solid fa-caret-up" v-if="showMass"></i>
-              <i class="fa-solid fa-caret-down" v-else></i> Mass
-            </th>
+            <th class="bg-dark text-white" colspan="2">Mass</th>
           </tr>
         </thead>
         <tbody v-show="showMass">
@@ -112,8 +106,8 @@ const props = defineProps<{
   formData: ONeillCylinderForm;
 }>();
 
-const showArea = ref(false);
-const showMass = ref(false);
+const showArea = ref(true);
+const showMass = ref(true);
 const showShielding = ref(false);
 
 /**
