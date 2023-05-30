@@ -65,10 +65,10 @@ const tabs = [
     id: "internalFloors",
     label: "Floors",
   },
-  {
-    id: "landUse",
-    label: "Land Use",
-  },
+  // {
+  //   id: "landUse",
+  //   label: "Land Use",
+  // },
 ];
 
 const props = defineProps<{
