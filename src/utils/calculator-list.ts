@@ -92,7 +92,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     id: "oneill-cylinder",
     name: "O'Neill Cylinder",
     description:
-      "Create an O'Neill Cylinder and estimate the population and energy requirements",
+      "Create an O'Neill Cylinder and estimate the area, mass, population and energy requirements",
     categories: [categories[STATION_CAT], categories[ADVANCED_CAT]],
     image: "https://i.imgur.com/4ZQZQ2M.png",
     link: "/calcs/oneill-cylinder",
