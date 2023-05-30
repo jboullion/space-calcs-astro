@@ -79,7 +79,7 @@
       <strong>Warning:</strong> The internal pressure is high.
     </div>
 
-    <NumberInput
+    <!-- <NumberInput
       id="internalTemperature"
       label="Internal Temperature"
       v-model.number="structure.internalTemperature"
@@ -89,7 +89,7 @@
       description=""
       tooltip=""
       unit="C"
-    />
+    /> -->
 
     <!-- <SelectInput
       id="airMix"
@@ -117,7 +117,7 @@
       <strong>Warning:</strong> The shell wall is too thick
     </div>
 
-    <NumberInput
+    <!-- <NumberInput
       id="minShieldingShellMass"
       label="Min Shielding Shell Mass"
       v-model.number="structure.minShieldingShellMass"
@@ -126,7 +126,7 @@
       :max="1000000"
       description=""
       unit="kg/m<sup>2</sup>"
-    />
+    /> -->
 
     <NumberInput
       id="internalStructureMass"

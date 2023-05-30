@@ -45,7 +45,7 @@
         <tbody v-show="showMass">
           <tr>
             <td>Internal Floors Mass</td>
-            <td class="text-end">{{ formatNumber(floorsMass) }} ton</td>
+            <td class="text-end">{{ formatNumber(floorsMass, 0) }} ton</td>
           </tr>
           <tr>
             <td>{{ formData.structure.material.name }} Mass</td>
@@ -53,10 +53,10 @@
               {{ formatNumber(materialMass / 1000, 0) }} ton
             </td>
           </tr>
-          <tr>
+          <!-- <tr>
             <td>Shielding Mass</td>
             <td class="text-end">ton</td>
-          </tr>
+          </tr> -->
           <tr>
             <td>Internal Structures Mass</td>
             <td class="text-end">
@@ -69,12 +69,12 @@
           </tr>
           <tr class="">
             <th>Total Mass</th>
-            <th class="text-end">ton</th>
+            <th class="text-end">{{ formatNumber(finalTotalMass, 0) }} ton</th>
           </tr>
         </tbody>
       </table>
 
-      <table class="table">
+      <!-- <table class="table">
         <thead class="cursor-pointer">
           <tr @click="showShielding = !showShielding">
             <th class="bg-dark text-white" colspan="2">
@@ -97,7 +97,7 @@
             <td class="text-end">kg</td>
           </tr>
         </tbody>
-      </table>
+      </table> -->
     </div>
   </div>
 </template>
@@ -310,7 +310,9 @@ const totalArea = computed(() => {
 const floorsMass = computed(() => {
   // =if(C22=0,0,InterFloors!C22/1000)
   const result =
-    props.formData.internal.levels == 0 ? 0 : Math.floor(totalMass.value);
+    props.formData.internal.levels == 0
+      ? 0
+      : Math.floor(totalMass.value) / 1000;
 
   return result;
 });
@@ -482,6 +484,18 @@ const airMass = computed(() => {
   // =C12*C3
 
   const result = airDensityMass.value * internalSurfaceArea.value;
+
+  return result;
+});
+
+const finalTotalMass = computed(() => {
+  // =C42+E42+CV19
+
+  const result =
+    materialMass.value +
+    internalStructureMass.value +
+    //floorsMass.value +
+    airMass.value;
 
   return result;
 });
