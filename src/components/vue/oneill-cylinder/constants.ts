@@ -90,7 +90,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 1000000,
     density: 1000,
     youngsModulus: 1000000,
-    possionRatio: 0.001,
+    poissonRatio: 0.001,
   },
   {
     name: "Aluminium Alloy (T6)",
@@ -99,7 +99,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 530,
     density: 2700,
     youngsModulus: 82,
-    possionRatio: 0.35,
+    poissonRatio: 0.35,
   },
   {
     name: "Nickel Alloy",
@@ -108,7 +108,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 1200,
     density: 8830,
     youngsModulus: 220,
-    possionRatio: 0.291,
+    poissonRatio: 0.291,
   },
   {
     name: "Low C steel",
@@ -117,7 +117,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 580,
     density: 7800,
     youngsModulus: 217,
-    possionRatio: 0.27,
+    poissonRatio: 0.27,
   },
   {
     name: "Medium C steel",
@@ -126,7 +126,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 1200,
     density: 7800,
     youngsModulus: 217,
-    possionRatio: 0.31,
+    poissonRatio: 0.31,
   },
   {
     name: "High C steel",
@@ -135,7 +135,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 1200,
     density: 7800,
     youngsModulus: 217,
-    possionRatio: 0.3,
+    poissonRatio: 0.3,
   },
   {
     name: "Titanium",
@@ -144,7 +144,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 1620,
     density: 4600,
     youngsModulus: 120,
-    possionRatio: 0.32,
+    poissonRatio: 0.32,
   },
   {
     name: "Silica Glass",
@@ -153,7 +153,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 155,
     density: 2220,
     youngsModulus: 74,
-    possionRatio: 0.2,
+    poissonRatio: 0.2,
   },
   {
     name: "Glass Ceramic",
@@ -162,7 +162,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 177,
     density: 2800,
     youngsModulus: 110,
-    possionRatio: 0.2,
+    poissonRatio: 0.2,
   },
   {
     name: "Granite",
@@ -171,7 +171,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 17,
     density: 3000,
     youngsModulus: 21,
-    possionRatio: 0.3,
+    poissonRatio: 0.3,
   },
   {
     name: "Concrete",
@@ -180,7 +180,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 5,
     density: 2600,
     youngsModulus: 21,
-    possionRatio: 0.3,
+    poissonRatio: 0.3,
   },
   {
     name: "Nylon",
@@ -189,7 +189,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 165,
     density: 1140,
     youngsModulus: 3.2,
-    possionRatio: 0.4,
+    poissonRatio: 0.4,
   },
   {
     name: "Carbon Fibre",
@@ -198,7 +198,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 1600,
     density: 2000,
     youngsModulus: 0.74,
-    possionRatio: 0.28,
+    poissonRatio: 0.28,
   },
   {
     name: "Kevlar",
@@ -207,7 +207,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 3000,
     density: 1440,
     youngsModulus: 112,
-    possionRatio: 0.36,
+    poissonRatio: 0.36,
   },
   {
     name: "Graphene",
@@ -216,7 +216,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 130000,
     density: 2270,
     youngsModulus: 1000,
-    possionRatio: 0.19,
+    poissonRatio: 0.19,
   },
   {
     name: "Soil",
@@ -225,7 +225,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 0,
     density: 1500,
     youngsModulus: 0,
-    possionRatio: 0,
+    poissonRatio: 0,
   },
   {
     name: "Polyethylene",
@@ -234,7 +234,7 @@ export const materials: StationMaterial[] = [
     tensileStrength: 30,
     density: 920,
     youngsModulus: 0.8,
-    possionRatio: 0.45,
+    poissonRatio: 0.45,
   },
 ];
 
@@ -273,6 +273,26 @@ export const populationDensityExamples: PopulationDensity[] = [
     name: "Melbourne",
     value: "melbourne",
     popKm2: 516,
+  },
+];
+
+export type Cap = {
+  name: string;
+  value: string;
+};
+
+export const structureCaps: Cap[] = [
+  {
+    name: "Flat",
+    value: "flat",
+  },
+  {
+    name: "Convex",
+    value: "convex",
+  },
+  {
+    name: "Concave",
+    value: "concave",
   },
 ];
 

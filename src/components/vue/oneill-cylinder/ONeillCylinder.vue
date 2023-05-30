@@ -34,17 +34,20 @@ import {
 // TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ONeillCylinderForm>({
   structure: {
-    radius: 1,
-    cylinderLength: 10,
-    surfaceGravity: 1,
-    internalPressure: 101,
+    radius: 100, // km
+    cylinderLength: 100, // km
+    surfaceGravity: 0.3, // g
+    internalPressure: 101, // kPa
     airMix: atmosphereCompositions[1],
     material: materials[1],
     safetyFactor: 1.3,
-    shellWallThickness: 5000.0,
-    minShieldingShellMass: 5000.0,
-    internalStructureMass: 1000.0,
-    caps: "flat",
+    shellWallThickness: 1000.0, // m
+    minShieldingShellMass: 0.0, // kg/m2
+    internalStructureMass: 200.0, // kg/m2
+    caps: {
+      name: "Flat",
+      value: "flat",
+    },
   },
   internal: {
     levelHeight: 10, // m

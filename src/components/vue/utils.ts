@@ -15,6 +15,11 @@ export function deepClone(obj: Object) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+export function roundToDecimal(num: number, decimalPlaces: number) {
+  const decimals = Math.pow(10, decimalPlaces);
+  return Math.round(num * decimals + Number.EPSILON) / decimals;
+}
+
 /**
  *
  *
@@ -37,6 +42,9 @@ export const physicsConstants = {
   sunTemp: 5778, // K
   stefanBoltzmann: 5.670367e-8, // Stefan-Boltzmann constant in W/m²K⁴
   solarConstant: 1361, // W/m² Energy absorbed per square meter at the top of the atmosphere
+  amstrongLimit: 6.3,
+  radiansPerSecToRpm: 9.549296585513721, // 30 / Math.PI
+  rpmToRadiansPerSec: 0.10471975511965977, // Math.PI / 30
 };
 
 export function gTom2s(g: number) {

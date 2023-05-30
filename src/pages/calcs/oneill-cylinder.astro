@@ -32,6 +32,9 @@ const references: Reference[] = [
 <Layout title={calculator.name} description={calculator.description}>
   <div class="container">
     <Hero title={calculator.name} description={calculator.description} />
+    <div class="alert alert-warning text-center mb-5">
+      <i class="fa-solid fa-triangle-exclamation"></i> Under construction!
+    </div>
     <ONeillCylinder client:load />
     <References references={references} />
   </div>

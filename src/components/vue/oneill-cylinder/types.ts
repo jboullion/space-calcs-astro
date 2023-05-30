@@ -1,3 +1,5 @@
+import type { Cap } from "./constants";
+
 export interface ONeillCylinderForm {
   structure: Structure;
   internal: InternalFloors;
@@ -17,7 +19,7 @@ export type Structure = {
   shellWallThickness: number; // m
   minShieldingShellMass: number; // kg/m2
   internalStructureMass: number; // kg/m2
-  caps: "flat" | "convex" | "concave";
+  caps: Cap; //"flat" | "convex" | "concave"
 };
 
 export type InternalFloors = {
@@ -54,7 +56,7 @@ export type StationMaterial = {
   tensileStrength: number; //Mpa
   density: number; // kg/m3
   youngsModulus: number;
-  possionRatio: number;
+  poissonRatio: number;
 };
 
 export type PopulationDensity = {
