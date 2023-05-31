@@ -1,6 +1,7 @@
 <template>
   <div id="habitable__results" class="col-lg-8 calc-form">
     <div
+      id="habitable-canvas"
       class="canvas-wrapper border"
       style="position: relative; height: 500px; width: 100%"
     >
