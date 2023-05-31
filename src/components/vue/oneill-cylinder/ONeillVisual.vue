@@ -314,7 +314,7 @@ function buildFloors() {
     side: materialType,
   });
 
-  for (let i = 1; i <= props.formData.internal.levels; i++) {
+  for (let i = 0; i < props.formData.internal.levels; i++) {
     const currentFloorHeight = internalRadius.value - floorHeight * i;
 
     var arcShape = new THREE.Shape();
@@ -342,7 +342,7 @@ function buildFloors() {
     const floor = new THREE.Mesh(geometry, floorMaterial);
 
     if (props.formData.structure.caps.value === "concave") {
-      floor.position.z = props.formData.structure.radius / 2;
+      floor.position.z = props.formData.structure.radius;
     }
 
     three.floors.add(floor);

@@ -6,13 +6,15 @@
       v-model.number="internal.levelHeight"
       :step="1"
       :min="10"
-      :max="1000"
-      description="Min: 10m, Maximum: 100m"
+      :max="maxLevelHeight"
+      :description="`Min: 10m, Maximum: ${maxLevelHeight}m`"
       unit="m"
+      @change="updateLevelHeight"
     />
 
     <NumberInput
       id="floors"
+      :key="levelsKey"
       label="# Floors"
       v-model.number="internal.levels"
       :step="1"
@@ -49,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, computed } from "vue";
+import { defineProps, ref, computed, nextTick, getCurrentInstance } from "vue";
 
 import NumberInput from "../forms/NumberInput.vue";
 import SelectInput from "../forms/SelectInput.vue";
@@ -65,14 +67,30 @@ const props = defineProps<{
   structure: Structure;
 }>();
 
+const levelsKey = ref(0);
+
 const maxLevels = computed(() => {
   const defaultMax = 100;
 
   return Math.min(
-    Math.floor((props.structure.radius * 1000) / props.internal.levelHeight),
+    Math.floor(innerRadius.value / props.internal.levelHeight),
     defaultMax
   );
 });
+
+const maxLevelHeight = computed(() => {
+  const defaultMax = 1000;
+
+  return Math.floor((props.structure.radius * 1000) / 2);
+});
+
+const updateLevelHeight = () => {
+  if (props.internal.levels > maxLevels.value) {
+    props.internal.levels = maxLevels.value;
+
+    levelsKey.value += 1;
+  }
+};
 
 // const spinRads = computed(() => {
 //   const { radius, surfaceGravity } = props.structure;
@@ -86,9 +104,9 @@ const maxLevels = computed(() => {
 //   return calcG_Accel(props.structure.radius, spinRads.value);
 // });
 
-// const innerRadius = computed(() => {
-//   return props.structure.radius * 1000 - props.structure.shellWallThickness;
-// });
+const innerRadius = computed(() => {
+  return props.structure.radius * 1000 - props.structure.shellWallThickness;
+});
 
 // // CW5
 // const lookupMultiplier = computed(() => {
