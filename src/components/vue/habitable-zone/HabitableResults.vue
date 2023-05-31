@@ -4,7 +4,7 @@
       class="canvas-wrapper border"
       style="position: relative; height: 500px; width: 100%"
     >
-      <i class="fas fa-cog fa-spin mb-0 h1"></i>
+      <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
     </div>
     <p>
       <strong>Note:</strong> Habitable zone is calculated for Earth-like
