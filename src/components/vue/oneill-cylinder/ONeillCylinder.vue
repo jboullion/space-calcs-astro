@@ -1,11 +1,13 @@
 <template>
-  <div id="oneill__app" class="row justify-content-center">
+  <div id="oneill__app" class="row justify-content-center calculator">
     <div id="oneill__form" class="col-lg-4">
       <div class="p-2 rounded border mb-5">
         <ONeillForm :formData="formData" />
       </div>
     </div>
     <div id="oneill__results" class="col-lg-8">
+      <ONeillVisual :formData="formData" />
+
       <div class="p-2 rounded border mb-5">
         <ONeillResults :formData="formData" />
       </div>
@@ -23,6 +25,7 @@
 import { computed, onMounted, ref } from "vue";
 import ONeillForm from "./ONeillForm.vue";
 import ONeillResults from "./ONeillResults.vue";
+import ONeillVisual from "./ONeillVisual.vue";
 
 import type { ONeillCylinderForm } from "./types";
 import {
@@ -34,7 +37,7 @@ import {
 // TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ONeillCylinderForm>({
   structure: {
-    radius: 100, // km
+    radius: 10, // km
     cylinderLength: 100, // km
     surfaceGravity: 0.3, // g
     internalPressure: 101, // kPa
@@ -52,7 +55,7 @@ const formData = ref<ONeillCylinderForm>({
   },
   internal: {
     levelHeight: 50, // m
-    levels: 100,
+    levels: 20,
     floorMaterial: materials[1],
   },
   landUse: {

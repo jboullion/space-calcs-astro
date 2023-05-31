@@ -6,7 +6,7 @@
       v-model.number="internal.levelHeight"
       :step="1"
       :min="10"
-      :max="100"
+      :max="1000"
       description="Min: 10m, Maximum: 100m"
       unit="m"
     />
