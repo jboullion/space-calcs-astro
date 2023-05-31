@@ -50,7 +50,7 @@
       v-model.number="structure.surfaceGravity"
       :step="0.1"
       :min="0.1"
-      :max="10"
+      :max="100"
       :description="`RPM: ${rpm}<br />Inner Gravity: ${formatNumber(
         upperLevelGravity
       )}G`"
