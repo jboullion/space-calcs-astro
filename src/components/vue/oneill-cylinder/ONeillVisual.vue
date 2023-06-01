@@ -71,11 +71,16 @@ onBeforeUnmount(() => {
 // Computed Properties ------------------------------
 
 const stationWidth = computed(() => {
-    const maxDimenstion = Math.max(
-        props.formData.structure.radius,
-        props.formData.structure.cylinderLength / 2,
+    // const maxDimenstion = Math.max(
+    //     props.formData.structure.radius,
+    //     props.formData.structure.cylinderLength / 2,
+    // );
+    // return maxDimenstion * 2;
+
+    return (
+        props.formData.structure.cylinderLength +
+        props.formData.structure.radius * 2
     );
-    return maxDimenstion * 2;
 });
 
 const internalRadius = computed(() => {
@@ -190,7 +195,7 @@ function setupThreeJS() {
     three.renderer.setSize(width, height);
 
     // Camera
-    const cameraDistance = stationWidth.value * 1.8;
+    const cameraDistance = stationWidth.value;
     three.camera = new THREE.PerspectiveCamera(
         45,
         width / height,
