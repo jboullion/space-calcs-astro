@@ -1,31 +1,34 @@
 ---
-import type { Reference } from "../../types/types";
+import type { Reference } from '../../types/types';
 
-import Layout from "../../layouts/Layout.astro";
-import Hero from "../../components/calcs/Hero.astro";
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
 
-import SpaceElevator from "../../components/vue/space-elevator/SpaceElevator.vue";
-import References from "../../components/shared/References.astro";
-import { calculators } from "../../utils/calculator-list";
+import SpaceElevator from '../../components/vue/space-elevator/SpaceElevator.vue';
+import References from '../../components/shared/References.astro';
+import { calculators } from '../../utils/calculator-list';
 
-const calculator = calculators.find((calc) => calc.id === "space-elevator");
+const calculator = calculators.find((calc) => calc.id === 'space-elevator');
 
 if (!calculator) {
-  throw new Error("Calculator not found");
+    throw new Error('Calculator not found');
 }
 
 const references: Reference[] = [];
 ---
 
 <Layout title={calculator.name} description={calculator.description}>
-  <div class="container">
-    <Hero title={calculator.name} description={calculator.description} />
-    <div style="min-height: 700px;" class="calculator">
-      <SpaceElevator client:load />
-    </div>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div class="alert alert-warning text-center mb-5">
+            <i class="fa-solid fa-triangle-exclamation"></i> Under construction!
+        </div>
+        <div style="min-height: 700px;" class="calculator">
+            <SpaceElevator client:load />
+        </div>
 
-    <References references={references} />
-  </div>
+        <References references={references} />
+    </div>
 </Layout>
 
 <style></style>
