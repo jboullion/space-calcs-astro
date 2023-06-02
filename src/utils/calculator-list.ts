@@ -97,15 +97,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
         image: '',
         link: '/calcs/oneill-cylinder',
     },
-    // {
-    //   id: "space-elevator",
-    //   name: "Space Elevator",
-    //   description:
-    //     "Create a space elevator and estimate the mass, length, time, and energy requirements",
-    //   categories: [categories[STATION_CAT]],
-    //   image: "",
-    //   link: "/calcs/space-elevator",
-    // },
+    {
+        id: 'space-elevator',
+        name: 'Space Elevator',
+        description:
+            'Create a space elevator and estimate the mass, length, time, and energy requirements',
+        categories: [categories[STATION_CAT]],
+        image: '',
+        link: '/calcs/space-elevator',
+    },
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>

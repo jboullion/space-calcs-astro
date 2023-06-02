@@ -6,7 +6,7 @@
             v-model.number="formData.planetRadius"
             :step="1"
             :min="100"
-            :max="1000000"
+            :max="10000000"
             unit="km"
         />
 
@@ -14,10 +14,10 @@
             id="planet-density"
             label="Planet Desnity"
             v-model.number="formData.planetDensity"
-            :step="1"
-            :min="1"
-            :max="100"
-            unit="kg"
+            :step="0.1"
+            :min="0.1"
+            :max="1000000"
+            unit="g/cm³"
         />
 
         <NumberInput
@@ -30,7 +30,7 @@
             unit="hours"
         />
 
-        <NumberInput
+        <!-- <NumberInput
             id="car-speed"
             label="Car Speed"
             v-model.number="formData.carSpeed"
@@ -38,15 +38,15 @@
             :min="1"
             :max="1000"
             unit="km/h"
-        />
+        /> -->
     </div>
 </template>
 <script setup lang="ts">
-import { defineProps } from 'vue'
-import type { SpaceElevatorForm } from './types'
-import NumberInput from '../forms/NumberInput.vue'
+import { defineProps } from 'vue';
+import type { SpaceElevatorForm } from './types';
+import NumberInput from '../forms/NumberInput.vue';
 
 defineProps<{
-    formData: SpaceElevatorForm
-}>()
+    formData: SpaceElevatorForm;
+}>();
 </script>

@@ -17,16 +17,16 @@
 
 // ? NOTE: Optional Improvements!
 
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-import type { SpaceElevatorForm } from './types'
+import type { SpaceElevatorForm } from './types';
 
-import SEForm from './SEForm.vue'
-import SEVisual from './SEVisual.vue'
+import SEForm from './SEForm.vue';
+import SEVisual from './SEVisual.vue';
 
 const formData = ref<SpaceElevatorForm>({
     planetRadius: 6378.14,
-    planetDensity: 5514,
+    planetDensity: 5.514,
     planetGravity: 9.807,
     // planetMass: 5.972 * Math.pow(10, 24),
     // planetGravity: 9.807,
@@ -34,7 +34,7 @@ const formData = ref<SpaceElevatorForm>({
     carSpeed: 100, //km/h
     payloadMass: 1000, //kg
     latitude: 0, //degrees
-})
+});
 </script>
 
 <style></style>

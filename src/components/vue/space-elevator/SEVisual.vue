@@ -1,18 +1,56 @@
 <template>
-    <div
-        id="space-elevator-canvas"
-        class="canvas-wrapper border"
-        style="position: relative; height: 500px"
-    >
-        <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+    <div>
+        <div
+            id="space-elevator-canvas"
+            class="canvas-wrapper border"
+            style="position: relative; height: 500px"
+        >
+            <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+        </div>
+
+        <div class="p-2 rounded border mb-5">
+            <div>
+                <table class="table table-striped mb-0">
+                    <tbody>
+                        <tr>
+                            <th>Planet Mass</th>
+                            <td class="text-end">
+                                {{ planetMass.toExponential(3) }} kg
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Surface Gravity</th>
+                            <td class="text-end">
+                                {{ formatNumber(planetGravity) }} m/s<sup
+                                    >2</sup
+                                >
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="border-0">Elevator Height</th>
+                            <td class="border-0 text-end">
+                                {{ formatNumber(geostationaryOrbit, 0) }} km
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { computed, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
+import {
+    computed,
+    onBeforeMount,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    watch,
+} from 'vue';
 import type { SpaceElevatorForm } from './types';
-import { physicsConstants } from '../utils';
+import { physicsConstants, formatNumber } from '../utils';
 
 const props = defineProps<{
     formData: SpaceElevatorForm;
@@ -100,14 +138,22 @@ onBeforeUnmount(() => {
  *
  */
 
-const elevatorHeight = computed(() => {
-    // TODO: Calculate the planet geostationary height
-    return 36000;
-});
+// const elevatorHeight = computed(() => {
+//     // TODO: Calculate the planet geostationary height
+//     return 36000;
+// });
 
 const scaledPlanetRadius = computed(() => {
     // TODO: We may want to manipulate the radius of the planet to make it easier to work with in Three.js
     return props.formData.planetRadius;
+});
+
+const planetRadiusMeters = computed(() => {
+    return props.formData.planetRadius * 1000;
+});
+
+const planetDensityKgPerM3 = computed(() => {
+    return props.formData.planetDensity * 1000;
 });
 
 const planetCircumference = computed(() => {
@@ -122,8 +168,8 @@ const planetMass = computed(() => {
     const result =
         (4 / 3) *
         Math.PI *
-        Math.pow(scaledPlanetRadius.value, 3) *
-        props.formData.planetDensity;
+        Math.pow(planetRadiusMeters.value, 3) *
+        planetDensityKgPerM3.value;
 
     return result;
 });
@@ -132,7 +178,7 @@ const planetGravity = computed(() => {
     // g = (G * M) / r^2
     const result =
         (physicsConstants.gravityConstant * planetMass.value) /
-        Math.pow(scaledPlanetRadius.value, 2);
+        Math.pow(planetRadiusMeters.value, 2);
 
     return result;
 });
@@ -144,8 +190,8 @@ const planetGravityAlt = computed(() => {
         (4 / 3) *
         Math.PI *
         physicsConstants.gravityConstant *
-        scaledPlanetRadius.value *
-        props.formData.planetDensity;
+        planetRadiusMeters.value *
+        planetDensityKgPerM3.value;
 
     return result;
 });
@@ -181,10 +227,10 @@ const geostationaryOrbit = computed(() => {
                 Math.pow(rotationInSeconds.value, 2)) /
                 (4 * Math.pow(Math.PI, 2)),
             1 / 3,
-        ) - scaledPlanetRadius.value;
+        ) - planetRadiusMeters.value;
 
-    // measured in meters
-    return result;
+    // measured in kilometers
+    return result / 1000;
 });
 
 /**
@@ -273,9 +319,8 @@ function updateCamera() {
     if (!three.renderer) return;
 
     // Camera
-    const cameraPositionDistance = elevatorHeight.value;
-    const cameraZoomDistance =
-        props.formData.planetRadius + elevatorHeight.value * 2;
+    const cameraPositionDistance = geostationaryOrbit.value * 1.1;
+    const cameraZoomDistance = cameraPositionDistance * 2;
     let rendererSize = new THREE.Vector2();
     three.renderer.getSize(rendererSize);
     three.camera = new THREE.PerspectiveCamera(
@@ -409,4 +454,9 @@ function radiansPerSecond(radius: number, speed: number) {
 
     return (speed / circumference) * (Math.PI * 2);
 }
+
+// NOTE: This is not very optimal, but should be fine for now
+watch(props.formData, () => {
+    setupScene();
+});
 </script>
