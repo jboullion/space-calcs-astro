@@ -1,86 +1,85 @@
 <template>
-    <div id="structureTab" class="py-2">
-        <NumberInput
-            id="radius"
-            label="Radius"
-            v-model.number="structure.radius"
-            :step="0.1"
-            :min="1"
-            :max="1000000"
-            unit="km"
-            @change="updateRadius"
-        />
+  <div id="structureTab" class="py-2">
+    <NumberInput
+      id="radius"
+      label="Radius"
+      v-model.number="structure.radius"
+      :step="0.1"
+      :min="0.1"
+      :max="1000000"
+      unit="km"
+    />
 
-        <NumberInput
-            id="cylinderLength"
-            label="Cylinder Length"
-            v-model.number="structure.cylinderLength"
-            :step="0.1"
-            :min="1"
-            :max="1000000"
-            :description="`Max Passive Stability: ${formatNumber(
-                maxPassiveStabilty,
-            )} km`"
-            unit="km"
-        />
+    <NumberInput
+      id="cylinderLength"
+      label="Cylinder Length"
+      v-model.number="structure.cylinderLength"
+      :step="1"
+      :min="10"
+      :max="1000000"
+      :description="`Max Passive Stability: ${formatNumber(
+        maxPassiveStabilty
+      )} km`"
+      unit="km"
+    />
 
-        <SelectInput
-            id="material"
-            label="Material"
-            v-model="structure.material"
-            :options="materials"
-            :description="`Tensile Strength: ${formatNumber(
-                structureTensileStrength,
-                2,
-            )} MPa`"
-        />
+    <SelectInput
+      id="material"
+      label="Material"
+      v-model="structure.material"
+      :options="materials"
+      :description="`Tensile Strength: ${formatNumber(
+        structureTensileStrength,
+        2
+      )} MPa`"
+    />
 
-        <NumberInput
-            id="safetyFactor"
-            label="Safety Factor"
-            v-model.number="structure.safetyFactor"
-            :step="0.1"
-            :min="1"
-            :max="10"
-            description=""
-        />
+    <NumberInput
+      id="safetyFactor"
+      label="Safety Factor"
+      v-model.number="structure.safetyFactor"
+      :step="0.1"
+      :min="1"
+      :max="10"
+      description=""
+    />
 
-        <NumberInput
-            id="surfaceGravity"
-            label="Surface Gravity"
-            v-model.number="structure.surfaceGravity"
-            :step="0.1"
-            :min="0.1"
-            :max="10"
-            :description="`RPM: ${rpm}<br />Inner Gravity: ${formatNumber(
-                upperLevelGravity,
-            )}G`"
-            unit="G"
-        />
+    <NumberInput
+      id="surfaceGravity"
+      label="Surface Gravity"
+      v-model.number="structure.surfaceGravity"
+      :step="0.1"
+      :min="0.1"
+      :max="100"
+      :description="`RPM: ${rpm}<br />Inner Gravity: ${formatNumber(
+        upperLevelGravity
+      )}G`"
+      unit="G"
+    />
 
-        <NumberInput
-            id="internalPressure"
-            label="Internal Air Pressure"
-            v-model.number="structure.internalPressure"
-            :step="1"
-            :min="20"
-            :max="1200"
-            :description="`${requiredO2}% O2 required`"
-            tooltip="Min: 20 kPa. Max: 1200 kPa. 1 Atmosphere ~101 kPa"
-            unit="kpa"
-        />
+    <NumberInput
+      id="internalPressure"
+      label="Internal Air Pressure"
+      v-model.number="structure.internalPressure"
+      :step="1"
+      :min="20"
+      :max="1200"
+      :description="`${requiredO2}% O2 required`"
+      tooltip="Min: 20 kPa. Max: 1200 kPa. 1 Atmosphere ~101 kPa"
+      unit="kpa"
+    />
 
-        <div class="alert alert-warning" v-if="structure.internalPressure < 65">
-            <strong>Warning:</strong> The internal pressure is low.
-        </div>
-        <div
-            class="alert alert-warning"
-            v-else-if="structure.internalPressure > 202"
-        >
-            <strong>Warning:</strong> The internal pressure is high.
-        </div>
+    <div class="alert alert-warning" v-if="structure.internalPressure < 65">
+      <strong>Warning:</strong> The internal pressure is low.
+    </div>
+    <div
+      class="alert alert-warning"
+      v-else-if="structure.internalPressure > 202"
+    >
+      <strong>Warning:</strong> The internal pressure is high.
+    </div>
 
-        <!-- <NumberInput
+    <!-- <NumberInput
       id="internalTemperature"
       label="Internal Temperature"
       v-model.number="structure.internalTemperature"

@@ -23,6 +23,7 @@
 // ? NOTE: Optional Improvements!
 
 import { computed, onMounted, ref, watch } from 'vue';
+
 import ONeillForm from './ONeillForm.vue';
 import ONeillResults from './ONeillResults.vue';
 import ONeillVisual from './ONeillVisual.vue';
@@ -45,7 +46,7 @@ const formData = ref<ONeillCylinderForm>({
         airMix: atmosphereCompositions[1],
         material: materials[1],
         safetyFactor: 1.3,
-        shellWallThickness: 1000.0, // m
+        shellWallThickness: 20.0, // m
         minShieldingShellMass: 0.0, // kg/m2
         internalStructureMass: 200.0, // kg/m2
         caps: {
@@ -65,6 +66,7 @@ const formData = ref<ONeillCylinderForm>({
         // unusedDensity: number; // % calculated
         urbanDensityExample: populationDensityExamples[5],
     },
+
     diet: {},
 });
 

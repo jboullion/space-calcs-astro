@@ -1,31 +1,31 @@
 ---
-import DarkMode from "../vue/shared/DarkMode.vue";
-import Logo from "./Logo.astro";
+import DarkMode from '../vue/shared/DarkMode.vue';
+import Logo from './Logo.astro';
 
 // TODO: Do we want to set up a bootswatch theme switcher?
 // TODO: https://stackoverflow.com/questions/19192747/how-to-dynamically-change-themes-after-clicking-a-drop-down-menu-of-themes
 ---
 
 <header>
-  <div class="navbar navbar-dark bg-dark shadow-sm">
-    <div class="container justify-content-between">
-      <a
-        href="/"
-        class="navbar-brand d-flex align-items-center text-white gap-4"
-      >
-        <div style="transform: rotate(90deg);" class="ms-3">
-          <Logo height={40} />
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container justify-content-between">
+            <a
+                href="/"
+                class="navbar-brand d-flex align-items-center text-white gap-4"
+            >
+                <div style="transform: rotate(90deg);" class="ms-3">
+                    <Logo height={40} />
+                </div>
+                Space Calcs
+            </a>
+            <DarkMode client:only />
         </div>
-        Space Calcs
-      </a>
-      <DarkMode client:only />
     </div>
-  </div>
 </header>
 <style>
-  .navbar-brand {
-    font-family: "Orbitron", sans-serif;
-    letter-spacing: 1px;
-    font-size: 1.5rem;
-  }
+    .navbar-brand {
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
+        font-size: 1.5rem;
+    }
 </style>

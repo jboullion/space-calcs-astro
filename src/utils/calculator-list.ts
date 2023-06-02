@@ -17,7 +17,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     name: "Rocket Potential Delta V",
     description: "Calculate the delta v required for a mission",
     categories: [categories[ROCKET_CAT], categories[ORBIT_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/delta-v",
   },
   {
@@ -25,7 +25,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     name: "Hohmann Transfer",
     description: "Calculate the delta v required for a Hohmann transfer",
     categories: [categories[ROCKET_CAT], categories[ORBIT_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/hohmann-transfer",
   },
   {
@@ -33,7 +33,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     name: "Orbit Visualizer",
     description: "Visualize the orbit of a satellite",
     categories: [categories[ORBIT_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/orbit-visualizer",
   },
   {
@@ -41,7 +41,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     name: "Rotational Gravity",
     description: "Calculate the forces on a rotating space station",
     categories: [categories[STATION_CAT], categories[HABITAT_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/rotational-gravity",
   },
   {
@@ -51,7 +51,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
       "Esimate the energy, mass, crew, and volume requirements for a habitat",
     categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
     advanced: true,
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/habitat-requirements",
   },
   {
@@ -59,7 +59,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     name: "Nutrition Requirements",
     description: "Estimate the nutrition requirements for a crew",
     categories: [categories[HABITAT_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/nutrition-requirements",
   },
   {
@@ -67,7 +67,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     name: "Habitable Zone",
     description: "Estimate the habitable zone of a star",
     categories: [categories[ORBIT_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/habitable-zone",
   },
   {
@@ -76,7 +76,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     description:
       "Estimate the available power from a solar panel anywhere in the solar system",
     categories: [categories[HABITAT_CAT], categories[STATION_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/solar-energy",
   },
   {
@@ -85,7 +85,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
     description:
       "Estimate the number of intelligent civilizations in the Milky Way galaxy",
     categories: [categories[LIFE_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/drake-equation",
   },
   {
@@ -94,8 +94,17 @@ export const unOrderedCalculators: SpaceCalc[] = [
     description:
       "Create an O'Neill Cylinder and estimate the area, mass, population and energy requirements",
     categories: [categories[STATION_CAT], categories[ADVANCED_CAT]],
-    image: "https://i.imgur.com/4ZQZQ2M.png",
+    image: "",
     link: "/calcs/oneill-cylinder",
+  },
+  {
+    id: "space-elevator",
+    name: "Space Elevator",
+    description:
+      "Create a space elevator and estimate the mass, length, time, and energy requirements",
+    categories: [categories[STATION_CAT]],
+    image: "",
+    link: "/calcs/space-elevator",
   },
 ];
 
