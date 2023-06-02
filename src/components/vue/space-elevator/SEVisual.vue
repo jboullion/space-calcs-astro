@@ -274,7 +274,8 @@ function updateCamera() {
 
     // Camera
     const cameraPositionDistance = elevatorHeight.value;
-    const cameraZoomDistance = elevatorHeight.value * 2;
+    const cameraZoomDistance =
+        props.formData.planetRadius + elevatorHeight.value * 2;
     let rendererSize = new THREE.Vector2();
     three.renderer.getSize(rendererSize);
     three.camera = new THREE.PerspectiveCamera(
@@ -347,7 +348,7 @@ function setupPlanet() {
 
 function setupElevator() {
     const stationMaterial = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
+        color: 0xdddddd,
         side: THREE.FrontSide,
     });
 
@@ -364,6 +365,20 @@ function setupElevator() {
         scaledPlanetRadius.value + geostationaryOrbit.value / 2;
 
     planet.group.add(elevatorMesh);
+
+    const elevatorTopGeometry = new THREE.SphereGeometry(
+        geostationaryOrbit.value / 100,
+        24,
+        24,
+    );
+    const elevatorTopMesh = new THREE.Mesh(
+        elevatorTopGeometry,
+        stationMaterial,
+    );
+    elevatorTopMesh.position.z =
+        scaledPlanetRadius.value + geostationaryOrbit.value;
+
+    planet.group.add(elevatorTopMesh);
     //three.scene.add(elevatorMesh);
 }
 
