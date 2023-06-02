@@ -22,7 +22,8 @@
 
 // ? NOTE: Optional Improvements!
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+
 import ONeillForm from './ONeillForm.vue';
 import ONeillResults from './ONeillResults.vue';
 import ONeillVisual from './ONeillVisual.vue';
@@ -65,9 +66,18 @@ const formData = ref<ONeillCylinderForm>({
         // unusedDensity: number; // % calculated
         urbanDensityExample: populationDensityExamples[5],
     },
+
     diet: {},
 });
 
 onMounted(() => {});
+
+// watch(
+//     () => formData.value,
+//     (newValue) => {
+//         //console.log('formData changed', newValue);
+//     },
+//     { deep: true },
+// );
 </script>
 <style></style>
