@@ -30,7 +30,7 @@
             unit="hours"
         />
 
-        <!-- <NumberInput
+        <NumberInput
             id="car-speed"
             label="Car Speed"
             v-model.number="formData.carSpeed"
@@ -38,7 +38,7 @@
             :min="1"
             :max="1000"
             unit="km/h"
-        /> -->
+        />
     </div>
 </template>
 <script setup lang="ts">

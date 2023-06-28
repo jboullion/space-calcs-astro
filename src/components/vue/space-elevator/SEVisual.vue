@@ -1,5 +1,12 @@
 <template>
     <div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-primary btn-lg px-5" @click="play">
+                <i class="fas" :class="playClass"></i>
+            </button>
+            <h3 class="mb-0">Time: {{ currentTime }}</h3>
+        </div>
+
         <div
             id="space-elevator-canvas"
             class="canvas-wrapper border"
@@ -31,6 +38,11 @@
                             <td class="border-0 text-end">
                                 {{ formatNumber(geostationaryOrbit, 0) }} km
                             </td>
+                        </tr>
+
+                        <tr>
+                            <th class="border-0">Car Travel Time</th>
+                            <td class="border-0 text-end">TODO hrs</td>
                         </tr>
                     </tbody>
                 </table>
@@ -88,6 +100,7 @@ const three = {
     scene: new THREE.Scene(),
     camera: new THREE.PerspectiveCamera(),
     controls: null as OrbitControls | null,
+    carMesh: null as THREE.Mesh | null,
     // group: null,
     // stats: null, // used for debugging
     // gui: null, // used for debugging
@@ -104,6 +117,21 @@ const animation = {
 };
 
 const textureDir = '/textures/';
+
+const animationDefaults = {
+    play: false,
+    FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
+    prevTick: 0, // track the last tick timestamp
+    orbitRotationVector: new THREE.Vector3(0, 0, 1),
+    simulationSpeed: 1000, // how much faster than real time does the animation play?
+    currentFrame: 1,
+    complete: false,
+    duration: 30, // seconds
+};
+
+const animationConstants = ref({ ...animationDefaults });
+
+const currentTime = 0;
 
 /**
  *
@@ -233,6 +261,14 @@ const geostationaryOrbit = computed(() => {
     return result / 1000;
 });
 
+const elevatorTopHeight = computed(() => {
+    return geostationaryOrbit.value + scaledPlanetRadius.value;
+});
+
+const totalFramesInElevatorRide = computed(() => {
+    return animationConstants.value.duration * animationConstants.value.FPS;
+});
+
 /**
  *
  *
@@ -319,7 +355,7 @@ function updateCamera() {
     if (!three.renderer) return;
 
     // Camera
-    const cameraPositionDistance = geostationaryOrbit.value * 1.1;
+    const cameraPositionDistance = elevatorTopHeight.value * 3;
     const cameraZoomDistance = cameraPositionDistance * 2;
     let rendererSize = new THREE.Vector2();
     three.renderer.getSize(rendererSize);
@@ -330,7 +366,8 @@ function updateCamera() {
         cameraZoomDistance * 4,
     );
 
-    three.camera.position.z = cameraPositionDistance;
+    three.camera.position.y = cameraPositionDistance;
+    three.camera.rotation.x = -Math.PI / 2;
     // this.three.controls.enableZoom = false;
 
     // Controls
@@ -397,9 +434,11 @@ function setupElevator() {
         side: THREE.FrontSide,
     });
 
+    const elevatorRadius = geostationaryOrbit.value / 500;
+
     const elevatorGeometry = new THREE.CylinderGeometry(
-        20,
-        20,
+        elevatorRadius,
+        elevatorRadius,
         geostationaryOrbit.value,
         24,
     );
@@ -412,19 +451,44 @@ function setupElevator() {
     planet.group.add(elevatorMesh);
 
     const elevatorTopGeometry = new THREE.SphereGeometry(
-        geostationaryOrbit.value / 100,
+        elevatorRadius * 6,
         24,
         24,
     );
+
     const elevatorTopMesh = new THREE.Mesh(
         elevatorTopGeometry,
         stationMaterial,
     );
-    elevatorTopMesh.position.z =
-        scaledPlanetRadius.value + geostationaryOrbit.value;
+    elevatorTopMesh.position.z = elevatorTopHeight.value;
 
     planet.group.add(elevatorTopMesh);
     //three.scene.add(elevatorMesh);
+
+    setupCar();
+}
+
+function setupCar() {
+    if (three.carMesh) {
+        planet.group.remove(three.carMesh);
+    }
+
+    const carMaterial = new THREE.MeshPhongMaterial({
+        color: 0xea6730,
+        emissive: 0xea6730,
+        emissiveIntensity: 1,
+        side: THREE.FrontSide,
+    });
+
+    const carRadius = geostationaryOrbit.value / 80;
+
+    const carGeometry = new THREE.SphereGeometry(carRadius, 24, 24);
+
+    three.carMesh = new THREE.Mesh(carGeometry, carMaterial);
+    three.carMesh.rotation.x = Math.PI / 2;
+    three.carMesh.position.z = scaledPlanetRadius.value + carRadius;
+
+    planet.group.add(three.carMesh);
 }
 
 function animate() {
@@ -447,12 +511,52 @@ function animate() {
     animation.prevTick = now;
 
     planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
+
+    if (animationConstants.value.complete || !animationConstants.value.play)
+        return;
+
+    if (three.carMesh) {
+        if (three.carMesh.position.z > elevatorTopHeight.value) {
+            animationConstants.value.complete = true;
+        } else {
+            three.carMesh.position.z += props.formData.carSpeed;
+        }
+    }
+
+    //animationConstants.value.currentFrame++;
 }
 
 function radiansPerSecond(radius: number, speed: number) {
     const circumference = 2 * Math.PI * radius;
 
     return (speed / circumference) * (Math.PI * 2);
+}
+
+const playClass = computed(() => {
+    if (!animationConstants.value.complete) {
+        if (!animationConstants.value.play) {
+            return 'fa-play';
+        } else {
+            return 'fa-pause';
+        }
+    } else {
+        return 'fa-undo';
+    }
+});
+
+function play() {
+    if (animationConstants.value.complete) {
+        reset();
+        return;
+    }
+
+    animationConstants.value.play = !animationConstants.value.play;
+}
+
+function reset() {
+    animationConstants.value = { ...animationDefaults };
+
+    setupCar();
 }
 
 // NOTE: This is not very optimal, but should be fine for now
