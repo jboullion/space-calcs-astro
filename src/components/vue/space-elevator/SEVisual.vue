@@ -34,15 +34,15 @@
                             </td>
                         </tr>
                         <tr>
-                            <th class="border-0">Elevator Height</th>
-                            <td class="border-0 text-end">
+                            <th class="">Elevator Height</th>
+                            <td class="text-end">
                                 {{ formatNumber(geostationaryOrbit, 0) }} km
                             </td>
                         </tr>
 
                         <tr>
                             <th class="border-0">Car Travel Time</th>
-                            <td class="border-0 text-end">TODO hrs</td>
+                            <td class="border-0 text-end">{{ travelTime }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -51,6 +51,11 @@
     </div>
 </template>
 <script setup lang="ts">
+// TODO:
+// 1. Animation should last 30sec
+// 2. Car should travel up at constant rate over 30 sec? (Do we want an ease?)
+// 3. Planet should rotate at constant rate over 30 sec
+
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
@@ -110,28 +115,24 @@ const three = {
     maxMovement: new THREE.Vector3(),
 };
 
-const animation = {
-    FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
-    prevTick: 0, // track the last tick timestamp
-    simulationSpeed: 2000, // 1 = realtime, 2 = 2x realtime, etc.
-};
-
 const textureDir = '/textures/';
 
 const animationDefaults = {
     play: false,
-    FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
+    FPS: 30, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
     prevTick: 0, // track the last tick timestamp
     orbitRotationVector: new THREE.Vector3(0, 0, 1),
     simulationSpeed: 1000, // how much faster than real time does the animation play?
     currentFrame: 1,
     complete: false,
-    duration: 30, // seconds
+    duration: 10, // seconds
+    durationFrames: 0, // The total number of frames in the animation
 };
 
-const animationConstants = ref({ ...animationDefaults });
+animationDefaults.durationFrames =
+    animationDefaults.duration * animationDefaults.FPS;
 
-const currentTime = 0;
+const animationConstants = ref({ ...animationDefaults });
 
 /**
  *
@@ -225,7 +226,7 @@ const planetGravityAlt = computed(() => {
 });
 
 const rotationInSeconds = computed(() => {
-    const result = props.formData.planetRotation * 60 * 60;
+    const result = props.formData.planetRotation * 60 * 60; // * animationConstants.value.simulationSpeed;
 
     return result;
 });
@@ -237,11 +238,25 @@ const rotationInMetersPerSecond = computed(() => {
 });
 
 const rotationSpeed = computed(() => {
+    const totalNumberOfRotations =
+        carTravelTimeTotalHours.value / props.formData.planetRotation;
+
+    const oneRotation = Math.PI * 2;
+
+    const totalRotationRadians = oneRotation * totalNumberOfRotations;
+
+    const result =
+        totalRotationRadians / animationConstants.value.durationFrames;
+
+    return result;
+});
+
+const carAnimationSpeed = computed(() => {
+    if (!three.carMesh) return 0;
+
     return (
-        radiansPerSecond(
-            scaledPlanetRadius.value,
-            rotationInMetersPerSecond.value * animation.simulationSpeed,
-        ) / animation.FPS
+        (elevatorTopHeight.value - scaledPlanetRadius.value) /
+        animationDefaults.durationFrames
     );
 });
 
@@ -265,8 +280,36 @@ const elevatorTopHeight = computed(() => {
     return geostationaryOrbit.value + scaledPlanetRadius.value;
 });
 
-const totalFramesInElevatorRide = computed(() => {
-    return animationConstants.value.duration * animationConstants.value.FPS;
+const carTravelTimeTotalHours = computed(() => {
+    return (
+        (elevatorTopHeight.value - scaledPlanetRadius.value) /
+        props.formData.carSpeed
+    );
+});
+
+const carTravelTimeDays = computed(() => {
+    return carTravelTimeTotalHours.value / 24;
+});
+
+const carTravelRemainingHours = computed(() => {
+    return (carTravelTimeDays.value % 1) * 24;
+});
+
+const travelTime = computed(() => {
+    return `${Math.floor(carTravelTimeDays.value)} days, ${Math.floor(
+        carTravelRemainingHours.value,
+    )} hours`;
+});
+
+const currentTime = computed(() => {
+    const percentComplete =
+        animationConstants.value.currentFrame /
+        animationConstants.value.durationFrames;
+
+    const currentDay = (carTravelTimeTotalHours.value * percentComplete) / 24;
+    const currentHour = (currentDay % 1) * 24;
+
+    return `${Math.floor(currentDay)} days, ${Math.floor(currentHour)} hours`;
 });
 
 /**
@@ -313,7 +356,7 @@ function setupScene() {
 
     //setupAxesHelper();
 
-    if (!animation.prevTick) {
+    if (!animationConstants.value.prevTick) {
         animate();
     }
 }
@@ -504,26 +547,32 @@ function animate() {
     //if (formData.value.pause) return;
 
     // clamp to fixed framerate
-    const now = Math.round((animation.FPS * window.performance.now()) / 1000);
+    const now = Math.round(
+        (animationConstants.value.FPS * window.performance.now()) / 1000,
+    );
 
-    if (now == animation.prevTick) return;
+    if (now == animationConstants.value.prevTick) return;
 
-    animation.prevTick = now;
-
-    planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
+    animationConstants.value.prevTick = now;
 
     if (animationConstants.value.complete || !animationConstants.value.play)
         return;
 
+    planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
+
     if (three.carMesh) {
-        if (three.carMesh.position.z > elevatorTopHeight.value) {
-            animationConstants.value.complete = true;
-        } else {
-            three.carMesh.position.z += props.formData.carSpeed;
-        }
+        three.carMesh.position.z += carAnimationSpeed.value;
     }
 
-    //animationConstants.value.currentFrame++;
+    animationConstants.value.currentFrame++;
+
+    if (
+        animationConstants.value.currentFrame >=
+        animationConstants.value.durationFrames
+    ) {
+        animationConstants.value.play = false;
+        animationConstants.value.complete = true;
+    }
 }
 
 function radiansPerSecond(radius: number, speed: number) {
