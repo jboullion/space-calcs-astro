@@ -52,11 +52,13 @@ const three = {
 };
 
 const animation = {
-    FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
+    FPS: 30, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
     prevTick: 0, // track the last tick timestamp
     rotationSpeed: 0.1, // This tells threeJS how fast to move and is based on the rpm
     radians: 6, // there are 6 radians in a circle. This helps us to calculate full rotations
 };
+
+const curveSegments = 12;
 
 onMounted(() => {
     load();
@@ -207,12 +209,8 @@ function setupThreeJS() {
 
     // Controls
     three.controls = new OrbitControls(three.camera, three.renderer.domElement);
-    //   three.controls = new FlyControls(three.camera, three.canvas); //new OrbitControls(three.camera, three.renderer.domElement);
-    //   three.controls.dragToLook = true;
-    //   three.controls.movementSpeed = 0.1;
-    //   three.controls.rollSpeed = Math.PI / 24;
-    //   three.controls.autoForward = false;
-    //three.controls.enableZoom = true;
+    three.controls.maxDistance = cameraDistance * 4;
+    three.controls.minDistance = cameraDistance / 2;
 
     // Lights
     three.scene.add(new THREE.AmbientLight(0x404040));
@@ -275,7 +273,7 @@ function buildCylinderStation(material: THREE.Material) {
         depth: props.formData.structure.cylinderLength,
         steps: 1,
         bevelEnabled: false,
-        curveSegments: 24,
+        curveSegments: curveSegments,
     };
 
     var arcShape = new THREE.Shape();
@@ -311,7 +309,7 @@ function buildFloors() {
         depth: props.formData.structure.cylinderLength,
         steps: 1,
         bevelEnabled: false,
-        curveSegments: 24,
+        curveSegments: curveSegments,
     };
 
     if (props.formData.structure.caps.value === 'concave') {
@@ -392,7 +390,7 @@ function buildFlatCaps() {
         props.formData.structure.radius,
         props.formData.structure.radius,
         capHeight,
-        48,
+        curveSegments * 2,
     );
 
     const cap = new THREE.Mesh(capGeometry, capMaterial);
@@ -410,8 +408,8 @@ function buildConvexCaps() {
 
     const capGeometry = new THREE.SphereGeometry(
         props.formData.structure.radius,
-        48,
-        48,
+        curveSegments * 2,
+        curveSegments * 2,
         0,
         2 * Math.PI,
         0,
@@ -431,8 +429,8 @@ function buildConcaveCaps() {
 
     const capGeometry = new THREE.SphereGeometry(
         internalRadius.value,
-        48,
-        48,
+        curveSegments * 2,
+        curveSegments * 2,
         0,
         2 * Math.PI,
         0,
@@ -451,19 +449,7 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    var cameraZoomDistance = stationWidth.value * 2;
-
-    var minMovement = new THREE.Vector3(
-        -cameraZoomDistance,
-        -cameraZoomDistance,
-        -cameraZoomDistance,
-    );
-    var maxMovement = new THREE.Vector3(
-        cameraZoomDistance,
-        cameraZoomDistance,
-        cameraZoomDistance,
-    );
-    three.camera.position.clamp(minMovement, maxMovement);
+    three.controls.update();
 
     three.renderer.render(three.scene, three.camera);
 
@@ -472,13 +458,10 @@ function animate() {
     // clamp to fixed framerate
     const now = Math.round((animation.FPS * window.performance.now()) / 1000);
 
-    // Update FlyControls (if used)
-    // const deltaTime = now - animation.prevTick;
-    // three.camera.updateProjectionMatrix();
-    // three.controls.update(deltaTime);
-
     if (now == animation.prevTick) return;
     animation.prevTick = now;
+
+    console.log('Number of Triangles', three.renderer.info.render.triangles);
 
     // three.group.rotation.z += this.rotationSpeed;
     three.group.rotation.z += rotationSpeed.value;

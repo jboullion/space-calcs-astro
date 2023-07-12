@@ -39,7 +39,6 @@
                                 {{ formatNumber(geostationaryOrbit, 0) }} km
                             </td>
                         </tr>
-
                         <tr>
                             <th class="border-0">Car Travel Time</th>
                             <td class="border-0 text-end">{{ travelTime }}</td>
