@@ -461,8 +461,6 @@ function animate() {
     if (now == animation.prevTick) return;
     animation.prevTick = now;
 
-    console.log('Number of Triangles', three.renderer.info.render.triangles);
-
     // three.group.rotation.z += this.rotationSpeed;
     three.group.rotation.z += rotationSpeed.value;
 
