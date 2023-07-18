@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import Lagrange from '../../components/vue/lagrange/Lagrange.vue';
+import References from '../../components/shared/References.astro';
+import type { Reference } from '../../types/types';
+import { calculators } from '../../utils/calculator-list';
+
+const calculator = calculators.find((calc) => calc.id === 'lagrange-points');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+const references: Reference[] = [];
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div class="alert alert-warning text-center mb-5">
+            <i class="fa-solid fa-triangle-exclamation"></i> Under construction!
+            More features and bug fixes coming soon.
+        </div>
+        <Lagrange client:load />
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>
