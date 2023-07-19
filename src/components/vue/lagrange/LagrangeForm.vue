@@ -27,7 +27,7 @@
             :step="0.1"
             :min="0.1"
             :max="100"
-            unit="AU"
+            unit="au"
         />
     </div>
 </template>

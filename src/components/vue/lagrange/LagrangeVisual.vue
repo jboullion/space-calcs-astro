@@ -8,6 +8,11 @@
     </div>
 </template>
 <script setup lang="ts">
+// TODO:
+
+// 1. Possible just have a "red" and "blue" color for the spheres instead of textures
+// 2. Set body radius based on mass?
+
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { ILagrangeForm } from './types';
 
@@ -87,6 +92,10 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', setupScene);
 });
 
+const scaledDistance = computed<number>(() => {
+    return props.formData.distance * 1000;
+});
+
 function load() {
     const textureLoader = new THREE.TextureLoader();
     textures.earth = textureLoader.load('/textures/2k_earth_daymap.jpg');
@@ -108,6 +117,11 @@ function setupScene() {
     setupSun();
     setupPlanet();
     setupOrbit();
+    setupL1();
+    setupL2();
+    setupL3();
+    setupL4();
+    setupL5();
 
     if (!animation.prevTick) {
         animate();
@@ -135,7 +149,7 @@ function setupThreeJS() {
     three.renderer.setSize(width, height);
 
     // Camera
-    const cameraDistance = 1000; // props.formData.distance * 2 * 100;
+    const cameraDistance = scaledDistance.value * 3;
     three.camera = new THREE.PerspectiveCamera(
         45,
         width / height,
@@ -167,7 +181,11 @@ function setupPlanet() {
         // opacity: 0.1,
     });
 
-    bodyOne.geometry = new THREE.SphereGeometry(100, 32, 32);
+    bodyOne.geometry = new THREE.SphereGeometry(
+        props.formData.massTwo * 100,
+        32,
+        32,
+    );
 
     bodyOne.mesh = new THREE.Mesh(
         bodyOne.geometry,
@@ -175,7 +193,7 @@ function setupPlanet() {
     );
 
     bodyOne.mesh.rotation.x = Math.PI / 2;
-    bodyOne.mesh.position.set(100, 0, 0);
+    bodyOne.mesh.position.set(scaledDistance.value, 0, 0);
 
     bodyOne.group.add(bodyOne.mesh);
 
@@ -192,10 +210,13 @@ function setupSun() {
     material.emissive = new THREE.Color(0xffff00);
     material.emissiveIntensity = 0.3;
 
-    const geometry = new THREE.SphereGeometry(200, 64, 64);
+    const geometry = new THREE.SphereGeometry(
+        props.formData.massOne * 200,
+        64,
+        64,
+    );
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.set(Math.PI / 2, 0, 0);
-    mesh.position.set(-200, 0, 0);
 
     three.scene.add(mesh);
 }
@@ -203,13 +224,13 @@ function setupSun() {
 function setupOrbit() {
     if (!three.scene) return;
 
-    const orbitSize = props.formData.distance * 100; // / scaleConversions.scaleFactor;
-    const lineSize = props.formData.distance * 2;
+    const orbitSize = scaledDistance.value;
+    const lineSize = props.formData.distance;
 
     const orbitGeometry = new THREE.RingGeometry(
         orbitSize - lineSize,
         orbitSize + lineSize,
-        128,
+        264,
     );
     const orbitMaterial = new THREE.MeshBasicMaterial({
         color: '#ffffff',
@@ -219,6 +240,96 @@ function setupOrbit() {
 
     // this.drawDeltaV(orbit, endOrbit);
     three.scene.add(orbitMesh);
+}
+
+function setupL1() {
+    if (!three.scene) return;
+
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xea6730,
+    });
+
+    const geometry = new THREE.SphereGeometry(
+        props.formData.massTwo * 10,
+        16,
+        16,
+    );
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(scaledDistance.value * 0.8, 0, 0);
+
+    three.scene.add(mesh);
+}
+
+function setupL2() {
+    if (!three.scene) return;
+
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xea6730,
+    });
+
+    const geometry = new THREE.SphereGeometry(
+        props.formData.massTwo * 10,
+        16,
+        16,
+    );
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(scaledDistance.value * 1.2, 0, 0);
+
+    three.scene.add(mesh);
+}
+
+function setupL3() {
+    if (!three.scene) return;
+
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xea6730,
+    });
+
+    const geometry = new THREE.SphereGeometry(
+        props.formData.massTwo * 10,
+        16,
+        16,
+    );
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(scaledDistance.value * -1, 0, 0);
+
+    three.scene.add(mesh);
+}
+
+function setupL4() {
+    if (!three.scene) return;
+
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xea6730,
+    });
+
+    const geometry = new THREE.SphereGeometry(
+        props.formData.massTwo * 10,
+        16,
+        16,
+    );
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(scaledDistance.value * 0.5, scaledDistance.value, 0);
+
+    three.scene.add(mesh);
+}
+
+function setupL5() {
+    if (!three.scene) return;
+
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xea6730,
+    });
+
+    const geometry = new THREE.SphereGeometry(
+        props.formData.massTwo * 10,
+        16,
+        16,
+    );
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(scaledDistance.value * 0.5, -scaledDistance.value, 0);
+
+    three.scene.add(mesh);
 }
 
 function animate() {
@@ -238,4 +349,8 @@ function animate() {
     if (now == animation.prevTick) return;
     animation.prevTick = now;
 }
+
+watch(props.formData, () => {
+    setupScene();
+});
 </script>
