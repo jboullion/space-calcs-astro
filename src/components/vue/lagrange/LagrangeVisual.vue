@@ -6,6 +6,42 @@
     >
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
     </div>
+
+    <div class="p-2 rounded border mb-5">
+        <div>
+            <h2>Results</h2>
+            <div>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>One AU</th>
+                            <td class="text-end">
+                                {{ formatNumber(physicsConstants.AU) }} km
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Distance from Earth to L1</th>
+                            <td class="text-end">
+                                {{ formatNumber(L1Point) }} km
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Distance from Earth to L2</th>
+                            <td class="text-end">
+                                {{ formatNumber(L2Point) }} km
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Distance from Earth Orbit to L3</th>
+                            <td class="text-end">
+                                {{ formatNumber(L3Point) }} km
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </template>
 <script setup lang="ts">
 // TODO:
@@ -29,6 +65,10 @@ import {
     removeAllChildNodes,
     roundToDecimal,
 } from '../utils';
+import {
+    CSS2DObject,
+    CSS2DRenderer,
+} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 const props = defineProps<{
     formData: ILagrangeForm;
@@ -56,6 +96,8 @@ const three = {
     controls: null as OrbitControls | null,
     bodyOne: new THREE.Mesh(),
     bodyTwo: new THREE.Mesh(),
+    renderOrder: 0,
+    labelRenderer: null as CSS2DRenderer | null,
     group: new THREE.Group(),
     orbitGroup: new THREE.Group(),
     minMovement: null as THREE.Vector3 | null,
@@ -105,9 +147,9 @@ const L1Point = computed<number>(() => {
     const MEarth = physicsConstants.earthMass;
 
     // Calculate the distance to the L1 point
-    const rL1 = R * Math.pow(mSun / (3 * MEarth), 1 / 3);
+    const rL1 = R * Math.pow(MEarth / (3 * mSun), 1 / 3);
 
-    return rL1;
+    return rL1; // physicsConstants.AU / rL1;
 });
 
 const L2Point = computed<number>(() => {
@@ -117,9 +159,9 @@ const L2Point = computed<number>(() => {
     const MEarth = physicsConstants.earthMass;
 
     // Calculate the distance to the L1 point
-    const rL2 = R * Math.pow(mSun / (3 * MEarth), 1 / 3) * (1 + MEarth / mSun);
+    const rL2 = R * Math.pow(MEarth / (3 * mSun), 1 / 3) * (1 + MEarth / mSun);
 
-    return rL2;
+    return rL2; // physicsConstants.AU / rL2;
 });
 
 const L3Point = computed<number>(() => {
@@ -127,9 +169,9 @@ const L3Point = computed<number>(() => {
     const mSun = physicsConstants.sunMass;
     const MEarth = physicsConstants.earthMass;
 
-    const rL3 = R * Math.pow(mSun / (3 * MEarth), 1 / 3) * (1 - MEarth / mSun);
+    const rL3 = R * ((7 * MEarth) / (12 * mSun));
 
-    return rL3;
+    return rL3; // physicsConstants.AU / rL3;
 });
 
 function load() {
@@ -183,6 +225,14 @@ function setupThreeJS() {
     const height = 500;
 
     three.renderer.setSize(width, height);
+
+    three.labelRenderer = new CSS2DRenderer();
+
+    three.labelRenderer.setSize(width, height);
+    three.labelRenderer.domElement.style.position = 'absolute';
+    three.labelRenderer.domElement.style.top = '0px';
+    three.labelRenderer.domElement.style.pointerEvents = 'none';
+    three.canvas.appendChild(three.labelRenderer.domElement);
 
     // Camera
     const cameraDistance = scaledDistance.value * 3;
@@ -272,6 +322,31 @@ function setupOrbit() {
     three.orbitGroup.add(orbitMesh);
 }
 
+function getLabel(name: string) {
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'label';
+    labelDiv.textContent = name;
+    labelDiv.style.backgroundColor = 'transparent';
+    labelDiv.style.color = 'white';
+    labelDiv.style.fontSize = '16px';
+    labelDiv.style.fontFamily = 'sans-serif';
+    labelDiv.style.padding = '0.5em';
+    labelDiv.style.borderRadius = '0.5em';
+    labelDiv.style.pointerEvents = 'none';
+    labelDiv.style.textAlign = 'center';
+    labelDiv.style.opacity = '1';
+    // labelDiv.style.border = "1px solid white";
+
+    const label = new CSS2DObject(labelDiv);
+    label.position.set(0, 0, 0);
+    // @ts-ignore
+    label.center.set(0, 1);
+
+    label.layers.set(0);
+
+    return label;
+}
+
 function setupL1() {
     if (!three.scene) return;
 
@@ -286,6 +361,10 @@ function setupL1() {
     );
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 0.8, 0, 0);
+
+    mesh.layers.enableAll();
+    const label = getLabel('L1');
+    mesh.add(label);
 
     three.orbitGroup.add(mesh);
 }
@@ -305,6 +384,10 @@ function setupL2() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 1.2, 0, 0);
 
+    mesh.layers.enableAll();
+    const label = getLabel('L2');
+    mesh.add(label);
+
     three.orbitGroup.add(mesh);
 }
 
@@ -322,6 +405,10 @@ function setupL3() {
     );
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * -1, 0, 0);
+
+    mesh.layers.enableAll();
+    const label = getLabel('L3');
+    mesh.add(label);
 
     three.orbitGroup.add(mesh);
 }
@@ -341,6 +428,10 @@ function setupL4() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 0.5, scaledDistance.value, 0);
 
+    mesh.layers.enableAll();
+    const label = getLabel('L4');
+    mesh.add(label);
+
     three.orbitGroup.add(mesh);
 }
 
@@ -358,6 +449,9 @@ function setupL5() {
     );
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 0.5, -scaledDistance.value, 0);
+    mesh.layers.enableAll();
+    const label = getLabel('L5');
+    mesh.add(label);
 
     three.orbitGroup.add(mesh);
 }
@@ -370,6 +464,9 @@ function animate() {
     three.controls.update();
 
     three.renderer.render(three.scene, three.camera);
+
+    if (three.labelRenderer)
+        three.labelRenderer.render(three.scene, three.camera);
 
     //if (formData.value.pause) return;
 

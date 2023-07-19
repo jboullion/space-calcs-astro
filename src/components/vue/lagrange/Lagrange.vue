@@ -7,10 +7,6 @@
         </div>
         <div id="lagrange__results" class="col-lg-8">
             <LagrangeVisual :formData="formData" />
-
-            <div class="p-2 rounded border mb-5">
-                <LagrangeResults :formData="formData" />
-            </div>
         </div>
     </div>
 </template>
