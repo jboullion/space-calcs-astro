@@ -57,6 +57,7 @@ const three = {
     bodyOne: new THREE.Mesh(),
     bodyTwo: new THREE.Mesh(),
     group: new THREE.Group(),
+    orbitGroup: new THREE.Group(),
     minMovement: null as THREE.Vector3 | null,
     maxMovement: null as THREE.Vector3 | null,
 };
@@ -64,23 +65,24 @@ const three = {
 const animation = {
     FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
     prevTick: 0, // track the last tick timestamp
+    rotationAxis: new THREE.Vector3(0, 0, 1),
     // rotationSpeed: 0.1, // This tells threeJS how fast to move and is based on the rpm
     // radians: 6, // there are 6 radians in a circle. This helps us to calculate full rotations
 };
 
-const bodyOne = {
-    mesh: new THREE.Mesh(),
-    geometry: new THREE.SphereGeometry(),
-    material: new THREE.Material(),
-    group: new THREE.Group() as THREE.Group,
-};
+// const bodyOne = {
+//     mesh: new THREE.Mesh(),
+//     geometry: new THREE.SphereGeometry(),
+//     material: new THREE.Material(),
+//     group: new THREE.Group() as THREE.Group,
+// };
 
-const bodyTwo = {
-    mesh: new THREE.Mesh(),
-    geometry: new THREE.SphereGeometry(),
-    material: new THREE.Material(),
-    group: new THREE.Group() as THREE.Group,
-};
+// const bodyTwo = {
+//     mesh: new THREE.Mesh(),
+//     geometry: new THREE.SphereGeometry(),
+//     material: new THREE.Material(),
+//     group: new THREE.Group() as THREE.Group,
+// };
 
 onMounted(() => {
     load();
@@ -94,6 +96,40 @@ onBeforeUnmount(() => {
 
 const scaledDistance = computed<number>(() => {
     return props.formData.distance * 1000;
+});
+
+const L1Point = computed<number>(() => {
+    // TODO: Update this if the user changes relationship
+    const R = props.formData.distance * physicsConstants.AU;
+    const mSun = physicsConstants.sunMass;
+    const MEarth = physicsConstants.earthMass;
+
+    // Calculate the distance to the L1 point
+    const rL1 = R * Math.pow(mSun / (3 * MEarth), 1 / 3);
+
+    return rL1;
+});
+
+const L2Point = computed<number>(() => {
+    // TODO: Update this if the user changes relationship
+    const R = props.formData.distance * physicsConstants.AU;
+    const mSun = physicsConstants.sunMass;
+    const MEarth = physicsConstants.earthMass;
+
+    // Calculate the distance to the L1 point
+    const rL2 = R * Math.pow(mSun / (3 * MEarth), 1 / 3) * (1 + MEarth / mSun);
+
+    return rL2;
+});
+
+const L3Point = computed<number>(() => {
+    const R = props.formData.distance * physicsConstants.AU;
+    const mSun = physicsConstants.sunMass;
+    const MEarth = physicsConstants.earthMass;
+
+    const rL3 = R * Math.pow(mSun / (3 * MEarth), 1 / 3) * (1 - MEarth / mSun);
+
+    return rL3;
 });
 
 function load() {
@@ -166,38 +202,32 @@ function setupThreeJS() {
 
     // Lights
     three.scene.add(new THREE.AmbientLight(0x404040));
-    const light = new THREE.DirectionalLight(0xffffff, 0.5);
+    const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
+
     three.scene.add(light);
 
-    three.scene.add(three.group);
+    three.scene.add(three.orbitGroup);
 }
 
 function setupPlanet() {
-    bodyOne.group = new THREE.Group();
-
-    bodyOne.material = new THREE.MeshLambertMaterial({
+    const material = new THREE.MeshLambertMaterial({
         map: textures.earth,
         // transparent: true,
         // opacity: 0.1,
     });
 
-    bodyOne.geometry = new THREE.SphereGeometry(
+    const geometry = new THREE.SphereGeometry(
         props.formData.massTwo * 100,
         32,
         32,
     );
 
-    bodyOne.mesh = new THREE.Mesh(
-        bodyOne.geometry,
-        bodyOne.material as THREE.Material,
-    );
+    const mesh = new THREE.Mesh(geometry, material as THREE.Material);
 
-    bodyOne.mesh.rotation.x = Math.PI / 2;
-    bodyOne.mesh.position.set(scaledDistance.value, 0, 0);
+    mesh.rotation.x = Math.PI / 2;
+    mesh.position.set(scaledDistance.value, 0, 0);
 
-    bodyOne.group.add(bodyOne.mesh);
-
-    three.scene.add(bodyOne.group);
+    three.orbitGroup.add(mesh);
 }
 
 function setupSun() {
@@ -208,7 +238,7 @@ function setupSun() {
         side: THREE.FrontSide,
     });
     material.emissive = new THREE.Color(0xffff00);
-    material.emissiveIntensity = 0.3;
+    material.emissiveIntensity = 0.6;
 
     const geometry = new THREE.SphereGeometry(
         props.formData.massOne * 200,
@@ -218,7 +248,7 @@ function setupSun() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.set(Math.PI / 2, 0, 0);
 
-    three.scene.add(mesh);
+    three.orbitGroup.add(mesh);
 }
 
 function setupOrbit() {
@@ -239,7 +269,7 @@ function setupOrbit() {
     const orbitMesh = new THREE.Mesh(orbitGeometry, orbitMaterial);
 
     // this.drawDeltaV(orbit, endOrbit);
-    three.scene.add(orbitMesh);
+    three.orbitGroup.add(orbitMesh);
 }
 
 function setupL1() {
@@ -257,7 +287,7 @@ function setupL1() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 0.8, 0, 0);
 
-    three.scene.add(mesh);
+    three.orbitGroup.add(mesh);
 }
 
 function setupL2() {
@@ -275,7 +305,7 @@ function setupL2() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 1.2, 0, 0);
 
-    three.scene.add(mesh);
+    three.orbitGroup.add(mesh);
 }
 
 function setupL3() {
@@ -293,7 +323,7 @@ function setupL3() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * -1, 0, 0);
 
-    three.scene.add(mesh);
+    three.orbitGroup.add(mesh);
 }
 
 function setupL4() {
@@ -311,7 +341,7 @@ function setupL4() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 0.5, scaledDistance.value, 0);
 
-    three.scene.add(mesh);
+    three.orbitGroup.add(mesh);
 }
 
 function setupL5() {
@@ -329,7 +359,7 @@ function setupL5() {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(scaledDistance.value * 0.5, -scaledDistance.value, 0);
 
-    three.scene.add(mesh);
+    three.orbitGroup.add(mesh);
 }
 
 function animate() {
@@ -348,6 +378,8 @@ function animate() {
 
     if (now == animation.prevTick) return;
     animation.prevTick = now;
+
+    three.orbitGroup.rotateOnAxis(animation.rotationAxis, 0.01);
 }
 
 watch(props.formData, () => {

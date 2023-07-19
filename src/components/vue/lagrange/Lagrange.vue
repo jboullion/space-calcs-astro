@@ -32,6 +32,7 @@ import type { ILagrangeForm } from './types';
 
 // TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ILagrangeForm>({
+    relationship: 'star',
     massOne: 1,
     massTwo: 1,
     distance: 1,

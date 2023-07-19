@@ -13,7 +13,12 @@ if (!calculator) {
     throw new Error('Calculator not found');
 }
 
-const references: Reference[] = [];
+const references: Reference[] = [
+    {
+        title: 'Wiki: Lagrange Points',
+        url: 'https://en.wikipedia.org/wiki/Lagrange_point',
+    },
+];
 ---
 
 <Layout title={calculator.name} description={calculator.description}>
