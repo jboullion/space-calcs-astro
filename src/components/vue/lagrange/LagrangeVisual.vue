@@ -22,7 +22,7 @@
                         <tr>
                             <th>Planet to L1</th>
                             <td class="text-end">
-                                {{ formatNumber(L1Point) }} km
+                                {{ formatNumber(L1Point, 0) }} km
                             </td>
                         </tr>
                         <tr>
@@ -32,7 +32,7 @@
                         <tr>
                             <th>Planet to L2</th>
                             <td class="text-end">
-                                {{ formatNumber(L2Point) }} km
+                                {{ formatNumber(L2Point, 0) }} km
                             </td>
                         </tr>
                         <tr>
@@ -42,7 +42,7 @@
                         <tr>
                             <th>Planet Orbit to L3</th>
                             <td class="text-end">
-                                {{ formatNumber(L3Point) }} km
+                                {{ formatNumber(L3Point, 0) }} km
                             </td>
                         </tr>
                         <tr>
@@ -52,7 +52,7 @@
                         <tr>
                             <th>Planet and Star to L4 and L5</th>
                             <td class="text-end">
-                                {{ formatNumber(L4andL5Points) }} km
+                                {{ formatNumber(L4andL5Points, 0) }} km
                             </td>
                         </tr>
                     </tbody>
@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
 });
 
 const scaledDistance = computed<number>(() => {
-    return props.formData.distance * 1000;
+    return 1000; // props.formData.distance *
 });
 
 const L1Point = computed<number>(() => {

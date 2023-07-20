@@ -12,8 +12,8 @@
             id="massOne"
             label="Mass One"
             v-model.number="formData.massOne"
-            :step="1"
-            :min="1"
+            :step="0.1"
+            :min="0.1"
             :max="1000"
             unit="M<sub>⊙</sub>"
         />
@@ -22,8 +22,8 @@
             id="massTwo"
             label="Mass Two"
             v-model.number="formData.massTwo"
-            :step="1"
-            :min="1"
+            :step="0.1"
+            :min="0.1"
             :max="1000"
             unit="M<sub>⊕</sub>"
         />
