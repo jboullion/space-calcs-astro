@@ -20,37 +20,37 @@
                             </td>
                         </tr> -->
                         <tr>
-                            <th>Distance from Planet to L1</th>
+                            <th>Planet to L1</th>
                             <td class="text-end">
                                 {{ formatNumber(L1Point) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Distance from the Star to L1</th>
+                            <th>Star to L1</th>
                             <td class="text-end">{{ L1SunPoint }} au</td>
                         </tr>
                         <tr>
-                            <th>Distance from Planet to L2</th>
+                            <th>Planet to L2</th>
                             <td class="text-end">
                                 {{ formatNumber(L2Point) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Distance from the Star to L2</th>
+                            <th>Star to L2</th>
                             <td class="text-end">{{ L2SunPoint }} au</td>
                         </tr>
                         <tr>
-                            <th>Distance from Planet Orbit to L3</th>
+                            <th>Planet Orbit to L3</th>
                             <td class="text-end">
                                 {{ formatNumber(L3Point) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Distance from the Star to L3</th>
+                            <th>Star to L3</th>
                             <td class="text-end">{{ L3SunPoint }} au</td>
                         </tr>
                         <tr>
-                            <th>Distance from Planet to L4 and L5</th>
+                            <th>Planet and Star to L4 and L5</th>
                             <td class="text-end">
                                 {{ formatNumber(L4andL5Points) }} km
                             </td>
@@ -126,23 +126,7 @@ const animation = {
     FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
     prevTick: 0, // track the last tick timestamp
     rotationAxis: new THREE.Vector3(0, 0, 1),
-    // rotationSpeed: 0.1, // This tells threeJS how fast to move and is based on the rpm
-    // radians: 6, // there are 6 radians in a circle. This helps us to calculate full rotations
 };
-
-// const bodyOne = {
-//     mesh: new THREE.Mesh(),
-//     geometry: new THREE.SphereGeometry(),
-//     material: new THREE.Material(),
-//     group: new THREE.Group() as THREE.Group,
-// };
-
-// const bodyTwo = {
-//     mesh: new THREE.Mesh(),
-//     geometry: new THREE.SphereGeometry(),
-//     material: new THREE.Material(),
-//     group: new THREE.Group() as THREE.Group,
-// };
 
 onMounted(() => {
     load();
@@ -317,11 +301,7 @@ function setupPlanet() {
         // opacity: 0.1,
     });
 
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massTwo * 100,
-        32,
-        32,
-    );
+    const geometry = new THREE.SphereGeometry(100, 32, 32);
 
     const mesh = new THREE.Mesh(geometry, material as THREE.Material);
 
@@ -341,11 +321,7 @@ function setupSun() {
     material.emissive = new THREE.Color(0xffff00);
     material.emissiveIntensity = 0.6;
 
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massOne * 200,
-        64,
-        64,
-    );
+    const geometry = new THREE.SphereGeometry(200, 32, 32);
     const mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.set(Math.PI / 2, 0, 0);
 
@@ -398,154 +374,88 @@ function getLabel(name: string) {
     return label;
 }
 
-function setupL1() {
+function addPoint(name: string, position: THREE.Vector3) {
     if (!three.scene) return;
 
     const material = new THREE.MeshBasicMaterial({
         color: 0xea6730,
     });
 
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massTwo * 10,
-        16,
-        16,
-    );
+    const geometry = new THREE.SphereGeometry(10, 12, 12);
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(scaledDistance.value * 0.8, 0, 0);
+    mesh.position.set(position.x, position.y, position.z);
 
     mesh.layers.enableAll();
-    const label = getLabel('L1');
+    const label = getLabel(name);
     mesh.add(label);
 
     three.orbitGroup.add(mesh);
+}
+
+function addEllipse(position: THREE.Vector3, rotation: number = 0.5) {
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xea6730,
+    });
+
+    const curve = new THREE.EllipseCurve(
+        0,
+        0, // ax, aY
+        300,
+        100, // xRadius, yRadius
+        0,
+        2 * Math.PI, // aStartAngle, aEndAngle
+        false, // aClockwise
+        rotation, // aRotation
+    );
+
+    const points = curve.getPoints(50);
+    const elipseGeometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    // Create the final object to add to the scene
+    const ellipse = new THREE.Line(elipseGeometry, material);
+    ellipse.position.set(position.x, position.y, 0);
+    three.orbitGroup.add(ellipse);
+}
+
+function setupL1() {
+    const position = new THREE.Vector3(scaledDistance.value * 0.8, 0, 0);
+    addPoint('L1', position);
 }
 
 function setupL2() {
-    if (!three.scene) return;
-
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xea6730,
-    });
-
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massTwo * 10,
-        16,
-        16,
-    );
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(scaledDistance.value * 1.2, 0, 0);
-
-    mesh.layers.enableAll();
-    const label = getLabel('L2');
-    mesh.add(label);
-
-    three.orbitGroup.add(mesh);
+    const position = new THREE.Vector3(scaledDistance.value * 1.2, 0, 0);
+    addPoint('L2', position);
 }
 
 function setupL3() {
-    if (!three.scene) return;
-
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xea6730,
-    });
-
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massTwo * 10,
-        16,
-        16,
-    );
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(scaledDistance.value * -1, 0, 0);
-
-    mesh.layers.enableAll();
-    const label = getLabel('L3');
-    mesh.add(label);
-
-    three.orbitGroup.add(mesh);
+    const position = new THREE.Vector3(scaledDistance.value * -1, 0, 0);
+    addPoint('L3', position);
 }
 
 function setupL4() {
     if (!three.scene) return;
 
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xea6730,
-    });
-
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massTwo * 10,
-        16,
-        16,
-    );
-    const mesh = new THREE.Mesh(geometry, material);
     const forwardPosition = (scaledDistance.value * Math.sqrt(3)) / 2;
-    mesh.position.set(scaledDistance.value * 0.5, forwardPosition, 0);
-
-    const curve = new THREE.EllipseCurve(
+    const position = new THREE.Vector3(
+        scaledDistance.value * 0.5,
+        forwardPosition,
         0,
-        0, // ax, aY
-        props.formData.massTwo * 400,
-        props.formData.massTwo * 100, // xRadius, yRadius
-        0,
-        2 * Math.PI, // aStartAngle, aEndAngle
-        false, // aClockwise
-        -0.51, // aRotation
     );
-
-    const points = curve.getPoints(50);
-    const elipseGeometry = new THREE.BufferGeometry().setFromPoints(points);
-
-    // Create the final object to add to the scene
-    const ellipse = new THREE.Line(elipseGeometry, material);
-    ellipse.position.set(mesh.position.x, mesh.position.y, 0);
-    three.orbitGroup.add(ellipse);
-
-    mesh.layers.enableAll();
-    const label = getLabel('L4');
-    mesh.add(label);
-
-    three.orbitGroup.add(mesh);
+    addPoint('L4', position);
+    addEllipse(position, -0.5);
 }
 
 function setupL5() {
     if (!three.scene) return;
 
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xea6730,
-    });
-
-    const geometry = new THREE.SphereGeometry(
-        props.formData.massTwo * 10,
-        16,
-        16,
-    );
-    const mesh = new THREE.Mesh(geometry, material);
     const forwardPosition = (scaledDistance.value * Math.sqrt(3)) / 2;
-    mesh.position.set(scaledDistance.value * 0.5, -forwardPosition, 0);
-
-    const curve = new THREE.EllipseCurve(
+    const position = new THREE.Vector3(
+        scaledDistance.value * 0.5,
+        -forwardPosition,
         0,
-        0, // ax, aY
-        props.formData.massTwo * 400,
-        props.formData.massTwo * 100, // xRadius, yRadius
-        0,
-        2 * Math.PI, // aStartAngle, aEndAngle
-        false, // aClockwise
-        0.51, // aRotation
     );
-
-    const points = curve.getPoints(50);
-    const elipseGeometry = new THREE.BufferGeometry().setFromPoints(points);
-
-    // Create the final object to add to the scene
-    const ellipse = new THREE.Line(elipseGeometry, material);
-    ellipse.position.set(mesh.position.x, mesh.position.y, 0);
-    three.orbitGroup.add(ellipse);
-
-    mesh.layers.enableAll();
-    const label = getLabel('L5');
-    mesh.add(label);
-
-    three.orbitGroup.add(mesh);
+    addPoint('L5', position);
+    addEllipse(position);
 }
 
 function animate() {
