@@ -13,28 +13,46 @@
             <div>
                 <table class="table">
                     <tbody>
-                        <tr>
+                        <!-- <tr>
                             <th>One AU</th>
                             <td class="text-end">
                                 {{ formatNumber(physicsConstants.AU) }} km
                             </td>
-                        </tr>
+                        </tr> -->
                         <tr>
-                            <th>Distance from Earth to L1</th>
+                            <th>Distance from Planet to L1</th>
                             <td class="text-end">
                                 {{ formatNumber(L1Point) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Distance from Earth to L2</th>
+                            <th>Distance from the Star to L1</th>
+                            <td class="text-end">{{ L1SunPoint }} au</td>
+                        </tr>
+                        <tr>
+                            <th>Distance from Planet to L2</th>
                             <td class="text-end">
                                 {{ formatNumber(L2Point) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Distance from Earth Orbit to L3</th>
+                            <th>Distance from the Star to L2</th>
+                            <td class="text-end">{{ L2SunPoint }} au</td>
+                        </tr>
+                        <tr>
+                            <th>Distance from Planet Orbit to L3</th>
                             <td class="text-end">
                                 {{ formatNumber(L3Point) }} km
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Distance from the Star to L3</th>
+                            <td class="text-end">{{ L3SunPoint }} au</td>
+                        </tr>
+                        <tr>
+                            <th>Distance from Planet to L4 and L5</th>
+                            <td class="text-end">
+                                {{ formatNumber(L4andL5Points) }} km
                             </td>
                         </tr>
                     </tbody>
@@ -152,6 +170,13 @@ const L1Point = computed<number>(() => {
     return rL1; // physicsConstants.AU / rL1;
 });
 
+const L1SunPoint = computed<string>(() => {
+    return (
+        (physicsConstants.AU - L1Point.value) /
+        physicsConstants.AU
+    ).toFixed(3);
+});
+
 const L2Point = computed<number>(() => {
     // TODO: Update this if the user changes relationship
     const R = props.formData.distance * physicsConstants.AU;
@@ -164,6 +189,13 @@ const L2Point = computed<number>(() => {
     return rL2; // physicsConstants.AU / rL2;
 });
 
+const L2SunPoint = computed<string>(() => {
+    return (
+        (physicsConstants.AU + L2Point.value) /
+        physicsConstants.AU
+    ).toFixed(3);
+});
+
 const L3Point = computed<number>(() => {
     const R = props.formData.distance * physicsConstants.AU;
     const mSun = physicsConstants.sunMass;
@@ -171,7 +203,21 @@ const L3Point = computed<number>(() => {
 
     const rL3 = R * ((7 * MEarth) / (12 * mSun));
 
-    return rL3; // physicsConstants.AU / rL3;
+    // we are returning negative here because we want a positive number to mean closer to the sun
+    return -rL3; // physicsConstants.AU / rL3;
+});
+
+const L3SunPoint = computed<string>(() => {
+    return (
+        (physicsConstants.AU + L3Point.value) /
+        physicsConstants.AU
+    ).toFixed(3);
+});
+
+const L4andL5Points = computed<number>(() => {
+    //const rL4andL5 = (physicsConstants.AU * Math.sqrt(3)) / 2;
+
+    return physicsConstants.AU * props.formData.distance; // physicsConstants.AU / rL4andL5;
 });
 
 function load() {
@@ -183,12 +229,21 @@ function load() {
     setupScene();
 }
 
+function resetScene() {
+    if (!three.scene || !three.canvas) return;
+
+    three.canvas.innerHTML = '';
+    three.scene.remove.apply(three.scene, three.scene.children);
+    three.renderer?.dispose();
+    three.renderer = null;
+    three.scene = new THREE.Scene();
+    three.orbitGroup = new THREE.Group();
+}
+
 function setupScene() {
     if (loading.value) return;
 
-    if (three.scene && three.canvas) {
-        removeAllChildNodes(three.canvas);
-    }
+    resetScene();
 
     setupThreeJS();
 
@@ -207,9 +262,6 @@ function setupScene() {
 }
 
 function setupThreeJS() {
-    three.scene = new THREE.Scene();
-    three.group = new THREE.Group();
-
     // Renderer
     three.renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -255,7 +307,6 @@ function setupThreeJS() {
     const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
 
     three.scene.add(light);
-
     three.scene.add(three.orbitGroup);
 }
 
@@ -328,7 +379,7 @@ function getLabel(name: string) {
     labelDiv.textContent = name;
     labelDiv.style.backgroundColor = 'transparent';
     labelDiv.style.color = 'white';
-    labelDiv.style.fontSize = '16px';
+    labelDiv.style.fontSize = '12px';
     labelDiv.style.fontFamily = 'sans-serif';
     labelDiv.style.padding = '0.5em';
     labelDiv.style.borderRadius = '0.5em';
@@ -426,7 +477,27 @@ function setupL4() {
         16,
     );
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(scaledDistance.value * 0.5, scaledDistance.value, 0);
+    const forwardPosition = (scaledDistance.value * Math.sqrt(3)) / 2;
+    mesh.position.set(scaledDistance.value * 0.5, forwardPosition, 0);
+
+    const curve = new THREE.EllipseCurve(
+        0,
+        0, // ax, aY
+        props.formData.massTwo * 400,
+        props.formData.massTwo * 100, // xRadius, yRadius
+        0,
+        2 * Math.PI, // aStartAngle, aEndAngle
+        false, // aClockwise
+        -0.51, // aRotation
+    );
+
+    const points = curve.getPoints(50);
+    const elipseGeometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    // Create the final object to add to the scene
+    const ellipse = new THREE.Line(elipseGeometry, material);
+    ellipse.position.set(mesh.position.x, mesh.position.y, 0);
+    three.orbitGroup.add(ellipse);
 
     mesh.layers.enableAll();
     const label = getLabel('L4');
@@ -448,7 +519,28 @@ function setupL5() {
         16,
     );
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(scaledDistance.value * 0.5, -scaledDistance.value, 0);
+    const forwardPosition = (scaledDistance.value * Math.sqrt(3)) / 2;
+    mesh.position.set(scaledDistance.value * 0.5, -forwardPosition, 0);
+
+    const curve = new THREE.EllipseCurve(
+        0,
+        0, // ax, aY
+        props.formData.massTwo * 400,
+        props.formData.massTwo * 100, // xRadius, yRadius
+        0,
+        2 * Math.PI, // aStartAngle, aEndAngle
+        false, // aClockwise
+        0.51, // aRotation
+    );
+
+    const points = curve.getPoints(50);
+    const elipseGeometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    // Create the final object to add to the scene
+    const ellipse = new THREE.Line(elipseGeometry, material);
+    ellipse.position.set(mesh.position.x, mesh.position.y, 0);
+    three.orbitGroup.add(ellipse);
+
     mesh.layers.enableAll();
     const label = getLabel('L5');
     mesh.add(label);
@@ -476,7 +568,7 @@ function animate() {
     if (now == animation.prevTick) return;
     animation.prevTick = now;
 
-    three.orbitGroup.rotateOnAxis(animation.rotationAxis, 0.01);
+    three.orbitGroup.rotateOnAxis(animation.rotationAxis, 0.005);
 }
 
 watch(props.formData, () => {
