@@ -64,8 +64,13 @@
 <script setup lang="ts">
 // TODO:
 
-// 1. Possible just have a "red" and "blue" color for the spheres instead of textures
-// 2. Set body radius based on mass?
+// 1. Curve the lagrange ellipse to match the orbit of the planet
+// 2. Change the skins and masses of the bodies when the user changes the relationship
+
+// OPTIONAL:
+// 1. Allow the user to click and add a point to the solar plane. This object will then rotate with the grop but also move it's position depending on the position relative to the masses. If the object is on a lagrange point it will stay still. If it is not then it will move towards that body
+// 1b. If we do the above add small circles around the L1, L2, L3 points to show the area of influence
+// 2. Pause simulation. Or add a start / stop button?
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { ILagrangeForm } from './types';
@@ -481,6 +486,8 @@ function animate() {
     three.orbitGroup.rotateOnAxis(animation.rotationAxis, 0.005);
 }
 
+// Rebuild our scene when the form data changes.
+// TODO: Might not need to do this?
 watch(props.formData, () => {
     setupScene();
 });
