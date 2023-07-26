@@ -64,7 +64,7 @@
 <script setup lang="ts">
 // TODO:
 
-// 1. Curve the lagrange ellipse to match the orbit of the planet
+// 1. Curve the lagrange ellipse to match the orbit of the planet?
 // 2. Change the skins and masses of the bodies when the user changes the relationship
 
 // OPTIONAL:
@@ -92,6 +92,7 @@ import {
     CSS2DObject,
     CSS2DRenderer,
 } from 'three/examples/jsm/renderers/CSS2DRenderer';
+import { GUI } from 'dat.gui';
 
 const props = defineProps<{
     formData: ILagrangeForm;
@@ -291,12 +292,82 @@ function setupThreeJS() {
     three.controls.maxDistance = cameraDistance * 4;
     three.controls.minDistance = cameraDistance / 2;
 
+    three.canvas.addEventListener('click', addClickPoint, false);
+
+    // const raycaster = new THREE.Raycaster();
+    // const sceneMeshes: THREE.Mesh[] = [];
+    // const dir = new THREE.Vector3();
+    // let intersects: THREE.Intersection[] = [];
+
+    // three.controls.addEventListener('change', function () {
+    //     // xLine.position.copy(three.controls.target)
+    //     // yLine.position.copy(controls.target)
+    //     // zLine.position.copy(controls.target)
+
+    //     if (!three.controls) return;
+
+    //     raycaster.set(
+    //         three.controls.target,
+    //         dir
+    //             .subVectors(three.camera.position, three.controls.target)
+    //             .normalize(),
+    //     );
+
+    //     intersects = raycaster.intersectObjects(sceneMeshes, false);
+    //     console.log(intersects);
+    //     if (intersects.length > 0) {
+    //         console.log('hit');
+    //         if (
+    //             intersects[0].distance <
+    //             three.controls.target.distanceTo(three.camera.position)
+    //         ) {
+    //             three.camera.position.copy(intersects[0].point);
+    //         }
+    //     }
+    // });
+
     // Lights
     three.scene.add(new THREE.AmbientLight(0x404040));
     const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
 
     three.scene.add(light);
     three.scene.add(three.orbitGroup);
+
+    // // GUI
+    // three.gui = new dat.GUI({ autoPlace: false });
+    // three.canvas.appendChild(three.gui.domElement);
+}
+
+// TODO: Find the point a user clicked and place a point there
+// Try to intersect the point with the orbit CircleGeometry
+function addClickPoint() {
+    if (!three.controls) return;
+    // var geometry = new THREE.BoxGeometry(200, 200, 200);
+
+    // var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+    // var mesh = new THREE.Mesh(geometry, material);
+
+    // mesh.position.set(500, 400, 0);
+
+    // const material = new THREE.MeshBasicMaterial({
+    //     color: 0xea6730,
+    // });
+
+    // const geometry = new THREE.SphereGeometry(10, 12, 12);
+    // const mesh = new THREE.Mesh(geometry, material);
+    // mesh.position.set(position.x, position.y, position.z);
+
+    // mesh.layers.enableAll();
+    // const label = getLabel(name);
+    // mesh.add(label);
+
+    // three.orbitGroup.add(mesh);
+
+    // console.log(three.controls?.target);
+
+    // //scene is global
+    // three.orbitGroup.add(mesh);
 }
 
 function setupPlanet() {
@@ -352,6 +423,15 @@ function setupOrbit() {
 
     // this.drawDeltaV(orbit, endOrbit);
     three.orbitGroup.add(orbitMesh);
+
+    const geometry = new THREE.CircleGeometry(orbitSize * 2, 32);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.1,
+    });
+    const circle = new THREE.Mesh(geometry, material);
+    three.scene.add(circle);
 }
 
 function getLabel(name: string) {
@@ -403,7 +483,7 @@ function addEllipse(position: THREE.Vector3, rotation: number = 0.5) {
     });
 
     const curve = new THREE.EllipseCurve(
-        0,
+        10,
         0, // ax, aY
         300,
         100, // xRadius, yRadius
@@ -420,6 +500,26 @@ function addEllipse(position: THREE.Vector3, rotation: number = 0.5) {
     const ellipse = new THREE.Line(elipseGeometry, material);
     ellipse.position.set(position.x, position.y, 0);
     three.orbitGroup.add(ellipse);
+
+    // //Create a closed wavey loop
+    // const linecurve = new THREE.CubicBezierCurve(
+    //     new THREE.Vector2(300, 0),
+    //     new THREE.Vector2(45, 150),
+    //     new THREE.Vector2(-45, 150),
+    //     new THREE.Vector2(-300, 0),
+    // );
+
+    // const linepoints = linecurve.getPoints(50);
+    // const linegeometry = new THREE.BufferGeometry().setFromPoints(linepoints);
+
+    // const linematerial = new THREE.LineBasicMaterial({ color: 0xea6730 });
+
+    // // Create the final object to add to the scene
+    // const curveObject = new THREE.Line(linegeometry, linematerial);
+    // curveObject.position.set(position.x, position.y, 0);
+    // curveObject.rotation.set(0, 0, rotation);
+
+    // three.orbitGroup.add(curveObject);
 }
 
 function setupL1() {
@@ -446,6 +546,23 @@ function setupL4() {
         forwardPosition,
         0,
     );
+
+    // const gui = new GUI();
+    // const cubeFolder = gui.addFolder('L4');
+    // const cubeX = cubeFolder.add(position, 'x', 0, scaledDistance.value * 2);
+    // const cubeY = cubeFolder.add(position, 'y', 0, forwardPosition * 2);
+    // cubeFolder.open();
+
+    // cubeX.onChange(function (value: number) {
+    //     position.x = value;
+    //     addEllipse(position, -0.5);
+    // });
+
+    // cubeY.onChange(function (value: number) {
+    //     position.y = value;
+    //     addEllipse(position, -0.5);
+    // });
+
     addPoint('L4', position);
     addEllipse(position, -0.5);
 }
