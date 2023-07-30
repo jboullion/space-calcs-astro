@@ -424,14 +424,14 @@ function setupOrbit() {
     // this.drawDeltaV(orbit, endOrbit);
     three.orbitGroup.add(orbitMesh);
 
-    const geometry = new THREE.CircleGeometry(orbitSize * 2, 32);
-    const material = new THREE.MeshBasicMaterial({
-        color: 0xff0000,
-        transparent: true,
-        opacity: 0.1,
-    });
-    const circle = new THREE.Mesh(geometry, material);
-    three.scene.add(circle);
+    // const geometry = new THREE.CircleGeometry(orbitSize * 2, 32);
+    // const material = new THREE.MeshBasicMaterial({
+    //     color: 0xff0000,
+    //     transparent: true,
+    //     opacity: 0.1,
+    // });
+    // const circle = new THREE.Mesh(geometry, material);
+    // three.scene.add(circle);
 }
 
 function getLabel(name: string) {
