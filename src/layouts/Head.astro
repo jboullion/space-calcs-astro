@@ -1,7 +1,7 @@
 ---
 export interface Props {
-  title: string;
-  description: string;
+    title: string;
+    description: string;
 }
 
 const { title, description } = Astro.props;
@@ -15,58 +15,61 @@ const { title, description } = Astro.props;
 <title>{title}</title>
 <meta name="description" content={description} />
 <meta
-  name="keywords"
-  content="Calculators, Space, O'Neill Cylinder, Solar Power, Science Fiction, Hard Science Fiction, Space Settlement"
+    name="keywords"
+    content="Calculators, Space, O'Neill Cylinder, Solar Power, Science Fiction, Hard Science Fiction, Space Settlement"
 />
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
-  rel="preload"
-  as="style"
-  href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter&display=swap"
+    rel="preload"
+    as="style"
+    href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter&display=swap"
 />
 <link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter&display=swap"
-  media="print"
-  onload="this.media='all'"
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Orbitron&family=Inter&display=swap"
+    media="print"
+    onload="this.media='all'"
 />
 
 <!-- Store / Load darkmode -->
 <script is:inline>
-  // Credit: https://www.kevinzunigacuellar.com/blog/dark-mode-in-astro/
-  const theme = (() => {
-    if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-      return localStorage.getItem("theme");
-    }
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  })();
+    // Credit: https://www.kevinzunigacuellar.com/blog/dark-mode-in-astro/
+    const theme = (() => {
+        if (
+            typeof localStorage !== 'undefined' &&
+            localStorage.getItem('theme')
+        ) {
+            return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            return 'light';
+        }
+        return 'dark';
+    })();
 
-  if (theme === "light") {
-    document.documentElement.setAttribute("data-bs-theme", "light");
-  } else {
-    document.documentElement.setAttribute("data-bs-theme", "dark");
-  }
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+    }
 
-  window.localStorage.setItem("theme", theme);
+    window.localStorage.setItem('theme', theme);
 </script>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5QDKHJTWSC"
 ></script>
 <script is:inline>
-  window.dataLayer = window.dataLayer || [];
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-  gtag("js", new Date());
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
 
-  gtag("config", "G-5QDKHJTWSC");
+    gtag('config', 'G-5QDKHJTWSC');
 </script>
 
 <!-- Google Adsense -->
