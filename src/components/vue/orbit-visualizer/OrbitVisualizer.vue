@@ -70,7 +70,7 @@
                                 :min="1"
                                 :max="100000"
                                 @change="updateSimulationSpeed"
-                                tooltip="How much faster should the simulation run than real time?"
+                                tooltip="How much faster should the simulation run?"
                             />
 
                             <CheckboxInput
@@ -419,7 +419,7 @@ const formData = ref({
     angle: 0,
     gravity: 1,
     pause: false,
-    simulationSpeed: 2000,
+    simulationSpeed: 1,
     planetScale: 1,
 });
 
@@ -480,17 +480,21 @@ const scaledShipSpeed = computed(() => {
     return kmhTOms(orbit.value.velocity) * formData.value.planetScale;
 });
 
+const scaledSimulationSpeed = computed(() => {
+    return formData.value.simulationSpeed * 2000;
+});
+
 const scaledPlanetUpdateSpeed = computed(() => {
     return (
         velocityToUpdateSpeed(scaledPlanetSpeed.value) *
-        formData.value.simulationSpeed
+        scaledSimulationSpeed.value
     );
 });
 
 const scaledShipUpdateSpeed = computed(() => {
     return (
         velocityToUpdateSpeed(scaledShipSpeed.value) *
-        formData.value.simulationSpeed
+        scaledSimulationSpeed.value
     );
 });
 
@@ -498,7 +502,7 @@ const rotationSpeed = computed(() => {
     return (
         (radiansPerSecond(scaledPlanetRadius.value, scaledPlanetSpeed.value) /
             animation.value.FPS) *
-        formData.value.simulationSpeed
+        scaledSimulationSpeed.value
     );
 });
 
@@ -515,7 +519,7 @@ const orbitSpeed = computed(() => {
     return (
         (radiansPerSecond(totalOrbitHeight.value, scaledShipSpeed.value) /
             animation.value.FPS) *
-        formData.value.simulationSpeed
+        scaledSimulationSpeed.value
     );
 });
 
@@ -848,7 +852,7 @@ function startTrace() {
     clearOrbit();
 
     orbit.value.tracing = true;
-    orbit.value.tickTime = 100000 / formData.value.simulationSpeed; //orbit.value.period / formData.value.simulationSpeed * (100 * formData.value.simulationSpeed) //orbit.valueSpeed * 1000; //300; //this.;
+    orbit.value.tickTime = 100000 / scaledSimulationSpeed.value; //orbit.value.period / formData.value.simulationSpeed * (100 * formData.value.simulationSpeed) //orbit.valueSpeed * 1000; //300; //this.;
 
     orbit.value.interval = window.setInterval(traceOrbit, orbit.value.tickTime);
 
@@ -1131,8 +1135,8 @@ function updateOrbitalInclination() {
 }
 
 function updateSimulationSpeed() {
-    if (formData.value.simulationSpeed > 10000) {
-        formData.value.simulationSpeed = 10000;
+    if (formData.value.simulationSpeed > 10) {
+        formData.value.simulationSpeed = 10;
     } else if (formData.value.simulationSpeed < 1) {
         formData.value.simulationSpeed = 1;
     }

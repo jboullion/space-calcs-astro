@@ -106,14 +106,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
         image: '',
         link: '/calcs/space-elevator',
     },
-    {
-        id: 'lagrange-points',
-        name: 'Lagrange Points',
-        description: 'Calculate the Lagrange points for a two body system',
-        categories: [categories[ORBIT_CAT]],
-        image: '',
-        link: '/calcs/lagrange-points',
-    },
+    // {
+    //     id: 'lagrange-points',
+    //     name: 'Lagrange Points',
+    //     description: 'Calculate the Lagrange points for a two body system',
+    //     categories: [categories[ORBIT_CAT]],
+    //     image: '',
+    //     link: '/calcs/lagrange-points',
+    // },
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>
