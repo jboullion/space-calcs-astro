@@ -78,6 +78,7 @@
 // 1. Allow the user to click and add a point to the solar plane. This object will then rotate with the grop but also move it's position depending on the position relative to the masses. If the object is on a lagrange point it will stay still. If it is not then it will move towards that body
 // 1b. If we do the above add small circles around the L1, L2, L3 points to show the area of influence
 // 2. Pause simulation. Or add a start / stop button?
+// 3. Draw an equalateral triangle between the body and the L4 and L5 points
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { ILagrangeForm } from './types';
@@ -263,6 +264,9 @@ function setupThreeJS() {
         antialias: true,
         logarithmicDepthBuffer: true,
     }); // { alpha: true }
+    three.renderer.shadowMap.enabled = true;
+    three.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
     three.canvas = document.getElementById('lagrange-canvas');
 
     if (!three.canvas) return;
@@ -340,7 +344,19 @@ function setupThreeJS() {
         three.scene.add(light);
     } else {
         const light = new THREE.DirectionalLight(0xffffff, 1.5);
+
+        light.position.set(-scaledDistance.value * 1.3, 0, 0);
+
         light.castShadow = true;
+        light.shadow.mapSize.width = 512;
+        light.shadow.mapSize.height = 512;
+        light.shadow.camera.near = 100;
+        light.shadow.camera.far = scaledDistance.value * 3;
+        light.shadow.camera.left = 200;
+        light.shadow.camera.right = -200;
+        light.shadow.camera.top = 200;
+        light.shadow.camera.bottom = -200;
+
         three.scene.add(light);
     }
 
@@ -397,14 +413,16 @@ function setupPlanet() {
     three.bodyTwo = new THREE.Mesh(geometry, material as THREE.Material);
     three.bodyTwo.position.set(scaledDistance.value, 0, 0);
 
-    // if (props.formData.relationship === 'star') {
-    //     three.bodyTwo.rotation.x = Math.PI / 2;
-    //     //three.bodyTwo.rotation.z = +0.4;
-    //     // three.earthRotationGroup.add(three.bodyTwo);
-    //     // three.earthRotationGroup.position.set(scaledDistance.value, 0, 0);
-    // } else {
-    //     three.bodyTwo.rotation.x = Math.PI / 2;
-    // }
+    if (props.formData.relationship.value === 'star') {
+        //three.bodyTwo.rotation.x = Math.PI / 2;
+        //three.bodyTwo.rotation.z = +0.4;
+        // three.earthRotationGroup.add(three.bodyTwo);
+        // three.earthRotationGroup.position.set(scaledDistance.value, 0, 0);
+    } else {
+        three.bodyTwo.castShadow = true;
+        three.bodyTwo.receiveShadow = true;
+        //three.bodyTwo.rotation.x = Math.PI / 2;
+    }
 
     three.bodyTwo.rotation.x = Math.PI / 2;
 
@@ -431,6 +449,11 @@ function setupSun() {
 
     three.bodyOne = new THREE.Mesh(geometry, material);
     three.bodyOne.rotation.set(Math.PI / 2, 0, 0);
+
+    if (props.formData.relationship.value === 'moon') {
+        three.bodyOne.castShadow = true;
+        three.bodyOne.receiveShadow = true;
+    }
 
     three.orbitGroup.add(three.bodyOne);
 }
@@ -647,4 +670,14 @@ function animate() {
 watch(props.formData, () => {
     setupScene();
 });
+
+// window.addEventListener('resize', onWindowResize, false);
+// function onWindowResize() {
+//     if (!three.renderer || !three.camera) return;
+
+//     three.camera.aspect = window.innerWidth / window.innerHeight;
+//     three.camera.updateProjectionMatrix();
+//     three.renderer.setSize(window.innerWidth, window.innerHeight);
+//     three.renderer.render(three.scene, three.camera);
+// }
 </script>
