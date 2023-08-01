@@ -7,6 +7,13 @@
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
     </div>
 
+    <div class="pb-2">
+        <p>
+            <b>Note:</b> This system is not to scale and is meant only as a
+            visual representation
+        </p>
+    </div>
+
     <div class="p-2 rounded border mb-5">
         <div>
             <h2>Results</h2>
@@ -78,16 +85,7 @@ import type { ILagrangeForm } from './types';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-// import {
-//   CSS2DObject,
-//   CSS2DRenderer,
-// } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-import {
-    formatNumber,
-    physicsConstants,
-    removeAllChildNodes,
-    roundToDecimal,
-} from '../utils';
+import { formatNumber, physicsConstants } from '../utils';
 import {
     CSS2DObject,
     CSS2DRenderer,
@@ -103,12 +101,14 @@ const loading = ref(true);
 interface Textures {
     space: THREE.Texture | null;
     earth: THREE.Texture | null;
+    moon: THREE.Texture | null;
     sun: THREE.Texture | null;
 }
 
 const textures: Textures = {
     space: null,
     earth: null,
+    moon: null,
     sun: null,
 };
 
@@ -124,6 +124,7 @@ const three = {
     labelRenderer: null as CSS2DRenderer | null,
     group: new THREE.Group(),
     orbitGroup: new THREE.Group(),
+    //earthRotationGroup: new THREE.Group(),
     minMovement: null as THREE.Vector3 | null,
     maxMovement: null as THREE.Vector3 | null,
 };
@@ -132,6 +133,7 @@ const animation = {
     FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
     prevTick: 0, // track the last tick timestamp
     rotationAxis: new THREE.Vector3(0, 0, 1),
+    earthRotationAxis: new THREE.Vector3(0, 1, 0),
 };
 
 onMounted(() => {
@@ -214,6 +216,7 @@ function load() {
     const textureLoader = new THREE.TextureLoader();
     textures.earth = textureLoader.load('/textures/2k_earth_daymap.jpg');
     textures.sun = textureLoader.load('/textures/2k_sun.jpg');
+    textures.moon = textureLoader.load('/textures/2k_moon.jpg');
 
     loading.value = false;
     setupScene();
@@ -228,6 +231,9 @@ function resetScene() {
     three.renderer = null;
     three.scene = new THREE.Scene();
     three.orbitGroup = new THREE.Group();
+    three.bodyOne = new THREE.Mesh();
+    three.bodyTwo = new THREE.Mesh();
+    //three.earthRotationGroup = new THREE.Group();
 }
 
 function setupScene() {
@@ -328,9 +334,17 @@ function setupThreeJS() {
 
     // Lights
     three.scene.add(new THREE.AmbientLight(0x404040));
-    const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
 
-    three.scene.add(light);
+    if (props.formData.relationship.value === 'star') {
+        const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
+        three.scene.add(light);
+    } else {
+        const light = new THREE.DirectionalLight(0xffffff, 1.5);
+        light.castShadow = true;
+        three.scene.add(light);
+    }
+
+    //three.scene.add(three.earthRotationGroup);
     three.scene.add(three.orbitGroup);
 
     // // GUI
@@ -372,19 +386,29 @@ function addClickPoint() {
 
 function setupPlanet() {
     const material = new THREE.MeshLambertMaterial({
-        map: textures.earth,
-        // transparent: true,
-        // opacity: 0.1,
+        map:
+            props.formData.relationship.value === 'star'
+                ? textures.earth
+                : textures.moon,
     });
 
     const geometry = new THREE.SphereGeometry(100, 32, 32);
 
-    const mesh = new THREE.Mesh(geometry, material as THREE.Material);
+    three.bodyTwo = new THREE.Mesh(geometry, material as THREE.Material);
+    three.bodyTwo.position.set(scaledDistance.value, 0, 0);
 
-    mesh.rotation.x = Math.PI / 2;
-    mesh.position.set(scaledDistance.value, 0, 0);
+    // if (props.formData.relationship === 'star') {
+    //     three.bodyTwo.rotation.x = Math.PI / 2;
+    //     //three.bodyTwo.rotation.z = +0.4;
+    //     // three.earthRotationGroup.add(three.bodyTwo);
+    //     // three.earthRotationGroup.position.set(scaledDistance.value, 0, 0);
+    // } else {
+    //     three.bodyTwo.rotation.x = Math.PI / 2;
+    // }
 
-    three.orbitGroup.add(mesh);
+    three.bodyTwo.rotation.x = Math.PI / 2;
+
+    three.orbitGroup.add(three.bodyTwo);
 }
 
 function setupSun() {
@@ -394,14 +418,21 @@ function setupSun() {
         map: textures.sun,
         side: THREE.FrontSide,
     });
-    material.emissive = new THREE.Color(0xffff00);
-    material.emissiveIntensity = 0.6;
+
+    if (props.formData.relationship.value === 'moon') {
+        material.map = textures.earth;
+    } else {
+        // three.earthRotationGroup.add(three.bodyOne);
+        material.emissive = new THREE.Color(0xffff00);
+        material.emissiveIntensity = 0.6;
+    }
 
     const geometry = new THREE.SphereGeometry(200, 32, 32);
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.set(Math.PI / 2, 0, 0);
 
-    three.orbitGroup.add(mesh);
+    three.bodyOne = new THREE.Mesh(geometry, material);
+    three.bodyOne.rotation.set(Math.PI / 2, 0, 0);
+
+    three.orbitGroup.add(three.bodyOne);
 }
 
 function setupOrbit() {
@@ -523,12 +554,12 @@ function addEllipse(position: THREE.Vector3, rotation: number = 0.5) {
 }
 
 function setupL1() {
-    const position = new THREE.Vector3(scaledDistance.value * 0.8, 0, 0);
+    const position = new THREE.Vector3(scaledDistance.value * 0.75, 0, 0);
     addPoint('L1', position);
 }
 
 function setupL2() {
-    const position = new THREE.Vector3(scaledDistance.value * 1.2, 0, 0);
+    const position = new THREE.Vector3(scaledDistance.value * 1.25, 0, 0);
     addPoint('L2', position);
 }
 
@@ -601,6 +632,14 @@ function animate() {
     animation.prevTick = now;
 
     three.orbitGroup.rotateOnAxis(animation.rotationAxis, 0.005);
+
+    if (props.formData.relationship.value === 'star') {
+        // * 365 for earth days...but that looks TOO fast
+        three.bodyTwo.rotateOnAxis(animation.earthRotationAxis, 0.005 * 10);
+    } else {
+        // * 27 for a month...but that looks too fast
+        three.bodyOne.rotateOnAxis(animation.earthRotationAxis, 0.005 * 4);
+    }
 }
 
 // Rebuild our scene when the form data changes.

@@ -1,5 +1,9 @@
+export type BodyRelation = {
+    name: string;
+    value: string;
+};
 export interface ILagrangeForm {
-    relationship: 'star' | 'moon';
+    relationship: BodyRelation;
     massOne: number;
     massTwo: number;
     distance: number;

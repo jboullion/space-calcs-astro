@@ -50,13 +50,13 @@
 import { computed, onMounted, ref } from 'vue';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
-import type { ILagrangeForm } from './types';
+import type { BodyRelation, ILagrangeForm } from './types';
 
 const props = defineProps<{
     formData: ILagrangeForm;
 }>();
 
-const relationships = [
+const relationships: BodyRelation[] = [
     {
         name: 'Star and Planet',
         value: 'star',
