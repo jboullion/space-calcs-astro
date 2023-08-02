@@ -1,0 +1,31 @@
+<div id="skeletonLoader" class="row justify-content-center calculator">
+    <div id="skeleton__form" class="col-lg-4">
+        <div class="p-2 rounded border mb-5"></div>
+    </div>
+    <div id="skeleton__results" class="col-lg-8">
+        <div class="p-2 rounded border mb-5"></div>
+    </div>
+</div>
+
+<style>
+    @keyframes fade {
+        0%,
+        100% {
+            opacity: 0.3;
+        }
+        50% {
+            opacity: 0;
+        }
+    }
+
+    #skeletonLoader {
+        opacity: 0.3;
+        animation: fade 2s linear;
+    }
+
+    #skeleton__form > div,
+    #skeleton__results > div {
+        background-color: #ccc;
+        height: 500px;
+    }
+</style>

@@ -243,6 +243,12 @@ function load() {
     textures.moon = textureLoader.load('/textures/2k_moon.jpg');
 
     loading.value = false;
+
+    if (document) {
+        const skeletonLoader = document.querySelector('#skeletonLoader');
+        if (skeletonLoader) skeletonLoader.remove();
+    }
+
     setupScene();
 }
 

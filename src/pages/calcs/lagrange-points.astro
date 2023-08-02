@@ -6,6 +6,8 @@ import Lagrange from '../../components/vue/lagrange/Lagrange.vue';
 import References from '../../components/shared/References.astro';
 import type { Reference } from '../../types/types';
 import { calculators } from '../../utils/calculator-list';
+import { Skeleton } from 'three';
+import SkeletonLoader from '../../components/shared/SkeletonLoader.astro';
 
 const calculator = calculators.find((calc) => calc.id === 'lagrange-points');
 
@@ -27,7 +29,9 @@ const references: Reference[] = [
         <div class="alert alert-warning text-center mb-5">
             <i class="fa-solid fa-triangle-exclamation"></i> Under construction!
         </div>
-        <Lagrange client:load />
+        <SkeletonLoader />
+        <Lagrange client:only />
+
         <References references={references} />
     </div>
 </Layout>
