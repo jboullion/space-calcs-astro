@@ -94,7 +94,7 @@ import {
     CSS2DObject,
     CSS2DRenderer,
 } from 'three/examples/jsm/renderers/CSS2DRenderer';
-import { GUI } from 'dat.gui';
+// import { GUI } from 'dat.gui';
 
 const props = defineProps<{
     formData: ILagrangeForm;
