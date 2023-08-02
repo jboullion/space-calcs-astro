@@ -18,15 +18,13 @@
 
 // ? NOTE: Optional Improvements!
 
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 
 import LagrangeForm from './LagrangeForm.vue';
-import LagrangeResults from './LagrangeResults.vue';
 import LagrangeVisual from './LagrangeVisual.vue';
 
 import type { ILagrangeForm } from './types';
 
-// TODO: Do we want to move the default value to "constants.ts"?
 const formData = reactive<ILagrangeForm>({
     relationship: {
         name: 'Star and Planet',
@@ -53,16 +51,5 @@ watch(
         }
     },
 );
-
-// watch(formData.value.relationship, () => {
-//     console.log('relationship changed');
-//     if (formData.value.relationship.value === 'star') {
-//         formData.value.massOne = 1;
-//         formData.value.massTwo = 1;
-//     } else {
-//         formData.value.massOne = 1;
-//         formData.value.massTwo = 0.012;
-//     }
-// });
 </script>
 <style></style>
