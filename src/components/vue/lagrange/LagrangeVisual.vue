@@ -89,12 +89,13 @@ import type { ILagrangeForm } from './types';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import { formatNumber, physicsConstants } from '../utils';
 import {
     CSS2DObject,
     CSS2DRenderer,
 } from 'three/examples/jsm/renderers/CSS2DRenderer';
 // import { GUI } from 'dat.gui';
+
+import { formatNumber, physicsConstants } from '../utils';
 
 const props = defineProps<{
     formData: ILagrangeForm;
