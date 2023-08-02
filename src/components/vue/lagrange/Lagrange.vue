@@ -6,7 +6,7 @@
             </div>
         </div>
         <div id="lagrange__results" class="col-lg-8">
-            <LagrangeVisual :formData="formData" />
+            <LagrangeVisual v-if="isClient" :formData="formData" />
         </div>
     </div>
 </template>
@@ -36,6 +36,8 @@ const formData = reactive<ILagrangeForm>({
 });
 
 onMounted(() => {});
+
+const isClient = typeof window !== 'undefined';
 
 watch(
     () => formData.relationship,
