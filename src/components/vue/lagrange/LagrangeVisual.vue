@@ -27,37 +27,40 @@
                             </td>
                         </tr> -->
                         <tr>
-                            <th>Planet to L1</th>
+                            <th>{{ bodyTwoName }} to L1</th>
                             <td class="text-end">
                                 {{ formatNumber(L1Point, 0) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Star to L1</th>
+                            <th>{{ bodyOneName }} to L1</th>
                             <td class="text-end">{{ L1SunPoint }} au</td>
                         </tr>
                         <tr>
-                            <th>Planet to L2</th>
+                            <th>{{ bodyTwoName }} to L2</th>
                             <td class="text-end">
                                 {{ formatNumber(L2Point, 0) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Star to L2</th>
+                            <th>{{ bodyOneName }} to L2</th>
                             <td class="text-end">{{ L2SunPoint }} au</td>
                         </tr>
                         <tr>
-                            <th>Planet Orbit to L3</th>
+                            <th>{{ bodyTwoName }} Orbit to L3</th>
                             <td class="text-end">
                                 {{ formatNumber(L3Point, 0) }} km
                             </td>
                         </tr>
                         <tr>
-                            <th>Star to L3</th>
+                            <th>{{ bodyOneName }} to L3</th>
                             <td class="text-end">{{ L3SunPoint }} au</td>
                         </tr>
                         <tr>
-                            <th>Planet and Star to L4 and L5</th>
+                            <th>
+                                {{ bodyTwoName }} and {{ bodyOneName }} to L4
+                                and L5
+                            </th>
                             <td class="text-end">
                                 {{ formatNumber(L4andL5Points, 0) }} km
                             </td>
@@ -71,14 +74,14 @@
 <script setup lang="ts">
 // TODO:
 
-// 1. Curve the lagrange ellipse to match the orbit of the planet?
-// 2. Change the skins and masses of the bodies when the user changes the relationship
+// 1. Update result table language
 
 // OPTIONAL:
 // 1. Allow the user to click and add a point to the solar plane. This object will then rotate with the grop but also move it's position depending on the position relative to the masses. If the object is on a lagrange point it will stay still. If it is not then it will move towards that body
 // 1b. If we do the above add small circles around the L1, L2, L3 points to show the area of influence
 // 2. Pause simulation. Or add a start / stop button?
 // 3. Draw an equalateral triangle between the body and the L4 and L5 points
+// 4. Curve the lagrange ellipse to match the orbit of the planet?
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { ILagrangeForm } from './types';
@@ -137,6 +140,8 @@ const animation = {
     earthRotationAxis: new THREE.Vector3(0, 1, 0),
 };
 
+const scaledDistance = 1000;
+
 onMounted(() => {
     load();
 
@@ -147,70 +152,87 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', setupScene);
 });
 
-const scaledDistance = computed<number>(() => {
-    return 1000; // props.formData.distance *
+const bodyOneName = computed<string>(() => {
+    return props.formData.relationship.value === 'star' ? 'Star' : 'Planet';
+});
+
+const bodyTwoName = computed<string>(() => {
+    return props.formData.relationship.value === 'star' ? 'Planet' : 'Moon';
+});
+
+const calcDistance = computed<number>(() => {
+    return props.formData.relationship.value === 'star'
+        ? physicsConstants.AU * props.formData.distance
+        : physicsConstants.earthRadius * props.formData.distance;
+});
+
+const calcMassOne = computed<number>(() => {
+    if (props.formData.relationship.value === 'star') {
+        return physicsConstants.sunMass * props.formData.massOne;
+    } else {
+        return physicsConstants.earthMass * props.formData.massOne;
+    }
+    // props.formData.massOne *
+});
+
+const calcMassTwo = computed<number>(() => {
+    return physicsConstants.earthMass * props.formData.massTwo;
 });
 
 const L1Point = computed<number>(() => {
-    // TODO: Update this if the user changes relationship
-    const R = props.formData.distance * physicsConstants.AU;
-    const mSun = physicsConstants.sunMass;
-    const MEarth = physicsConstants.earthMass;
+    const R = calcDistance.value;
+    const bodyOne = calcMassOne.value;
+    const bodyTwo = calcMassTwo.value;
 
     // Calculate the distance to the L1 point
-    const rL1 = R * Math.pow(MEarth / (3 * mSun), 1 / 3);
+    const rL1 = R * Math.pow(bodyTwo / (3 * bodyOne), 1 / 3);
 
     return rL1; // physicsConstants.AU / rL1;
 });
 
 const L1SunPoint = computed<string>(() => {
-    return (
-        (physicsConstants.AU - L1Point.value) /
-        physicsConstants.AU
-    ).toFixed(3);
+    return ((calcDistance.value - L1Point.value) / calcDistance.value).toFixed(
+        3,
+    );
 });
 
 const L2Point = computed<number>(() => {
-    // TODO: Update this if the user changes relationship
-    const R = props.formData.distance * physicsConstants.AU;
-    const mSun = physicsConstants.sunMass;
-    const MEarth = physicsConstants.earthMass;
+    const R = calcDistance.value;
+    const bodyOne = calcMassOne.value;
+    const bodyTwo = calcMassTwo.value;
 
     // Calculate the distance to the L1 point
-    const rL2 = R * Math.pow(MEarth / (3 * mSun), 1 / 3) * (1 + MEarth / mSun);
+    const rL2 =
+        R * Math.pow(bodyTwo / (3 * bodyOne), 1 / 3) * (1 + bodyTwo / bodyOne);
 
     return rL2; // physicsConstants.AU / rL2;
 });
 
 const L2SunPoint = computed<string>(() => {
-    return (
-        (physicsConstants.AU + L2Point.value) /
-        physicsConstants.AU
-    ).toFixed(3);
+    return ((calcDistance.value + L2Point.value) / calcDistance.value).toFixed(
+        3,
+    );
 });
 
 const L3Point = computed<number>(() => {
-    const R = props.formData.distance * physicsConstants.AU;
-    const mSun = physicsConstants.sunMass;
-    const MEarth = physicsConstants.earthMass;
+    const R = calcDistance.value;
+    const bodyOne = calcMassOne.value;
+    const bodyTwo = calcMassTwo.value;
 
-    const rL3 = R * ((7 * MEarth) / (12 * mSun));
+    const rL3 = R * ((7 * bodyTwo) / (12 * bodyOne));
 
     // we are returning negative here because we want a positive number to mean closer to the sun
     return -rL3; // physicsConstants.AU / rL3;
 });
 
 const L3SunPoint = computed<string>(() => {
-    return (
-        (physicsConstants.AU + L3Point.value) /
-        physicsConstants.AU
-    ).toFixed(3);
+    return ((calcDistance.value + L3Point.value) / calcDistance.value).toFixed(
+        3,
+    );
 });
 
 const L4andL5Points = computed<number>(() => {
-    //const rL4andL5 = (physicsConstants.AU * Math.sqrt(3)) / 2;
-
-    return physicsConstants.AU * props.formData.distance; // physicsConstants.AU / rL4andL5;
+    return calcDistance.value;
 });
 
 function load() {
@@ -287,7 +309,7 @@ function setupThreeJS() {
     three.canvas.appendChild(three.labelRenderer.domElement);
 
     // Camera
-    const cameraDistance = scaledDistance.value * 3;
+    const cameraDistance = scaledDistance * 3;
     three.camera = new THREE.PerspectiveCamera(
         45,
         width / height,
@@ -345,13 +367,13 @@ function setupThreeJS() {
     } else {
         const light = new THREE.DirectionalLight(0xffffff, 1.5);
 
-        light.position.set(-scaledDistance.value * 1.3, 0, 0);
+        light.position.set(-scaledDistance * 1.3, 0, 0);
 
         light.castShadow = true;
         light.shadow.mapSize.width = 512;
         light.shadow.mapSize.height = 512;
         light.shadow.camera.near = 100;
-        light.shadow.camera.far = scaledDistance.value * 3;
+        light.shadow.camera.far = scaledDistance * 3;
         light.shadow.camera.left = 200;
         light.shadow.camera.right = -200;
         light.shadow.camera.top = 200;
@@ -411,13 +433,13 @@ function setupPlanet() {
     const geometry = new THREE.SphereGeometry(100, 32, 32);
 
     three.bodyTwo = new THREE.Mesh(geometry, material as THREE.Material);
-    three.bodyTwo.position.set(scaledDistance.value, 0, 0);
+    three.bodyTwo.position.set(scaledDistance, 0, 0);
 
     if (props.formData.relationship.value === 'star') {
         //three.bodyTwo.rotation.x = Math.PI / 2;
         //three.bodyTwo.rotation.z = +0.4;
         // three.earthRotationGroup.add(three.bodyTwo);
-        // three.earthRotationGroup.position.set(scaledDistance.value, 0, 0);
+        // three.earthRotationGroup.position.set(scaledDistance, 0, 0);
     } else {
         three.bodyTwo.castShadow = true;
         three.bodyTwo.receiveShadow = true;
@@ -461,8 +483,8 @@ function setupSun() {
 function setupOrbit() {
     if (!three.scene) return;
 
-    const orbitSize = scaledDistance.value;
-    const lineSize = props.formData.distance;
+    const orbitSize = scaledDistance;
+    const lineSize = 2;
 
     const orbitGeometry = new THREE.RingGeometry(
         orbitSize - lineSize,
@@ -577,33 +599,33 @@ function addEllipse(position: THREE.Vector3, rotation: number = 0.5) {
 }
 
 function setupL1() {
-    const position = new THREE.Vector3(scaledDistance.value * 0.75, 0, 0);
+    const position = new THREE.Vector3(scaledDistance * 0.75, 0, 0);
     addPoint('L1', position);
 }
 
 function setupL2() {
-    const position = new THREE.Vector3(scaledDistance.value * 1.25, 0, 0);
+    const position = new THREE.Vector3(scaledDistance * 1.25, 0, 0);
     addPoint('L2', position);
 }
 
 function setupL3() {
-    const position = new THREE.Vector3(scaledDistance.value * -1, 0, 0);
+    const position = new THREE.Vector3(scaledDistance * -1, 0, 0);
     addPoint('L3', position);
 }
 
 function setupL4() {
     if (!three.scene) return;
 
-    const forwardPosition = (scaledDistance.value * Math.sqrt(3)) / 2;
+    const forwardPosition = (scaledDistance * Math.sqrt(3)) / 2;
     const position = new THREE.Vector3(
-        scaledDistance.value * 0.5,
+        scaledDistance * 0.5,
         forwardPosition,
         0,
     );
 
     // const gui = new GUI();
     // const cubeFolder = gui.addFolder('L4');
-    // const cubeX = cubeFolder.add(position, 'x', 0, scaledDistance.value * 2);
+    // const cubeX = cubeFolder.add(position, 'x', 0, scaledDistance * 2);
     // const cubeY = cubeFolder.add(position, 'y', 0, forwardPosition * 2);
     // cubeFolder.open();
 
@@ -624,9 +646,9 @@ function setupL4() {
 function setupL5() {
     if (!three.scene) return;
 
-    const forwardPosition = (scaledDistance.value * Math.sqrt(3)) / 2;
+    const forwardPosition = (scaledDistance * Math.sqrt(3)) / 2;
     const position = new THREE.Vector3(
-        scaledDistance.value * 0.5,
+        scaledDistance * 0.5,
         -forwardPosition,
         0,
     );
@@ -667,9 +689,16 @@ function animate() {
 
 // Rebuild our scene when the form data changes.
 // TODO: Might not need to do this?
-watch(props.formData, () => {
-    setupScene();
-});
+// watch(props.formData, () => {
+
+// });
+
+watch(
+    () => props.formData.relationship,
+    (newValue) => {
+        setupScene();
+    },
+);
 
 // window.addEventListener('resize', onWindowResize, false);
 // function onWindowResize() {
