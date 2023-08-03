@@ -282,46 +282,17 @@
             </div>
         </div>
         <div id="rotational__results" class="col-lg-8 calc-form">
-            <div class="split-details" v-show="showCalcDetails">
-                <div
-                    class="alert py-2 mb-2"
-                    :class="angularComfort"
-                    role="alert"
-                >
-                    <i class="fas fa-undo"></i> Angular Velocity (radians/s):
-                    {{ formatNumber(radsPerSec) }}
-                </div>
-
-                <div
-                    class="alert py-2 mb-2"
-                    :class="velocityComfort"
-                    role="alert"
-                >
-                    <i class="fas fa-flip-horizontal fa-sync-alt"></i>
-                    Tangential Velocity (m/s):
-                    {{ formatNumber(pointTangentialVelocity) }}<br />
-                </div>
-
-                <div
-                    class="alert py-2 mb-2"
-                    :class="gravityComfort"
-                    role="alert"
-                >
-                    <i class="fas fa-download"></i> Centripetal Acceleration
-                    (m/s²):
-                    {{ formatNumber(pointCentripetalAcceleration) }}
-                </div>
-
-                <div
-                    class="alert py-2 mb-3"
-                    :class="gravityComfort"
-                    role="alert"
-                >
-                    <i class="fas fa-cloud-download-alt"></i> Apparent Gravity
-                    (g):
-                    {{ formatNumber(pointGravity) }}
-                </div>
-            </div>
+            <RotationResults
+                v-show="showCalcDetails"
+                :angularComfort="angularComfort"
+                :formatNumber="formatNumber"
+                :radsPerSec="radsPerSec"
+                :velocityComfort="velocityComfort"
+                :pointTangentialVelocity="pointTangentialVelocity"
+                :gravityComfort="gravityComfort"
+                :pointCentripetalAcceleration="pointCentripetalAcceleration"
+                :pointGravity="pointGravity"
+            />
 
             <!-- <div class="p-2 rounded border mb-5">
                 <div>
@@ -525,6 +496,8 @@ import {
     radiansToDegrees,
     rpmToRadians,
 } from '../utils';
+import Legend from './Legend.vue';
+import RotationResults from './RotationResults.vue';
 
 const loading = ref(true);
 const needsUpdate = ref(false);
