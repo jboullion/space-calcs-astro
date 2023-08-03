@@ -101,7 +101,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
         id: 'space-elevator',
         name: 'Space Elevator',
         description:
-            'Create a space elevator and estimate the mass, length, time, and energy requirements',
+            'Create a space elevator and estimate the mass, length, and time requirements',
         categories: [categories[STATION_CAT]],
         image: '',
         link: '/calcs/space-elevator',

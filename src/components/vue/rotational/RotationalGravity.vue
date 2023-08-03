@@ -1,86 +1,61 @@
 <template>
     <div id="rotational__app" class="row" v-cloak>
         <div id="rotational__form" class="col-lg-4">
-            <div class="calc-form col-12 mb-5 px-2 rounded border">
-                <div>
-                    <div id="mission" class="rotational__mission">
-                        <!-- <h4>Mission</h4> -->
-                        <div class="calc-toggle">
-                            <SelectInput
-                                id="structureType"
-                                label="Structure Type"
-                                v-model="formData.type"
-                                :options="availableTypes"
-                                tooltip="What type of object is rotating? Different structures provide different advantages."
-                                @update:modelValue="updateType"
-                                :description="formData.type.description"
-                            />
+            <div class="calc-form col-12 mb-5 px-2 pt-2 rounded border">
+                <NumberInput
+                    v-if="formData.type.shape != 'can'"
+                    id="shipLength"
+                    :label="structureLengthName"
+                    v-model="formData.shipLength"
+                    tooltip="The length of the structure. This is only visual and does not affect the results."
+                    :min="1"
+                    unit="m"
+                    @change="updateShipLength"
+                />
 
-                            <NumberInput
-                                v-if="formData.type.shape != 'can'"
-                                id="shipLength"
-                                :label="structureLengthName"
-                                v-model="formData.shipLength"
-                                tooltip="The length of the structure. This is only visual and does not affect the results."
-                                :min="1"
-                                unit="m"
-                                @change="updateShipLength"
-                            />
+                <NumberInput
+                    id="radius"
+                    label="Radius"
+                    v-model="formData.radius"
+                    tooltip="The distance from the center of rotation to the outer edge of the structure."
+                    :min="0"
+                    unit="m"
+                    @change="updateRadius"
+                />
 
-                            <NumberInput
-                                id="radius"
-                                label="Radius"
-                                v-model="formData.radius"
-                                tooltip="The distance from the center of rotation to the outer edge of the structure."
-                                :min="0"
-                                unit="m"
-                                @change="updateRadius"
-                            />
+                <NumberInput
+                    id="rpm"
+                    :key="`rpm-${rpmKey}`"
+                    label="Revolutions per minute"
+                    v-model="formData.rpm"
+                    tooltip="The rotation speed of the structure"
+                    :min="0"
+                    :max="1000"
+                    :step="0.1"
+                    unit="rpm"
+                    @change="updateRPM"
+                />
 
-                            <NumberInput
-                                id="rpm"
-                                :key="`rpm-${rpmKey}`"
-                                label="Revolutions per minute"
-                                v-model="formData.rpm"
-                                tooltip="The rotation speed of the structure"
-                                :min="0"
-                                :max="1000"
-                                :step="0.1"
-                                unit="rpm"
-                                @change="updateRPM"
-                            />
+                <NumberInput
+                    id="gravity"
+                    :key="`gravity-${gravityKey}`"
+                    label="Gravity"
+                    v-model="formData.gravity"
+                    tooltip="The apparent gravity applied by the centripetal acceleration."
+                    :min="0"
+                    :step="0.01"
+                    unit="g"
+                    @change="updateGravity"
+                />
 
-                            <NumberInput
-                                id="gravity"
-                                :key="`gravity-${gravityKey}`"
-                                label="Gravity"
-                                v-model="formData.gravity"
-                                tooltip="The apparent gravity applied by the centripetal acceleration."
-                                :min="0"
-                                :step="0.01"
-                                unit="g"
-                                @change="updateGravity"
-                            />
+                <CheckboxInput
+                    id="showVisuals"
+                    label="Show Visuals"
+                    v-model="formData.showVisuals"
+                    tooltip=""
+                />
 
-                            <SelectInput
-                                id="location"
-                                label="Location"
-                                v-model="formData.location"
-                                :options="locations"
-                                tooltip="Update your environment and apply natural gravity if applicaible"
-                                @update:modelValue="setupScene"
-                                :description="formData.location.description"
-                            />
-
-                            <CheckboxInput
-                                id="showEnvironment"
-                                label="Show environment?"
-                                v-model="formData.showEnvironment"
-                                tooltip="Show the planet at your location. Purely visual."
-                                @change="setupScene"
-                            />
-
-                            <!-- <div class="form-check form-switch mb-3">
+                <!-- <div class="form-check form-switch mb-3">
                 <input
                   class="form-check-input"
                   type="checkbox"
@@ -99,142 +74,133 @@
                 </label>
               </div> -->
 
-                            <CheckboxInput
-                                id="seeInside"
-                                label="Show Inside of Structure?"
-                                v-model="formData.seeInside"
-                                tooltip="Display the inside or outside of the structure. Purely visual."
-                                @change="setupScene"
-                            />
-
-                            <CheckboxInput
-                                v-if="
-                                    formData.type.shape == 'cylinder' ||
-                                    formData.type.shape == 'can'
-                                "
-                                id="hollow"
-                                label="Hollow Cylinder?"
-                                v-model="formData.hollow"
-                                tooltip="Should the structure be hollow? Purely visual."
-                                @change="setupScene"
-                            />
-
-                            <!-- <div class="form-check form-switch mb-3">
+                <!-- <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" id="focusSuit" v-model="formData.focusSuit">
             <label class="form-check-label" for="focusSuit">
               Focus on suit?
             </label>
           </div> -->
-                        </div>
+            </div>
+            <div
+                class="calc-form col-12 mb-5 px-2 pt-2 rounded border"
+                v-show="formData.showVisuals"
+            >
+                <SelectInput
+                    id="structureType"
+                    label="Structure Type"
+                    v-model="formData.type"
+                    :options="availableTypes"
+                    tooltip="What type of object is rotating? Different structures provide different advantages."
+                    @update:modelValue="updateType"
+                    :description="formData.type.description"
+                />
+
+                <CheckboxInput
+                    id="showEnvironment"
+                    label="Show environment?"
+                    v-model="formData.showEnvironment"
+                    tooltip="Show the planet at your location. Purely visual."
+                    @change="setupScene"
+                />
+
+                <div class="form-check form-switch mb-3">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="pause"
+                        v-model="formData.pause"
+                    />
+                    <label class="form-check-label" for="pause">
+                        Pause Movement?
+                        <i
+                            class="fas fa-question-circle"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Stop the motion of the estimator"
+                        ></i>
+                    </label>
+                </div>
+
+                <SelectInput
+                    v-if="formData.showEnvironment"
+                    id="location"
+                    label="Location"
+                    v-model="formData.location"
+                    :options="locations"
+                    tooltip="Update your environment and apply natural gravity if applicaible"
+                    @update:modelValue="setupScene"
+                    :description="formData.location.description"
+                />
+
+                <div class="form-check form-switch mb-3">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="showGravityRule"
+                        v-model="formData.showGravityRule"
+                        @change="setupScene"
+                    />
+                    <label class="form-check-label" for="showGravityRule">
+                        Show gravity ruler?
+                        <i
+                            class="fas fa-question-circle"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Show a measurement tool for accurately finding the forces at any point along the structure's radius"
+                        ></i>
+                    </label>
+                </div>
+
+                <div class="mb-4" v-if="formData.showGravityRule">
+                    <label for="point" class="form-label"
+                        >Measurement Point</label
+                    >
+                    <input
+                        id="point"
+                        type="range"
+                        class="form-range"
+                        min="0"
+                        :max="formData.radius"
+                        v-model.number="formData.rulerPoint"
+                        @input="updateMeasurementPoint"
+                    />
+
+                    <div class="input-group">
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="point"
+                            v-model.number="formData.rulerPoint"
+                            min="0"
+                            :max="formData.radius"
+                            @input="updateMeasurementPoint"
+                        />
+                        <span class="input-group-text">m</span>
                     </div>
                 </div>
+
+                <CheckboxInput
+                    id="seeInside"
+                    label="Show Inside of Structure?"
+                    v-model="formData.seeInside"
+                    tooltip="Display the inside or outside of the structure. Purely visual."
+                    @change="setupScene"
+                />
+
+                <CheckboxInput
+                    v-if="
+                        formData.type.shape == 'cylinder' ||
+                        formData.type.shape == 'can'
+                    "
+                    id="hollow"
+                    label="Hollow Cylinder?"
+                    v-model="formData.hollow"
+                    tooltip="Should the structure be hollow? Purely visual."
+                    @change="setupScene"
+                />
             </div>
         </div>
         <div id="rotational__results" class="col-lg-8 calc-form">
-            <div class="control-instructions">
-                <!-- <div class="alert alert-info" role="alert">
-        <p class="mb-0"><small>left click to rotate</small></p>
-        <p class="mb-0"><small>right click to drag</small></p>
-        <p class="mb-0"><small>scroll to zoom</small></p>
-    </div> -->
-            </div>
-
-            <div
-                id="rotational-canvas"
-                class="canvas-wrapper border"
-                style="position: relative; height: 400px"
-            >
-                <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
-            </div>
-
-            <div class="form-check form-switch mb-3">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="pause"
-                    v-model="formData.pause"
-                />
-                <label class="form-check-label" for="pause">
-                    Pause Movement?
-                    <i
-                        class="fas fa-question-circle"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Stop the motion of the estimator"
-                    ></i>
-                </label>
-            </div>
-
-            <div class="form-check form-switch mb-3">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="showGravityRule"
-                    v-model="formData.showGravityRule"
-                    @change="setupScene"
-                />
-                <label class="form-check-label" for="showGravityRule">
-                    Show gravity ruler?
-                    <i
-                        class="fas fa-question-circle"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="Show a measurement tool for accurately finding the forces at any point along the structure's radius"
-                    ></i>
-                </label>
-            </div>
-
-            <div class="mb-4" v-if="formData.showGravityRule">
-                <label for="point" class="form-label">Measurement Point</label>
-                <input
-                    id="point"
-                    type="range"
-                    class="form-range"
-                    min="0"
-                    :max="formData.radius"
-                    v-model.number="formData.rulerPoint"
-                    @input="updateMeasurementPoint"
-                />
-
-                <div class="input-group">
-                    <input
-                        type="number"
-                        class="form-control"
-                        id="point"
-                        v-model.number="formData.rulerPoint"
-                        min="0"
-                        :max="formData.radius"
-                        @input="updateMeasurementPoint"
-                    />
-                    <span class="input-group-text">m</span>
-                </div>
-            </div>
-
-            <!-- <div class="quick-details row text-center" @click="showCalcDetails = !showCalcDetails">
-    <div class="col-3">
-      <div class="alert py-1 px-1" :class="angularComfort" role="alert">
-        <i class="fas fa-undo"></i> {{ radsPerSec | twoDecimals }}
-      </div>
-    </div>
-
-    <div class="col-3">
-      <div class="alert py-1 px-1" :class="velocityComfort" role="alert">
-        <i class="fas fa-flip-horizontal fa-sync-alt"></i> {{ pointTangentialVelocity | twoDecimals }}<br />
-      </div>
-    </div>
-
-    <div class="col-3">
-      <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
-        <i class="fas fa-download"></i> {{ pointCentripetalAcceleration | twoDecimals }}
-      </div>
-    </div>
-
-    <div class="col-3">
-      <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
-        <i class="fas fa-cloud-download-alt"></i> {{ pointGravity | twoDecimals }}
-      </div>
-    </div>
-  </div> -->
             <div class="split-details" v-show="showCalcDetails">
                 <div
                     class="alert py-2 mb-2"
@@ -275,6 +241,50 @@
                     {{ formatNumber(pointGravity) }}
                 </div>
             </div>
+
+            <div v-show="formData.showVisuals">
+                <div class="control-instructions">
+                    <!-- <div class="alert alert-info" role="alert">
+        <p class="mb-0"><small>left click to rotate</small></p>
+        <p class="mb-0"><small>right click to drag</small></p>
+        <p class="mb-0"><small>scroll to zoom</small></p>
+    </div> -->
+                </div>
+
+                <div
+                    id="rotational-canvas"
+                    class="canvas-wrapper border"
+                    style="position: relative; height: 400px"
+                >
+                    <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+                </div>
+            </div>
+
+            <!-- <div class="quick-details row text-center" @click="showCalcDetails = !showCalcDetails">
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="angularComfort" role="alert">
+        <i class="fas fa-undo"></i> {{ radsPerSec | twoDecimals }}
+      </div>
+    </div>
+
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="velocityComfort" role="alert">
+        <i class="fas fa-flip-horizontal fa-sync-alt"></i> {{ pointTangentialVelocity | twoDecimals }}<br />
+      </div>
+    </div>
+
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
+        <i class="fas fa-download"></i> {{ pointCentripetalAcceleration | twoDecimals }}
+      </div>
+    </div>
+
+    <div class="col-3">
+      <div class="alert py-1 px-1" :class="gravityComfort" role="alert">
+        <i class="fas fa-cloud-download-alt"></i> {{ pointGravity | twoDecimals }}
+      </div>
+    </div>
+  </div> -->
 
             <!-- <div id="coriolis" class="form-row" v-if="!formData.pause">
     <div class="col-12 d-flex justify-content-between">
@@ -511,6 +521,7 @@ const formData = ref({
     rulerPoint: 1000,
     hollow: true,
     showEnvironment: true,
+    showVisuals: true,
     seeInside: true,
     showGravityRule: true,
     pause: false,
