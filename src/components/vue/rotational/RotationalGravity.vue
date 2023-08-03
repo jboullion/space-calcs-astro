@@ -16,6 +16,32 @@
                 />
 
                 <NumberInput
+                    v-if="formData.type.shape != 'can'"
+                    id="shipLength"
+                    :label="structureLengthName"
+                    v-model="formData.shipLength"
+                    tooltip="The length of the structure. This is only visual and does not affect the results."
+                    :min="conversion.minLength"
+                    :max="conversion.maxLength"
+                    unit="m"
+                    @change="updateShipLength"
+                    :description="`Surface Area: ${formatNumber(
+                        surfaceArea,
+                    )} m²`"
+                />
+
+                <NumberInput
+                    id="thickness"
+                    label="Thickness"
+                    v-model="formData.thickness"
+                    tooltip="The distance from the inner edge to the outer edge of the structure."
+                    :min="2"
+                    :max="formData.radius"
+                    unit="m"
+                    @change="updateThickness"
+                />
+
+                <NumberInput
                     id="rpm"
                     :key="`rpm-${rpmKey}`"
                     label="Revolutions per minute"
@@ -69,13 +95,24 @@
                     </div>
                 </div>
 
-                <CheckboxInput
+                <NumberInput
+                    id="avgDensity"
+                    label="Average Density"
+                    v-model="formData.avgDensity"
+                    tooltip="The distance from the inner edge to the outer edge of the structure."
+                    :min="0"
+                    unit="kg/m^3"
+                    @change="updateRadius"
+                    :description="`Mass: ${formatNumber(totalMass, 0)} kg`"
+                />
+
+                <!-- <CheckboxInput
                     id="showAdvanced"
                     label="Show Advanced"
                     v-model="formData.showAdvanced"
                     :disabled="formData.type.shape != 'cylinder'"
                     tooltip=""
-                />
+                /> -->
 
                 <CheckboxInput
                     id="showVisuals"
@@ -111,7 +148,7 @@
           </div> -->
             </div>
 
-            <div
+            <!-- <div
                 class="calc-form col-12 mb-3 px-2 pt-2 rounded border"
                 v-show="formData.showAdvanced"
             >
@@ -151,7 +188,7 @@
                     @change="updateRadius"
                     :description="`Mass: ${formatNumber(totalMass, 0)} kg`"
                 />
-            </div>
+            </div> -->
 
             <div
                 class="calc-form col-12 mb-5 px-2 pt-2 rounded border"
