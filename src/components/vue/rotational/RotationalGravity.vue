@@ -70,16 +70,17 @@
                 </div>
 
                 <CheckboxInput
-                    id="showVisuals"
-                    label="Show Visuals"
-                    v-model="formData.showVisuals"
+                    id="showAdvanced"
+                    label="Show Advanced"
+                    v-model="formData.showAdvanced"
+                    :disabled="formData.type.shape != 'cylinder'"
                     tooltip=""
                 />
 
                 <CheckboxInput
-                    id="showAdvanced"
-                    label="Show Advanced"
-                    v-model="formData.showAdvanced"
+                    id="showVisuals"
+                    label="Show Visuals"
+                    v-model="formData.showVisuals"
                     tooltip=""
                 />
 
@@ -134,8 +135,10 @@
                     label="Thickness"
                     v-model="formData.thickness"
                     tooltip="The distance from the inner edge to the outer edge of the structure."
-                    :min="0"
+                    :min="2"
+                    :max="formData.radius"
                     unit="m"
+                    @change="updateThickness"
                 />
 
                 <NumberInput
@@ -1109,15 +1112,10 @@ function buildCylinderStation(material: THREE.Material) {
     arcShape.absarc(0, 0, formData.value.radius, 0, Math.PI * 2, false);
 
     if (formData.value.hollow) {
+        const stationThickness =
+            formData.value.radius - formData.value.thickness;
         var holePath = new THREE.Path();
-        holePath.absarc(
-            0,
-            0,
-            formData.value.radius - formData.value.radius / 5,
-            0,
-            Math.PI * 2,
-            true,
-        );
+        holePath.absarc(0, 0, stationThickness, 0, Math.PI * 2, true);
         arcShape.holes.push(holePath);
     }
 
@@ -1224,7 +1222,7 @@ function setupStation() {
         displayPlanet();
     }
 
-    // ? NOTE: Not currently used
+    // NOTE: Not currently used
     if (formData.value.showLocalAxis) {
         setupAxesHelper();
     }
@@ -1536,13 +1534,14 @@ function updateType() {
         (type) => type.shape === formData.value.type.shape,
     );
 
-    console.log('newType', newType);
-
     if (!newType) return;
 
     formData.value.radius = newType.defaults.radius;
     formData.value.rpm = newType.defaults.rpm;
     formData.value.shipLength = newType.defaults.length;
+    if (formData.value.showAdvanced && newType.shape !== 'cylinder') {
+        formData.value.showAdvanced = false;
+    }
 
     updateRadius();
 }
@@ -1554,6 +1553,10 @@ function updateShipLength() {
     // );
 
     // Ship length doesn't affect anything else so we can run it without "needs update"
+    setupScene();
+}
+
+function updateThickness() {
     setupScene();
 }
 
