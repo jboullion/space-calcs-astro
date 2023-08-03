@@ -37,12 +37,13 @@ export const unOrderedCalculators: SpaceCalc[] = [
         link: '/calcs/orbit-visualizer',
     },
     {
-        id: 'rotational-gravity',
-        name: 'Rotational Gravity',
-        description: 'Calculate the forces on a rotating space station',
+        id: 'rotating-habitats',
+        name: 'Rotating Habitats',
+        description:
+            'Calculate the forces and properties of a rotating space habitat',
         categories: [categories[STATION_CAT], categories[HABITAT_CAT]],
         image: '',
-        link: '/calcs/rotational-gravity',
+        link: '/calcs/rotating-habitats',
     },
     {
         id: 'habitat-requirements',

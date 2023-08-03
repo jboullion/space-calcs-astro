@@ -1,18 +1,7 @@
 <template>
     <div id="rotational__app" class="row" v-cloak>
         <div id="rotational__form" class="col-lg-4">
-            <div class="calc-form col-12 mb-5 px-2 pt-2 rounded border">
-                <NumberInput
-                    v-if="formData.type.shape != 'can'"
-                    id="shipLength"
-                    :label="structureLengthName"
-                    v-model="formData.shipLength"
-                    tooltip="The length of the structure. This is only visual and does not affect the results."
-                    :min="1"
-                    unit="m"
-                    @change="updateShipLength"
-                />
-
+            <div class="calc-form col-12 mb-3 px-2 pt-2 rounded border">
                 <NumberInput
                     id="radius"
                     label="Radius"
@@ -21,6 +10,9 @@
                     :min="0"
                     unit="m"
                     @change="updateRadius"
+                    :description="`Circumference: ${formatNumber(
+                        circumference,
+                    )} m`"
                 />
 
                 <NumberInput
@@ -34,9 +26,10 @@
                     :step="0.1"
                     unit="rpm"
                     @change="updateRPM"
+                    :description="`RPD: ${formatNumber(radsPerDay)}`"
                 />
 
-                <NumberInput
+                <!-- <NumberInput
                     id="gravity"
                     :key="`gravity-${gravityKey}`"
                     label="Gravity"
@@ -46,12 +39,47 @@
                     :step="0.01"
                     unit="g"
                     @change="updateGravity"
-                />
+                /> -->
+
+                <div class="mb-4" v-if="formData.showGravityRule">
+                    <label for="point" class="form-label"
+                        >Measurement Point</label
+                    >
+                    <input
+                        id="point"
+                        type="range"
+                        class="form-range"
+                        min="0"
+                        :max="formData.radius"
+                        v-model.number="formData.rulerPoint"
+                        @input="updateMeasurementPoint"
+                    />
+
+                    <div class="input-group">
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="point"
+                            v-model.number="formData.rulerPoint"
+                            min="0"
+                            :max="formData.radius"
+                            @input="updateMeasurementPoint"
+                        />
+                        <span class="input-group-text">m</span>
+                    </div>
+                </div>
 
                 <CheckboxInput
                     id="showVisuals"
                     label="Show Visuals"
                     v-model="formData.showVisuals"
+                    tooltip=""
+                />
+
+                <CheckboxInput
+                    id="showAdvanced"
+                    label="Show Advanced"
+                    v-model="formData.showAdvanced"
                     tooltip=""
                 />
 
@@ -81,6 +109,47 @@
             </label>
           </div> -->
             </div>
+
+            <div
+                class="calc-form col-12 mb-3 px-2 pt-2 rounded border"
+                v-show="formData.showAdvanced"
+            >
+                <NumberInput
+                    v-if="formData.type.shape != 'can'"
+                    id="shipLength"
+                    :label="structureLengthName"
+                    v-model="formData.shipLength"
+                    tooltip="The length of the structure. This is only visual and does not affect the results."
+                    :min="conversion.minLength"
+                    :max="conversion.maxLength"
+                    unit="m"
+                    @change="updateShipLength"
+                    :description="`Surface Area: ${formatNumber(
+                        surfaceArea,
+                    )} m²`"
+                />
+
+                <NumberInput
+                    id="thickness"
+                    label="Thickness"
+                    v-model="formData.thickness"
+                    tooltip="The distance from the inner edge to the outer edge of the structure."
+                    :min="0"
+                    unit="m"
+                />
+
+                <NumberInput
+                    id="avgDensity"
+                    label="Average Density"
+                    v-model="formData.avgDensity"
+                    tooltip="The distance from the inner edge to the outer edge of the structure."
+                    :min="0"
+                    unit="kg/m^3"
+                    @change="updateRadius"
+                    :description="`Mass: ${formatNumber(totalMass, 0)} kg`"
+                />
+            </div>
+
             <div
                 class="calc-form col-12 mb-5 px-2 pt-2 rounded border"
                 v-show="formData.showVisuals"
@@ -151,34 +220,6 @@
                     </label>
                 </div>
 
-                <div class="mb-4" v-if="formData.showGravityRule">
-                    <label for="point" class="form-label"
-                        >Measurement Point</label
-                    >
-                    <input
-                        id="point"
-                        type="range"
-                        class="form-range"
-                        min="0"
-                        :max="formData.radius"
-                        v-model.number="formData.rulerPoint"
-                        @input="updateMeasurementPoint"
-                    />
-
-                    <div class="input-group">
-                        <input
-                            type="number"
-                            class="form-control"
-                            id="point"
-                            v-model.number="formData.rulerPoint"
-                            min="0"
-                            :max="formData.radius"
-                            @input="updateMeasurementPoint"
-                        />
-                        <span class="input-group-text">m</span>
-                    </div>
-                </div>
-
                 <CheckboxInput
                     id="seeInside"
                     label="Show Inside of Structure?"
@@ -217,7 +258,7 @@
                     role="alert"
                 >
                     <i class="fas fa-flip-horizontal fa-sync-alt"></i>
-                    Tangential Velocity (m/s): :
+                    Tangential Velocity (m/s):
                     {{ formatNumber(pointTangentialVelocity) }}<br />
                 </div>
 
@@ -227,7 +268,7 @@
                     role="alert"
                 >
                     <i class="fas fa-download"></i> Centripetal Acceleration
-                    (m/s):
+                    (m/s²):
                     {{ formatNumber(pointCentripetalAcceleration) }}
                 </div>
 
@@ -241,6 +282,21 @@
                     {{ formatNumber(pointGravity) }}
                 </div>
             </div>
+
+            <!-- <div class="p-2 rounded border mb-5">
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>Velocity</th>
+                                <td class="text-end">
+                                    {{ formatNumber(velocity) }} m/s
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div> -->
 
             <div v-show="formData.showVisuals">
                 <div class="control-instructions">
@@ -522,10 +578,13 @@ const formData = ref({
     hollow: true,
     showEnvironment: true,
     showVisuals: true,
+    showAdvanced: false,
     seeInside: true,
     showGravityRule: true,
     pause: false,
     showLocalAxis: true,
+    thickness: 500, // m
+    avgDensity: 7850, // kg/m^3
 });
 
 const forces = {
@@ -592,6 +651,11 @@ const structureLengthName = computed(() => {
         : 'Structure Length';
 });
 
+const surfaceArea = computed(() => {
+    // formData.shipLength * stationWidth
+    return formData.value.shipLength * circumference.value;
+});
+
 const rotationSpeed = computed(() => {
     return rpmToUpdateSpeed(formData.value.rpm); //(formData.value.rpm / (this.animation.FPS * 60)) * this.animation.radians;
 });
@@ -616,6 +680,10 @@ const availableTypes = computed(() => {
 const pointGravity = computed(() => {
     return calcGravityFromRadius(formData.value.rulerPoint);
 });
+
+// const pointAcceleration = computed(() => {
+//     return gTom2s(pointGravity.value);
+// });
 
 const pointCentripetalAcceleration = computed(() => {
     // this.tangentialVelocity * this.tangentialVelocity / formData.value.radius;
@@ -646,8 +714,22 @@ const coriolisForce = (mass: number, velocity: number) => {
     return 2 * mass * velocity * (formData.value.rpm / 60);
 };
 
+// const velocity = computed(() => {
+//     //=SQRT(B2*B3)
+//     return Math.sqrt(centripetalAcceleration.value * formData.value.radius);
+// });
+
+const circumference = computed(() => {
+    return formData.value.radius * 2 * Math.PI;
+});
+
 const radsPerSec = computed(() => {
     return rpmToRadians(formData.value.rpm);
+});
+
+const radsPerDay = computed(() => {
+    // =(60*60*24)/(B5/B4)
+    return formData.value.rpm * 60 * 24;
 });
 
 const angularComfort = computed(() => {
@@ -698,6 +780,11 @@ const worldGravity = computed(() => {
     return formData.value.isSpace ? 0 : formData.value.location.g;
 });
 
+const totalMass = computed(() => {
+    return (
+        formData.value.avgDensity * surfaceArea.value * formData.value.thickness
+    );
+});
 /**
  *
  *
@@ -1461,22 +1548,27 @@ function updateType() {
 }
 
 function updateShipLength() {
-    formData.value.shipLength = Math.min(
-        Math.max(formData.value.shipLength, conversion.minLength),
-        conversion.maxLength,
-    );
+    // formData.value.shipLength = Math.min(
+    //     Math.max(formData.value.shipLength, conversion.minLength),
+    //     conversion.maxLength,
+    // );
 
     // Ship length doesn't affect anything else so we can run it without "needs update"
     setupScene();
 }
 
 function updateRadius() {
-    formData.value.radius = Math.min(
-        Math.max(formData.value.radius, conversion.minLength),
-        conversion.maxLength,
-    );
+    // formData.value.radius = Math.min(
+    //     Math.max(formData.value.radius, conversion.minLength),
+    //     conversion.maxLength,
+    // );
 
     needsUpdate.value = true;
+
+    formData.value.thickness =
+        formData.value.thickness > formData.value.radius / 2
+            ? formData.value.radius / 2
+            : formData.value.thickness;
 
     formData.value.gravity = +calcGravityFromRadius(
         formData.value.radius,

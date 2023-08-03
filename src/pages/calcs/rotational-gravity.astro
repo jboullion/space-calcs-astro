@@ -1,38 +1,41 @@
 ---
-import type { Reference } from "../../types/types";
+import type { Reference } from '../../types/types';
 
-import Layout from "../../layouts/Layout.astro";
-import Hero from "../../components/calcs/Hero.astro";
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
 
-import RotationalGravity from "../../components/vue/rotational/RotationalGravity.vue";
-import References from "../../components/shared/References.astro";
+import RotationalGravity from '../../components/vue/rotational/RotationalGravity.vue';
+import References from '../../components/shared/References.astro';
+import { calculators } from '../../utils/calculator-list';
 
-const title = "Rotational Gravity";
-const description =
-  "Calculate the rotation forces inside various space stations";
+const calculator = calculators.find((calc) => calc.id === 'rotating-habitats');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
 
 const references: Reference[] = [
-  {
-    title: "Spin Calc by Theodore W. Hall",
-    url: "https://www.artificial-gravity.com/sw/SpinCalc/",
-  },
-  {
-    title: "Artificial Gravity and the Architecture of Orbital Habitats",
-    url: "http://www.spacefuture.com/archive/artificial_gravity_and_the_architecture_of_orbital_habitats.shtml",
-  },
+    {
+        title: 'Spin Calc by Theodore W. Hall',
+        url: 'https://www.artificial-gravity.com/sw/SpinCalc/',
+    },
+    {
+        title: 'Artificial Gravity and the Architecture of Orbital Habitats',
+        url: 'http://www.spacefuture.com/archive/artificial_gravity_and_the_architecture_of_orbital_habitats.shtml',
+    },
 ];
 ---
 
-<Layout title={title} description={description}>
-  <div class="container">
-    <Hero title={title} description={description} />
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
 
-    <div style="min-height: 600px;" class="calculator">
-      <RotationalGravity client:load />
+        <div style="min-height: 600px;" class="calculator">
+            <RotationalGravity client:load />
+        </div>
+
+        <References references={references} />
     </div>
-
-    <References references={references} />
-  </div>
 </Layout>
 
 <style></style>
