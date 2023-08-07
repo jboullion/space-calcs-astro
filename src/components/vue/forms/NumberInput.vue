@@ -21,22 +21,10 @@
                 @change="($event) => updateValue($event)"
             />
             <span
-                v-if="unit && !Array.isArray(units)"
+                v-if="unit"
                 class="input-group-text bg-dark text-white"
                 v-html="unit"
             ></span>
-            <select
-                v-if="Array.isArray(units)"
-                class="form-select bg-dark text-white"
-                v-model="internalUnit"
-                @change="updateUnit"
-            >
-                <option
-                    v-for="unitOption in units"
-                    :value="unitOption"
-                    v-html="unitOption.label"
-                ></option>
-            </select>
         </div>
         <input
             v-if="showRange"
@@ -56,10 +44,10 @@
 </template>
 
 <script setup lang="ts">
+// TODO: Update to use the input wrapper
 import { computed, onBeforeMount, ref, watch } from 'vue';
 import { clampNumber, formatNumber } from '../utils';
 import Tooltip from './Tooltip.vue';
-import type { NumberUnits } from './types';
 
 const emit = defineEmits(['update:modelValue', 'updateUnit']);
 
@@ -68,7 +56,6 @@ const props = defineProps<{
     label: string;
     modelValue: number;
     unit?: string;
-    units?: NumberUnits[];
     prefix?: string;
     tooltip?: string;
     description?: string;
@@ -80,16 +67,9 @@ const props = defineProps<{
 }>();
 
 const internalValue = ref<string>(props.modelValue.toString());
-const internalUnit = ref<NumberUnits>();
 const numberInput = ref(null);
-const currentUnit = ref<NumberUnits>();
 
-onBeforeMount(() => {
-    if (props.units) {
-        internalUnit.value = props.units[0];
-        currentUnit.value = internalUnit.value;
-    }
-});
+onBeforeMount(() => {});
 
 const updateValue = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -113,34 +93,4 @@ const updateValue = (event: Event) => {
 
     emit('update:modelValue', clampedValue);
 };
-
-const updateUnit = () => {
-    convertUnitValue();
-    emit('updateUnit', currentUnit);
-};
-
-function convertUnitValue() {
-    if (!internalUnit.value || !currentUnit.value)
-        return Number(internalValue.value);
-    let value = Number(internalValue.value);
-    const conversionValue = currentUnit.value.value / internalUnit.value.value;
-
-    if (props.units) {
-        value = value * conversionValue;
-    }
-
-    value = Math.round(value * 100) / 100;
-
-    internalValue.value = value.toString();
-
-    currentUnit.value = internalUnit.value;
-}
-
-// // Watch prop value change and assign to value 'selected' Ref
-// watch(
-//   () => props.modelValue,
-//   (newValue: number) => {
-//     internalValue.value = newValue.toString();
-//   }
-// );
 </script>

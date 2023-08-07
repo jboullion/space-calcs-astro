@@ -26,10 +26,11 @@ import MassDriverVisual from './MassDriverVisual.vue';
 import MassDriverResults from './MassDriverResults.vue';
 
 import type { IMassDriverForm } from './types';
-import { meterUnits } from '../utils';
+import { convertUnitValue, meterUnits } from '../utils';
+import { NumberUnits } from '../forms/types';
 
 const formData = reactive<IMassDriverForm>({
-    bodyRadius: 6378000,
+    bodyRadius: 6378, //km
     bodyRadiusUnit: meterUnits[1], // km
     bodyDensity: 5.51, // g/cm³
     acceleration: 9.81, // m/s²  Optional gravity (g)
@@ -37,19 +38,15 @@ const formData = reactive<IMassDriverForm>({
 
 onMounted(() => {});
 
-// watch(
-//     () => formData.relationship,
-//     (newValue) => {
-//         if (newValue.value === 'star') {
-//             formData.massOne = 1;
-//             formData.massTwo = 1;
-//             formData.distance = 1;
-//         } else {
-//             formData.massOne = 1;
-//             formData.massTwo = 0.012;
-//             formData.distance = 60.33;
-//         }
-//     },
-// );
+watch(
+    () => formData.bodyRadiusUnit,
+    (newUnit, oldUnit) => {
+        formData.bodyRadius = convertUnitValue(
+            formData.bodyRadius,
+            newUnit,
+            oldUnit,
+        );
+    },
+);
 </script>
 <style></style>

@@ -1,3 +1,5 @@
+import type { NumberUnits } from './forms/types';
+
 // depricated: we use formatNumbers now
 export function addCommas(value: number, decimals: number = 0) {
     return formatNumber(value, decimals);
@@ -52,6 +54,18 @@ export const meterUnits = [
         value: 1609.34,
     },
 ];
+
+export function convertUnitValue(
+    value: number,
+    newUnit: NumberUnits,
+    oldUnit: NumberUnits,
+) {
+    const conversionValue = oldUnit.value / newUnit.value;
+
+    value = value * conversionValue;
+
+    return Math.round(value);
+}
 
 export const physicsConstants = {
     g: 9.80665, // m/s

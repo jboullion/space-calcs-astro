@@ -26,8 +26,8 @@ const props = defineProps<{
 }>();
 
 const convertedRadius = computed(() => {
-    console.log('props.formData', props.formData);
-
-    return props.formData.bodyRadius * props.formData.bodyRadiusUnit.value;
+    const conversionValue =
+        props.formData.bodyRadiusUnit.value * props.formData.bodyRadius;
+    return conversionValue;
 });
 </script>

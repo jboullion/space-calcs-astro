@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: Update to use the input wrapper
 import Tooltip from './Tooltip.vue';
 
 const emit = defineEmits(['update:modelValue']);
