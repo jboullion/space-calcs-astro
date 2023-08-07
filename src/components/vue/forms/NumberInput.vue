@@ -29,7 +29,7 @@
                 v-if="Array.isArray(units)"
                 class="form-select bg-dark text-white"
                 v-model="internalUnit"
-                @change="$emit('updateUnit', internalUnit)"
+                @change="updateUnit"
             >
                 <option
                     v-for="unitOption in units"
@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, watch } from 'vue';
-import { clampNumber } from '../utils';
+import { clampNumber, formatNumber } from '../utils';
 import Tooltip from './Tooltip.vue';
 import type { NumberUnits } from './types';
 
@@ -93,7 +93,7 @@ onBeforeMount(() => {
 
 const updateValue = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    const value = Number(target.value);
+    const value = parseFloat(target.value);
 
     let clampedValue = clampNumber(
         value,
@@ -114,9 +114,27 @@ const updateValue = (event: Event) => {
     emit('update:modelValue', clampedValue);
 };
 
-// const updateUnit = () => {
-//     emit('updateUnit', internalUnit);
-// };
+const updateUnit = () => {
+    convertUnitValue();
+    emit('updateUnit', currentUnit);
+};
+
+function convertUnitValue() {
+    if (!internalUnit.value || !currentUnit.value)
+        return Number(internalValue.value);
+    let value = Number(internalValue.value);
+    const conversionValue = currentUnit.value.value / internalUnit.value.value;
+
+    if (props.units) {
+        value = value * conversionValue;
+    }
+
+    value = Math.round(value * 100) / 100;
+
+    internalValue.value = value.toString();
+
+    currentUnit.value = internalUnit.value;
+}
 
 // // Watch prop value change and assign to value 'selected' Ref
 // watch(

@@ -39,6 +39,6 @@ onMounted(() => {});
 
 const updateUnit = (newUnit: NumberUnits) => {
     //emit('updateUnit', newUnit);
-    props.formData.bodyRaduisUnit = newUnit;
+    props.formData.bodyRadiusUnit = newUnit;
 };
 </script>

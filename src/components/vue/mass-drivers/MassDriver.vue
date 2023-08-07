@@ -29,7 +29,7 @@ import type { IMassDriverForm } from './types';
 import { meterUnits } from '../utils';
 
 const formData = reactive<IMassDriverForm>({
-    bodyRadius: 6378,
+    bodyRadius: 6378000,
     bodyRadiusUnit: meterUnits[1], // km
     bodyDensity: 5.51, // g/cm³
     acceleration: 9.81, // m/s²  Optional gravity (g)
