@@ -6,6 +6,7 @@
             </div>
         </div>
         <div id="mass-driver__results" class="col-lg-8">
+            <MassDriverResults :formData="formData" />
             <MassDriverVisual :formData="formData" />
         </div>
     </div>
@@ -22,11 +23,14 @@ import { onMounted, reactive, watch } from 'vue';
 
 import MassDriverForm from './MassDriverForm.vue';
 import MassDriverVisual from './MassDriverVisual.vue';
+import MassDriverResults from './MassDriverResults.vue';
 
 import type { IMassDriverForm } from './types';
+import { meterUnits } from '../utils';
 
 const formData = reactive<IMassDriverForm>({
     bodyRadius: 6378,
+    bodyRadiusUnit: meterUnits[1], // km
     bodyDensity: 5.51, // g/cm³
     acceleration: 9.81, // m/s²  Optional gravity (g)
 });

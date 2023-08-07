@@ -2,21 +2,16 @@
     <div>
         <h2>Results</h2>
         <div>
-            <!-- <table class="table">
-        <thead class="cursor-pointer">
-          <tr @click="showArea = !showArea">
-            <th class="bg-dark text-white" colspan="2">Area</th>
-          </tr>
-        </thead>
-        <tbody v-show="showArea">
-          <tr>
-            <td>Shell Floor Area</td>
-            <td class="text-end">
-              {{ formatNumber(shellFloorArea) }} km<sup>2</sup>
-            </td>
-          </tr>
-        </tbody>
-      </table> -->
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>Total Radius in Meters</td>
+                        <td class="text-end">
+                            {{ formatNumber(convertedRadius) }} m
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
@@ -29,4 +24,9 @@ import { formatNumber, physicsConstants, roundToDecimal } from '../utils';
 const props = defineProps<{
     formData: IMassDriverForm;
 }>();
+
+const convertedRadius = computed(() => {
+    console.log('props.formData', props.formData);
+    return props.formData.bodyRadius * props.formData.bodyRadiusUnit.value;
+});
 </script>

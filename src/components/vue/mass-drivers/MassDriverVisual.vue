@@ -6,24 +6,6 @@
     >
         <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
     </div>
-
-    <div class="p-2 rounded border mb-5">
-        <div>
-            <h2>Results</h2>
-            <div>
-                <table class="table">
-                    <tbody>
-                        <!-- <tr>
-                            <th>One AU</th>
-                            <td class="text-end">
-                                {{ formatNumber(physicsConstants.AU) }} km
-                            </td>
-                        </tr> -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 </template>
 <script setup lang="ts">
 // TODO:

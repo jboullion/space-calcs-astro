@@ -8,8 +8,9 @@
             :step="0.1"
             :min="0.1"
             :max="1000"
-            unit=""
+            :units="meterUnits"
             description=""
+            @updateUnit="updateUnit"
         />
     </div>
 </template>
@@ -25,11 +26,19 @@ import { computed, onMounted, ref } from 'vue';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
 import type { IMassDriverForm } from './types';
-import { physicsConstants, formatNumber } from '../utils';
+import type { NumberUnits } from '../forms/types';
+import { physicsConstants, formatNumber, meterUnits } from '../utils';
+
+const emit = defineEmits(['updateUnit']);
 
 const props = defineProps<{
     formData: IMassDriverForm;
 }>();
 
 onMounted(() => {});
+
+const updateUnit = (newUnit: NumberUnits) => {
+    //emit('updateUnit', newUnit);
+    props.formData.bodyRaduisUnit = newUnit;
+};
 </script>

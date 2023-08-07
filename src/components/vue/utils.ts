@@ -27,6 +27,32 @@ export function roundToDecimal(num: number, decimalPlaces: number) {
  *
  *
  */
+
+// export const meters = {
+//     toFeet: (m: number) => m * 3.28084,
+//     toMiles: (m: number) => m * 0.000621371,
+//     toKm: (m: number) => m / 1000,
+// };
+
+export const meterUnits = [
+    {
+        label: 'm',
+        value: 1,
+    },
+    {
+        label: 'km',
+        value: 1000,
+    },
+    {
+        label: 'ft',
+        value: 0.3048,
+    },
+    {
+        label: 'mi',
+        value: 1609.34,
+    },
+];
+
 export const physicsConstants = {
     g: 9.80665, // m/s
     gravityConstant: 0.000000000066743, //6.67408 * Math.pow(10, -11), // m3 kg-1 s-2

@@ -21,10 +21,22 @@
                 @change="($event) => updateValue($event)"
             />
             <span
-                v-if="unit"
+                v-if="unit && !Array.isArray(units)"
                 class="input-group-text bg-dark text-white"
                 v-html="unit"
             ></span>
+            <select
+                v-if="Array.isArray(units)"
+                class="form-select bg-dark text-white"
+                v-model="internalUnit"
+                @change="$emit('updateUnit', internalUnit)"
+            >
+                <option
+                    v-for="unitOption in units"
+                    :value="unitOption"
+                    v-html="unitOption.label"
+                ></option>
+            </select>
         </div>
         <input
             v-if="showRange"
@@ -44,17 +56,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { clampNumber } from '../utils';
 import Tooltip from './Tooltip.vue';
+import type { NumberUnits } from './types';
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'updateUnit']);
 
 const props = defineProps<{
     id: string;
     label: string;
     modelValue: number;
     unit?: string;
+    units?: NumberUnits[];
     prefix?: string;
     tooltip?: string;
     description?: string;
@@ -66,13 +80,22 @@ const props = defineProps<{
 }>();
 
 const internalValue = ref<string>(props.modelValue.toString());
+const internalUnit = ref<NumberUnits>();
 const numberInput = ref(null);
+const currentUnit = ref<NumberUnits>();
+
+onBeforeMount(() => {
+    if (props.units) {
+        internalUnit.value = props.units[0];
+        currentUnit.value = internalUnit.value;
+    }
+});
 
 const updateValue = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const value = Number(target.value);
 
-    const clampedValue = clampNumber(
+    let clampedValue = clampNumber(
         value,
         props.min ?? -Infinity,
         props.max ?? Infinity,
@@ -90,6 +113,10 @@ const updateValue = (event: Event) => {
 
     emit('update:modelValue', clampedValue);
 };
+
+// const updateUnit = () => {
+//     emit('updateUnit', internalUnit);
+// };
 
 // // Watch prop value change and assign to value 'selected' Ref
 // watch(
