@@ -3,53 +3,33 @@
         <h2>Results</h2>
         <div>
             <table class="table">
-                <tbody>
-                    <!-- <tr>
-                        <td>Total Radius in Meters</td>
+                <tbody class="align-middle">
+                    <tr>
+                        <th>Length of Track</th>
                         <td class="text-end">
-                            {{ formatNumber(convertedRadius) }} m
+                            {{ formatNumber(lengthOfTrack / 1000) }}
                         </td>
-                    </tr> -->
-
+                        <td style="width: 25%">
+                            <UnitSelect
+                                id="trackUnits"
+                                v-model="lengthUnit"
+                                :units="lengthUnits"
+                            />
+                        </td>
+                    </tr>
                     <tr>
-                        <th>Body Gravity</th>
+                        <th>Energy Required</th>
                         <td class="text-end">
-                            {{ formatNumber(gravity) }} m/s²
+                            {{ formatNumber(energyRequired) }}
                         </td>
-                    </tr>
-                    <!-- <tr>
-                        <th>Planet Rotation Speed</th>
                         <td>
-                            {{ addCommas(formData.location.rotationSpeed) }}
-                            m/s
+                            <UnitSelect
+                                id="energyUnits"
+                                v-model="energyUnit"
+                                :units="energyUnits"
+                            />
                         </td>
                     </tr>
-                    <tr>
-                        <th>Orbit Height</th>
-                        <td>{{ addCommas(displayOrbitHeight) }} km</td>
-                    </tr>
-                    <tr>
-                        <th>Orbit Velocity</th>
-                        <td>{{ addCommas(displayOrbitVelocity) }} m/s</td>
-                    </tr>
-                    <tr>
-                        <th>Orbtal Period</th>
-                        <td>{{ displayOrbitPeriod }} hours</td>
-                    </tr>
-                    <tr
-                        :class="
-                            formData.location.hillSphere <
-                            formData.location.stationaryOrbit
-                                ? 'table-warning'
-                                : ''
-                        "
-                    >
-                        <th>Stationary Orbit</th>
-                        <td>
-                            {{ addCommas(formData.location.stationaryOrbit) }}
-                            km
-                        </td>
-                    </tr> -->
                 </tbody>
             </table>
         </div>
@@ -57,18 +37,32 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import UnitSelect from '../forms/v2/UnitSelect.vue';
 import type { IMassDriverForm } from './types';
-
-import { formatNumber, physicsConstants, roundToDecimal } from '../utils';
+import {
+    accelerationUnits,
+    lengthUnits,
+    massUnits,
+    energyUnits,
+    roundToDecimal,
+    physicsConstants,
+    formatNumber,
+    m2sTog,
+} from '../utils';
 
 const props = defineProps<{
     formData: IMassDriverForm;
 }>();
 
-const convertedRadius = computed(() => {
-    const conversionValue =
-        props.formData.bodyRadiusUnit.value * props.formData.bodyRadius;
-    return conversionValue;
+const lengthUnit = ref(lengthUnits[1]);
+const energyUnit = ref(energyUnits[0]);
+
+const lengthOfTrack = computed(() => {
+    const initialSpeed = 0; // Starting from rest
+    const distance =
+        (convertedVelocity.value ** 2 - initialSpeed ** 2) /
+        (2 * convertedAcceleration.value);
+    return distance / lengthUnit.value.value;
 });
 
 const convertedAcceleration = computed(() => {
@@ -77,27 +71,23 @@ const convertedAcceleration = computed(() => {
     return conversionValue;
 });
 
-const gravity = computed(() => {
-    return calculateGravity(convertedRadius.value, props.formData.bodyDensity);
+const convertedVelocity = computed(() => {
+    const conversionValue =
+        props.formData.exitVelocityUnit.value * props.formData.exitVelocity;
+    return conversionValue;
 });
 
-function calculateGravity(radiusMeters: number, density: number) {
-    // Gravitational constant (m^3 kg^-1 s^-2)
-    // const G = 6.6743e-11;
+const convertedMass = computed(() => {
+    const conversionValue =
+        props.formData.payloadMassUnit.value * props.formData.payloadMass;
+    return conversionValue;
+});
 
-    // Calculate volume (V = 4/3 * π * r^3)
-    const volume = (4 / 3) * Math.PI * Math.pow(radiusMeters, 3);
+const energyRequired = computed(() => {
+    const mass = convertedMass.value;
+    const velocity = convertedVelocity.value;
+    const energy = (mass * velocity ** 2) / 2;
 
-    // Calculate mass (M = density * volume)
-    const mass = density * 1000 * volume;
-
-    // Calculate gravity (g = G * M / r^2)
-    const gravity =
-        (physicsConstants.gravityConstant * mass) / Math.pow(radiusMeters, 2);
-
-    console.log('gravity', gravity);
-    return gravity;
-}
-
-// energy = (mass x velocity²)/2
+    return energy * energyUnit.value.value;
+});
 </script>

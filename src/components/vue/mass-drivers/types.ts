@@ -8,4 +8,6 @@ export interface IMassDriverForm {
     accelerationUnit: Units;
     exitVelocity: number;
     exitVelocityUnit: Units;
+    payloadMass: number;
+    payloadMassUnit: Units;
 }

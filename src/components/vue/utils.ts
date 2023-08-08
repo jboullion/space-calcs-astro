@@ -36,22 +36,22 @@ export function roundToDecimal(num: number, decimalPlaces: number = 2) {
 //     toKm: (m: number) => m / 1000,
 // };
 
-export const meterUnits: Units[] = [
+export const lengthUnits: Units[] = [
     {
         label: 'm',
-        value: 1,
+        value: 0.001,
     },
     {
         label: 'km',
-        value: 1000,
+        value: 1,
     },
     {
         label: 'ft',
-        value: 0.3048,
+        value: 0.0003048,
     },
     {
         label: 'mi',
-        value: 1609.34,
+        value: 1.60934,
     },
 ];
 
@@ -72,6 +72,49 @@ export const accelerationUnits: Units[] = [
         label: 'ft/s²',
         value: 0.3048,
     },
+];
+
+export const massUnits: Units[] = [
+    {
+        label: 'g',
+        value: 0.001,
+    },
+    {
+        label: 'kg',
+        value: 1,
+    },
+    {
+        label: 'ton',
+        value: 1000,
+    },
+    {
+        label: 'lbs',
+        value: 2.20462,
+    },
+];
+
+export const densityUnits: Units[] = [
+    { label: 'g/cm³', value: 1 },
+    { label: 'kg/m³', value: 0.001 },
+    { label: 'g/mL', value: 1 },
+    { label: 'g/L', value: 0.001 },
+    { label: 'lb/in³', value: 0.036127292 },
+    { label: 'lb/ft³', value: 0.06242796 },
+    { label: 'oz/in³', value: 0.578036672 },
+];
+
+export const energyUnits: Units[] = [
+    { label: 'J', value: 1 },
+    { label: 'kJ', value: 0.001 },
+    { label: 'cal', value: 0.23900573614 }, // International Steam Table Calorie
+    { label: 'kcal', value: 0.00023900573614 }, // International Steam Table Calorie
+    { label: 'eV', value: 6.242e18 },
+    { label: 'BTU', value: 0.00094781707775 },
+    { label: 'ft-lb', value: 0.73756214928 },
+    { label: 'Wh', value: 0.00027777777778 },
+    { label: 'kWh', value: 0.00000027777777778 },
+    { label: 'MWh', value: 0.00000000027777777778 },
+    // Add more units as needed
 ];
 
 export function convertUnitValue(

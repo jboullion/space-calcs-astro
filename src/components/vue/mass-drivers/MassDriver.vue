@@ -7,7 +7,7 @@
         </div>
         <div id="mass-driver__results" class="col-lg-8">
             <MassDriverResults :formData="formData" />
-            <MassDriverVisual :formData="formData" />
+            <!-- <MassDriverVisual :formData="formData" /> -->
         </div>
     </div>
 </template>
@@ -26,17 +26,24 @@ import MassDriverVisual from './MassDriverVisual.vue';
 import MassDriverResults from './MassDriverResults.vue';
 
 import type { IMassDriverForm } from './types';
-import { accelerationUnits, convertUnitValue, meterUnits } from '../utils';
+import {
+    accelerationUnits,
+    convertUnitValue,
+    massUnits,
+    lengthUnits,
+} from '../utils';
 import { NumberUnits } from '../forms/types';
 
 const formData = reactive<IMassDriverForm>({
     bodyRadius: 6378, //km
-    bodyRadiusUnit: meterUnits[1], // km
+    bodyRadiusUnit: lengthUnits[1], // km
     bodyDensity: 5.51, // g/cm³
     acceleration: 9.81, // m/s²
     accelerationUnit: accelerationUnits[0], // m/s²
     exitVelocity: 7674, // m/s²
     exitVelocityUnit: accelerationUnits[0], // m/s²
+    payloadMass: 1000, // kg
+    payloadMassUnit: massUnits[1], // kg
 });
 
 onMounted(() => {});
@@ -69,6 +76,17 @@ watch(
     (newUnit, oldUnit) => {
         formData.exitVelocity = convertUnitValue(
             formData.exitVelocity,
+            newUnit,
+            oldUnit,
+        );
+    },
+);
+
+watch(
+    () => formData.payloadMassUnit,
+    (newUnit, oldUnit) => {
+        formData.payloadMass = convertUnitValue(
+            formData.payloadMass,
             newUnit,
             oldUnit,
         );
