@@ -132,6 +132,19 @@ export const energyUnits: Units[] = [
     // Add more units as needed
 ];
 
+export const hourUnits = [
+    // { label: 'milliseconds', value: 1000 },
+    { label: 'seconds', value: 1 },
+    // { label: "microseconds", value: 1e+6 },
+    // { label: "nanoseconds", value: 1e+9 },
+    { label: 'minutes', value: 1 / 60 },
+    { label: 'hours', value: 1 / 3600 },
+    // { label: "days", value: 1 / 86400 },
+    // { label: "weeks", value: 1 / 604800 },
+    // { label: "years", value: 1 / 31536000 },
+    // Add more units as needed
+];
+
 export function convertUnitValue(
     value: number,
     newUnit: NumberUnits,

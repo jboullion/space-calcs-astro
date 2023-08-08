@@ -26,9 +26,10 @@
 </template>
 
 <script setup lang="ts">
+import { formatNumber } from '../utils';
+
 defineProps<{
     angularComfort: 'alert-success' | 'alert-warning' | 'alert-danger';
-    formatNumber: (value: number, decimals?: number) => string;
     radsPerSec: number;
     velocityComfort: 'alert-success' | 'alert-warning' | 'alert-danger';
     pointTangentialVelocity: number;

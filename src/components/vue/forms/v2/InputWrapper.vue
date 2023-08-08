@@ -12,7 +12,10 @@
             <slot name="unit"></slot>
         </div>
         <p v-if="description" class="description">
-            <small class="text-muted" v-html="description"></small>
+            <small
+                :class="descClass ? descClass : 'text-muted'"
+                v-html="description"
+            ></small>
         </p>
     </div>
 </template>
@@ -26,6 +29,7 @@ defineProps<{
     prefix?: string;
     tooltip?: string;
     description?: string;
+    descClass?: string;
 }>();
 </script>
 

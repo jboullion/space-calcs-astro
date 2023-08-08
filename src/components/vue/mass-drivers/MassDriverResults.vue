@@ -18,6 +18,19 @@
                         </td>
                     </tr>
                     <tr>
+                        <th>Time of Travel</th>
+                        <td class="text-end">
+                            {{ formatNumber(travelTime) }}
+                        </td>
+                        <td style="width: 25%">
+                            <UnitSelect
+                                id="trackUnits"
+                                v-model="timeUnit"
+                                :units="hourUnits"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
                         <th>Energy Required</th>
                         <td class="text-end">
                             {{ formatNumber(energyRequired) }}
@@ -44,6 +57,7 @@ import {
     lengthUnits,
     massUnits,
     energyUnits,
+    hourUnits,
     roundToDecimal,
     physicsConstants,
     formatNumber,
@@ -55,7 +69,8 @@ const props = defineProps<{
 }>();
 
 const lengthUnit = ref(lengthUnits[1]);
-const energyUnit = ref(energyUnits[0]);
+const energyUnit = ref(energyUnits[9]);
+const timeUnit = ref(hourUnits[2]);
 
 const lengthOfTrack = computed(() => {
     const initialSpeed = 0; // Starting from rest
@@ -81,6 +96,13 @@ const convertedMass = computed(() => {
     const conversionValue =
         props.formData.payloadMassUnit.value * props.formData.payloadMass;
     return conversionValue;
+});
+
+const travelTime = computed(() => {
+    const initialSpeed = 0; // Starting from rest
+    const time =
+        (convertedVelocity.value - initialSpeed) / convertedAcceleration.value;
+    return time * timeUnit.value.value;
 });
 
 const energyRequired = computed(() => {

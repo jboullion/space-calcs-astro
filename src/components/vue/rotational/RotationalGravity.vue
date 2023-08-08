@@ -285,7 +285,6 @@
             <RotationResults
                 v-show="showCalcDetails"
                 :angularComfort="angularComfort"
-                :formatNumber="formatNumber"
                 :radsPerSec="radsPerSec"
                 :velocityComfort="velocityComfort"
                 :pointTangentialVelocity="pointTangentialVelocity"
