@@ -74,6 +74,21 @@ export const accelerationUnits: Units[] = [
     },
 ];
 
+export const velocityUnits: Units[] = [
+    {
+        label: 'm/s²',
+        value: 1,
+    },
+    {
+        label: 'km/s²',
+        value: 1000,
+    },
+    {
+        label: 'ft/s²',
+        value: 0.3048,
+    },
+];
+
 export const massUnits: Units[] = [
     {
         label: 'g',

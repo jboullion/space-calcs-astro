@@ -85,7 +85,7 @@
                 <UnitSelect
                     id="exitVelocityUnit"
                     v-model="formData.exitVelocityUnit"
-                    :units="accelerationUnits"
+                    :units="velocityUnits"
                 />
             </template>
         </InputWrapper>
@@ -131,6 +131,7 @@ import {
     accelerationUnits,
     lengthUnits,
     massUnits,
+    velocityUnits,
     physicsConstants,
     formatNumber,
     m2sTog,
