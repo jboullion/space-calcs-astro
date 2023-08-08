@@ -1,4 +1,4 @@
-import type { NumberUnits } from './forms/types';
+import type { NumberUnits, Units } from './forms/types';
 
 // depricated: we use formatNumbers now
 export function addCommas(value: number, decimals: number = 0) {
@@ -17,7 +17,7 @@ export function deepClone(obj: Object) {
     return JSON.parse(JSON.stringify(obj));
 }
 
-export function roundToDecimal(num: number, decimalPlaces: number) {
+export function roundToDecimal(num: number, decimalPlaces: number = 2) {
     const decimals = Math.pow(10, decimalPlaces);
     return Math.round(num * decimals + Number.EPSILON) / decimals;
 }
@@ -36,7 +36,7 @@ export function roundToDecimal(num: number, decimalPlaces: number) {
 //     toKm: (m: number) => m / 1000,
 // };
 
-export const meterUnits = [
+export const meterUnits: Units[] = [
     {
         label: 'm',
         value: 1,
@@ -55,16 +55,36 @@ export const meterUnits = [
     },
 ];
 
+export const accelerationUnits: Units[] = [
+    {
+        label: 'm/s²',
+        value: 1,
+    },
+    {
+        label: 'km/s²',
+        value: 1000,
+    },
+    {
+        label: 'g',
+        value: 9.80665,
+    },
+    {
+        label: 'ft/s²',
+        value: 0.3048,
+    },
+];
+
 export function convertUnitValue(
     value: number,
     newUnit: NumberUnits,
     oldUnit: NumberUnits,
+    deciminalPlaces: number = 2,
 ) {
     const conversionValue = oldUnit.value / newUnit.value;
 
     value = value * conversionValue;
 
-    return Math.round(value);
+    return roundToDecimal(value, deciminalPlaces);
 }
 
 export const physicsConstants = {

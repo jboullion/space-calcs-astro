@@ -96,7 +96,7 @@ const getMassOneDescription = computed(() => {
     }kg <br />${getMassOneUnit.value}: Is the mass of the ${
         props.formData.relationship.value === 'star'
             ? `Sun or ${physicsConstants.sunMass}kg`
-            : `Earth or ${physicsConstants.sunMass}kg`
+            : `Earth or ${physicsConstants.earthMass}kg`
     }`;
 });
 

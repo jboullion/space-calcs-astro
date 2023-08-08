@@ -26,14 +26,17 @@ import MassDriverVisual from './MassDriverVisual.vue';
 import MassDriverResults from './MassDriverResults.vue';
 
 import type { IMassDriverForm } from './types';
-import { convertUnitValue, meterUnits } from '../utils';
+import { accelerationUnits, convertUnitValue, meterUnits } from '../utils';
 import { NumberUnits } from '../forms/types';
 
 const formData = reactive<IMassDriverForm>({
     bodyRadius: 6378, //km
     bodyRadiusUnit: meterUnits[1], // km
     bodyDensity: 5.51, // g/cm³
-    acceleration: 9.81, // m/s²  Optional gravity (g)
+    acceleration: 9.81, // m/s²
+    accelerationUnit: accelerationUnits[0], // m/s²
+    exitVelocity: 7674, // m/s²
+    exitVelocityUnit: accelerationUnits[0], // m/s²
 });
 
 onMounted(() => {});
@@ -43,6 +46,29 @@ watch(
     (newUnit, oldUnit) => {
         formData.bodyRadius = convertUnitValue(
             formData.bodyRadius,
+            newUnit,
+            oldUnit,
+            0,
+        );
+    },
+);
+
+watch(
+    () => formData.accelerationUnit,
+    (newUnit, oldUnit) => {
+        formData.acceleration = convertUnitValue(
+            formData.acceleration,
+            newUnit,
+            oldUnit,
+        );
+    },
+);
+
+watch(
+    () => formData.exitVelocityUnit,
+    (newUnit, oldUnit) => {
+        formData.exitVelocity = convertUnitValue(
+            formData.exitVelocity,
             newUnit,
             oldUnit,
         );
