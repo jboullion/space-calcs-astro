@@ -71,13 +71,7 @@
             </template>
         </InputWrapper>
 
-        <InputWrapper
-            id="bodyRadius"
-            label="Body Radius"
-            :description="`Gravity: ${formatNumber(
-                gravityG,
-            )}g or ${formatNumber(gravityMpSec)} m/s²`"
-        >
+        <InputWrapper id="bodyRadius" label="Body Radius">
             <template v-slot:input>
                 <NumberInput
                     id="bodyRadius"
@@ -99,7 +93,13 @@
             </template>
         </InputWrapper>
 
-        <InputWrapper id="bodyDensity" label="Body Density" description="">
+        <!-- <InputWrapper
+            id="bodyDensity"
+            label="Body Density"
+            :description="`Body Gravity: ${formatNumber(
+                gravityG,
+            )}g or ${formatNumber(gravityMpSec)} m/s²`"
+        >
             <template v-slot:input>
                 <NumberInput
                     id="bodyDensity"
@@ -115,7 +115,7 @@
             <template v-slot:unit>
                 <SimpleUnit unit="g/cm³" />
             </template>
-        </InputWrapper>
+        </InputWrapper> -->
     </div>
 </template>
 
