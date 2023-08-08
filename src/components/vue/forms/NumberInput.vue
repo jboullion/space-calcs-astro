@@ -44,11 +44,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { clampNumber } from '../utils';
+// TODO: Update to use the input wrapper
+import { computed, onBeforeMount, ref, watch } from 'vue';
+import { clampNumber, formatNumber } from '../utils';
 import Tooltip from './Tooltip.vue';
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'updateUnit']);
 
 const props = defineProps<{
     id: string;
@@ -68,11 +69,13 @@ const props = defineProps<{
 const internalValue = ref<string>(props.modelValue.toString());
 const numberInput = ref(null);
 
+onBeforeMount(() => {});
+
 const updateValue = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    const value = Number(target.value);
+    const value = parseFloat(target.value);
 
-    const clampedValue = clampNumber(
+    let clampedValue = clampNumber(
         value,
         props.min ?? -Infinity,
         props.max ?? Infinity,
@@ -90,12 +93,4 @@ const updateValue = (event: Event) => {
 
     emit('update:modelValue', clampedValue);
 };
-
-// // Watch prop value change and assign to value 'selected' Ref
-// watch(
-//   () => props.modelValue,
-//   (newValue: number) => {
-//     internalValue.value = newValue.toString();
-//   }
-// );
 </script>

@@ -115,6 +115,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
         image: '',
         link: '/calcs/lagrange-points',
     },
+    {
+        id: 'mass-drivers',
+        name: 'Mass Drivers',
+        description:
+            'Calculate the length, acceleration, and power requirements for a mass driver',
+        categories: [categories[ROCKET_CAT]],
+        image: '',
+        link: '/calcs/mass-drivers',
+    },
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>
