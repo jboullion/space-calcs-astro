@@ -1,99 +1,104 @@
 <template>
     <div class="calc-form">
-        <InputWrapper
-            id="acceleration"
-            label="Acceleration"
-            :descClass="gravityComfort"
-            :description="accelerationGs"
-        >
-            <template v-slot:input>
-                <NumberInput
-                    id="acceleration"
-                    :key="`acceleration-${formData.acceleration}`"
-                    type="number"
-                    class="form-control"
-                    v-model.number="formData.acceleration"
-                    :min="1"
-                    :max="10000 / formData.accelerationUnit.value"
-                    :step="1"
-                />
-            </template>
-            <template v-slot:unit>
-                <UnitSelect
-                    id="accelerationUnit"
-                    v-model="formData.accelerationUnit"
-                    :units="accelerationUnits"
-                />
-            </template>
-        </InputWrapper>
+        <div class="p-2 rounded border mb-5">
+            <InputWrapper
+                id="acceleration"
+                label="Acceleration"
+                :descClass="gravityComfort"
+                :description="accelerationGs"
+            >
+                <template v-slot:input>
+                    <NumberInput
+                        id="acceleration"
+                        :key="`acceleration-${formData.acceleration}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.acceleration"
+                        :min="1"
+                        :max="10000 / formData.accelerationUnit.value"
+                        :step="1"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <UnitSelect
+                        id="accelerationUnit"
+                        v-model="formData.accelerationUnit"
+                        :units="accelerationUnits"
+                    />
+                </template>
+            </InputWrapper>
 
-        <InputWrapper id="exitVelocity" label="Final Velocity" description="">
-            <template v-slot:input>
-                <NumberInput
-                    id="exitVelocity"
-                    :key="`exitVelocity-${formData.exitVelocity}`"
-                    type="number"
-                    class="form-control"
-                    v-model.number="formData.exitVelocity"
-                    :min="1"
-                    :max="100000 / formData.exitVelocityUnit.value"
-                    :step="1"
-                />
-            </template>
-            <template v-slot:unit>
-                <UnitSelect
-                    id="exitVelocityUnit"
-                    v-model="formData.exitVelocityUnit"
-                    :units="velocityUnits"
-                />
-            </template>
-        </InputWrapper>
+            <InputWrapper
+                id="exitVelocity"
+                label="Final Velocity"
+                description=""
+            >
+                <template v-slot:input>
+                    <NumberInput
+                        id="exitVelocity"
+                        :key="`exitVelocity-${formData.exitVelocity}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.exitVelocity"
+                        :min="1"
+                        :max="100000 / formData.exitVelocityUnit.value"
+                        :step="1"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <UnitSelect
+                        id="exitVelocityUnit"
+                        v-model="formData.exitVelocityUnit"
+                        :units="velocityUnits"
+                    />
+                </template>
+            </InputWrapper>
 
-        <InputWrapper id="payloadMass" label="Payload Mass" description="">
-            <template v-slot:input>
-                <NumberInput
-                    id="payloadMass"
-                    :key="`payloadMass-${formData.payloadMass}`"
-                    type="number"
-                    class="form-control"
-                    v-model.number="formData.payloadMass"
-                    :min="1"
-                    :max="100000 / formData.payloadMassUnit.value"
-                    :step="1"
-                />
-            </template>
-            <template v-slot:unit>
-                <UnitSelect
-                    id="exitVelocityUnit"
-                    v-model="formData.payloadMassUnit"
-                    :units="massUnits"
-                />
-            </template>
-        </InputWrapper>
+            <InputWrapper id="payloadMass" label="Payload Mass" description="">
+                <template v-slot:input>
+                    <NumberInput
+                        id="payloadMass"
+                        :key="`payloadMass-${formData.payloadMass}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.payloadMass"
+                        :min="1"
+                        :max="100000 / formData.payloadMassUnit.value"
+                        :step="1"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <UnitSelect
+                        id="exitVelocityUnit"
+                        v-model="formData.payloadMassUnit"
+                        :units="massUnits"
+                    />
+                </template>
+            </InputWrapper>
 
-        <InputWrapper id="bodyRadius" label="Body Radius">
-            <template v-slot:input>
-                <NumberInput
-                    id="bodyRadius"
-                    :key="`radius-${formData.bodyRadius}`"
-                    type="number"
-                    class="form-control"
-                    v-model.number="formData.bodyRadius"
-                    :min="1"
-                    :max="100000000 / formData.bodyRadiusUnit.value"
-                    :step="1"
-                />
-            </template>
-            <template v-slot:unit>
-                <UnitSelect
-                    id="bodyRadiusUnit"
-                    v-model="formData.bodyRadiusUnit"
-                    :units="lengthUnits"
-                />
-            </template>
-        </InputWrapper>
+            <InputWrapper id="bodyRadius" label="Body Radius">
+                <template v-slot:input>
+                    <NumberInput
+                        id="bodyRadius"
+                        :key="`radius-${formData.bodyRadius}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.bodyRadius"
+                        :min="1"
+                        :max="100000000 / formData.bodyRadiusUnit.value"
+                        :step="1"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <UnitSelect
+                        id="bodyRadiusUnit"
+                        v-model="formData.bodyRadiusUnit"
+                        :units="lengthUnits"
+                    />
+                </template>
+            </InputWrapper>
 
-        <!-- <InputWrapper
+            <!-- <InputWrapper
             id="bodyDensity"
             label="Body Density"
             :description="`Body Gravity: ${formatNumber(
@@ -116,6 +121,11 @@
                 <SimpleUnit unit="g/cm³" />
             </template>
         </InputWrapper> -->
+        </div>
+
+        <div class="p-2 rounded border mb-5">
+            <h1>Visuals</h1>
+        </div>
     </div>
 </template>
 

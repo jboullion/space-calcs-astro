@@ -1,6 +1,11 @@
 <template>
     <div>
-        <MassDriverVisual :formData="formData" :trackLengthM="trackLengthM" />
+        <MassDriverVisual
+            :formData="formData"
+            :trackLengthM="trackLengthM"
+            :travelTime="travelTime"
+            :timeUnit="timeUnit"
+        />
 
         <h2>Results</h2>
         <div>

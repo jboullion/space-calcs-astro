@@ -1,9 +1,7 @@
 <template>
     <div id="mass-driver__app" class="row justify-content-center calculator">
         <div id="mass-driver__form" class="col-lg-4">
-            <div class="p-2 rounded border mb-5">
-                <MassDriverForm :formData="formData" />
-            </div>
+            <MassDriverForm :formData="formData" />
         </div>
         <div id="mass-driver__results" class="col-lg-8">
             <MassDriverResults :formData="formData" />

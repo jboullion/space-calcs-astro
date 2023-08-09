@@ -1,10 +1,22 @@
 <template>
-    <div
-        id="mass-driver-canvas"
-        class="canvas-wrapper border"
-        style="position: relative; height: 500px; width: 100%"
-    >
-        <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+    <div>
+        <div class="d-flex justify-content-between mb-3 align-items-center">
+            <button class="btn btn-lg px-5" :class="playColor" @click="play">
+                <i class="fas" :class="playClass"></i>
+            </button>
+            <h3 class="mb-0">
+                Time: {{ formatNumber(playTime) }}
+                {{ timeUnit.label }}
+            </h3>
+        </div>
+
+        <div
+            id="mass-driver-canvas"
+            class="canvas-wrapper border"
+            style="position: relative; height: 500px; width: 100%"
+        >
+            <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -25,15 +37,19 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import { GUI } from 'dat.gui';
 
 import {
+    hourUnits,
     convertUnitValue,
     formatNumber,
     lengthUnits,
     physicsConstants,
 } from '../utils';
+import type { Units } from '../forms/types';
 
 const props = defineProps<{
     formData: IMassDriverForm;
     trackLengthM: number;
+    travelTime: number;
+    timeUnit: Units;
 }>();
 
 const loading = ref(true);
@@ -70,7 +86,13 @@ const animation = {
     prevTick: 0, // track the last tick timestamp
     rotationAxis: new THREE.Vector3(0, 0, 1),
     earthRotationAxis: new THREE.Vector3(0, 1, 0),
+    complete: false,
+    play: false,
+    currentFrame: 0,
+    totalFrames: 400,
 };
+
+const playTime = ref(0);
 
 const planet = {
     mesh: new THREE.Mesh(),
@@ -123,6 +145,10 @@ function setupScene() {
     if (three.scene && three.canvas) {
         removeAllChildNodes(three.canvas);
     }
+
+    animation.complete = false;
+    animation.currentFrame = 0;
+    playTime.value = 0;
 
     setupThreeJS();
 
@@ -233,7 +259,6 @@ function setupPlanet() {
 
 // TODO: May need to look into paths / shapes / ExtrudeGeometry for the track. IF we want to lift the "exit" of the track up
 // OR, perhaps we create a second track that aims up at the end of the track.
-// TODO: Need to calculate the arc radians based on length of track and radius of planet
 function setupTrack() {
     const trackLengthPercent =
         props.trackLengthM / 1000 / bodyCircumferenceKM.value;
@@ -283,7 +308,73 @@ function animate() {
     if (now == animation.prevTick) return;
 
     animation.prevTick = now;
+
+    if (animation.play) {
+        animation.currentFrame++;
+        if (animation.currentFrame % 10 == 0) {
+            playTime.value =
+                props.travelTime *
+                (animation.currentFrame / animation.totalFrames);
+        }
+
+        if (animation.currentFrame > animation.totalFrames) {
+            animation.complete = true;
+            animation.play = false;
+        }
+    }
 }
+
+/** Play Animation */
+const playClass = computed(() => {
+    console.log('playClass', animation);
+    if (playTime.value === 0) {
+        return 'fa-play';
+    } else if (playTime.value === props.travelTime) {
+        return 'fa-undo';
+    } else {
+        return 'fa-pause';
+    }
+});
+
+const playColor = computed(() => {
+    if (playTime.value === 0) {
+        return 'btn-primary';
+    } else if (playTime.value === props.travelTime) {
+        return 'btn-danger';
+    } else {
+        return 'btn-outline-primary';
+    }
+});
+
+// const travelTimeMinutes = computed(() => {
+//     return convertUnitValue(
+//         props.travelTime,
+//         props.timeUnit,
+//         hourUnits[1], //km
+//         0,
+//     );
+// });
+
+// const travelTimeHours = computed(() => {
+//     return convertUnitValue(
+//         props.travelTime,
+//         props.timeUnit,
+//         hourUnits[1], //km
+//         0,
+//     );
+// });
+
+function play() {
+    console.log('play', animation);
+    if (animation.complete) {
+        setupScene();
+        return;
+    }
+
+    animation.play = !animation.play;
+}
+
+/** End Animation */
 
 watch(
     () => props.formData,
