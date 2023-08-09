@@ -170,6 +170,10 @@ export const physicsConstants = {
     AU: 149597870.7, // km
     earthMass: 5.972e24, // kg
     earthRadius: 6371, // km
+    marsRadius: 3389.5, // km
+    marsMass: 6.39e23, // kg
+    moonRadius: 1737.4, // km
+    moonMass: 7.34767309e22, // kg
     sunMass: 1.989e30, // kg
     sunRadius: 696340, // km
     sunLuminosity: 3.828e26, // W

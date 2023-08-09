@@ -122,10 +122,6 @@
             </template>
         </InputWrapper> -->
         </div>
-
-        <div class="p-2 rounded border mb-5">
-            <h1>Visuals</h1>
-        </div>
     </div>
 </template>
 

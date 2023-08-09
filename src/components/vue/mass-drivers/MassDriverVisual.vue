@@ -56,6 +56,7 @@ const loading = ref(true);
 
 interface Textures {
     earth: THREE.Texture | null;
+    mars: THREE.Texture | null;
     moon: THREE.Texture | null;
 }
 
@@ -171,8 +172,8 @@ async function loadModels() {
     const textureLoader = new THREE.TextureLoader();
 
     textures.earth = await textureLoader.load('/textures/2k_earth_daymap.jpg');
-    // textures.mars = await textureLoader.load(textureDir + '2k_mars.jpg');
-    // textures.moon = await textureLoader.load(textureDir + '2k_moon.jpg');
+    textures.mars = await textureLoader.load('/textures/2k_mars.jpg');
+    textures.moon = await textureLoader.load('/textures/2k_moon.jpg');
 
     loading.value = false;
     setupScene();
@@ -260,28 +261,27 @@ function updateCamera() {
 }
 
 function setupPlanet() {
-    planet.material = new THREE.MeshLambertMaterial({
-        map: textures.earth,
-    });
-
     // TODO: When radius is near Mars show mars texture. Lower than that show moon texture. Lower than that maybe just show a sphere with a color?
-    // switch (formData.value.location.name) {
-    //     case 'Earth':
-    //         planet.material = new THREE.MeshLambertMaterial({
-    //             map: textures.earth,
-    //         });
-    //         break;
-    //     case 'Mars':
-    //         planet.material = new THREE.MeshLambertMaterial({
-    //             map: textures.mars,
-    //         });
-    //         break;
-    //     case 'Moon':
-    //         planet.material = new THREE.MeshLambertMaterial({
-    //             map: textures.moon,
-    //         });
-    //         break;
-    // }
+    if (computedBodyRadiusKM.value > physicsConstants.earthRadius * 1.15) {
+        planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
+    } else if (computedBodyRadiusKM.value > physicsConstants.marsRadius * 1.5) {
+        planet.material = new THREE.MeshLambertMaterial({
+            map: textures.earth,
+        });
+    } else if (
+        computedBodyRadiusKM.value >
+        physicsConstants.moonRadius * 1.25
+    ) {
+        planet.material = new THREE.MeshLambertMaterial({
+            map: textures.mars,
+        });
+    } else if (computedBodyRadiusKM.value > physicsConstants.moonRadius * 0.5) {
+        planet.material = new THREE.MeshLambertMaterial({
+            map: textures.moon,
+        });
+    } else {
+        planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
+    }
 
     planet.geometry = new THREE.SphereGeometry(
         computedBodyRadiusKM.value,
@@ -316,7 +316,7 @@ function setupTrack() {
     }
 
     const trackWidth = computedBodyRadiusKM.value / 100;
-    const trackRadius = computedBodyRadiusKM.value + trackWidth;
+    const trackRadius = computedBodyRadiusKM.value + trackWidth + trackWidth;
 
     const geometry = new THREE.TorusGeometry(
         trackRadius,
@@ -326,7 +326,7 @@ function setupTrack() {
         -track.arcRadians,
     );
 
-    const material = new THREE.MeshBasicMaterial({ color: 0x777777 });
+    const material = new THREE.MeshBasicMaterial({ color: 0x555555 });
     const torus = new THREE.Mesh(geometry, material);
 
     torus.rotation.x = Math.PI / 2;
@@ -357,7 +357,7 @@ function setupSled() {
 
     const sledMesh = new THREE.Mesh(sledGeometry, sledMaterial);
     sledMesh.rotation.x = Math.PI / 2;
-    sledMesh.position.z = computedBodyRadiusKM.value + sledRadius;
+    sledMesh.position.z = computedBodyRadiusKM.value + sledRadius + sledRadius;
 
     //three.scene.add(sledMesh);
 
