@@ -1,5 +1,7 @@
 <template>
     <div>
+        <MassDriverVisual :formData="formData" />
+
         <h2>Results</h2>
         <div>
             <table class="table">
@@ -51,6 +53,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import UnitSelect from '../forms/v2/UnitSelect.vue';
+import MassDriverVisual from './MassDriverVisual.vue';
 import type { IMassDriverForm } from './types';
 import {
     accelerationUnits,

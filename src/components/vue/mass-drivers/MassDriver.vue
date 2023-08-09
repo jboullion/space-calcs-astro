@@ -7,7 +7,6 @@
         </div>
         <div id="mass-driver__results" class="col-lg-8">
             <MassDriverResults :formData="formData" />
-            <!-- <MassDriverVisual :formData="formData" /> -->
         </div>
     </div>
 </template>
@@ -22,7 +21,6 @@
 import { onMounted, reactive, watch } from 'vue';
 
 import MassDriverForm from './MassDriverForm.vue';
-import MassDriverVisual from './MassDriverVisual.vue';
 import MassDriverResults from './MassDriverResults.vue';
 
 import type { IMassDriverForm } from './types';
