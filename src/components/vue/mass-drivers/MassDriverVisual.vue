@@ -70,27 +70,32 @@ const three = {
     scene: new THREE.Scene(),
     camera: new THREE.PerspectiveCamera(),
     controls: null as OrbitControls | null,
-    bodyOne: new THREE.Mesh(),
-    bodyTwo: new THREE.Mesh(),
     renderOrder: 0,
     //labelRenderer: null as CSS2DRenderer | null,
-    group: new THREE.Group(),
-    orbitGroup: new THREE.Group(),
-    //earthRotationGroup: new THREE.Group(),
+    sledGroup: new THREE.Group(),
     minMovement: null as THREE.Vector3 | null,
     maxMovement: null as THREE.Vector3 | null,
 };
 
-const animation = {
-    FPS: 60, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
+const track = {
+    mesh: new THREE.Mesh(),
+    geometry: new THREE.TorusGeometry(),
+    material: new THREE.Material(),
+    arcRadians: 0,
+};
+
+const animationDefaults = {
+    FPS: 30, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
     prevTick: 0, // track the last tick timestamp
-    rotationAxis: new THREE.Vector3(0, 0, 1),
-    earthRotationAxis: new THREE.Vector3(0, 1, 0),
+    rotationAxis: new THREE.Vector3(0, 1, 0),
+    rotationSpeed: 0,
     complete: false,
     play: false,
     currentFrame: 0,
-    totalFrames: 400,
+    totalFrames: 300,
 };
+
+const animation = ref({ ...animationDefaults });
 
 const playTime = ref(0);
 
@@ -109,6 +114,19 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', setupScene);
 });
 
+const convertedAccelerationMpS = computed(() => {
+    // return convertUnitValue(
+    //     props.formData.acceleration,
+    //     props.formData.accelerationUnit,
+    //     lengthUnits[1], //km
+    //     0,
+    // );
+    const acceleration =
+        props.formData.accelerationUnit.value * props.formData.acceleration;
+
+    return acceleration;
+});
+
 const computedBodyRadiusKM = computed(() => {
     return convertUnitValue(
         props.formData.bodyRadius,
@@ -121,6 +139,33 @@ const computedBodyRadiusKM = computed(() => {
 const bodyCircumferenceKM = computed(() => {
     return computedBodyRadiusKM.value * 2 * Math.PI;
 });
+
+const animiationSpeedIncrement = computed(() => {
+    const increment = calculateAngularAcceleration(
+        track.arcRadians,
+        animation.value.totalFrames,
+    );
+
+    return increment;
+});
+
+function calculateAngularAcceleration(
+    angularDistance: number,
+    totalTimeSteps: number,
+) {
+    const initialAngularDisplacement = 0; // Starting from rest
+    const initialAngularVelocity = 0; // Starting from rest
+
+    const numerator =
+        2 *
+        (angularDistance -
+            initialAngularDisplacement -
+            initialAngularVelocity * totalTimeSteps);
+    const denominator = totalTimeSteps ** 2;
+
+    const angularAcceleration = numerator / denominator;
+    return angularAcceleration;
+}
 
 async function loadModels() {
     const textureLoader = new THREE.TextureLoader();
@@ -146,8 +191,7 @@ function setupScene() {
         removeAllChildNodes(three.canvas);
     }
 
-    animation.complete = false;
-    animation.currentFrame = 0;
+    animation.value = { ...animationDefaults };
     playTime.value = 0;
 
     setupThreeJS();
@@ -156,7 +200,9 @@ function setupScene() {
 
     setupTrack();
 
-    if (!animation.prevTick) {
+    setupSled();
+
+    if (!animation.value.prevTick) {
         animate();
     }
 }
@@ -263,10 +309,10 @@ function setupTrack() {
     const trackLengthPercent =
         props.trackLengthM / 1000 / bodyCircumferenceKM.value;
 
-    let arcRadians = trackLengthPercent * Math.PI * 2;
+    track.arcRadians = trackLengthPercent * Math.PI * 2;
 
     if (trackLengthPercent > 100) {
-        arcRadians = Math.PI * 2;
+        track.arcRadians = Math.PI * 2;
     }
 
     const trackWidth = computedBodyRadiusKM.value / 100;
@@ -277,16 +323,46 @@ function setupTrack() {
         trackWidth,
         12,
         50,
-        -arcRadians,
+        -track.arcRadians,
     );
+
     const material = new THREE.MeshBasicMaterial({ color: 0x777777 });
     const torus = new THREE.Mesh(geometry, material);
+
     torus.rotation.x = Math.PI / 2;
     torus.rotation.z = Math.PI / 2;
 
     //torus.rotation.y = Math.PI / 4; // TODO: Do we want to allow turning the track? Similar to the orbit rotation on orbit visualizer
 
     three.scene.add(torus);
+}
+
+function setupSled() {
+    three.sledGroup = new THREE.Group();
+
+    // if (three.carMesh) {
+    //     planet.group.remove(three.carMesh);
+    // }
+
+    const sledMaterial = new THREE.MeshPhongMaterial({
+        color: 0xea6730,
+        emissive: 0xea6730,
+        emissiveIntensity: 1,
+        side: THREE.FrontSide,
+    });
+
+    const sledRadius = computedBodyRadiusKM.value / 90;
+
+    const sledGeometry = new THREE.SphereGeometry(sledRadius, 24, 24);
+
+    const sledMesh = new THREE.Mesh(sledGeometry, sledMaterial);
+    sledMesh.rotation.x = Math.PI / 2;
+    sledMesh.position.z = computedBodyRadiusKM.value + sledRadius;
+
+    //three.scene.add(sledMesh);
+
+    three.sledGroup.add(sledMesh);
+    three.scene.add(three.sledGroup);
 }
 
 function animate() {
@@ -303,30 +379,38 @@ function animate() {
     //if (formData.value.pause) return;
 
     // clamp to fixed framerate
-    const now = Math.round((animation.FPS * window.performance.now()) / 1000);
+    const now = Math.round(
+        (animation.value.FPS * window.performance.now()) / 1000,
+    );
 
-    if (now == animation.prevTick) return;
+    if (now == animation.value.prevTick) return;
 
-    animation.prevTick = now;
+    animation.value.prevTick = now;
 
-    if (animation.play) {
-        animation.currentFrame++;
-        if (animation.currentFrame % 10 == 0) {
+    if (animation.value.play) {
+        animation.value.currentFrame++;
+        animation.value.rotationSpeed += animiationSpeedIncrement.value; //0.000006;
+
+        three.sledGroup.rotateOnAxis(
+            animation.value.rotationAxis,
+            animation.value.rotationSpeed,
+        );
+
+        if (animation.value.currentFrame % 10 == 0) {
             playTime.value =
                 props.travelTime *
-                (animation.currentFrame / animation.totalFrames);
+                (animation.value.currentFrame / animation.value.totalFrames);
         }
 
-        if (animation.currentFrame > animation.totalFrames) {
-            animation.complete = true;
-            animation.play = false;
+        if (animation.value.currentFrame > animation.value.totalFrames) {
+            animation.value.complete = true;
+            animation.value.play = false;
         }
     }
 }
 
 /** Play Animation */
 const playClass = computed(() => {
-    console.log('playClass', animation);
     if (playTime.value === 0) {
         return 'fa-play';
     } else if (playTime.value === props.travelTime) {
@@ -344,6 +428,15 @@ const playColor = computed(() => {
     } else {
         return 'btn-outline-primary';
     }
+});
+
+const travelTimeSeconds = computed(() => {
+    return convertUnitValue(
+        props.travelTime,
+        props.timeUnit,
+        hourUnits[0], //sec
+        0,
+    );
 });
 
 // const travelTimeMinutes = computed(() => {
@@ -365,13 +458,12 @@ const playColor = computed(() => {
 // });
 
 function play() {
-    console.log('play', animation);
-    if (animation.complete) {
+    if (animation.value.complete) {
         setupScene();
         return;
     }
 
-    animation.play = !animation.play;
+    animation.value.play = !animation.value.play;
 }
 
 /** End Animation */
