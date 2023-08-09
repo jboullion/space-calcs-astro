@@ -87,6 +87,7 @@ onBeforeUnmount(() => {
 });
 
 const computedBodyRadiusKM = computed(() => {
+    console.log('computedBodyRadiusKM', props.formData.bodyRadius);
     return convertUnitValue(
         props.formData.bodyRadius,
         props.formData.bodyRadiusUnit,
@@ -97,7 +98,7 @@ const computedBodyRadiusKM = computed(() => {
 
 async function loadModels() {
     const textureLoader = new THREE.TextureLoader();
-    // //this.textures.space = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_stars.jpg');
+
     textures.earth = await textureLoader.load('/textures/2k_earth_daymap.jpg');
     // textures.mars = await textureLoader.load(textureDir + '2k_mars.jpg');
     // textures.moon = await textureLoader.load(textureDir + '2k_moon.jpg');
@@ -105,18 +106,6 @@ async function loadModels() {
     loading.value = false;
     setupScene();
 }
-
-// function setupAxesHelper() {
-//   if (!three.scene) return;
-//   const axesHelper = new THREE.AxesHelper(scaledPlanetRadius.value / 10); // 500 is size
-//   axesHelper.position.set(
-//     scaledPlanetRadius.value + scaledPlanetRadius.value / 10,
-//     0,
-//     0
-//   );
-//   //this.three.group.add(axesHelper);
-//   three.scene.add(axesHelper);
-// }
 
 function removeAllChildNodes(parent: HTMLElement) {
     while (parent.firstChild) {
@@ -131,15 +120,11 @@ function setupScene() {
         removeAllChildNodes(three.canvas);
     }
 
-    //needsUpdate.value = false;
-
     setupThreeJS();
 
     setupPlanet();
 
-    //setupStarship();
-
-    //this.setupAxesHelper();
+    setupTrack();
 
     if (!animation.prevTick) {
         animate();
@@ -161,7 +146,7 @@ function setupThreeJS() {
     three.canvas.appendChild(three.renderer.domElement);
 
     const width = three.canvas.getBoundingClientRect().width;
-    const height = 400;
+    const height = 500;
 
     three.renderer.setSize(width, height);
 
@@ -172,10 +157,6 @@ function setupThreeJS() {
     const light = new THREE.DirectionalLight(0xffffff, 0.5);
     light.position.set(0, 0, 1);
     three.scene.add(light);
-
-    // // GUI
-    // this.three.gui = new dat.GUI( { autoPlace: false } );
-    // this.three.canvas.appendChild(this.three.gui.domElement);
 }
 
 function updateCamera() {
@@ -193,24 +174,13 @@ function updateCamera() {
         cameraZoomDistance * 2,
     );
 
-    // three.minMovement = new THREE.Vector3(
-    //     -cameraZoomDistance,
-    //     -cameraZoomDistance,
-    //     -cameraZoomDistance,
-    // );
-    // three.maxMovement = new THREE.Vector3(
-    //     cameraZoomDistance,
-    //     cameraZoomDistance,
-    //     cameraZoomDistance,
-    // );
-
     three.camera.position.z = cameraPositionDistance;
     // this.three.controls.enableZoom = false;
 
     // Controls
     three.controls = new OrbitControls(three.camera, three.renderer.domElement);
     three.controls.maxDistance = cameraZoomDistance;
-    three.controls.minDistance = computedBodyRadiusKM.value;
+    three.controls.minDistance = computedBodyRadiusKM.value * 2;
 }
 
 function setupPlanet() {
@@ -249,7 +219,31 @@ function setupPlanet() {
         planet.material as THREE.Material,
     );
 
+    // Randomly rotate the planet on each load so no one hemisphere is always facing the camera
+    planet.mesh.rotateY(Math.random() * Math.PI * 2);
+    planet.mesh.position.set(0, 0, 0);
+
     three.scene.add(planet.mesh);
+}
+
+function setupTrack() {
+    const trackWidth = computedBodyRadiusKM.value / 100;
+    const trackRadius = computedBodyRadiusKM.value + trackWidth;
+
+    const geometry = new THREE.TorusGeometry(
+        trackRadius,
+        trackWidth,
+        12,
+        50,
+        1.8,
+    );
+    const material = new THREE.MeshBasicMaterial({ color: 0x777777 });
+    const torus = new THREE.Mesh(geometry, material);
+    torus.rotation.x = Math.PI / 2;
+
+    //torus.rotation.y = Math.PI / 4; // TODO: Do we want to allow turning the track?
+
+    three.scene.add(torus);
 }
 
 function animate() {
@@ -272,4 +266,12 @@ function animate() {
 
     animation.prevTick = now;
 }
+
+watch(
+    () => props.formData,
+    () => {
+        setupScene();
+    },
+    { deep: true },
+);
 </script>
