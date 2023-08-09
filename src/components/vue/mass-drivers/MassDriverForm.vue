@@ -122,6 +122,9 @@
 <script setup lang="ts">
 // TODO: Must Dos!
 
+// 1. Add in souces of friction and drag? (air resistance, etc.)
+// 2. Add "Car" mass and drag coefficient?
+
 // ! BUGS
 
 // ? NOTE: Optional Improvements!

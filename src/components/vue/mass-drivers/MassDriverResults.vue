@@ -1,15 +1,24 @@
 <template>
     <div>
-        <MassDriverVisual :formData="formData" />
+        <MassDriverVisual :formData="formData" :trackLengthM="trackLengthM" />
 
         <h2>Results</h2>
         <div>
             <table class="table">
                 <tbody class="align-middle">
                     <tr>
+                        <th>Body Circumference</th>
+                        <td class="text-end">
+                            {{ formatNumber(bodyCircumference) }}
+                        </td>
+                        <td style="width: 25%">
+                            {{ props.formData.bodyRadiusUnit.label }}
+                        </td>
+                    </tr>
+                    <tr>
                         <th>Length of Track</th>
                         <td class="text-end">
-                            {{ formatNumber(lengthOfTrack / 1000) }}
+                            {{ formatNumber(trackLengthM / 1000) }}
                         </td>
                         <td style="width: 25%">
                             <UnitSelect
@@ -65,6 +74,7 @@ import {
     physicsConstants,
     formatNumber,
     m2sTog,
+    convertUnitValue,
 } from '../utils';
 
 const props = defineProps<{
@@ -72,10 +82,11 @@ const props = defineProps<{
 }>();
 
 const lengthUnit = ref(lengthUnits[1]);
+const circumferenceUnit = ref(lengthUnits[1]);
 const energyUnit = ref(energyUnits[9]);
 const timeUnit = ref(hourUnits[2]);
 
-const lengthOfTrack = computed(() => {
+const trackLengthM = computed(() => {
     const initialSpeed = 0; // Starting from rest
     const distance =
         (convertedVelocity.value ** 2 - initialSpeed ** 2) /
@@ -114,5 +125,9 @@ const energyRequired = computed(() => {
     const energy = (mass * velocity ** 2) / 2;
 
     return energy * energyUnit.value.value;
+});
+
+const bodyCircumference = computed(() => {
+    return props.formData.bodyRadius * 2 * Math.PI;
 });
 </script>

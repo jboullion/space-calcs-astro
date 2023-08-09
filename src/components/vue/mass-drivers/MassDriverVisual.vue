@@ -33,6 +33,7 @@ import {
 
 const props = defineProps<{
     formData: IMassDriverForm;
+    trackLengthM: number;
 }>();
 
 const loading = ref(true);
@@ -87,13 +88,16 @@ onBeforeUnmount(() => {
 });
 
 const computedBodyRadiusKM = computed(() => {
-    console.log('computedBodyRadiusKM', props.formData.bodyRadius);
     return convertUnitValue(
         props.formData.bodyRadius,
         props.formData.bodyRadiusUnit,
         lengthUnits[1], //km
         0,
     );
+});
+
+const bodyCircumferenceKM = computed(() => {
+    return computedBodyRadiusKM.value * 2 * Math.PI;
 });
 
 async function loadModels() {
@@ -188,6 +192,7 @@ function setupPlanet() {
         map: textures.earth,
     });
 
+    // TODO: When radius is near Mars show mars texture. Lower than that show moon texture. Lower than that maybe just show a sphere with a color?
     // switch (formData.value.location.name) {
     //     case 'Earth':
     //         planet.material = new THREE.MeshLambertMaterial({
@@ -226,7 +231,19 @@ function setupPlanet() {
     three.scene.add(planet.mesh);
 }
 
+// TODO: May need to look into paths / shapes / ExtrudeGeometry for the track. IF we want to lift the "exit" of the track up
+// OR, perhaps we create a second track that aims up at the end of the track.
+// TODO: Need to calculate the arc radians based on length of track and radius of planet
 function setupTrack() {
+    const trackLengthPercent =
+        props.trackLengthM / 1000 / bodyCircumferenceKM.value;
+
+    let arcRadians = trackLengthPercent * Math.PI * 2;
+
+    if (trackLengthPercent > 100) {
+        arcRadians = Math.PI * 2;
+    }
+
     const trackWidth = computedBodyRadiusKM.value / 100;
     const trackRadius = computedBodyRadiusKM.value + trackWidth;
 
@@ -235,13 +252,14 @@ function setupTrack() {
         trackWidth,
         12,
         50,
-        1.8,
+        -arcRadians,
     );
     const material = new THREE.MeshBasicMaterial({ color: 0x777777 });
     const torus = new THREE.Mesh(geometry, material);
     torus.rotation.x = Math.PI / 2;
+    torus.rotation.z = Math.PI / 2;
 
-    //torus.rotation.y = Math.PI / 4; // TODO: Do we want to allow turning the track?
+    //torus.rotation.y = Math.PI / 4; // TODO: Do we want to allow turning the track? Similar to the orbit rotation on orbit visualizer
 
     three.scene.add(torus);
 }
