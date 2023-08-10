@@ -269,7 +269,6 @@ function updateCamera() {
 }
 
 function setupPlanet() {
-    // TODO: When radius is near Mars show mars texture. Lower than that show moon texture. Lower than that maybe just show a sphere with a color?
     if (computedBodyRadiusKM.value > physicsConstants.earthRadius * 1.15) {
         planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
     } else if (computedBodyRadiusKM.value > physicsConstants.marsRadius * 1.5) {
@@ -453,6 +452,15 @@ function play() {
 
 watch(
     () => props.trackLengthM,
+    () => {
+        nextTick(() => {
+            setupScene();
+        });
+    },
+);
+
+watch(
+    () => props.formData.bodyRadius,
     () => {
         nextTick(() => {
             setupScene();
