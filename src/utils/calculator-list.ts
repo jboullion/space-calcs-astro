@@ -124,6 +124,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
         image: '',
         link: '/calcs/mass-drivers',
     },
+    {
+        id: 'star-travel',
+        name: 'Travel Between Stars',
+        description:
+            'Calculate the time and energy required to travel between stars.',
+        categories: [categories[ROCKET_CAT]],
+        image: '',
+        link: '/calcs/star-travel',
+    },
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>

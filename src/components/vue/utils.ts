@@ -55,6 +55,29 @@ export const lengthUnits: Units[] = [
     },
 ];
 
+export const longDistanceUnit: Units[] = [
+    {
+        label: 'km',
+        value: 1,
+    },
+    {
+        label: 'mi',
+        value: 1.60934,
+    },
+    {
+        label: 'AU',
+        value: 149597870.7,
+    },
+    {
+        label: 'ly',
+        value: 9460730472580.8,
+    },
+    {
+        label: 'pc',
+        value: 30856775814671.0,
+    },
+];
+
 export const accelerationUnits: Units[] = [
     {
         label: 'm/s²',
@@ -145,6 +168,15 @@ export const hourUnits = [
     // Add more units as needed
 ];
 
+export const highSpeedUnits: Units[] = [
+    { label: 'm/s', value: 1 },
+    { label: 'km/s', value: 1000 },
+    { label: 'ft/s', value: 0.3048 },
+    { label: 'mi/s', value: 1609.34 },
+    { label: 'c', value: 299792458 },
+    { label: 'Mach', value: 340.3 },
+];
+
 export function convertUnitValue(
     value: number,
     newUnit: NumberUnits,
@@ -162,6 +194,7 @@ export const physicsConstants = {
     g: 9.80665, // m/s
     gravityConstant: 0.000000000066743, //6.67408 * Math.pow(10, -11), // m3 kg-1 s-2
     c3Deceleration: 1.5, // km/s
+    c: 299792458, // m/s
     escVe: 11.186, // km/s,
     GM: 1.327e11, // km^3/s^2
     foot: 0.3048, // m

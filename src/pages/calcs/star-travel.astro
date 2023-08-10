@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+//@ts-ignore
+import StarTravel from '../../components/vue/star-travel/StarTravel.vue';
+import References from '../../components/shared/References.astro';
+import type { Reference } from '../../types/types';
+import { calculators } from '../../utils/calculator-list';
+// import { Skeleton } from 'three';
+// import SkeletonLoader from '../../components/shared/SkeletonLoader.astro';
+
+const calculator = calculators.find((calc) => calc.id === 'star-travel');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+const references: Reference[] = [];
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <!-- <SkeletonLoader /> -->
+        <StarTravel client:load />
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>
