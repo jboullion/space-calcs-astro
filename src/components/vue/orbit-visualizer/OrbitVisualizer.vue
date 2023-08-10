@@ -147,15 +147,15 @@
     </div>
   </div>
 </div> -->
-            <div class="split-details mt-3">
-                <!-- <div class="alert py-2 mb-2" :class="" role="alert">
+            <div class="p-2 rounded border mb-5 mt-3">
+                <table class="table mb-0">
+                    <!-- <div class="alert py-2 mb-2" :class="" role="alert">
     Planet Diameter (km): {{ planet.diameter }}<br />
   </div>
 
   <div class="alert py-2 mb-2" :class="" role="alert">
     Planet Mass (kg): {{ planet.mass }}
   </div> -->
-                <table class="table table-striped border">
                     <tbody>
                         <tr>
                             <th>Planet Radius</th>
@@ -208,8 +208,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Hill Sphere</th>
-                            <td>
+                            <th class="border-0">Hill Sphere</th>
+                            <td class="border-0">
                                 {{ addCommas(formData.location.hillSphere) }} km
                             </td>
                         </tr>

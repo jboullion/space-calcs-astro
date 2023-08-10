@@ -15,60 +15,48 @@
     </div>
 
     <div class="p-2 rounded border mb-5">
-        <div>
-            <h2>Results</h2>
-            <div>
-                <table class="table">
-                    <tbody>
-                        <!-- <tr>
+        <table class="table mb-0">
+            <tbody>
+                <!-- <tr>
                             <th>One AU</th>
                             <td class="text-end">
                                 {{ formatNumber(physicsConstants.AU) }} km
                             </td>
                         </tr> -->
-                        <tr>
-                            <th>{{ bodyTwoName }} to L1</th>
-                            <td class="text-end">
-                                {{ formatNumber(L1Point, 0) }} km
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{{ bodyOneName }} to L1</th>
-                            <td class="text-end">{{ L1SunPoint }} au</td>
-                        </tr>
-                        <tr>
-                            <th>{{ bodyTwoName }} to L2</th>
-                            <td class="text-end">
-                                {{ formatNumber(L2Point, 0) }} km
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{{ bodyOneName }} to L2</th>
-                            <td class="text-end">{{ L2SunPoint }} au</td>
-                        </tr>
-                        <tr>
-                            <th>{{ bodyTwoName }} Orbit to L3</th>
-                            <td class="text-end">
-                                {{ formatNumber(L3Point, 0) }} km
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>{{ bodyOneName }} to L3</th>
-                            <td class="text-end">{{ L3SunPoint }} au</td>
-                        </tr>
-                        <tr>
-                            <th>
-                                {{ bodyTwoName }} and {{ bodyOneName }} to L4
-                                and L5
-                            </th>
-                            <td class="text-end">
-                                {{ formatNumber(L4andL5Points, 0) }} km
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                <tr>
+                    <th>{{ bodyTwoName }} to L1</th>
+                    <td class="text-end">{{ formatNumber(L1Point, 0) }} km</td>
+                </tr>
+                <tr>
+                    <th>{{ bodyOneName }} to L1</th>
+                    <td class="text-end">{{ L1SunPoint }} au</td>
+                </tr>
+                <tr>
+                    <th>{{ bodyTwoName }} to L2</th>
+                    <td class="text-end">{{ formatNumber(L2Point, 0) }} km</td>
+                </tr>
+                <tr>
+                    <th>{{ bodyOneName }} to L2</th>
+                    <td class="text-end">{{ L2SunPoint }} au</td>
+                </tr>
+                <tr>
+                    <th>{{ bodyTwoName }} Orbit to L3</th>
+                    <td class="text-end">{{ formatNumber(L3Point, 0) }} km</td>
+                </tr>
+                <tr>
+                    <th>{{ bodyOneName }} to L3</th>
+                    <td class="text-end">{{ L3SunPoint }} au</td>
+                </tr>
+                <tr>
+                    <th class="border-0">
+                        {{ bodyTwoName }} and {{ bodyOneName }} to L4 and L5
+                    </th>
+                    <td class="text-end border-0">
+                        {{ formatNumber(L4andL5Points, 0) }} km
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </template>
 <script setup lang="ts">

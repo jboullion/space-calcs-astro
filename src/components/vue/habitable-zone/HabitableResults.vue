@@ -13,28 +13,32 @@
             different habitable zones.
         </p>
 
-        <table class="table table-striped border">
-            <tbody>
-                <tr class="" :title="luminosityEquation">
-                    <th>Luminosity (L)</th>
-                    <td class="text-end">
-                        {{ luminosity.toExponential(4) }} W
-                    </td>
-                </tr>
-                <!-- <tr class="">
+        <div class="p-2 rounded border mb-5">
+            <table class="table mb-0">
+                <tbody>
+                    <tr class="" :title="luminosityEquation">
+                        <th>Luminosity (L)</th>
+                        <td class="text-end">
+                            {{ luminosity.toExponential(4) }} W
+                        </td>
+                    </tr>
+                    <!-- <tr class="">
           <th>Flux (kT)</th>
           <td class="text-end">{{ formatNumber(energyFlux) }} kT</td>
         </tr> -->
-                <tr class="" :title="hzInnerEquation">
-                    <th>Inner Radius</th>
-                    <td class="text-end">{{ formatNumber(hzInner) }} AU</td>
-                </tr>
-                <tr class="" :title="hzOuterEquation">
-                    <th>Outer Radius</th>
-                    <td class="text-end">{{ formatNumber(hzOuter) }} AU</td>
-                </tr>
-            </tbody>
-        </table>
+                    <tr class="" :title="hzInnerEquation">
+                        <th>Inner Radius</th>
+                        <td class="text-end">{{ formatNumber(hzInner) }} AU</td>
+                    </tr>
+                    <tr class="" :title="hzOuterEquation">
+                        <th class="border-0">Outer Radius</th>
+                        <td class="text-end border-0">
+                            {{ formatNumber(hzOuter) }} AU
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 

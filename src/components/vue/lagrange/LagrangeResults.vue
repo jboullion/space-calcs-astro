@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h2>Results</h2>
         <div>
             <!-- <table class="table">
         <thead class="cursor-pointer">

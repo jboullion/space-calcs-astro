@@ -7,9 +7,8 @@
             :timeUnit="timeUnit"
         />
 
-        <h2>Results</h2>
-        <div>
-            <table class="table">
+        <div class="p-2 rounded border mb-5">
+            <table class="table mb-0">
                 <tbody class="align-middle">
                     <tr>
                         <th>Body Circumference</th>
@@ -47,11 +46,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Energy Required</th>
-                        <td class="text-end">
+                        <th class="border-0">Energy Required</th>
+                        <td class="text-end border-0">
                             {{ formatNumber(energyRequired) }}
                         </td>
-                        <td>
+                        <td class="border-0">
                             <UnitSelect
                                 id="energyUnits"
                                 v-model="energyUnit"
