@@ -1,13 +1,16 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Home from "../components/vue/home/Home.vue";
+import Layout from '../layouts/Layout.astro';
+import Home from '../components/vue/home/Home.vue';
+import Sponsor from '../components/shared/Sponsor.astro';
 ---
 
 <Layout
-  title="Space Calcs"
-  description="Space Calcs provides you with many tools to help you think about and estimate your next space mission? Want to write a a Hard Sci-Fi book? Create YouTube Content? Estiamte your crazy ideas for settling space? You can find your answers here!"
+    title="Space Calcs"
+    description="Space Calcs provides you with many tools to help you think about and estimate your next space mission? Want to write a a Hard Sci-Fi book? Create YouTube Content? Estiamte your crazy ideas for settling space? You can find your answers here!"
 >
-  <Home client:load />
+    <Home client:load />
+
+    <Sponsor />
 </Layout>
 
 <style></style>

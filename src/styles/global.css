@@ -1,5 +1,5 @@
 :root {
-  /* --bs-primary: red;
+    /* --bs-primary: red;
   --bs-primary-hover: #c00;
   --bs-primary-active: #e00;
   --bs-primary-border: #a00;
@@ -7,11 +7,11 @@
 }
 
 body {
-  font-family: "Inter", sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
-[data-bs-theme="dark"] body {
-  background-color: black;
+[data-bs-theme='dark'] body {
+    background-color: black;
 }
 
 /* .btn-primary {
@@ -51,34 +51,58 @@ body {
 } */
 
 h1 {
-  font-family: "Orbitron", sans-serif;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .bg-orange {
-  background-color: var(--bs-orange);
+    background-color: var(--bs-orange);
+}
+
+.text-discord {
+    color: #7289da;
+}
+
+.text-discord:hover {
+    color: #677bc4;
+}
+
+.text-discord:active {
+    color: #5b6eae;
+}
+
+.text-linkedin {
+    color: #0a66c2;
+}
+
+.text-linkedin:hover {
+    color: #0a5abf;
+}
+
+.text-linkedin:active {
+    color: #094f9e;
 }
 
 /**
   * Custom range input
   */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-  input[type="range"] {
-    overflow: hidden;
-    -webkit-appearance: none;
-    background-color: transparent;
-  }
+    input[type='range'] {
+        overflow: hidden;
+        -webkit-appearance: none;
+        background-color: transparent;
+    }
 
-  input[type="range"]::-webkit-slider-runnable-track {
-    background: #fff;
-    height: 12px;
-    border: 1px solid #dee2e6;
-  }
+    input[type='range']::-webkit-slider-runnable-track {
+        background: #fff;
+        height: 12px;
+        border: 1px solid #dee2e6;
+    }
 }
 
 .text-dark .text-muted {
-  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+    color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
 }
 
 .cursor-pointer {
-  cursor: pointer;
+    cursor: pointer;
 }
