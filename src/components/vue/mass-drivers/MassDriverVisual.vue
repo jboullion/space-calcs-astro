@@ -24,7 +24,14 @@
 
 // OPTIONAL:
 
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import {
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    watch,
+} from 'vue';
 import type { IMassDriverForm } from './types';
 
 import * as THREE from 'three';
@@ -62,6 +69,7 @@ interface Textures {
 
 const textures: Textures = {
     earth: null,
+    mars: null,
     moon: null,
 };
 
@@ -309,6 +317,8 @@ function setupTrack() {
     const trackLengthPercent =
         props.trackLengthM / 1000 / bodyCircumferenceKM.value;
 
+    console.log('props.trackLengthM', props.trackLengthM);
+
     track.arcRadians = trackLengthPercent * Math.PI * 2;
 
     if (trackLengthPercent > 100) {
@@ -430,33 +440,6 @@ const playColor = computed(() => {
     }
 });
 
-const travelTimeSeconds = computed(() => {
-    return convertUnitValue(
-        props.travelTime,
-        props.timeUnit,
-        hourUnits[0], //sec
-        0,
-    );
-});
-
-// const travelTimeMinutes = computed(() => {
-//     return convertUnitValue(
-//         props.travelTime,
-//         props.timeUnit,
-//         hourUnits[1], //km
-//         0,
-//     );
-// });
-
-// const travelTimeHours = computed(() => {
-//     return convertUnitValue(
-//         props.travelTime,
-//         props.timeUnit,
-//         hourUnits[1], //km
-//         0,
-//     );
-// });
-
 function play() {
     if (animation.value.complete) {
         setupScene();
@@ -469,10 +452,11 @@ function play() {
 /** End Animation */
 
 watch(
-    () => props.formData,
+    () => props.trackLengthM,
     () => {
-        setupScene();
+        nextTick(() => {
+            setupScene();
+        });
     },
-    { deep: true },
 );
 </script>
