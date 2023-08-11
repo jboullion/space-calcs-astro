@@ -4,7 +4,7 @@
             <StarTravelForm :formData="formData" />
         </div>
         <div id="star-travel__results" class="col-lg-8">
-            <!-- <StarTravelResults :formData="formData" /> -->
+            <StarTravelResults :formData="formData" />
         </div>
     </div>
 </template>
@@ -35,10 +35,12 @@ const formData = reactive<IStarTravelForm>({
     distance: 4.22, // light years
     acceleration: 9.81, // m/s²
     accelerationUnit: accelerationUnits[0], // m/s²
-    topSpeed: 0.1, // c
-    topSpeedUnit: highSpeedUnits[4], // c
+    maxVelocity: 0.1, // c
+    maxVelocityUnit: highSpeedUnits[4], // c
     deceleration: 9.81, // m/s²
     decelerationUnit: accelerationUnits[0], // m/s²
+    shipMass: 1000, // ton
+    shipMassUnit: massUnits[2], // ton
 });
 
 onMounted(() => {});
@@ -55,10 +57,10 @@ watch(
 );
 
 watch(
-    () => formData.topSpeedUnit,
+    () => formData.maxVelocityUnit,
     (newUnit, oldUnit) => {
-        formData.topSpeed = convertUnitValue(
-            formData.topSpeed,
+        formData.maxVelocity = convertUnitValue(
+            formData.maxVelocity,
             newUnit,
             oldUnit,
         );
@@ -70,6 +72,17 @@ watch(
     (newUnit, oldUnit) => {
         formData.deceleration = convertUnitValue(
             formData.deceleration,
+            newUnit,
+            oldUnit,
+        );
+    },
+);
+
+watch(
+    () => formData.shipMassUnit,
+    (newUnit, oldUnit) => {
+        formData.shipMass = convertUnitValue(
+            formData.shipMass,
             newUnit,
             oldUnit,
         );

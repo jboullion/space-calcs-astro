@@ -20,7 +20,7 @@ import type { NumberUnits } from '../types';
 const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps<{
-    id: string;
+    id?: string;
     modelValue: NumberUnits;
     units: NumberUnits[];
 }>();
@@ -31,8 +31,6 @@ const updateValue = (event: Event) => {
 
     const newUnit =
         props.units.find((unit) => unit.label === value) ?? props.units[0];
-
-    console.log('UnitSelect: updateValue', newUnit);
 
     emit('update:modelValue', newUnit);
 };

@@ -120,7 +120,7 @@ const travelTime = computed(() => {
     const initialSpeed = 0; // Starting from rest
     const time =
         (convertedVelocity.value - initialSpeed) / convertedAcceleration.value;
-    return time * timeUnit.value.value;
+    return time / timeUnit.value.value;
 });
 
 const energyRequired = computed(() => {

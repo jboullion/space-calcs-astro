@@ -156,17 +156,38 @@ export const energyUnits: Units[] = [
 ];
 
 export const hourUnits = [
-    // { label: 'milliseconds', value: 1000 },
     { label: 'seconds', value: 1 },
+    { label: 'minutes', value: 60 },
+    { label: 'hours', value: 3600 },
+];
+
+export const longTimeUnits = [
+    // { label: 'milliseconds', value: 1000 },
+    //{ label: 'seconds', value: 1 },
     // { label: "microseconds", value: 1e+6 },
     // { label: "nanoseconds", value: 1e+9 },
-    { label: 'minutes', value: 1 / 60 },
-    { label: 'hours', value: 1 / 3600 },
-    // { label: "days", value: 1 / 86400 },
-    // { label: "weeks", value: 1 / 604800 },
-    // { label: "years", value: 1 / 31536000 },
-    // Add more units as needed
+    //{ label: 'minutes', value: 1 / 60 },
+    //{ label: 'hours', value: 1 / 3600 },
+    { label: 'days', value: 86400 },
+    { label: 'weeks', value: 604800 },
+    { label: 'years', value: 31536000 },
+    { label: 'decades', value: 315360000 },
+    { label: 'centuries', value: 3153600000 },
+    { label: 'millennia', value: 31536000000 },
 ];
+
+// export const timeUnits = [
+//     // { label: 'milliseconds', value: 1000 },
+//     { label: 'seconds', value: 1 },
+//     // { label: "microseconds", value: 1e+6 },
+//     // { label: "nanoseconds", value: 1e+9 },
+//     { label: 'minutes', value: 1 / 60 },
+//     { label: 'hours', value: 1 / 3600 },
+//     { label: "days", value: 1 / 86400 },
+//     { label: "weeks", value: 1 / 604800 },
+//     { label: "years", value: 1 / 31536000 },
+//     // Add more units as needed
+// ];
 
 export const highSpeedUnits: Units[] = [
     { label: 'm/s', value: 1 },

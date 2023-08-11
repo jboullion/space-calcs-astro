@@ -50,18 +50,22 @@
                 </template>
             </InputWrapper>
 
-            <InputWrapper id="topSpeed" label="Top Speed" description="">
+            <InputWrapper
+                id="maxVelocity"
+                label="Max Velocity"
+                description="Time Dilation: 0%"
+            >
                 <template v-slot:input>
                     <NumberInput
-                        id="topSpeed"
-                        :key="`topSpeed-${formData.topSpeed}`"
+                        id="maxVelocity"
+                        :key="`maxVelocity-${formData.maxVelocity}`"
                         type="number"
                         class="form-control"
-                        v-model.number="formData.topSpeed"
-                        :min="1"
+                        v-model.number="formData.maxVelocity"
+                        :min="0.1"
                         :max="
                             (physicsConstants.c * 1000) /
-                            formData.topSpeedUnit.value
+                            formData.maxVelocityUnit.value
                         "
                         :step="1"
                     />
@@ -69,7 +73,7 @@
                 <template v-slot:unit>
                     <UnitSelect
                         id="accelerationUnit"
-                        v-model="formData.topSpeedUnit"
+                        v-model="formData.maxVelocityUnit"
                         :units="highSpeedUnits"
                     />
                 </template>
@@ -98,6 +102,28 @@
                         id="accelerationUnit"
                         v-model="formData.decelerationUnit"
                         :units="accelerationUnits"
+                    />
+                </template>
+            </InputWrapper>
+
+            <InputWrapper id="shipMass" label="Ship Mass" description="">
+                <template v-slot:input>
+                    <NumberInput
+                        id="shipMass"
+                        :key="`shipMass-${formData.shipMass}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.shipMass"
+                        :min="1"
+                        :max="10000000000 / formData.shipMassUnit.value"
+                        :step="1"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <UnitSelect
+                        id="accelerationUnit"
+                        v-model="formData.shipMassUnit"
+                        :units="massUnits"
                     />
                 </template>
             </InputWrapper>
