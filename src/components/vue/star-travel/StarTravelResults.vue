@@ -9,9 +9,23 @@
 
         <ResultTable>
             <tr>
+                <td>Total Travel Distance</td>
+                <td class="text-end">
+                    {{ formatNumber(convertedTravelDistanceM) }}
+                </td>
+                <td style="width: 25%">M</td>
+            </tr>
+            <tr>
                 <th>Total Travel Time</th>
-                <td class="text-end">{{ formatNumber(totalTravelTime) }}</td>
-                <td style="width: 25%">{{}}</td>
+                <td class="text-end">
+                    {{ formatNumber(convertedTravelTime) }}
+                </td>
+                <td style="width: 25%">
+                    <UnitSelect
+                        v-model="totalTimeUnit"
+                        :units="longTimeUnits"
+                    />
+                </td>
             </tr>
             <tr>
                 <th>Apparent Travel Time</th>
@@ -31,6 +45,13 @@
                 </td>
             </tr>
             <tr>
+                <td>Distance Traveled during acceleration</td>
+                <td class="text-end">
+                    {{ formatNumber(convertedAccelerationDistanceM) }}
+                </td>
+                <td style="width: 25%">M</td>
+            </tr>
+            <tr>
                 <th>Acceleration Energy</th>
                 <td class="text-end">{{}}</td>
                 <td style="width: 25%">{{}}</td>
@@ -38,7 +59,7 @@
             <tr>
                 <th>Time at Max Velocity</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedTimeToAccelerate) }}
+                    {{ formatNumber(convertedTimeAtMaxVelocity) }}
                 </td>
                 <td style="width: 25%">
                     <UnitSelect
@@ -58,6 +79,13 @@
                         :units="longTimeUnits"
                     />
                 </td>
+            </tr>
+            <tr>
+                <td>Distance Traveled during Deceleration</td>
+                <td class="text-end">
+                    {{ formatNumber(convertedDecelerationDistanceM) }}
+                </td>
+                <td style="width: 25%">M</td>
             </tr>
             <tr>
                 <th class="border-0">Deceleration Energy</th>
@@ -106,13 +134,26 @@ const props = defineProps<{
     formData: IStarTravelForm;
 }>();
 
-const accelTimeUnit = ref(longTimeUnits[2]);
-const decelTimeUnit = ref(longTimeUnits[2]);
+const accelTimeUnit = ref(longTimeUnits[0]);
+const decelTimeUnit = ref(longTimeUnits[0]);
 const maxVelocityUnit = ref(longTimeUnits[2]);
+const totalTimeUnit = ref(longTimeUnits[2]);
+
+const convertedTravelDistanceM = computed(() => {
+    const lightYearsToMeters = 9460730472580800; // 9460730472580.8 km
+    const conversionValue = lightYearsToMeters * props.formData.distance;
+    return conversionValue;
+});
 
 const convertedAccelerationMpS = computed(() => {
     const conversionValue =
         props.formData.accelerationUnit.value * props.formData.acceleration;
+    return conversionValue;
+});
+
+const convertedDecelerationMpS = computed(() => {
+    const conversionValue =
+        props.formData.decelerationUnit.value * props.formData.deceleration;
     return conversionValue;
 });
 
@@ -144,10 +185,19 @@ const convertedTimeToAccelerate = computed(() => {
     );
 });
 
+const convertedAccelerationDistanceM = computed(() => {
+    const initialVelocity = 0; // Starting from rest
+    const distance =
+        (convertedVelocityMpS.value ** 2 - initialVelocity ** 2) /
+        (2 * convertedAccelerationMpS.value);
+
+    return distance;
+});
+
 const timeToDecelerateSec = computed(() => {
     return calculateTimeToReachSpeed(
         convertedVelocityMpS.value,
-        convertedAccelerationMpS.value,
+        convertedDecelerationMpS.value,
     );
 });
 
@@ -160,8 +210,32 @@ const convertedTimeToDecelerate = computed(() => {
     );
 });
 
-const timeAtMaxVelocity = computed(() => {
-    return 0; //timeToAccelerate.value * 2;
+const convertedDecelerationDistanceM = computed(() => {
+    const initialVelocity = 0; // Starting from rest
+    const distance =
+        (convertedVelocityMpS.value ** 2 - initialVelocity ** 2) /
+        (2 * convertedDecelerationMpS.value);
+    return distance;
+});
+
+const timeAtMaxVelocityS = computed(() => {
+    // Calculate distance traveled at maximum velocity
+    const maxVelocityDistance =
+        convertedTravelDistanceM.value -
+        convertedAccelerationDistanceM.value -
+        convertedDecelerationDistanceM.value;
+
+    // Calculate time traveled at maximum velocity
+    return maxVelocityDistance / convertedVelocityMpS.value;
+});
+
+const convertedTimeAtMaxVelocity = computed(() => {
+    return convertUnitValue(
+        timeAtMaxVelocityS.value,
+        maxVelocityUnit.value,
+        hourUnits[0], // seconds
+        0,
+    );
 });
 
 const totalTravelTime = computed(() => {
@@ -176,4 +250,19 @@ function calculateTimeToReachSpeed(
     const time = (finalVelocity - initialVelocity) / acceleration;
     return time;
 }
+
+const convertedTravelTime = computed(() => {
+    // Calculate total travel time
+    const totalTravelTime =
+        timeToAccelerateSec.value +
+        timeAtMaxVelocityS.value +
+        timeToDecelerateSec.value;
+
+    return convertUnitValue(
+        totalTravelTime,
+        totalTimeUnit.value,
+        hourUnits[0], // seconds
+        0,
+    );
+});
 </script>
