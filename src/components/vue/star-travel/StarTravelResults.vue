@@ -8,13 +8,18 @@
         /> -->
 
         <ResultTable>
-            <tr>
-                <td>Total Travel Distance</td>
+            <!-- <tr>
+                <th>Total Travel Distance</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedTravelDistanceM) }}
+                    {{ formatNumber(convertedTravelDistance) }}
                 </td>
-                <td style="width: 25%">M</td>
-            </tr>
+                <td style="width: 25%">
+                    <UnitSelect
+                        v-model="totalDistanceUnit"
+                        :units="longDistanceUnits"
+                    />
+                </td>
+            </tr> -->
             <tr>
                 <th>Total Travel Time</th>
                 <td class="text-end">
@@ -27,17 +32,17 @@
                     />
                 </td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <th>Apparent Travel Time</th>
                 <td class="text-end"></td>
                 <td style="width: 25%"></td>
-            </tr>
+            </tr> -->
             <tr>
                 <th>Time to Accelerate</th>
                 <td class="text-end">
                     {{ formatNumber(convertedTimeToAccelerate) }}
                 </td>
-                <td style="width: 25%">
+                <td>
                     <UnitSelect
                         v-model="accelTimeUnit"
                         :units="longTimeUnits"
@@ -45,30 +50,24 @@
                 </td>
             </tr>
             <tr>
-                <td>Distance Traveled during acceleration</td>
+                <th>Acceleration Distance</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedAccelerationDistanceM) }}
+                    {{ formatNumber(convertedAccelerationDistance) }}
                 </td>
-                <td style="width: 25%">M</td>
-            </tr>
-            <tr>
-                <th>Acceleration Energy</th>
-                <td class="text-end">
-                    {{ formatNumber(convertedAccelEnergy) }}
-                </td>
-                <td style="width: 25%">
+                <td>
                     <UnitSelect
-                        v-model="accelEnergyUnit"
-                        :units="energyUnits"
+                        v-model="accelDistanceUnit"
+                        :units="longDistanceUnits"
                     />
                 </td>
             </tr>
+
             <tr>
                 <th>Time at Max Velocity</th>
                 <td class="text-end">
                     {{ formatNumber(convertedTimeAtMaxVelocity) }}
                 </td>
-                <td style="width: 25%">
+                <td>
                     <UnitSelect
                         v-model="maxVelocityUnit"
                         :units="longTimeUnits"
@@ -80,7 +79,7 @@
                 <td class="text-end">
                     {{ formatNumber(convertedTimeToDecelerate) }}
                 </td>
-                <td style="width: 25%">
+                <td>
                     <UnitSelect
                         v-model="decelTimeUnit"
                         :units="longTimeUnits"
@@ -88,16 +87,28 @@
                 </td>
             </tr>
             <tr>
-                <td>Distance Traveled during Deceleration</td>
+                <th>Deceleration Distance</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedDecelerationDistanceM) }}
+                    {{ formatNumber(convertedDecelerationDistance) }}
                 </td>
-                <td style="width: 25%">M</td>
+                <td>
+                    <UnitSelect
+                        v-model="decelDistanceUnit"
+                        :units="longDistanceUnits"
+                    />
+                </td>
             </tr>
             <tr>
-                <th class="border-0">Deceleration Energy</th>
-                <td class="text-end border-0">{{}}</td>
-                <td class="border-0" style="width: 25%">{{}}</td>
+                <th class="border-0">Energy Required</th>
+                <td class="text-end border-0">
+                    {{ formatNumber(convertedAccelEnergy * 2) }}
+                </td>
+                <td class="border-0">
+                    <UnitSelect
+                        v-model="energyRequiredUnit"
+                        :units="energyUnits"
+                    />
+                </td>
             </tr>
             <!--                    
                     <tr>
@@ -123,18 +134,14 @@ import ResultTable from '../forms/v2/ResultTable.vue';
 //import StarTravelVisual from './StarTravelVisual.vue';
 import type { IStarTravelForm } from './types';
 import {
-    accelerationUnits,
     lengthUnits,
-    massUnits,
+    longDistanceUnits,
     energyUnits,
     hourUnits,
     longTimeUnits,
-    roundToDecimal,
     physicsConstants,
     formatNumber,
-    m2sTog,
     convertUnitValue,
-    velocityUnits,
 } from '../utils';
 
 const props = defineProps<{
@@ -145,7 +152,22 @@ const accelTimeUnit = ref(longTimeUnits[0]);
 const decelTimeUnit = ref(longTimeUnits[0]);
 const maxVelocityUnit = ref(longTimeUnits[2]);
 const totalTimeUnit = ref(longTimeUnits[2]);
-const accelEnergyUnit = ref(energyUnits[9]);
+const energyRequiredUnit = ref(energyUnits[11]);
+const accelDistanceUnit = ref(longDistanceUnits[2]);
+const decelDistanceUnit = ref(longDistanceUnits[2]);
+//const totalDistanceUnit = ref(longDistanceUnits[2]);
+
+// const convertedTravelDistance = computed(() => {
+//     const decimals =
+//         totalDistanceUnit.value.value > physicsConstants.AU ? 3 : 0;
+
+//     return convertUnitValue(
+//         convertedTravelDistanceM.value,
+//         totalDistanceUnit.value,
+//         lengthUnits[0], // meters
+//         decimals,
+//     );
+// });
 
 const convertedTravelDistanceM = computed(() => {
     const lightYearsToMeters = 9460730472580800; // 9460730472580.8 km
@@ -193,6 +215,18 @@ const convertedTimeToAccelerate = computed(() => {
     );
 });
 
+const convertedAccelerationDistance = computed(() => {
+    const decimals =
+        accelDistanceUnit.value.value > physicsConstants.AU ? 3 : 0;
+
+    return convertUnitValue(
+        convertedAccelerationDistanceM.value,
+        accelDistanceUnit.value,
+        lengthUnits[0], // meters
+        decimals,
+    );
+});
+
 const convertedAccelerationDistanceM = computed(() => {
     const initialVelocity = 0; // Starting from rest
     const distance =
@@ -215,6 +249,18 @@ const convertedTimeToDecelerate = computed(() => {
         decelTimeUnit.value,
         hourUnits[0], // seconds
         0,
+    );
+});
+
+const convertedDecelerationDistance = computed(() => {
+    const decimals =
+        decelDistanceUnit.value.value > physicsConstants.AU ? 3 : 0;
+
+    return convertUnitValue(
+        convertedDecelerationDistanceM.value,
+        decelDistanceUnit.value,
+        lengthUnits[0], // meters
+        decimals,
     );
 });
 
@@ -247,6 +293,8 @@ const convertedTimeAtMaxVelocity = computed(() => {
 });
 
 const convertedTravelTime = computed(() => {
+    const decimals = totalTimeUnit.value.value > 604800 ? 2 : 0;
+
     // Calculate total travel time
     const totalTravelTime =
         timeToAccelerateSec.value +
@@ -257,11 +305,13 @@ const convertedTravelTime = computed(() => {
         totalTravelTime,
         totalTimeUnit.value,
         hourUnits[0], // seconds
-        0,
+        decimals,
     );
 });
 
+// The same energy is required for deceleration unless the deceleration has a different ending velocity. In this case we are assuming 0
 const convertedAccelEnergy = computed(() => {
+    // This energy us returned in Joules
     const energy = calculateEnergyRequired(
         convertedMassKg.value,
         convertedVelocityMpS.value,
@@ -269,7 +319,7 @@ const convertedAccelEnergy = computed(() => {
 
     return convertUnitValue(
         energy,
-        accelEnergyUnit.value,
+        energyRequiredUnit.value,
         energyUnits[0], // Joules
         0,
     );

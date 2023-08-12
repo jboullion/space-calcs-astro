@@ -55,7 +55,7 @@ export const lengthUnits: Units[] = [
     },
 ];
 
-export const longDistanceUnit: Units[] = [
+export const longDistanceUnits: Units[] = [
     {
         label: 'km',
         value: 1,
@@ -72,10 +72,10 @@ export const longDistanceUnit: Units[] = [
         label: 'ly',
         value: 9460730472580.8,
     },
-    {
-        label: 'pc',
-        value: 30856775814671.0,
-    },
+    // {
+    //     label: 'pc',
+    //     value: 30856775814671.0,
+    // },
 ];
 
 export const accelerationUnits: Units[] = [
@@ -162,6 +162,8 @@ export const energyUnits: Units[] = [
     { label: 'Wh', value: 277.77777778 },
     { label: 'kWh', value: 277777.77778 },
     { label: 'MWh', value: 277777777.78 },
+    { label: 'GWh', value: 277777777778 },
+    { label: 'TWh', value: 277777777777778 },
     // Add more units as needed
 ];
 
