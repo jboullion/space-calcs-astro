@@ -1,7 +1,10 @@
 <template>
     <div id="star-travel__app" class="row justify-content-center calculator">
         <div id="star-travel__form" class="col-lg-4">
-            <StarTravelForm :formData="formData" />
+            <StarTravelForm
+                :formData="formData"
+                @update-travel-distance="updateTravelDistance"
+            />
         </div>
         <div id="star-travel__results" class="col-lg-8">
             <StarTravelResults :formData="formData" />
@@ -30,8 +33,10 @@ import {
     highSpeedUnits,
 } from '../utils';
 import { NumberUnits } from '../forms/types';
+import { travelLocations } from './constants';
 
 const formData = reactive<IStarTravelForm>({
+    exampleLocation: travelLocations[0],
     distance: 4.22, // light years
     acceleration: 9.81, // m/s²
     accelerationUnit: accelerationUnits[0], // m/s²
@@ -88,5 +93,13 @@ watch(
         );
     },
 );
+
+function updateTravelDistance() {
+    const location = travelLocations.find(
+        (loc) => loc.value === formData.exampleLocation.value,
+    );
+
+    if (location) formData.distance = location.distance;
+}
 </script>
 <style></style>

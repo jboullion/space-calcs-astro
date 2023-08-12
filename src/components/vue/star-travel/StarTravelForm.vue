@@ -1,6 +1,14 @@
 <template>
     <div class="calc-form">
         <div class="p-2 rounded border mb-5">
+            <SelectInput
+                id="example-location"
+                label="Example Location"
+                v-model="formData.exampleLocation"
+                :options="travelLocations"
+                @update:modelValue="$emit('updateTravelDistance', $event)"
+            />
+
             <InputWrapper
                 id="distance"
                 label="Distance Between Stars"
@@ -144,25 +152,25 @@
 import { computed, onMounted, ref } from 'vue';
 import InputWrapper from '../forms/v2/InputWrapper.vue';
 import NumberInput from '../forms/v2/NumberInput.vue';
+import SelectInput from '../forms/SelectInput.vue';
 import SimpleUnit from '../forms/v2/SimpleUnit.vue';
 import UnitSelect from '../forms/v2/UnitSelect.vue';
 import type { IStarTravelForm } from './types';
+import { travelLocations } from './constants';
 import {
     accelerationUnits,
     highSpeedUnits,
-    lengthUnits,
     massUnits,
-    velocityUnits,
     physicsConstants,
     formatNumber,
     m2sTog,
 } from '../utils';
 
-const emit = defineEmits([]);
-
 const props = defineProps<{
     formData: IStarTravelForm;
 }>();
+
+const emit = defineEmits(['updateTravelDistance']);
 
 onMounted(() => {});
 
