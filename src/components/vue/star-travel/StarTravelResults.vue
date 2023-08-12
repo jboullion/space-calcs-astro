@@ -53,8 +53,15 @@
             </tr>
             <tr>
                 <th>Acceleration Energy</th>
-                <td class="text-end">{{}}</td>
-                <td style="width: 25%">{{}}</td>
+                <td class="text-end">
+                    {{ formatNumber(convertedAccelEnergy) }}
+                </td>
+                <td style="width: 25%">
+                    <UnitSelect
+                        v-model="accelEnergyUnit"
+                        :units="energyUnits"
+                    />
+                </td>
             </tr>
             <tr>
                 <th>Time at Max Velocity</th>
@@ -138,6 +145,7 @@ const accelTimeUnit = ref(longTimeUnits[0]);
 const decelTimeUnit = ref(longTimeUnits[0]);
 const maxVelocityUnit = ref(longTimeUnits[2]);
 const totalTimeUnit = ref(longTimeUnits[2]);
+const accelEnergyUnit = ref(energyUnits[9]);
 
 const convertedTravelDistanceM = computed(() => {
     const lightYearsToMeters = 9460730472580800; // 9460730472580.8 km
@@ -238,19 +246,6 @@ const convertedTimeAtMaxVelocity = computed(() => {
     );
 });
 
-const totalTravelTime = computed(() => {
-    return 0; //timeToAccelerate.value * 2;
-});
-
-function calculateTimeToReachSpeed(
-    finalVelocity: number,
-    acceleration: number,
-) {
-    const initialVelocity = 0; // Starting from rest
-    const time = (finalVelocity - initialVelocity) / acceleration;
-    return time;
-}
-
 const convertedTravelTime = computed(() => {
     // Calculate total travel time
     const totalTravelTime =
@@ -265,4 +260,36 @@ const convertedTravelTime = computed(() => {
         0,
     );
 });
+
+const convertedAccelEnergy = computed(() => {
+    const energy = calculateEnergyRequired(
+        convertedMassKg.value,
+        convertedVelocityMpS.value,
+    );
+
+    return convertUnitValue(
+        energy,
+        accelEnergyUnit.value,
+        energyUnits[0], // Joules
+        0,
+    );
+});
+
+const totalTravelTime = computed(() => {
+    return 0; //timeToAccelerate.value * 2;
+});
+
+function calculateTimeToReachSpeed(
+    finalVelocity: number,
+    acceleration: number,
+) {
+    const initialVelocity = 0; // Starting from rest
+    const time = (finalVelocity - initialVelocity) / acceleration;
+    return time;
+}
+
+function calculateEnergyRequired(mass: number, velocity: number): number {
+    const kineticEnergy = 0.5 * mass * velocity ** 2;
+    return kineticEnergy;
+}
 </script>

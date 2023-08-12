@@ -136,7 +136,7 @@ const energyRequired = computed(() => {
     const velocity = convertedVelocity.value;
     const energy = (mass * velocity ** 2) / 2;
 
-    return energy * energyUnit.value.value;
+    return energy / energyUnit.value.value;
 });
 
 const bodyCircumference = computed(() => {
