@@ -28,8 +28,9 @@ export type StarTravelResults = {
     travelTime: number; // years
     accelTime: number; // ly
     decelTime: number; // g or m/s^2
+    totalDistance: number; // ly
     accelDistance: number;
     decelDistance: number; // g or m/s^2
-    timeMaxVelocity: number;
+    // timeMaxVelocity: number;
     //fuelEfficiency: number; // Mass -> Energy (MJ) ?
 };

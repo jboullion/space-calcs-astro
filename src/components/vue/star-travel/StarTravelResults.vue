@@ -137,13 +137,15 @@ const energyRequiredUnit = ref(energyUnits[11]);
 const accelDistanceUnit = ref(longDistanceUnits[2]);
 const decelDistanceUnit = ref(longDistanceUnits[2]);
 
-const results = ref<StarTravelResults>({
-    travelTime: 0,
-    accelTime: 0,
-    decelTime: 0,
-    accelDistance: 0,
-    decelDistance: 0,
-    timeMaxVelocity: 0,
+const results = computed<StarTravelResults>(() => {
+    return {
+        travelTime: travelTimeSec.value,
+        accelTime: timeToAccelerateSec.value,
+        decelTime: timeToDecelerateSec.value,
+        totalDistance: convertedTravelDistanceM.value,
+        accelDistance: convertedAccelerationDistanceM.value,
+        decelDistance: convertedDecelerationDistanceM.value,
+    };
 });
 
 //const totalDistanceUnit = ref(longDistanceUnits[2]);
@@ -283,17 +285,19 @@ const convertedTimeAtMaxVelocity = computed(() => {
     );
 });
 
+const travelTimeSec = computed(() => {
+    return (
+        timeToAccelerateSec.value +
+        timeAtMaxVelocityS.value +
+        timeToDecelerateSec.value
+    );
+});
+
 const convertedTravelTime = computed(() => {
     const decimals = totalTimeUnit.value.value > 604800 ? 2 : 0;
 
-    // Calculate total travel time
-    const totalTravelTime =
-        timeToAccelerateSec.value +
-        timeAtMaxVelocityS.value +
-        timeToDecelerateSec.value;
-
     return convertUnitValue(
-        totalTravelTime,
+        travelTimeSec.value,
         totalTimeUnit.value,
         hourUnits[0], // seconds
         decimals,

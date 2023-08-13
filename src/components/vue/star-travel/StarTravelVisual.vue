@@ -250,11 +250,19 @@ function setupTrack() {
         color: 0xff0000,
     });
 
-    // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
     const trackRadius = 5;
-    const accelLength = 100;
-    const maxVelocityLength = 100;
-    const decelLength = 100;
+    const trackWidth = three.starDistance * 2;
+
+    const accelPercent =
+        props.results.accelDistance / props.results.totalDistance;
+    const decelPercent =
+        props.results.decelDistance / props.results.totalDistance;
+    const maxPercent = (100 - accelPercent - decelPercent) / 100;
+
+    // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
+    const accelLength = trackWidth * accelPercent;
+    const decelLength = trackWidth * decelPercent;
+    const maxVelocityLength = trackWidth - accelLength - decelLength;
 
     const accelGeometry = new THREE.CylinderGeometry(
         trackRadius,
