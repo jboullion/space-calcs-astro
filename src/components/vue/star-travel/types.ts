@@ -23,3 +23,13 @@ export type StarLocation = {
     value: string;
     distance: number; // ly
 };
+
+export type StarTravelResults = {
+    travelTime: number; // years
+    accelTime: number; // ly
+    decelTime: number; // g or m/s^2
+    accelDistance: number;
+    decelDistance: number; // g or m/s^2
+    timeMaxVelocity: number;
+    //fuelEfficiency: number; // Mass -> Energy (MJ) ?
+};

@@ -1,11 +1,6 @@
 <template>
     <div>
-        <!-- <StarTravelVisual
-            :formData="formData"
-            :trackLengthM="trackLengthM"
-            :travelTime="travelTime"
-            :timeUnit="timeUnit"
-        /> -->
+        <StarTravelVisual :formData="formData" :results="results" />
 
         <ResultTable>
             <tr>
@@ -117,8 +112,8 @@
 import { ref, computed } from 'vue';
 import UnitSelect from '../forms/v2/UnitSelect.vue';
 import ResultTable from '../forms/v2/ResultTable.vue';
-//import StarTravelVisual from './StarTravelVisual.vue';
-import type { IStarTravelForm } from './types';
+import StarTravelVisual from './StarTravelVisual.vue';
+import type { IStarTravelForm, StarTravelResults } from './types';
 import {
     lengthUnits,
     longDistanceUnits,
@@ -141,6 +136,16 @@ const totalTimeUnit = ref(longTimeUnits[2]);
 const energyRequiredUnit = ref(energyUnits[11]);
 const accelDistanceUnit = ref(longDistanceUnits[2]);
 const decelDistanceUnit = ref(longDistanceUnits[2]);
+
+const results = ref<StarTravelResults>({
+    travelTime: 0,
+    accelTime: 0,
+    decelTime: 0,
+    accelDistance: 0,
+    decelDistance: 0,
+    timeMaxVelocity: 0,
+});
+
 //const totalDistanceUnit = ref(longDistanceUnits[2]);
 
 // const convertedTravelDistance = computed(() => {
