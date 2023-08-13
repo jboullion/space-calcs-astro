@@ -262,7 +262,8 @@ function setupTrack() {
     // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
     const accelLength = trackWidth * accelPercent;
     const decelLength = trackWidth * decelPercent;
-    const maxVelocityLength = trackWidth - accelLength - decelLength;
+    const maxVelocityLength =
+        trackWidth - accelLength - decelLength - three.starRadius * 2;
 
     const accelGeometry = new THREE.CylinderGeometry(
         trackRadius,
@@ -361,4 +362,17 @@ function animate() {
 
     animation.value.prevTick = now;
 }
+
+watch(props.formData, (newValue, oldValue) => {
+    //updateCamera();
+    // const baseDistance = Math.max(props.formData.planetOrbit, hzOuter.value);
+    // const cameraZoomDistance = baseDistance * AUtoDistance * 4;
+    // three.camera.far = cameraZoomDistance * 2;
+    // three.camera.updateProjectionMatrix();
+    // if (three.controls) {
+    //     three.controls.maxDistance = cameraZoomDistance;
+    // }
+
+    setupScene();
+});
 </script>
