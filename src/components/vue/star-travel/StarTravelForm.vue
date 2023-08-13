@@ -61,7 +61,7 @@
             <InputWrapper
                 id="maxVelocity"
                 label="Max Velocity"
-                description="Time Dilation: 0%"
+                :description="`Time Dilation: ${timeDilation}%`"
             >
                 <template v-slot:input>
                     <NumberInput
@@ -75,7 +75,7 @@
                             (physicsConstants.c * 1000) /
                             formData.maxVelocityUnit.value
                         "
-                        :step="1"
+                        :step="0.1"
                     />
                 </template>
                 <template v-slot:unit>
@@ -226,5 +226,22 @@ const decelerationComfort = computed(() => {
     // else if (accelGravityG.value < 1.1) return 'text-success';
     // else if (accelGravityG.value < 1.5) return 'text-warning';
     // else return 'text-danger';
+});
+
+const timeDilation = computed(() => {
+    const convertedVelocity =
+        props.formData.maxVelocityUnit.value * props.formData.maxVelocity;
+
+    if (convertedVelocity > physicsConstants.c) return '∞';
+
+    const timeDilation =
+        1 /
+        Math.sqrt(
+            1 -
+                (convertedVelocity / physicsConstants.c) *
+                    (convertedVelocity / physicsConstants.c),
+        );
+
+    return formatNumber(timeDilation);
 });
 </script>

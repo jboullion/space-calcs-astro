@@ -8,18 +8,6 @@
         /> -->
 
         <ResultTable>
-            <!-- <tr>
-                <th>Total Travel Distance</th>
-                <td class="text-end">
-                    {{ formatNumber(convertedTravelDistance) }}
-                </td>
-                <td style="width: 25%">
-                    <UnitSelect
-                        v-model="totalDistanceUnit"
-                        :units="longDistanceUnits"
-                    />
-                </td>
-            </tr> -->
             <tr>
                 <th>Total Travel Time</th>
                 <td class="text-end">
@@ -32,11 +20,6 @@
                     />
                 </td>
             </tr>
-            <!-- <tr>
-                <th>Apparent Travel Time</th>
-                <td class="text-end"></td>
-                <td style="width: 25%"></td>
-            </tr> -->
             <tr>
                 <th>Time to Accelerate</th>
                 <td class="text-end">
@@ -50,6 +33,19 @@
                 </td>
             </tr>
             <tr>
+                <th>Time to Decelerate</th>
+                <td class="text-end">
+                    {{ formatNumber(convertedTimeToDecelerate) }}
+                </td>
+                <td>
+                    <UnitSelect
+                        v-model="decelTimeUnit"
+                        :units="longTimeUnits"
+                    />
+                </td>
+            </tr>
+
+            <tr>
                 <th>Acceleration Distance</th>
                 <td class="text-end">
                     {{ formatNumber(convertedAccelerationDistance) }}
@@ -57,6 +53,19 @@
                 <td>
                     <UnitSelect
                         v-model="accelDistanceUnit"
+                        :units="longDistanceUnits"
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <th>Deceleration Distance</th>
+                <td class="text-end">
+                    {{ formatNumber(convertedDecelerationDistance) }}
+                </td>
+                <td>
+                    <UnitSelect
+                        v-model="decelDistanceUnit"
                         :units="longDistanceUnits"
                     />
                 </td>
@@ -74,30 +83,7 @@
                     />
                 </td>
             </tr>
-            <tr>
-                <th>Time to Decelerate</th>
-                <td class="text-end">
-                    {{ formatNumber(convertedTimeToDecelerate) }}
-                </td>
-                <td>
-                    <UnitSelect
-                        v-model="decelTimeUnit"
-                        :units="longTimeUnits"
-                    />
-                </td>
-            </tr>
-            <tr>
-                <th>Deceleration Distance</th>
-                <td class="text-end">
-                    {{ formatNumber(convertedDecelerationDistance) }}
-                </td>
-                <td>
-                    <UnitSelect
-                        v-model="decelDistanceUnit"
-                        :units="longDistanceUnits"
-                    />
-                </td>
-            </tr>
+
             <tr>
                 <th class="border-0">Energy Required</th>
                 <td class="text-end border-0">

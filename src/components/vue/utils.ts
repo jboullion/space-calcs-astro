@@ -305,6 +305,23 @@ export function kToC(k: number) {
 }
 
 /**
+ * Return the difference in time between two clocks moving at different velocities.
+ * @param properTime Seconds
+ * @param velocity % speed of light
+ */
+export function calculateTimeDilation(
+    properTime: number,
+    velocity: number,
+): number {
+    const speedOfLight = physicsConstants.c;
+
+    const dilationFactor = 1 / Math.sqrt(1 - velocity ** 2 / speedOfLight ** 2);
+    const dilatedTime = properTime * dilationFactor;
+
+    return dilatedTime;
+}
+
+/**
  *
  * THREE JS
  *
