@@ -4,6 +4,7 @@
             <StarTravelForm
                 :formData="formData"
                 @update-travel-distance="updateTravelDistance"
+                @update-engine="updateEngine"
             />
         </div>
         <div id="star-travel__results" class="col-lg-8">
@@ -33,19 +34,20 @@ import {
     highSpeedUnits,
 } from '../utils';
 import { NumberUnits } from '../forms/types';
-import { travelLocations } from './constants';
+import { travelLocations, exampleEngines } from './constants';
 
 const formData = reactive<IStarTravelForm>({
     exampleLocation: travelLocations[0],
     distance: 4.22, // light years
     acceleration: 9.81, // m/s²
     accelerationUnit: accelerationUnits[0], // m/s²
-    maxVelocity: 0.1, // c
-    maxVelocityUnit: highSpeedUnits[4], // c
+    maxVelocity: 50000, // c
+    maxVelocityUnit: highSpeedUnits[0], // c
     deceleration: 9.81, // m/s²
     decelerationUnit: accelerationUnits[0], // m/s²
     shipMass: 1000, // ton
     shipMassUnit: massUnits[2], // ton
+    exampleEngine: exampleEngines[0],
 });
 
 onMounted(() => {});
@@ -100,6 +102,49 @@ function updateTravelDistance() {
     );
 
     if (location) formData.distance = location.distance;
+}
+
+function updateEngine() {
+    const engine = exampleEngines.find(
+        (eng) => eng.value === formData.exampleEngine.value,
+    );
+
+    if (engine) {
+        const convertedAccel = convertUnitValue(
+            engine.acceleration,
+            accelerationUnits[0],
+            formData.accelerationUnit,
+            5,
+        );
+
+        formData.acceleration = convertedAccel;
+
+        const convertedMaxVelocity = convertUnitValue(
+            engine.maxVelocity,
+            formData.maxVelocityUnit,
+            highSpeedUnits[0],
+            5,
+        );
+
+        formData.maxVelocity = convertedMaxVelocity;
+
+        const convertedDecel = convertUnitValue(
+            engine.deceleration,
+            accelerationUnits[0],
+            formData.decelerationUnit,
+            5,
+        );
+
+        formData.deceleration = convertedDecel;
+
+        // formData.accelerationUnit = engine.accelerationUnit;
+        // formData.maxVelocity = engine.maxVelocity;
+        // formData.maxVelocityUnit = engine.maxVelocityUnit;
+        // formData.deceleration = engine.deceleration;
+        // formData.decelerationUnit = engine.decelerationUnit;
+        // formData.shipMass = engine.shipMass;
+        // formData.shipMassUnit = engine.shipMassUnit;
+    }
 }
 </script>
 <style></style>

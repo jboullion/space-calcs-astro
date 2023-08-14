@@ -16,6 +16,7 @@ export interface IStarTravelForm {
     shipMass: number;
     shipMassUnit: Units;
     //fuelEfficiency: number; // Mass -> Energy (MJ) ?
+    exampleEngine: EngineType;
 }
 
 export type StarLocation = {
@@ -33,4 +34,13 @@ export type StarTravelResults = {
     decelDistance: number; // g or m/s^2
     // timeMaxVelocity: number;
     //fuelEfficiency: number; // Mass -> Energy (MJ) ?
+};
+
+export type EngineType = {
+    name: string;
+    value: string;
+    acceleration: number; // g or m/s^2
+    maxVelocity: number;
+    deceleration: number; // g or m/s^2
+    fuelEfficiency: number; // Mass -> Energy (MJ) ?
 };

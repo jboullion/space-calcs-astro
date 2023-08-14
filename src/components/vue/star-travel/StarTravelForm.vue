@@ -31,6 +31,14 @@
                 </template>
             </InputWrapper>
 
+            <SelectInput
+                id="example-engine"
+                label="Example Engines"
+                v-model="formData.exampleEngine"
+                :options="exampleEngines"
+                @update:modelValue="$emit('updateEngine', $event)"
+            />
+
             <InputWrapper
                 id="acceleration"
                 label="Acceleration"
@@ -156,7 +164,7 @@ import SelectInput from '../forms/SelectInput.vue';
 import SimpleUnit from '../forms/v2/SimpleUnit.vue';
 import UnitSelect from '../forms/v2/UnitSelect.vue';
 import type { IStarTravelForm } from './types';
-import { travelLocations } from './constants';
+import { travelLocations, exampleEngines } from './constants';
 import {
     accelerationUnits,
     highSpeedUnits,
@@ -170,7 +178,7 @@ const props = defineProps<{
     formData: IStarTravelForm;
 }>();
 
-const emit = defineEmits(['updateTravelDistance']);
+const emit = defineEmits(['updateTravelDistance', 'updateEngine']);
 
 onMounted(() => {});
 

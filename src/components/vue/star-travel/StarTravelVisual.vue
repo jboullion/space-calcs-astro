@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="d-flex justify-content-between mb-3 align-items-center">
+        <!-- <div class="d-flex justify-content-between mb-3 align-items-center">
             <button class="btn btn-lg px-5" :class="playColor" @click="play">
                 <i class="fas" :class="playClass"></i>
             </button>
@@ -8,12 +8,12 @@
                 Time: {{ formatNumber(playTime) }}
                 years
             </h3>
-        </div>
+        </div> -->
 
         <div
             id="star-travel-canvas"
             class="canvas-wrapper border"
-            style="position: relative; height: 50%; width: 100%"
+            style="position: relative; height: 40%; width: 100%"
         >
             <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
         </div>
@@ -80,6 +80,7 @@ const three = {
     renderWidth: 0,
     starDistance: 0,
     starRadius: 0,
+    lastWidth: 0,
     //controls: null as OrbitControls | null,
     //labelRenderer: null as CSS2DRenderer | null,
     //minMovement: null as THREE.Vector3 | null,
@@ -107,12 +108,22 @@ const ship = {
 
 onMounted(() => {
     loadModels();
-    window.addEventListener('resize', setupScene, { passive: true });
+    window.addEventListener('resize', resize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-    window.removeEventListener('resize', setupScene);
+    window.removeEventListener('resize', resize);
 });
+
+function resize() {
+    if (!three.canvas) return;
+
+    const width = three.canvas.getBoundingClientRect().width;
+
+    if (width != three.lastWidth) {
+        setupScene();
+    }
+}
 
 async function loadModels() {
     const textureLoader = new THREE.TextureLoader();
@@ -161,7 +172,9 @@ function setupThreeJS() {
     three.canvas.appendChild(three.renderer.domElement);
 
     const width = three.canvas.getBoundingClientRect().width;
-    const height = width * 0.5;
+    const height = width * 0.4;
+
+    three.lastWidth = width;
 
     three.renderer.setSize(width, height);
 
@@ -253,11 +266,19 @@ function setupTrack() {
     const trackRadius = 5;
     const trackWidth = three.starDistance * 2;
 
-    const accelPercent =
+    let accelPercent =
         props.results.accelDistance / props.results.totalDistance;
-    const decelPercent =
+    let decelPercent =
         props.results.decelDistance / props.results.totalDistance;
-    const maxPercent = (100 - accelPercent - decelPercent) / 100;
+
+    // TODO: What to do if the acceleration takes longer than 50% / trip time?
+    // TODO: Do we give an error if the acceleration takes longer than 50% / trip time? Or perhaps we instead transition immediately to deceleration time and skip max velocity / set it to 0?
+    // if (accelPercent > 0.5) {
+    //     accelPercent = 0.5;
+    // }
+    // if (decelPercent > 0.5) {
+    //     decelPercent = 0.5;
+    // }
 
     // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
     const accelLength = trackWidth * accelPercent;
@@ -306,6 +327,8 @@ function setupTrack() {
         0,
     );
 
+    console.log('');
+
     three.scene.add(accelTrack);
     three.scene.add(maxTrack);
     three.scene.add(decelTrack);
@@ -345,11 +368,8 @@ function play() {
 
 function animate() {
     if (!three.renderer) return;
-    //if (!three.controls) return;
 
     requestAnimationFrame(animate);
-
-    //three.controls.update();
 
     three.renderer.render(three.scene, three.camera);
 
@@ -364,15 +384,8 @@ function animate() {
 }
 
 watch(props.formData, (newValue, oldValue) => {
-    //updateCamera();
-    // const baseDistance = Math.max(props.formData.planetOrbit, hzOuter.value);
-    // const cameraZoomDistance = baseDistance * AUtoDistance * 4;
-    // three.camera.far = cameraZoomDistance * 2;
-    // three.camera.updateProjectionMatrix();
-    // if (three.controls) {
-    //     three.controls.maxDistance = cameraZoomDistance;
-    // }
-
-    setupScene();
+    nextTick(() => {
+        setupScene();
+    });
 });
 </script>
