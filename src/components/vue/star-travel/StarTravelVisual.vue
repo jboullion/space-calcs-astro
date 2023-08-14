@@ -13,7 +13,7 @@
         <div
             id="star-travel-canvas"
             class="canvas-wrapper border"
-            style="position: relative; height: 40%; width: 100%"
+            style="position: relative; height: 30%; width: 100%"
         >
             <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
         </div>
@@ -172,7 +172,7 @@ function setupThreeJS() {
     three.canvas.appendChild(three.renderer.domElement);
 
     const width = three.canvas.getBoundingClientRect().width;
-    const height = width * 0.4;
+    const height = width * 0.3;
 
     three.lastWidth = width;
 

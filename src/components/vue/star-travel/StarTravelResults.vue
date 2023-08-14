@@ -82,7 +82,7 @@
             <tr>
                 <th class="border-0">Energy Required</th>
                 <td class="text-end border-0">
-                    {{ formatNumber(convertedAccelEnergy * 2) }}
+                    {{ convertedAccelEnergy }}
                 </td>
                 <td class="border-0">
                     <UnitSelect
@@ -334,11 +334,16 @@ const convertedAccelEnergy = computed(() => {
         convertedVelocityMpS.value,
     );
 
-    return convertUnitValue(
-        energy,
-        energyRequiredUnit.value,
-        energyUnits[0], // Joules
-        0,
+    if (convertedVelocityMpS.value >= physicsConstants.c) return '∞';
+
+    // Assume same energy for accel and decel ( * 2)
+    return (
+        convertUnitValue(
+            energy,
+            energyRequiredUnit.value,
+            energyUnits[0], // Joules
+            2,
+        ) * 2
     );
 });
 
