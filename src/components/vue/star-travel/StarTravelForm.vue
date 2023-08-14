@@ -250,6 +250,8 @@ const timeDilation = computed(() => {
                     (convertedVelocity / physicsConstants.c),
         );
 
-    return formatNumber(timeDilation);
+    const dilationPercent = (timeDilation - 1) * 100;
+
+    return formatNumber(dilationPercent, 3);
 });
 </script>
