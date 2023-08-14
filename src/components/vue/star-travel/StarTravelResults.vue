@@ -18,7 +18,7 @@
             <tr>
                 <th>Time to Accelerate</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedTimeToAccelerate) }}
+                    {{ formatNumber(convertedTimeToAccelerate, 2) }}
                 </td>
                 <td>
                     <UnitSelect
@@ -30,7 +30,7 @@
             <tr>
                 <th>Time to Decelerate</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedTimeToDecelerate) }}
+                    {{ formatNumber(convertedTimeToDecelerate, 2) }}
                 </td>
                 <td>
                     <UnitSelect
@@ -43,7 +43,7 @@
             <tr>
                 <th>Acceleration Distance</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedAccelerationDistance) }}
+                    {{ formatNumber(convertedAccelerationDistance, 3) }}
                 </td>
                 <td>
                     <UnitSelect
@@ -56,7 +56,7 @@
             <tr>
                 <th>Deceleration Distance</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedDecelerationDistance) }}
+                    {{ formatNumber(convertedDecelerationDistance, 3) }}
                 </td>
                 <td>
                     <UnitSelect
@@ -204,7 +204,7 @@ const convertedTimeToAccelerate = computed(() => {
         timeToAccelerateSec.value,
         accelTimeUnit.value,
         hourUnits[0], // seconds
-        0,
+        2,
     );
 });
 
@@ -212,12 +212,23 @@ const convertedAccelerationDistance = computed(() => {
     const decimals =
         accelDistanceUnit.value.value > physicsConstants.AU ? 3 : 0;
 
-    return convertUnitValue(
+    let result = convertUnitValue(
         convertedAccelerationDistanceM.value,
         accelDistanceUnit.value,
         lengthUnits[0], // meters
         decimals,
     );
+
+    if (result === 0) {
+        result = convertUnitValue(
+            convertedAccelerationDistanceM.value,
+            accelDistanceUnit.value,
+            lengthUnits[0], // meters
+            3,
+        );
+    }
+
+    return result;
 });
 
 const convertedAccelerationDistanceM = computed(() => {
@@ -241,7 +252,7 @@ const convertedTimeToDecelerate = computed(() => {
         timeToDecelerateSec.value,
         decelTimeUnit.value,
         hourUnits[0], // seconds
-        0,
+        2,
     );
 });
 
@@ -249,12 +260,23 @@ const convertedDecelerationDistance = computed(() => {
     const decimals =
         decelDistanceUnit.value.value > physicsConstants.AU ? 3 : 0;
 
-    return convertUnitValue(
+    let result = convertUnitValue(
         convertedDecelerationDistanceM.value,
         decelDistanceUnit.value,
         lengthUnits[0], // meters
         decimals,
     );
+
+    if (result === 0) {
+        result = convertUnitValue(
+            convertedDecelerationDistanceM.value,
+            decelDistanceUnit.value,
+            lengthUnits[0], // meters
+            3,
+        );
+    }
+
+    return result;
 });
 
 const convertedDecelerationDistanceM = computed(() => {
