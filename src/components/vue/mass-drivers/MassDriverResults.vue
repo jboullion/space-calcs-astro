@@ -22,7 +22,7 @@
                     <tr>
                         <th>Length of Track</th>
                         <td class="text-end">
-                            {{ formatNumber(trackLengthM / 1000) }}
+                            {{ formatNumber(convertedTrackLength) }}
                         </td>
                         <td style="width: 25%">
                             <UnitSelect
@@ -90,12 +90,20 @@ const circumferenceUnit = ref(lengthUnits[1]);
 const energyUnit = ref(energyUnits[9]);
 const timeUnit = ref(hourUnits[2]);
 
-const trackLengthM = computed(() => {
+const convertedTrackLength = computed(() => {
     const initialSpeed = 0; // Starting from rest
     const distance =
         (convertedVelocity.value ** 2 - initialSpeed ** 2) /
         (2 * convertedAcceleration.value);
-    return distance / lengthUnit.value.value;
+    return distance / lengthUnit.value.value / 1000;
+});
+
+const trackLengthM = computed(() => {
+    return convertUnitValue(
+        convertedTrackLength.value,
+        lengthUnits[0],
+        lengthUnit.value,
+    );
 });
 
 const convertedAcceleration = computed(() => {
@@ -120,7 +128,7 @@ const travelTime = computed(() => {
     const initialSpeed = 0; // Starting from rest
     const time =
         (convertedVelocity.value - initialSpeed) / convertedAcceleration.value;
-    return time * timeUnit.value.value;
+    return time / timeUnit.value.value;
 });
 
 const energyRequired = computed(() => {
@@ -128,7 +136,7 @@ const energyRequired = computed(() => {
     const velocity = convertedVelocity.value;
     const energy = (mass * velocity ** 2) / 2;
 
-    return energy * energyUnit.value.value;
+    return energy / energyUnit.value.value;
 });
 
 const bodyCircumference = computed(() => {

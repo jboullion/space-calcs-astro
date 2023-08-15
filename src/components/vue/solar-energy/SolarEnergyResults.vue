@@ -372,8 +372,8 @@ function setupZones() {
 
     const planetOrbit: Zone = {
         name: 'Planet Orbit',
-        color: 0xffffff,
-        emissive: 0xffffff,
+        color: 0xea6730,
+        emissive: 0xea6730,
         innerRadius: props.formData.planetOrbit * AUtoDistance,
         outerRadius: props.formData.planetOrbit * AUtoDistance + orbitWidth,
         opacity: 1,
@@ -526,7 +526,7 @@ function createOrbit(orbit: Zone, zIndex: number = 0) {
 
     const zoneMesh = new THREE.Mesh(zoneGeometry, zoneMaterial);
     three.renderOrder++;
-    zoneMesh.position.z = -zIndex;
+    zoneMesh.position.z = zIndex;
 
     three.scene.add(zoneMesh);
 

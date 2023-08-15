@@ -55,6 +55,29 @@ export const lengthUnits: Units[] = [
     },
 ];
 
+export const longDistanceUnits: Units[] = [
+    {
+        label: 'km',
+        value: 1,
+    },
+    {
+        label: 'mi',
+        value: 1.60934,
+    },
+    {
+        label: 'AU',
+        value: 149597870.7,
+    },
+    {
+        label: 'ly',
+        value: 9460730472580.8,
+    },
+    // {
+    //     label: 'pc',
+    //     value: 30856775814671.0,
+    // },
+];
+
 export const accelerationUnits: Units[] = [
     {
         label: 'm/s²',
@@ -120,29 +143,71 @@ export const densityUnits: Units[] = [
 
 export const energyUnits: Units[] = [
     { label: 'J', value: 1 },
-    { label: 'kJ', value: 0.001 },
-    { label: 'cal', value: 0.23900573614 }, // International Steam Table Calorie
-    { label: 'kcal', value: 0.00023900573614 }, // International Steam Table Calorie
-    { label: 'eV', value: 6.242e18 },
-    { label: 'BTU', value: 0.00094781707775 },
-    { label: 'ft-lb', value: 0.73756214928 },
-    { label: 'Wh', value: 0.00027777777778 },
-    { label: 'kWh', value: 0.00000027777777778 },
-    { label: 'MWh', value: 0.00000000027777777778 },
+    // { label: 'kJ', value: 0.001 },
+    // { label: 'cal', value: 0.23900573614 }, // International Steam Table Calorie
+    // { label: 'kcal', value: 0.00023900573614 }, // International Steam Table Calorie
+    // { label: 'eV', value: 6.242e18 },
+    // { label: 'BTU', value: 0.00094781707775 },
+    // { label: 'ft-lb', value: 0.73756214928 },
+    // { label: 'Wh', value: 0.00027777777778 },
+    // { label: 'kWh', value: 0.00000027777777778 },
+    // { label: 'MWh', value: 0.00000000027777777778 },
+
+    { label: 'kJ', value: 1000 },
+    { label: 'cal', value: 239.00573614 }, // International Steam Table Calorie
+    { label: 'kcal', value: 239005.73614 }, // International Steam Table Calorie
+    { label: 'eV', value: 6.242e21 },
+    { label: 'BTU', value: 947.81707775 },
+    { label: 'ft-lb', value: 737562.14928 },
+    { label: 'Wh', value: 277.77777778 },
+    { label: 'kWh', value: 277777.77778 },
+    { label: 'MWh', value: 277777777.78 },
+    { label: 'GWh', value: 277777777778 },
+    { label: 'TWh', value: 277777777777778 },
     // Add more units as needed
 ];
 
 export const hourUnits = [
-    // { label: 'milliseconds', value: 1000 },
     { label: 'seconds', value: 1 },
+    { label: 'minutes', value: 60 },
+    { label: 'hours', value: 3600 },
+];
+
+export const longTimeUnits = [
+    // { label: 'milliseconds', value: 1000 },
+    //{ label: 'seconds', value: 1 },
     // { label: "microseconds", value: 1e+6 },
     // { label: "nanoseconds", value: 1e+9 },
-    { label: 'minutes', value: 1 / 60 },
-    { label: 'hours', value: 1 / 3600 },
-    // { label: "days", value: 1 / 86400 },
-    // { label: "weeks", value: 1 / 604800 },
-    // { label: "years", value: 1 / 31536000 },
-    // Add more units as needed
+    //{ label: 'minutes', value: 1 / 60 },
+    //{ label: 'hours', value: 1 / 3600 },
+    { label: 'days', value: 86400 },
+    { label: 'weeks', value: 604800 },
+    { label: 'years', value: 31536000 },
+    { label: 'decades', value: 315360000 },
+    { label: 'centuries', value: 3153600000 },
+    { label: 'millennia', value: 31536000000 },
+];
+
+// export const timeUnits = [
+//     // { label: 'milliseconds', value: 1000 },
+//     { label: 'seconds', value: 1 },
+//     // { label: "microseconds", value: 1e+6 },
+//     // { label: "nanoseconds", value: 1e+9 },
+//     { label: 'minutes', value: 1 / 60 },
+//     { label: 'hours', value: 1 / 3600 },
+//     { label: "days", value: 1 / 86400 },
+//     { label: "weeks", value: 1 / 604800 },
+//     { label: "years", value: 1 / 31536000 },
+//     // Add more units as needed
+// ];
+
+export const highSpeedUnits: Units[] = [
+    { label: 'm/s', value: 1 },
+    { label: 'km/s', value: 1000 },
+    { label: 'ft/s', value: 0.3048 },
+    { label: 'mi/s', value: 1609.34 },
+    { label: 'c', value: 299792458 },
+    { label: 'Mach', value: 340.3 },
 ];
 
 export function convertUnitValue(
@@ -162,6 +227,7 @@ export const physicsConstants = {
     g: 9.80665, // m/s
     gravityConstant: 0.000000000066743, //6.67408 * Math.pow(10, -11), // m3 kg-1 s-2
     c3Deceleration: 1.5, // km/s
+    c: 299792458, // m/s
     escVe: 11.186, // km/s,
     GM: 1.327e11, // km^3/s^2
     foot: 0.3048, // m
@@ -236,6 +302,23 @@ export function relativeDifference(a: number, b: number) {
 
 export function kToC(k: number) {
     return k - 273.15;
+}
+
+/**
+ * Return the difference in time between two clocks moving at different velocities.
+ * @param properTime Seconds
+ * @param velocity % speed of light
+ */
+export function calculateTimeDilation(
+    properTime: number,
+    velocity: number,
+): number {
+    const speedOfLight = physicsConstants.c;
+
+    const dilationFactor = 1 / Math.sqrt(1 - velocity ** 2 / speedOfLight ** 2);
+    const dilatedTime = properTime * dilationFactor;
+
+    return dilatedTime;
 }
 
 /**

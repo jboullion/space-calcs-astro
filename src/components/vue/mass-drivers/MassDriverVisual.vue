@@ -316,8 +316,6 @@ function setupTrack() {
     const trackLengthPercent =
         props.trackLengthM / 1000 / bodyCircumferenceKM.value;
 
-    console.log('props.trackLengthM', props.trackLengthM);
-
     track.arcRadians = trackLengthPercent * Math.PI * 2;
 
     if (trackLengthPercent > 100) {
