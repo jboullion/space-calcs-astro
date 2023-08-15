@@ -15,7 +15,7 @@ export interface IStarTravelForm {
     // finalVelocityUnit: Units;
     shipMass: number;
     shipMassUnit: Units;
-    //fuelEfficiency: number; // Mass -> Energy (MJ) ?
+    fuelEfficiency: number; // Mass -> Energy (MJ) ?
     exampleEngine: EngineType;
 }
 

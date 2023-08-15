@@ -80,36 +80,32 @@
             </tr>
 
             <tr>
-                <th class="border-0">Energy Required</th>
-                <td class="text-end border-0">
+                <th class="">Energy Required</th>
+                <td class="text-end">
                     {{ convertedAccelEnergy }}
                 </td>
-                <td class="border-0">
+                <td class="">
                     <UnitSelect
                         v-model="energyRequiredUnit"
                         :units="energyUnits"
                     />
                 </td>
             </tr>
-            <!--                    
-                    <tr>
-                        <th class="border-0">Energy Required</th>
-                        <td class="text-end border-0">
-                            {{ formatNumber(energyRequired) }}
-                        </td>
-                        <td class="border-0">
-                            <UnitSelect
-                                id="energyUnits"
-                                v-model="energyUnit"
-                                :units="energyUnits"
-                            />
-                        </td>
-                    </tr> -->
+            <tr>
+                <th>Fuel Mass Required</th>
+                <td class="text-end">
+                    {{ formatNumber(fuelMassRequired / 1000, 4) }}
+                </td>
+                <td>
+                    <SimpleUnit unit="ton" />
+                </td>
+            </tr>
         </ResultTable>
     </div>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import SimpleUnit from '../forms/v2/SimpleUnit.vue';
 import UnitSelect from '../forms/v2/UnitSelect.vue';
 import ResultTable from '../forms/v2/ResultTable.vue';
 import StarTravelVisual from './StarTravelVisual.vue';
@@ -349,6 +345,14 @@ const convertedAccelEnergy = computed(() => {
 
 const totalTravelTime = computed(() => {
     return 0; //timeToAccelerate.value * 2;
+});
+
+const fuelMassRequired = computed(() => {
+    const convertedToC = convertedVelocityMpS.value / physicsConstants.c;
+    const perKgPercent = (2 * convertedToC) / (1 - convertedToC);
+    return (
+        (perKgPercent * convertedMassKg.value) / props.formData.fuelEfficiency
+    );
 });
 
 function calculateTimeToReachSpeed(

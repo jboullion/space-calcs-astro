@@ -143,6 +143,28 @@
                     />
                 </template>
             </InputWrapper>
+
+            <InputWrapper
+                id="fuelEfficiency"
+                label="Fuel Conversion Rate"
+                tooltip="The fuel conversion rate is the the efficiency of converting fuel mass into energy."
+            >
+                <template v-slot:input>
+                    <NumberInput
+                        id="fuelEfficiency"
+                        :key="`fuelEfficiency-${formData.fuelEfficiency}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.fuelEfficiency"
+                        :min="0.0001"
+                        :max="1"
+                        :step="0.0001"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <SimpleUnit unit="km x m x m" />
+                </template>
+            </InputWrapper>
         </div>
     </div>
 </template>

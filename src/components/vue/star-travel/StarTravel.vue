@@ -48,6 +48,7 @@ const formData = reactive<IStarTravelForm>({
     shipMass: 1000, // ton
     shipMassUnit: massUnits[2], // ton
     exampleEngine: exampleEngines[0],
+    fuelEfficiency: exampleEngines[0].fuelEfficiency, // km x m x m
 });
 
 onMounted(() => {});
@@ -137,13 +138,7 @@ function updateEngine() {
 
         formData.deceleration = convertedDecel;
 
-        // formData.accelerationUnit = engine.accelerationUnit;
-        // formData.maxVelocity = engine.maxVelocity;
-        // formData.maxVelocityUnit = engine.maxVelocityUnit;
-        // formData.deceleration = engine.deceleration;
-        // formData.decelerationUnit = engine.decelerationUnit;
-        // formData.shipMass = engine.shipMass;
-        // formData.shipMassUnit = engine.shipMassUnit;
+        formData.fuelEfficiency = engine.fuelEfficiency;
     }
 }
 </script>

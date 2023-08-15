@@ -16,7 +16,16 @@ if (!calculator) {
     throw new Error('Calculator not found');
 }
 
-const references: Reference[] = [];
+const references: Reference[] = [
+    {
+        title: 'Space Travel Calculator',
+        url: 'https://spacetravel.simhub.online/spacetravel.php',
+    },
+    {
+        title: 'The Relativistic Rocket',
+        url: 'https://math.ucr.edu/home/baez/physics/Relativity/SR/Rocket/rocket.html',
+    },
+];
 ---
 
 <Layout title={calculator.name} description={calculator.description}>
