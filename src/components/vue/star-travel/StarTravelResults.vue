@@ -1,6 +1,6 @@
 <template>
     <div>
-        <StarTravelVisual :formData="formData" :results="results" />
+        <!-- <StarTravelVisual :formData="formData" :results="results" /> -->
 
         <ResultTable>
             <tr>
