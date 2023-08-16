@@ -318,8 +318,9 @@ function setupTrack() {
 
     track.arcRadians = trackLengthPercent * Math.PI * 2;
 
-    if (trackLengthPercent > 100) {
-        track.arcRadians = Math.PI * 2;
+    let displayRadians = track.arcRadians;
+    if (displayRadians > 1) {
+        displayRadians = Math.PI * 2;
     }
 
     const trackWidth = computedBodyRadiusKM.value / 100;
@@ -330,7 +331,7 @@ function setupTrack() {
         trackWidth,
         12,
         50,
-        -track.arcRadians,
+        -displayRadians,
     );
 
     const material = new THREE.MeshBasicMaterial({ color: 0x555555 });

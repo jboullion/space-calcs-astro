@@ -88,7 +88,7 @@ const props = defineProps<{
 const lengthUnit = ref(lengthUnits[1]);
 const circumferenceUnit = ref(lengthUnits[1]);
 const energyUnit = ref(energyUnits[9]);
-const timeUnit = ref(hourUnits[2]);
+const timeUnit = ref(hourUnits[1]);
 
 const convertedTrackLength = computed(() => {
     const initialSpeed = 0; // Starting from rest
