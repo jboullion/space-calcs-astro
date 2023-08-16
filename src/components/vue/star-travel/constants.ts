@@ -81,14 +81,14 @@ export const exampleEngines: EngineType[] = [
         deceleration: 27,
         fuelEfficiency: 0.5,
     },
-    {
-        name: 'Warp Drive',
-        value: 'Warp Drive',
-        acceleration: physicsConstants.c,
-        maxVelocity: physicsConstants.c * 10,
-        deceleration: physicsConstants.c,
-        fuelEfficiency: 1,
-    },
+    // {
+    //     name: 'Warp Drive',
+    //     value: 'Warp Drive',
+    //     acceleration: physicsConstants.c,
+    //     maxVelocity: physicsConstants.c * 10,
+    //     deceleration: physicsConstants.c,
+    //     fuelEfficiency: 1,
+    // },
     // {
     //     name: 'Jump Drive',
     //     value: 'Jump Drive',
