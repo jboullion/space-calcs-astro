@@ -31,6 +31,7 @@
                 />
 
                 <NumberInput
+                    v-if="formData.type.shape == 'cylinder'"
                     id="thickness"
                     label="Thickness"
                     v-model="formData.thickness"

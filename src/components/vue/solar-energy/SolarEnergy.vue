@@ -25,13 +25,14 @@
                     v-model.number="formData.planetOrbit"
                     unit="AU"
                     :min="0.1"
+                    :max="1000"
                     :step="0.1"
                     tooltip="Distance from the star in astronomical units. Earth is ~1 AU. Mars is ~1.5 AU."
                     @change="
                         formData.planetOrbit = clampNumber(
                             formData.planetOrbit,
                             0.1,
-                            100,
+                            1000,
                         )
                     "
                 />

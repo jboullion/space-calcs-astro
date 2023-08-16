@@ -280,7 +280,12 @@ function updateCamera() {
     if (!three.renderer) return;
 
     // Camera
-    const baseDistance = props.formData.planetOrbit;
+    let baseDistance = props.formData.planetOrbit;
+
+    if (props.formData.starRadius > 250) {
+        baseDistance = props.formData.starRadius / 20;
+    }
+
     const cameraPositionDistance = baseDistance * AUtoDistance * 2.5;
     const cameraZoomDistance = baseDistance * AUtoDistance * 5;
 
@@ -365,10 +370,12 @@ function clearZones() {
 
 function setupZones() {
     // At large star sizes the orbit is too small to see
-    const orbitWidth = Math.max(
+    let orbitWidth = Math.max(
         4 + Math.floor(props.formData.starRadius / 3),
         10,
     );
+
+    orbitWidth = Math.min(100, orbitWidth);
 
     const planetOrbit: Zone = {
         name: 'Planet Orbit',
@@ -422,7 +429,7 @@ function setupZones() {
     createOrbit(venusOrbit);
     createOrbit(mercuryOrbit);
 
-    if (props.formData.planetOrbit > 3) {
+    if (props.formData.planetOrbit > 3 || props.formData.starRadius > 200) {
         const jupiterOrbit: Zone = {
             name: 'Jupiter Orbit',
             color: 0xffaa00,
@@ -435,7 +442,7 @@ function setupZones() {
         createOrbit(jupiterOrbit);
     }
 
-    if (props.formData.planetOrbit > 7) {
+    if (props.formData.planetOrbit > 7 || props.formData.starRadius > 300) {
         const saturnOrbit: Zone = {
             name: 'Saturn Orbit',
             color: 0xaaaa00,
@@ -448,7 +455,7 @@ function setupZones() {
         createOrbit(saturnOrbit);
     }
 
-    if (props.formData.planetOrbit > 15) {
+    if (props.formData.planetOrbit > 15 || props.formData.starRadius > 400) {
         const uranusOrbit: Zone = {
             name: 'Uranus Orbit',
             color: 0x00aaff,
@@ -461,7 +468,7 @@ function setupZones() {
         createOrbit(uranusOrbit);
     }
 
-    if (props.formData.planetOrbit > 25) {
+    if (props.formData.planetOrbit > 25 || props.formData.starRadius > 500) {
         const neptuneOrbit: Zone = {
             name: 'Neptune Orbit',
             color: 0x0033ff,
@@ -474,7 +481,7 @@ function setupZones() {
         createOrbit(neptuneOrbit);
     }
 
-    if (props.formData.planetOrbit > 30) {
+    if (props.formData.planetOrbit > 30 || props.formData.starRadius > 600) {
         const plutoOrbit: Zone = {
             name: 'Pluto Orbit',
             color: 0xa020f0,
@@ -598,5 +605,6 @@ watch(props.formData, (newValue, oldValue) => {
     clearZones();
     setupSun();
     setupZones();
+    updateCamera();
 });
 </script>
