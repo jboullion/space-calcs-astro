@@ -262,11 +262,9 @@ const currentTime = computed(() => {
 async function loadModels() {
     const textureLoader = new THREE.TextureLoader();
     // //this.textures.space = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_stars.jpg');
-    textures.earth = await textureLoader.load(
-        textureDir + '2k_earth_daymap.jpg',
-    );
-    textures.mars = await textureLoader.load(textureDir + '2k_mars.jpg');
-    textures.moon = await textureLoader.load(textureDir + '2k_moon.jpg');
+    textures.earth = textureLoader.load(textureDir + '2k_earth_daymap.jpg');
+    textures.mars = textureLoader.load(textureDir + '2k_mars.jpg');
+    textures.moon = textureLoader.load(textureDir + '2k_moon.jpg');
 
     loading.value = false;
     setupScene();
@@ -360,29 +358,56 @@ function setupPlanet() {
     planet.group = new THREE.Group();
     //planet.axis = new THREE.Vector3(0, 1, 0); // TODO: formData.location.axis
 
-    planet.material = new THREE.MeshLambertMaterial({
-        map: textures.earth,
-        // transparent: true,
-        // opacity: 0.1,
-    });
+    if (props.formData.planetRadius > physicsConstants.earthRadius * 1.15) {
+        planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
+    } else if (
+        props.formData.planetRadius >
+        physicsConstants.marsRadius * 1.5
+    ) {
+        planet.material = new THREE.MeshLambertMaterial({
+            map: textures.earth,
+        });
+    } else if (
+        props.formData.planetRadius >
+        physicsConstants.moonRadius * 1.25
+    ) {
+        planet.material = new THREE.MeshLambertMaterial({
+            map: textures.mars,
+        });
+    } else if (
+        props.formData.planetRadius >
+        physicsConstants.moonRadius * 0.5
+    ) {
+        planet.material = new THREE.MeshLambertMaterial({
+            map: textures.moon,
+        });
+    } else {
+        planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
+    }
 
-    // switch (formData.value.location.name) {
-    //	 case "Earth":
-    //		 planet.material = new THREE.MeshLambertMaterial({
-    //			 map: textures.earth,
-    //		 });
-    //		 break;
-    //	 case "Mars":
-    //		 planet.material = new THREE.MeshLambertMaterial({
-    //			 map: textures.mars,
-    //		 });
-    //		 break;
-    //	 case "Moon":
-    //		 planet.material = new THREE.MeshLambertMaterial({
-    //			 map: textures.moon,
-    //		 });
-    //		 break;
-    // }
+    // planet.material = new THREE.MeshLambertMaterial({
+    //     map: textures.earth,
+    //     // transparent: true,
+    //     // opacity: 0.1,
+    // });
+
+    // // switch (formData.value.location.name) {
+    // //	 case "Earth":
+    // //		 planet.material = new THREE.MeshLambertMaterial({
+    // //			 map: textures.earth,
+    // //		 });
+    // //		 break;
+    // //	 case "Mars":
+    // //		 planet.material = new THREE.MeshLambertMaterial({
+    // //			 map: textures.mars,
+    // //		 });
+    // //		 break;
+    // //	 case "Moon":
+    // //		 planet.material = new THREE.MeshLambertMaterial({
+    // //			 map: textures.moon,
+    // //		 });
+    // //		 break;
+    // // }
 
     planet.geometry = new THREE.SphereGeometry(
         props.formData.planetRadius,

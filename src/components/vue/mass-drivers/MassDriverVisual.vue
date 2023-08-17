@@ -179,9 +179,9 @@ function calculateAngularAcceleration(
 async function loadModels() {
     const textureLoader = new THREE.TextureLoader();
 
-    textures.earth = await textureLoader.load('/textures/2k_earth_daymap.jpg');
-    textures.mars = await textureLoader.load('/textures/2k_mars.jpg');
-    textures.moon = await textureLoader.load('/textures/2k_moon.jpg');
+    textures.earth = textureLoader.load('/textures/2k_earth_daymap.jpg');
+    textures.mars = textureLoader.load('/textures/2k_mars.jpg');
+    textures.moon = textureLoader.load('/textures/2k_moon.jpg');
 
     loading.value = false;
     setupScene();
