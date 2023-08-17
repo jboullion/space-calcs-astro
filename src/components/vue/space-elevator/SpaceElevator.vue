@@ -6,6 +6,7 @@
                     :formData="formData"
                     :planetGravity="planetGravity"
                     :planetMass="planetMass"
+                    :crossSectionalArea="crossSectionalArea"
                     :geostationaryOrbit="geostationaryOrbit"
                 />
             </div>
@@ -13,7 +14,8 @@
         <div id="space-elevator__results" class="col-lg-8 calc-form">
             <SEVisual
                 :formData="formData"
-                :geostationary-orbit="geostationaryOrbit"
+                :crossSectionalArea="crossSectionalArea"
+                :geostationaryOrbit="geostationaryOrbit"
             />
         </div>
     </div>
@@ -47,9 +49,9 @@ const formData = ref<SpaceElevatorForm>({
     planetRotation: 24,
     carSpeed: 200, //km/h
     payloadMass: 1000, //kg
-    latitude: 0, //degrees
     material: materials[4],
-    safetyFactor: 1.5,
+    safetyFactor: 1.3,
+    counterweightMass: 10000,
 });
 
 const planetRadiusMeters = computed(() => {
@@ -87,30 +89,11 @@ const planetGravity = computed(() => {
     return result;
 });
 
-// // Calculate gravity without using the mass of the planet
-// const planetGravityAlt = computed(() => {
-//     //g = (4/3) * π * G * r * ρ
-//     const result =
-//         (4 / 3) *
-//         Math.PI *
-//         physicsConstants.gravityConstant *
-//         planetRadiusMeters.value *
-//         planetDensityKgPerM3.value;
-
-//     return result;
-// });
-
 const rotationInSeconds = computed(() => {
-    const result = formData.value.planetRotation * 60 * 60; // * animationConstants.value.simulationSpeed;
+    const result = formData.value.planetRotation * 60 * 60;
 
     return result;
 });
-
-// const rotationInMetersPerSecond = computed(() => {
-//     const result = planetCircumference.value / rotationInSeconds.value;
-
-//     return result;
-// });
 
 const geostationaryOrbit = computed(() => {
     // h = (G * M * T^2 / 4π^2)^(1/3) - R
@@ -126,6 +109,22 @@ const geostationaryOrbit = computed(() => {
 
     // measured in kilometers
     return result / 1000;
+});
+
+const gravitationalForce = computed(() => {
+    const result = calculateGravitationalForce(
+        planetMass.value,
+        formData.value.counterweightMass,
+        geostationaryOrbit.value,
+    );
+
+    return result;
+});
+
+const crossSectionalArea = computed(() => {
+    const requiredCrossSectionalArea =
+        gravitationalForce.value / formData.value.material.tensileStrength;
+    return requiredCrossSectionalArea * formData.value.safetyFactor;
 });
 </script>
 

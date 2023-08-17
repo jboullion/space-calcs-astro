@@ -15,8 +15,21 @@
             <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
         </div>
 
-        <ResultTable>
-            <!-- <tr>
+        <div class="pb-2">
+            <p>
+                <b>Note:</b> We are assuming a constant radius cylinder for the
+                Space Elevator geometry. You could taper the tether to achive
+                optimal mass savings.
+            </p>
+            <p>
+                The elevator height should be close to the scale of the planet.
+                The tether width is not visually accurate because it is too
+                small to see.
+            </p>
+        </div>
+
+        <!-- <ResultTable>
+            <tr>
                 <th>Planet Mass</th>
                 <td class="text-end">{{ planetMass.toExponential(3) }} kg</td>
             </tr>
@@ -35,8 +48,8 @@
             <tr>
                 <th class="">Car Travel Time</th>
                 <td class="text-end">{{ travelTime }}</td>
-            </tr> -->
-            <!-- <tr>
+            </tr>
+            <tr>
                 <th class="">Gravitational Force</th>
                 <td class="text-end"></td>
             </tr>
@@ -47,20 +60,22 @@
             <tr>
                 <th class="">Required Tensile Strength</th>
                 <td class="text-end"></td>
-            </tr> -->
-        </ResultTable>
+            </tr> 
+        </ResultTable> -->
     </div>
 </template>
 <script setup lang="ts">
 // TODO:
-// 1. Calculate the tensile strength needed for the cable
 
-// 2. Do we update the width of the cable depending on the material? / cross section?
+// 1. Do we update the width of the cable using the crossSectionalArea? Could show why some materials are not feasible.
+// 2. Caluclate the energy required to move paylaod mass at a constant velocity (carSpeed) the entire tether length
+// 3. Change the planet texture when the radius changes. See mass driver for example
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
     computed,
+    nextTick,
     onBeforeMount,
     onBeforeUnmount,
     onMounted,
@@ -69,9 +84,11 @@ import {
 } from 'vue';
 import type { SpaceElevatorForm } from './types';
 import ResultTable from '../forms/v2/ResultTable.vue';
+import { physicsConstants } from '../utils';
 
 const props = defineProps<{
     formData: SpaceElevatorForm;
+    crossSectionalArea: number;
     geostationaryOrbit: number;
 }>();
 
@@ -170,6 +187,11 @@ onBeforeUnmount(() => {
  */
 const elevatorTopHeight = computed(() => {
     return props.geostationaryOrbit + props.formData.planetRadius;
+});
+
+const estimatedTetherRadius = computed(() => {
+    const radius = Math.sqrt(props.crossSectionalArea / Math.PI);
+    return radius;
 });
 
 const carTravelTimeTotalHours = computed(() => {
@@ -392,6 +414,12 @@ function setupElevator() {
         side: THREE.FrontSide,
     });
 
+    // Trying to show the correct width of tether makes it too small to see!
+    // const tetherPercentWidth =
+    //     estimatedTetherRadius.value / 1000 / props.formData.planetRadius;
+
+    // const elevatorRadius = props.formData.planetRadius * tetherPercentWidth;
+
     const elevatorRadius = props.geostationaryOrbit / 500;
 
     const elevatorGeometry = new THREE.CylinderGeometry(
@@ -525,6 +553,8 @@ function reset() {
 
 // NOTE: This is not very optimal, but should be fine for now
 watch(props.formData, () => {
-    setupScene();
+    nextTick(() => {
+        setupScene();
+    });
 });
 </script>

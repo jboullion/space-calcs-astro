@@ -61,7 +61,9 @@
             tooltip=""
             :description="`Max Tensile Strength: ${formatNumber(
                 formData.material.tensileStrength,
-            )} Mpa<br />Total Mass: ${estimatedTotalMass.toExponential(2)} kg`"
+            )} Mpa<br />Minimum Mass: ${estimatedTotalMass.toExponential(
+                2,
+            )} kg`"
             @update:modelValue=""
         />
 
@@ -86,48 +88,15 @@ import type { SpaceElevatorForm } from './types';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
 import { materials } from './constants';
-import {
-    physicsConstants,
-    formatNumber,
-    calculateGravitationalForce,
-    calculateMaxTensileStress,
-} from '../utils';
+import { formatNumber } from '../utils';
 
 const props = defineProps<{
     formData: SpaceElevatorForm;
     planetGravity: number;
     planetMass: number;
+    crossSectionalArea: number;
     geostationaryOrbit: number;
 }>();
-
-// TODO: do we want to make this an editable value?
-const massCounterweight = 10000; // kg (example value)
-
-const gravitationalForce = computed(() => {
-    const result = calculateGravitationalForce(
-        props.planetMass,
-        massCounterweight,
-        props.geostationaryOrbit,
-    );
-
-    return result;
-});
-
-// const crossSectionalArea = computed(() => {
-//     const crossSectionalArea = maxTension / allowableTensileStress.value;
-//     return crossSectionalArea;
-// });
-
-// const tensileStress = computed(() => {
-//     //const crossSectionalArea = 0.001; // square meters (example value)
-
-//     const result = calculateMaxTensileStress(
-//         gravitationalForce.value,
-//         crossSectionalArea.value,
-//     );
-
-//     return result;
-// });
 
 const elevatorTopHeight = computed(() => {
     return props.geostationaryOrbit + props.formData.planetRadius;
@@ -140,58 +109,24 @@ const carTravelTimeTotalHours = computed(() => {
     );
 });
 
-// TODO: In order to use this we might need to set up a material selector in the form and a safety factor field
-// const allowableTensileStress = computed(() => {
-//     const allowableTensileStress =
-//         requiredTensileStrength.value * props.formData.safetyFactor;
-//     return allowableTensileStress;
-// });
-
-// const centerOfMass = computed(() => {
-//     const distance =
-//         elevatorTopHeight.value +
-//         (massCounterweight / (props.planetMass + massCounterweight)) *
-//             elevatorTopHeight.value;
-
-//     return distance;
-// });
-
-// const allowedTensileStrength = computed(() => {
-//     // Calculate allowable tensile stress
-//     const allowableTensileStress =
-//         props.formData.material.tensileStrength / props.formData.safetyFactor;
-
-//     return allowableTensileStress;
-// });
-
-const crossSectionalArea = computed(() => {
-    const requiredCrossSectionalArea =
-        gravitationalForce.value / props.formData.material.tensileStrength;
-    return requiredCrossSectionalArea * props.formData.safetyFactor;
-});
-
 const estimatedTetherRadius = computed(() => {
-    const radius = Math.sqrt(crossSectionalArea.value / Math.PI);
+    const radius = Math.sqrt(props.crossSectionalArea / Math.PI);
     return radius;
 });
 
 const estimatedTotalMass = computed(() => {
     // Calculate tether volume using its cross-sectional area
-    const tetherVolume = crossSectionalArea.value * elevatorTopHeight.value;
+    const tetherVolume = props.crossSectionalArea * elevatorTopHeight.value;
 
     // Calculate tether mass based on its volume and density
     const tetherMass = props.formData.material.density * tetherVolume;
 
     // Calculate total mass by summing up tether, payload, and counterweight masses
     const totalMass =
-        tetherMass + (props.formData.payloadMass ?? 1000) + massCounterweight;
+        tetherMass +
+        (props.formData.payloadMass ?? 1000) +
+        props.formData.counterweightMass;
 
     return totalMass;
 });
-
-// const requiredTensileStrength = computed(() => {
-//     const requiredCrossSectionalArea =
-//         gravitationalForce.value / props.formData.material.tensileStrength;
-//     return requiredCrossSectionalArea;
-// });
 </script>
