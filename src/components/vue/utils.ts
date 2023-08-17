@@ -122,7 +122,7 @@ export const massUnits: Units[] = [
         value: 1,
     },
     {
-        label: 'ton',
+        label: 'tonne',
         value: 1000,
     },
     {

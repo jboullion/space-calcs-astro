@@ -36,7 +36,7 @@
                 <th class="">Car Travel Time</th>
                 <td class="text-end">{{ travelTime }}</td>
             </tr> -->
-            <tr>
+            <!-- <tr>
                 <th class="">Gravitational Force</th>
                 <td class="text-end"></td>
             </tr>
@@ -47,7 +47,7 @@
             <tr>
                 <th class="">Required Tensile Strength</th>
                 <td class="text-end"></td>
-            </tr>
+            </tr> -->
         </ResultTable>
     </div>
 </template>
@@ -69,15 +69,10 @@ import {
 } from 'vue';
 import type { SpaceElevatorForm } from './types';
 import ResultTable from '../forms/v2/ResultTable.vue';
-import {
-    physicsConstants,
-    formatNumber,
-    calculateGravitationalForce,
-    calculateMaxTensileStress,
-} from '../utils';
 
 const props = defineProps<{
     formData: SpaceElevatorForm;
+    geostationaryOrbit: number;
 }>();
 
 const loading = ref(true);
@@ -173,105 +168,15 @@ onBeforeUnmount(() => {
  *
  *
  */
-
-// const elevatorHeight = computed(() => {
-//     // TODO: Calculate the planet geostationary height
-//     return 36000;
-// });
-
-const scaledPlanetRadius = computed(() => {
-    // TODO: We may want to manipulate the radius of the planet to make it easier to work with in Three.js
-    return props.formData.planetRadius;
+const elevatorTopHeight = computed(() => {
+    return props.geostationaryOrbit + props.formData.planetRadius;
 });
 
-const planetRadiusMeters = computed(() => {
-    return props.formData.planetRadius * 1000;
-});
-
-const planetDensityKgPerM3 = computed(() => {
-    return props.formData.planetDensity * 1000;
-});
-
-const planetCircumference = computed(() => {
-    // C = 2πr
-    const result = 2 * Math.PI * scaledPlanetRadius.value;
-
-    return result;
-});
-
-const planetMass = computed(() => {
-    // M = (4/3) * π * r^3 * ρ
-    const result =
-        (4 / 3) *
-        Math.PI *
-        Math.pow(planetRadiusMeters.value, 3) *
-        planetDensityKgPerM3.value;
-
-    return result;
-});
-
-const planetGravity = computed(() => {
-    // g = (G * M) / r^2
-    const result =
-        (physicsConstants.gravityConstant * planetMass.value) /
-        Math.pow(planetRadiusMeters.value, 2);
-
-    return result;
-});
-
-// Calculate gravity without using the mass of the planet
-const planetGravityAlt = computed(() => {
-    //g = (4/3) * π * G * r * ρ
-    const result =
-        (4 / 3) *
-        Math.PI *
-        physicsConstants.gravityConstant *
-        planetRadiusMeters.value *
-        planetDensityKgPerM3.value;
-
-    return result;
-});
-
-const gravitationalForce = computed(() => {
-    // TODO: Add counterweight mass?
-    const massCounterweight = 1000; // kg (example value)
-
-    const result = calculateGravitationalForce(
-        planetMass.value,
-        massCounterweight,
-        geostationaryOrbit.value,
+const carTravelTimeTotalHours = computed(() => {
+    return (
+        (elevatorTopHeight.value - props.formData.planetRadius) /
+        props.formData.carSpeed
     );
-
-    return result;
-});
-
-const maxTensileStrength = computed(() => {
-    const crossSectionalArea = 0.001; // square meters (example value)
-
-    const result = calculateMaxTensileStress(
-        gravitationalForce.value,
-        crossSectionalArea,
-    );
-
-    return result;
-});
-
-// TODO: In order to use this we might need to set up a material selector in the form and a safety factor field
-// const allowableTensileStress = computed(() => (ultimateTensileStrength: number, safetyFactor: number): number {
-//   const allowableTensileStress = ultimateTensileStrength / safetyFactor;
-//   return allowableTensileStress;
-// });
-
-const rotationInSeconds = computed(() => {
-    const result = props.formData.planetRotation * 60 * 60; // * animationConstants.value.simulationSpeed;
-
-    return result;
-});
-
-const rotationInMetersPerSecond = computed(() => {
-    const result = planetCircumference.value / rotationInSeconds.value;
-
-    return result;
 });
 
 const rotationSpeed = computed(() => {
@@ -292,35 +197,8 @@ const carAnimationSpeed = computed(() => {
     if (!three.carMesh) return 0;
 
     return (
-        (elevatorTopHeight.value - scaledPlanetRadius.value) /
+        (elevatorTopHeight.value - props.formData.planetRadius) /
         animationDefaults.durationFrames
-    );
-});
-
-const geostationaryOrbit = computed(() => {
-    // h = (G * M * T^2 / 4π^2)^(1/3) - R
-
-    const result =
-        Math.pow(
-            (physicsConstants.gravityConstant *
-                planetMass.value *
-                Math.pow(rotationInSeconds.value, 2)) /
-                (4 * Math.pow(Math.PI, 2)),
-            1 / 3,
-        ) - planetRadiusMeters.value;
-
-    // measured in kilometers
-    return result / 1000;
-});
-
-const elevatorTopHeight = computed(() => {
-    return geostationaryOrbit.value + scaledPlanetRadius.value;
-});
-
-const carTravelTimeTotalHours = computed(() => {
-    return (
-        (elevatorTopHeight.value - scaledPlanetRadius.value) /
-        props.formData.carSpeed
     );
 });
 
@@ -485,7 +363,7 @@ function setupPlanet() {
     // }
 
     planet.geometry = new THREE.SphereGeometry(
-        scaledPlanetRadius.value,
+        props.formData.planetRadius,
         64,
         64,
     );
@@ -514,19 +392,19 @@ function setupElevator() {
         side: THREE.FrontSide,
     });
 
-    const elevatorRadius = geostationaryOrbit.value / 500;
+    const elevatorRadius = props.geostationaryOrbit / 500;
 
     const elevatorGeometry = new THREE.CylinderGeometry(
         elevatorRadius,
         elevatorRadius,
-        geostationaryOrbit.value,
+        props.geostationaryOrbit,
         24,
     );
 
     const elevatorMesh = new THREE.Mesh(elevatorGeometry, stationMaterial);
     elevatorMesh.rotation.x = Math.PI / 2;
     elevatorMesh.position.z =
-        scaledPlanetRadius.value + geostationaryOrbit.value / 2;
+        props.formData.planetRadius + props.geostationaryOrbit / 2;
 
     planet.group.add(elevatorMesh);
 
@@ -560,13 +438,13 @@ function setupCar() {
         side: THREE.FrontSide,
     });
 
-    const carRadius = geostationaryOrbit.value / 80;
+    const carRadius = props.geostationaryOrbit / 80;
 
     const carGeometry = new THREE.SphereGeometry(carRadius, 24, 24);
 
     three.carMesh = new THREE.Mesh(carGeometry, carMaterial);
     three.carMesh.rotation.x = Math.PI / 2;
-    three.carMesh.position.z = scaledPlanetRadius.value + carRadius;
+    three.carMesh.position.z = props.formData.planetRadius + carRadius;
 
     planet.group.add(three.carMesh);
 }
