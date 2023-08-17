@@ -15,45 +15,47 @@
             <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
         </div>
 
-        <div class="p-2 rounded border mb-5">
-            <div>
-                <table class="table table-striped mb-0">
-                    <tbody>
-                        <tr>
-                            <th>Planet Mass</th>
-                            <td class="text-end">
-                                {{ planetMass.toExponential(3) }} kg
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Surface Gravity</th>
-                            <td class="text-end">
-                                {{ formatNumber(planetGravity) }} m/s<sup
-                                    >2</sup
-                                >
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="">Elevator Height</th>
-                            <td class="text-end">
-                                {{ formatNumber(geostationaryOrbit, 0) }} km
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="border-0">Car Travel Time</th>
-                            <td class="border-0 text-end">{{ travelTime }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <ResultTable>
+            <!-- <tr>
+                <th>Planet Mass</th>
+                <td class="text-end">{{ planetMass.toExponential(3) }} kg</td>
+            </tr>
+            <tr>
+                <th>Surface Gravity</th>
+                <td class="text-end">
+                    {{ formatNumber(planetGravity) }} m/s<sup>2</sup>
+                </td>
+            </tr>
+            <tr>
+                <th class="">Elevator Height</th>
+                <td class="text-end">
+                    {{ formatNumber(geostationaryOrbit, 0) }} km
+                </td>
+            </tr>
+            <tr>
+                <th class="">Car Travel Time</th>
+                <td class="text-end">{{ travelTime }}</td>
+            </tr> -->
+            <tr>
+                <th class="">Gravitational Force</th>
+                <td class="text-end"></td>
+            </tr>
+            <tr>
+                <th class="">Cross Sectional Area</th>
+                <td class="text-end"></td>
+            </tr>
+            <tr>
+                <th class="">Required Tensile Strength</th>
+                <td class="text-end"></td>
+            </tr>
+        </ResultTable>
     </div>
 </template>
 <script setup lang="ts">
 // TODO:
-// 1. Animation should last 30sec
-// 2. Car should travel up at constant rate over 30 sec? (Do we want an ease?)
-// 3. Planet should rotate at constant rate over 30 sec
+// 1. Calculate the tensile strength needed for the cable
+
+// 2. Do we update the width of the cable depending on the material? / cross section?
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -66,7 +68,13 @@ import {
     watch,
 } from 'vue';
 import type { SpaceElevatorForm } from './types';
-import { physicsConstants, formatNumber } from '../utils';
+import ResultTable from '../forms/v2/ResultTable.vue';
+import {
+    physicsConstants,
+    formatNumber,
+    calculateGravitationalForce,
+    calculateMaxTensileStress,
+} from '../utils';
 
 const props = defineProps<{
     formData: SpaceElevatorForm;
@@ -223,6 +231,36 @@ const planetGravityAlt = computed(() => {
 
     return result;
 });
+
+const gravitationalForce = computed(() => {
+    // TODO: Add counterweight mass?
+    const massCounterweight = 1000; // kg (example value)
+
+    const result = calculateGravitationalForce(
+        planetMass.value,
+        massCounterweight,
+        geostationaryOrbit.value,
+    );
+
+    return result;
+});
+
+const maxTensileStrength = computed(() => {
+    const crossSectionalArea = 0.001; // square meters (example value)
+
+    const result = calculateMaxTensileStress(
+        gravitationalForce.value,
+        crossSectionalArea,
+    );
+
+    return result;
+});
+
+// TODO: In order to use this we might need to set up a material selector in the form and a safety factor field
+// const allowableTensileStress = computed(() => (ultimateTensileStrength: number, safetyFactor: number): number {
+//   const allowableTensileStress = ultimateTensileStrength / safetyFactor;
+//   return allowableTensileStress;
+// });
 
 const rotationInSeconds = computed(() => {
     const result = props.formData.planetRotation * 60 * 60; // * animationConstants.value.simulationSpeed;

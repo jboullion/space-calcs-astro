@@ -304,6 +304,33 @@ export function kToC(k: number) {
     return k - 273.15;
 }
 
+export function calculateGravitationalForce(
+    mass1: number,
+    mass2: number,
+    distance: number,
+): number {
+    const gravitationalConstant = physicsConstants.gravityConstant; // m³/kg s²
+
+    const force = (gravitationalConstant * mass1 * mass2) / distance ** 2;
+    return force;
+}
+
+export function calculateMaxTensileStress(
+    gravitationalForce: number,
+    crossSectionalArea: number,
+) {
+    const maxTensileStress = gravitationalForce / crossSectionalArea;
+    return maxTensileStress;
+}
+
+export function calculateCrossSectionalArea(
+    maxTension: number,
+    allowableTensileStress: number,
+): number {
+    const crossSectionalArea = maxTension / allowableTensileStress;
+    return crossSectionalArea;
+}
+
 /**
  * Return the difference in time between two clocks moving at different velocities.
  * @param properTime Seconds

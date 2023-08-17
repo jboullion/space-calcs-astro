@@ -19,10 +19,11 @@
 
 import { ref } from 'vue';
 
-import type { SpaceElevatorForm } from './types';
+import type { SpaceElevatorForm, SEMaterial } from './types';
 
 import SEForm from './SEForm.vue';
 import SEVisual from './SEVisual.vue';
+import { materials } from './types';
 
 const formData = ref<SpaceElevatorForm>({
     planetRadius: 6378.14,
@@ -31,9 +32,11 @@ const formData = ref<SpaceElevatorForm>({
     // planetMass: 5.972 * Math.pow(10, 24),
     // planetGravity: 9.807,
     planetRotation: 24,
-    carSpeed: 100, //km/h
+    carSpeed: 200, //km/h
     payloadMass: 1000, //kg
     latitude: 0, //degrees
+    material: materials[4],
+    safetyFactor: 1.5,
 });
 </script>
 

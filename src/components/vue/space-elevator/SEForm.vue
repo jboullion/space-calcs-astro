@@ -8,16 +8,18 @@
             :min="100"
             :max="10000000"
             unit="km"
+            description="Surface Gravity: TODO m/s²"
         />
 
         <NumberInput
             id="planet-density"
-            label="Planet Desnity"
+            label="Planet Density"
             v-model.number="formData.planetDensity"
             :step="0.1"
             :min="0.1"
             :max="1000000"
             unit="g/cm³"
+            description="Planet Mass: TODO kg"
         />
 
         <NumberInput
@@ -28,6 +30,7 @@
             :min="1"
             :max="1000"
             unit="hours"
+            description="Geostationary Orbit: TODO km"
         />
 
         <NumberInput
@@ -38,6 +41,27 @@
             :min="1"
             :max="1000"
             unit="km/h"
+            description="Travel Time: TODO hours"
+        />
+
+        <SelectInput
+            id="material"
+            label="Material"
+            v-model="formData.material"
+            :options="materials"
+            tooltip=""
+            description="Max Tensile Strength: TODO Mpa"
+            @update:modelValue=""
+        />
+
+        <NumberInput
+            id="safety-factor"
+            label="Safety Factor"
+            v-model.number="formData.safetyFactor"
+            :step="0.1"
+            :min="1"
+            :max="10"
+            description="Allowable Tensile Strength: TODO Mpa"
         />
     </div>
 </template>
@@ -45,6 +69,8 @@
 import { defineProps } from 'vue';
 import type { SpaceElevatorForm } from './types';
 import NumberInput from '../forms/NumberInput.vue';
+import SelectInput from '../forms/SelectInput.vue';
+import { materials } from './types';
 
 defineProps<{
     formData: SpaceElevatorForm;

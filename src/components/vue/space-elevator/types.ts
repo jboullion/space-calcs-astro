@@ -1,13 +1,107 @@
 export type SpaceElevatorForm = {
-  planetRadius: number;
-  planetDensity: number;
-  planetRotation: number;
-  planetGravity?: number;
-  planetMass?: number;
-  carSpeed: number; // The speed of the car in m/s
-  payloadMass?: number; // The amount of mass the elevator can carry
-  latitude?: number; // Where along the equator the elevator is located
+    planetRadius: number;
+    planetDensity: number;
+    planetRotation: number;
+    planetGravity?: number;
+    planetMass?: number;
+    carSpeed: number; // The speed of the car in m/s
+    payloadMass?: number; // The amount of mass the elevator can carry
+    latitude?: number; // Where along the equator the elevator is located
+    material: SEMaterial;
+    safetyFactor: number;
 };
+
+export type SEMaterial = {
+    name: string;
+    value: string;
+    density: number;
+    tensileStrength: number;
+    compressiveStrength: number;
+    shearStrength: number;
+    youngsModulus: number;
+    poissonRatio: number;
+    meltingPoint: number;
+};
+
+export const materials: SEMaterial[] = [
+    {
+        name: 'Steel',
+        value: 'steel',
+        density: 7850,
+        tensileStrength: 400e6,
+        compressiveStrength: 400e6,
+        shearStrength: 400e6,
+        youngsModulus: 200e9,
+        poissonRatio: 0.3,
+        meltingPoint: 1370,
+    },
+    {
+        name: 'Aluminum',
+        value: 'aluminum',
+        density: 2700,
+        tensileStrength: 400e6,
+        compressiveStrength: 400e6,
+        shearStrength: 400e6,
+        youngsModulus: 200e9,
+        poissonRatio: 0.3,
+        meltingPoint: 1370,
+    },
+    {
+        name: 'Titanium',
+        value: 'titanium',
+        density: 4500,
+        tensileStrength: 400e6,
+        compressiveStrength: 400e6,
+        shearStrength: 400e6,
+        youngsModulus: 200e9,
+        poissonRatio: 0.3,
+        meltingPoint: 1370,
+    },
+    {
+        name: 'Kevlar',
+        value: 'kevlar',
+        density: 1440,
+        tensileStrength: 400e6,
+        compressiveStrength: 400e6,
+        shearStrength: 400e6,
+        youngsModulus: 200e9,
+        poissonRatio: 0.3,
+        meltingPoint: 1370,
+    },
+    {
+        name: 'Carbon Nanotubes',
+        value: 'carbon-nanotubes',
+        density: 1300,
+        tensileStrength: 63e9,
+        compressiveStrength: 63e9,
+        shearStrength: 63e9,
+        youngsModulus: 1.0e12,
+        poissonRatio: 0.1,
+        meltingPoint: 3920,
+    },
+    {
+        name: 'Graphene',
+        value: 'graphene',
+        density: 1300,
+        tensileStrength: 130e9,
+        compressiveStrength: 130e9,
+        shearStrength: 130e9,
+        youngsModulus: 1.0e12,
+        poissonRatio: 0.1,
+        meltingPoint: 3920,
+    },
+    {
+        name: 'Diamond Nanothread',
+        value: 'diamond-nanothread',
+        density: 1300,
+        tensileStrength: 130e9,
+        compressiveStrength: 130e9,
+        shearStrength: 130e9,
+        youngsModulus: 1.0e12,
+        poissonRatio: 0.1,
+        meltingPoint: 3920,
+    },
+];
 
 // export type OrbitLocations = {
 //   id: number;
