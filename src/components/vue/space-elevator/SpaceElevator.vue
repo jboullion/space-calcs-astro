@@ -44,10 +44,10 @@ const formData = ref<SpaceElevatorForm>({
     planetRadius: 6378.14,
     planetDensity: 5.514,
     planetGravity: 9.807,
-    // planetMass: 5.972 * Math.pow(10, 24),
+    planetMass: physicsConstants.earthMass,
     // planetGravity: 9.807,
     planetRotation: 24,
-    carSpeed: 200, //km/h
+    carSpeed: 500, //km/h
     payloadMass: 1000, //kg
     material: materials[4],
     safetyFactor: 1.3,

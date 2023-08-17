@@ -31,6 +31,28 @@
                 </template>
             </InputWrapper>
 
+            <InputWrapper id="shipMass" label="Ship Mass" description="">
+                <template v-slot:input>
+                    <NumberInput
+                        id="shipMass"
+                        :key="`shipMass-${formData.shipMass}`"
+                        type="number"
+                        class="form-control"
+                        v-model.number="formData.shipMass"
+                        :min="1"
+                        :max="10000000000 / formData.shipMassUnit.value"
+                        :step="1"
+                    />
+                </template>
+                <template v-slot:unit>
+                    <UnitSelect
+                        id="accelerationUnit"
+                        v-model="formData.shipMassUnit"
+                        :units="massUnits"
+                    />
+                </template>
+            </InputWrapper>
+
             <SelectInput
                 id="example-engine"
                 label="Example Engines"
@@ -118,28 +140,6 @@
                         id="accelerationUnit"
                         v-model="formData.decelerationUnit"
                         :units="accelerationUnits"
-                    />
-                </template>
-            </InputWrapper>
-
-            <InputWrapper id="shipMass" label="Ship Mass" description="">
-                <template v-slot:input>
-                    <NumberInput
-                        id="shipMass"
-                        :key="`shipMass-${formData.shipMass}`"
-                        type="number"
-                        class="form-control"
-                        v-model.number="formData.shipMass"
-                        :min="1"
-                        :max="10000000000 / formData.shipMassUnit.value"
-                        :step="1"
-                    />
-                </template>
-                <template v-slot:unit>
-                    <UnitSelect
-                        id="accelerationUnit"
-                        v-model="formData.shipMassUnit"
-                        :units="massUnits"
                     />
                 </template>
             </InputWrapper>

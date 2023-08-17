@@ -69,7 +69,7 @@
             <tr>
                 <th>Time at Max Velocity</th>
                 <td class="text-end">
-                    {{ formatNumber(convertedTimeAtMaxVelocity) }}
+                    {{ formatNumber(convertedTimeAtMaxVelocity, 2) }}
                 </td>
                 <td>
                     <UnitSelect
@@ -333,13 +333,14 @@ const convertedAccelEnergy = computed(() => {
     if (convertedVelocityMpS.value >= physicsConstants.c) return '∞';
 
     // Assume same energy for accel and decel ( * 2)
-    return (
+    return formatNumber(
         convertUnitValue(
             energy,
             energyRequiredUnit.value,
             energyUnits[0], // Joules
             2,
-        ) * 2
+        ) * 2,
+        2,
     );
 });
 

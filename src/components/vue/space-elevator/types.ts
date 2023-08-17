@@ -3,7 +3,7 @@ export type SpaceElevatorForm = {
     planetDensity: number;
     planetRotation: number;
     planetGravity?: number;
-    planetMass?: number;
+    planetMass: number; // kg
     carSpeed: number; // The speed of the car in m/s
     payloadMass: number; // The amount of mass the elevator can carry
     material: SEMaterial;

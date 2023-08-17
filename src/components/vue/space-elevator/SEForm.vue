@@ -53,6 +53,19 @@
             )} hours`"
         />
 
+        <NumberInput
+            id="payloadMass"
+            label="Payload + Car Mass"
+            v-model.number="formData.payloadMass"
+            :step="1"
+            :min="1"
+            :max="10000"
+            unit="tonne"
+            :description="`Required Energy: ${formatNumber(
+                energyRequired,
+            )} MWh`"
+        />
+
         <SelectInput
             id="material"
             label="Material"
@@ -76,7 +89,7 @@
             :max="10"
             :description="`Cross Sectional Area: ${formatNumber(
                 crossSectionalArea,
-            )} m<sup>2</sup><br />Circular Radius: ${formatNumber(
+            )} m<sup>2</sup><br />Cylinder Radius: ${formatNumber(
                 estimatedTetherRadius,
             )} m`"
         />
@@ -88,7 +101,7 @@ import type { SpaceElevatorForm } from './types';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
 import { materials } from './constants';
-import { formatNumber } from '../utils';
+import { energyUnits, formatNumber, physicsConstants } from '../utils';
 
 const props = defineProps<{
     formData: SpaceElevatorForm;
@@ -124,9 +137,29 @@ const estimatedTotalMass = computed(() => {
     // Calculate total mass by summing up tether, payload, and counterweight masses
     const totalMass =
         tetherMass +
-        (props.formData.payloadMass ?? 1000) +
+        (props.formData.payloadMass * 1000 ?? 10000) +
         props.formData.counterweightMass;
 
     return totalMass;
+});
+
+const energyRequired = computed(() => {
+    // Calculate the change in potential energy
+    const potentialEnergyChange =
+        props.formData.payloadMass *
+        1000 *
+        physicsConstants.g *
+        props.geostationaryOrbit;
+
+    // Convert speed to meters per second
+    const speedMetersPerSecond = (props.formData.carSpeed * 1000) / 3600; // Convert from km/h to m/s
+
+    // Calculate the kinetic energy gained due to speed
+    const kineticEnergyChange =
+        0.5 * props.formData.payloadMass * speedMetersPerSecond ** 2;
+
+    // Total energy required is the sum of potential and kinetic energy changes
+    const requiredEnergy = potentialEnergyChange + kineticEnergyChange;
+    return requiredEnergy / energyUnits[9].value;
 });
 </script>
