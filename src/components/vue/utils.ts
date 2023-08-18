@@ -149,11 +149,11 @@ export const energyUnits: Units[] = [
     // { label: 'eV', value: 6.242e21 },
     // { label: 'BTU', value: 947.81707775 },
     // { label: 'ft-lb', value: 737562.14928 },
-    { label: 'Wh', value: 277.77777778 },
-    { label: 'kWh', value: 277777.77778 },
-    { label: 'MWh', value: 277777777.78 },
-    { label: 'GWh', value: 277777777778 },
-    { label: 'TWh', value: 277777777777778 },
+    { label: 'Wh', value: 3600 },
+    { label: 'kWh', value: 3600000 },
+    { label: 'MWh', value: 3600000000 },
+    { label: 'GWh', value: 3600000000000 },
+    { label: 'TWh', value: 3600000000000000 },
     // Add more units as needed
 ];
 

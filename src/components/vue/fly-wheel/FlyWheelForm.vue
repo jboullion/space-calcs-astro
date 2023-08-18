@@ -12,7 +12,10 @@
             <InputWrapper
                 id="mass"
                 label="Mass"
-                :description="`Stored Energy: ${formatNumber(storedEnergy)} j`"
+                :description="`Stored Energy: ${formatNumber(
+                    convertedStoredEnergy,
+                    3,
+                )} kWh`"
             >
                 <template v-slot:input>
                     <NumberInput
