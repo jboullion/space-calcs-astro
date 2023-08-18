@@ -1,6 +1,7 @@
 import type { SpaceCalc } from '../types/types';
 import {
     ADVANCED_CAT,
+    ENERGY_CAT,
     HABITAT_CAT,
     LIFE_CAT,
     ORBIT_CAT,
@@ -76,7 +77,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
         name: 'Solar Energy',
         description:
             'Estimate the available power from a solar panel anywhere in the solar system',
-        categories: [categories[HABITAT_CAT], categories[STATION_CAT]],
+        categories: [categories[ENERGY_CAT], categories[STATION_CAT]],
         image: '',
         link: '/calcs/solar-energy',
     },
@@ -132,6 +133,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
         categories: [categories[ROCKET_CAT]],
         image: '',
         link: '/calcs/star-travel',
+    },
+    {
+        id: 'fly-wheel',
+        name: 'Fly Wheel',
+        description: 'Estimate the properties of a fly wheel for storing power',
+        categories: [categories[ENERGY_CAT]],
+        image: '',
+        link: '/calcs/fly-wheel',
     },
 ];
 

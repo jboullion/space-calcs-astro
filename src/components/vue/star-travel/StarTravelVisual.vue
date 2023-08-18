@@ -327,8 +327,6 @@ function setupTrack() {
         0,
     );
 
-    console.log('');
-
     three.scene.add(accelTrack);
     three.scene.add(maxTrack);
     three.scene.add(decelTrack);

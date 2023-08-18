@@ -143,22 +143,12 @@ export const densityUnits: Units[] = [
 
 export const energyUnits: Units[] = [
     { label: 'J', value: 1 },
-    // { label: 'kJ', value: 0.001 },
-    // { label: 'cal', value: 0.23900573614 }, // International Steam Table Calorie
-    // { label: 'kcal', value: 0.00023900573614 }, // International Steam Table Calorie
-    // { label: 'eV', value: 6.242e18 },
-    // { label: 'BTU', value: 0.00094781707775 },
-    // { label: 'ft-lb', value: 0.73756214928 },
-    // { label: 'Wh', value: 0.00027777777778 },
-    // { label: 'kWh', value: 0.00000027777777778 },
-    // { label: 'MWh', value: 0.00000000027777777778 },
-
     { label: 'kJ', value: 1000 },
     { label: 'cal', value: 239.00573614 }, // International Steam Table Calorie
     { label: 'kcal', value: 239005.73614 }, // International Steam Table Calorie
-    { label: 'eV', value: 6.242e21 },
-    { label: 'BTU', value: 947.81707775 },
-    { label: 'ft-lb', value: 737562.14928 },
+    // { label: 'eV', value: 6.242e21 },
+    // { label: 'BTU', value: 947.81707775 },
+    // { label: 'ft-lb', value: 737562.14928 },
     { label: 'Wh', value: 277.77777778 },
     { label: 'kWh', value: 277777.77778 },
     { label: 'MWh', value: 277777777.78 },
@@ -174,12 +164,6 @@ export const hourUnits = [
 ];
 
 export const longTimeUnits = [
-    // { label: 'milliseconds', value: 1000 },
-    //{ label: 'seconds', value: 1 },
-    // { label: "microseconds", value: 1e+6 },
-    // { label: "nanoseconds", value: 1e+9 },
-    //{ label: 'minutes', value: 1 / 60 },
-    //{ label: 'hours', value: 1 / 3600 },
     { label: 'days', value: 86400 },
     { label: 'weeks', value: 604800 },
     { label: 'years', value: 31536000 },
