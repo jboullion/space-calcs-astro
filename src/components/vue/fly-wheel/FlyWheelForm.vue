@@ -2,19 +2,17 @@
     <div class="calc-form">
         <div class="p-2 rounded border mb-5">
             <SelectInput
-                id="example-location"
-                label="Example Location"
+                id="flywheelType"
+                label="Flywheel Type"
                 v-model="formData.geometry"
                 :options="flyWheelGeometry"
-                :description="`k = ${formData.geometry.k}`"
+                :description="`k: ${formData.geometry.k}`"
             />
 
             <InputWrapper
                 id="mass"
                 label="Mass"
-                :description="`Stored Energy: ${formatNumber(
-                    convertedStoredEnergy,
-                )} kWh`"
+                :description="`Stored Energy: ${formatNumber(storedEnergy)} j`"
             >
                 <template v-slot:input>
                     <NumberInput
@@ -33,7 +31,13 @@
                 </template>
             </InputWrapper>
 
-            <InputWrapper id="radius" label="Radius" description="">
+            <InputWrapper
+                id="radius"
+                label="Radius"
+                :description="`Moment of Inertia: ${formatNumber(
+                    momentOfInertia,
+                )} kg.m<sup>2</sup>`"
+            >
                 <template v-slot:input>
                     <NumberInput
                         id="radius"
@@ -74,6 +78,20 @@
                     <SimpleUnit unit="rpm" />
                 </template>
             </InputWrapper>
+
+            <SelectInput
+                id="material"
+                label="Material"
+                v-model="formData.material"
+                :options="materials"
+                :description="`Density: ${
+                    formData.material.density
+                } g/cm<sup>3</sup><br />Mat. Tensile Strength: ${formatNumber(
+                    formData.material.tensileStrength,
+                )} MPa<br />Req. Tensile Strength: ${formatNumber(
+                    requiredTensileStrength,
+                )} MPa`"
+            />
         </div>
     </div>
 </template>
@@ -103,7 +121,7 @@ import {
     energyUnits,
     convertUnitValue,
 } from '../utils';
-import { flyWheelGeometry } from './constants';
+import { flyWheelGeometry, materials } from './constants';
 
 const props = defineProps<{
     formData: IFlyWheelForm;
@@ -112,12 +130,8 @@ const props = defineProps<{
 const storedEnergy = computed(() => {
     const omega: number = (2 * Math.PI * props.formData.rpm) / 60;
 
-    // Calculate moment of inertia
-    const momentOfInertia: number =
-        0.5 * props.formData.mass * Math.pow(props.formData.radius, 2);
-
     // Calculate stored energy (joules)
-    return 0.5 * momentOfInertia * Math.pow(omega, 2);
+    return 0.5 * momentOfInertia.value * omega ** 2;
 });
 
 const convertedStoredEnergy = computed(() => {
@@ -131,5 +145,34 @@ const convertedStoredEnergy = computed(() => {
 
 const specificEnergy = computed(() => {
     return storedEnergy.value / props.formData.mass; // J/kg
+});
+
+const momentOfInertia = computed(() => {
+    // k⋅m⋅r2
+    return (
+        props.formData.geometry.k *
+        props.formData.mass *
+        props.formData.radius ** 2
+    );
+});
+
+const requiredTensileStrength = computed(() => {
+    // // Convert RPM to radians per second
+    // const omega: number = (2 * Math.PI * props.formData.rpm) / 60;
+
+    // // Calculate tensile strength N/m^2
+    // const tensileStrength: number =
+    //     (props.formData.mass *
+    //         Math.pow(omega, 2) *
+    //         Math.pow(props.formData.radius, 2)) /
+    //     (2 * props.formData.material.density * 1000); // g/c³ to kg/m³
+
+    // Convert tensile strength to kPa
+    //  const tensileStrengthKPa: number = tensileStrength / 1000;
+    const tensileStrength =
+        ((storedEnergy.value / props.formData.mass) *
+            props.formData.material.density) /
+        props.formData.geometry.k;
+    return tensileStrength / 100 / 1000; //MPa
 });
 </script>
