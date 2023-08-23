@@ -18,12 +18,12 @@
         <div class="pb-2">
             <p>
                 <b>Note:</b> We are assuming a constant radius cylinder for the
-                Space Elevator geometry. You could taper the tether to achive
-                optimal mass savings.
+                Space Elevator geometry. You could taper the tether for optimal
+                mass savings.
             </p>
             <p>
-                The elevator height should be close to the scale of the planet.
-                The tether width is not visually accurate because it is too
+                The elevator height should be to scale with the planet. The
+                elevator width is not visually accurate because it would be too
                 small to see.
             </p>
         </div>

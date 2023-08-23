@@ -11,12 +11,14 @@ import Logo from './Logo.astro';
         <div class="container justify-content-between">
             <a
                 href="/"
-                class="navbar-brand d-flex align-items-center text-white gap-4"
+                class="navbar-brand d-flex align-items-center text-white gap-4 p-0"
             >
-                <div style="transform: rotate(90deg);" class="ms-3">
-                    <Logo height={40} />
-                </div>
-                Space Calcs
+                <img
+                    id="logo"
+                    src="/name-logo.svg"
+                    alt="Space Calcs"
+                    height="32px"
+                />
             </a>
             <DarkMode client:only />
         </div>
