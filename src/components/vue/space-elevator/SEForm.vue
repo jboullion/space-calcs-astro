@@ -160,6 +160,6 @@ const energyRequired = computed(() => {
 
     // Total energy required is the sum of potential and kinetic energy changes
     const requiredEnergy = potentialEnergyChange + kineticEnergyChange;
-    return requiredEnergy / energyUnits[9].value;
+    return requiredEnergy / energyUnits[8].value;
 });
 </script>
