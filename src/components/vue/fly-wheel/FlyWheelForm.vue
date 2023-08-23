@@ -6,7 +6,7 @@
                 label="Flywheel Type"
                 v-model="formData.geometry"
                 :options="flyWheelGeometry"
-                :description="`k: ${formData.geometry.k}`"
+                :description="`Inertial constant k: ${formData.geometry.k}`"
             />
 
             <InputWrapper
