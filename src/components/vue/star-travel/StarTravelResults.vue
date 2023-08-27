@@ -299,7 +299,7 @@ const convertedTimeAtMaxVelocity = computed(() => {
         timeAtMaxVelocityS.value,
         maxVelocityUnit.value,
         hourUnits[0], // seconds
-        0,
+        2,
     );
 });
 
