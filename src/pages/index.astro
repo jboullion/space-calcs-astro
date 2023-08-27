@@ -16,22 +16,20 @@ import Sponsor from '../components/shared/Sponsor.astro';
         data-context="signin"
         data-ux_mode="popup"
         data-callback="handleSignInWithGoogle"
-        :data-nonce="hashedNonce"
-        data-auto_select="true"
-        data-itp_support="true"
+        data-nonce=""
+        data-auto_prompt="false"
     >
     </div>
 
     <div
         class="g_id_signin"
         data-type="standard"
-        data-shape="pill"
+        data-shape="rectangular"
         data-theme="outline"
         data-text="signin_with"
         data-size="large"
         data-logo_alignment="left"
     >
-        g_id_signin
     </div>
 
     <!-- <Home client:load />
