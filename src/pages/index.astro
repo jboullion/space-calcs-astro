@@ -44,6 +44,8 @@ import Sponsor from '../components/shared/Sponsor.astro';
             token: response.credential,
             nonce: hashedNonce, // must be the same one as provided in data-nonce (if any)
         });
+
+        console.log(data, error);
     }
 </script>
 
