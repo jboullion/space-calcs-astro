@@ -62,6 +62,8 @@
             </div>
         </section>
 
+        <SupabaseTest />
+
         <CalcList :search="search" :active-categories="activeCategories" />
     </div>
 </template>
@@ -74,6 +76,7 @@ import Logo from '../shared/Logo.vue';
 
 import { onMounted, ref } from 'vue';
 import { categories } from './constants';
+import SupabaseTest from './SupabaseTest.vue';
 // import { debounce } from "../../../utils/utils";
 
 // const loading = ref(true);
