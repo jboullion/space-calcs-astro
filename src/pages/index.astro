@@ -4,49 +4,11 @@ import Home from '../components/vue/home/Home.vue';
 import Sponsor from '../components/shared/Sponsor.astro';
 ---
 
-<script src="https://accounts.google.com/gsi/client" async></script>
-
 <Layout
     title="Space Calcs"
     description="All the tools you need to calculate your mission to space!"
 >
-    <div
-        id="g_id_onload"
-        data-client_id="563525421114-em4m5c4kl0q7tbtnpfnl4ecelskcd1qe.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleSignInWithGoogle"
-        :data-nonce="hashedNonce"
-        data-auto_select="true"
-        data-itp_support="true"
-    >
-    </div>
+    <Home client:load />
 
-    <div
-        class="g_id_signin"
-        data-type="standard"
-        data-shape="pill"
-        data-theme="outline"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left"
-    >
-        g_id_signin
-    </div>
-
-    <!-- <Home client:load />
-
-    <Sponsor /> -->
+    <Sponsor />
 </Layout>
-
-<script is:inline>
-    async function handleSignInWithGoogle(response) {
-        const { data, error } = await supabase.auth.signInWithIdToken({
-            provider: 'google',
-            token: response.credential,
-            nonce: hashedNonce, // must be the same one as provided in data-nonce (if any)
-        });
-    }
-</script>
-
-<style></style>
