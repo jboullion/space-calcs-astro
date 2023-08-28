@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Forgot from '../components/vue/auth/Forgot.vue';
+---
+
+<Layout title="Forgot | Space Calcs" description="Forgot">
+    <Forgot client:load />
+</Layout>
+
+<script is:inline>
+    // TODO: If we use this in other locations we may want to move this into it's own call or some other shared location
+    (function () {
+        'use strict';
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation');
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener(
+                'submit',
+                function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                },
+                false,
+            );
+        });
+    })();
+</script>
