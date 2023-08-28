@@ -19,7 +19,11 @@
                         Password must be 6 characters or more.
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    :disabled="loading"
+                >
                     Update Password
                 </button>
             </form>
@@ -40,6 +44,10 @@ const forgotSuccess = ref<boolean>(false);
 
 async function updatePassword(event: Event) {
     event.preventDefault();
+
+    if (!newPassword.value) {
+        return;
+    }
 
     loading.value = true;
 

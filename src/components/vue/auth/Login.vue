@@ -36,7 +36,13 @@
                         Password must be 6 characters or more.
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    :disabled="loading"
+                >
+                    Login
+                </button>
 
                 <div v-if="loginError" class="alert alert-danger mb-0 mt-3">
                     {{ loginError }}
