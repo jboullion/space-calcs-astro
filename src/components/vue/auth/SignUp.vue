@@ -7,6 +7,7 @@
                 v-if="!signupSuccess"
                 class="needs-validation mb-3"
                 @submit="signUpWithEmail"
+                ref="signupForm"
                 novalidate
             >
                 <div class="mb-3">
@@ -19,10 +20,10 @@
                         required
                     />
                     <div class="invalid-feedback">
-                        Please select a valid email.
+                        Please enter a valid email.
                     </div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-4">
                     <label for="password" class="form-label">Password</label>
                     <input
                         type="password"
@@ -39,7 +40,7 @@
                 </div>
                 <button
                     type="submit"
-                    class="btn btn-primary"
+                    class="btn btn-outline-light d-block w-100"
                     :disabled="loading"
                 >
                     Sign Up
@@ -71,8 +72,13 @@ const email = ref<string>('');
 const password = ref<string>('');
 const signupError = ref<string>('');
 const signupSuccess = ref<string>('');
+const signupForm = ref<HTMLFormElement>();
 
 async function signUpWithEmail(event: Event) {
+    if (!signupForm.value?.checkValidity()) {
+        return;
+    }
+
     event.preventDefault();
 
     loading.value = true;

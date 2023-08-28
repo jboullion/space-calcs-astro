@@ -1,0 +1,9 @@
+---
+import Layout from '../layouts/Layout.astro';
+// @ts-ignore
+import Account from '../components/vue/auth/Account.vue';
+---
+
+<Layout title="Account | Space Calcs" description="Space Calcs account">
+    <Account client:load />
+</Layout>

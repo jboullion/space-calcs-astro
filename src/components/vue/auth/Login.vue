@@ -7,6 +7,7 @@
                 class="mb-4 pb-4 border-bottom needs-validation"
                 @submit="signInWithEmail"
                 novalidate
+                ref="loginForm"
             >
                 <div v-if="!loginSuccess">
                     <div class="mb-3">
@@ -21,10 +22,10 @@
                             required
                         />
                         <div class="invalid-feedback">
-                            Please select a valid email.
+                            Please enter a valid email.
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="password" class="form-label"
                             >Password</label
                         >
@@ -43,7 +44,7 @@
                     </div>
                     <button
                         type="submit"
-                        class="btn btn-primary"
+                        class="btn btn-outline-light d-block w-100"
                         :disabled="loading"
                     >
                         Login
@@ -61,7 +62,7 @@
             <button
                 v-if="!loading && !siteUser"
                 id="googleButton"
-                class="google-button oauth-button"
+                class="btn btn-outline-light w-100 d-block oauth-button"
                 @click="signInWithProvider('google')"
             >
                 <span id="google-icon" class="icon"></span>
@@ -87,8 +88,13 @@ const email = ref<string>('');
 const password = ref<string>('');
 const loginError = ref<string>('');
 const loginSuccess = ref<string>('');
+const loginForm = ref<HTMLFormElement>();
 
 async function signInWithEmail(event: Event) {
+    if (!loginForm.value?.checkValidity()) {
+        return;
+    }
+
     event.preventDefault();
 
     loading.value = true;

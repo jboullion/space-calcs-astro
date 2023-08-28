@@ -9,7 +9,7 @@
                 @submit="updatePassword"
                 novalidate
             >
-                <div class="mb-3">
+                <div class="mb-4">
                     <label for="password" class="form-label">Password</label>
                     <input
                         type="password"
@@ -26,7 +26,7 @@
                 </div>
                 <button
                     type="submit"
-                    class="btn btn-primary"
+                    class="btn btn-outline-light d-block w-100"
                     :disabled="loading"
                 >
                     Update Password

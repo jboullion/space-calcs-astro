@@ -10,7 +10,7 @@
                 novalidate
                 ref="forgotForm"
             >
-                <div class="mb-3">
+                <div class="mb-4">
                     <label for="email" class="form-label">Email address</label>
                     <input
                         type="email"
@@ -25,7 +25,7 @@
                 </div>
                 <button
                     type="submit"
-                    class="btn btn-primary"
+                    class="btn btn-outline-light d-block w-100"
                     :disabled="loading"
                 >
                     Send Reset

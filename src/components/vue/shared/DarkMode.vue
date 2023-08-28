@@ -4,7 +4,6 @@
         @click="changeTheme()"
         class="btn btn-dark fs-4"
         aria-label="Darkmode"
-        style="height: 50px"
     >
         <i v-if="theme === 'light'" class="fa-solid fa-fw fa-moon"></i>
         <i v-if="theme === 'dark'" class="fa-solid fa-fw fa-sun"></i>
@@ -17,8 +16,9 @@ import { onBeforeMount, ref } from 'vue';
 const theme = ref<'light' | 'dark'>();
 
 onBeforeMount(() => {
-    if (localStorage.getItem('theme') == 'dark') {
-        theme.value = 'dark';
+    theme.value = 'dark';
+    if (localStorage.getItem('theme') == 'light') {
+        theme.value = 'light';
     }
 });
 

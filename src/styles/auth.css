@@ -3,7 +3,7 @@
     margin: 0 auto;
 }
 
-#loginForm .oauth-button {
+/* #loginForm .oauth-button {
     background: #fff;
     color: rgba(0, 0, 0, 0.54);
     box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 5px 0;
@@ -20,7 +20,7 @@
         border-color 0.2s ease-in-out 0s;
     transition: background-color 0.2s ease-in-out 0s,
         border-color 0.2s ease-in-out 0s;
-}
+} */
 
 #loginForm .oauth-button span.icon {
     display: inline-block;
