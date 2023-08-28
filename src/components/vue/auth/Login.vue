@@ -8,41 +8,50 @@
                 @submit="signInWithEmail"
                 novalidate
             >
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email address</label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        id="email"
-                        v-model="email"
-                        required
-                    />
-                    <div class="invalid-feedback">
-                        Please select a valid email.
+                <div v-if="!loginSuccess">
+                    <div class="mb-3">
+                        <label for="email" class="form-label"
+                            >Email address</label
+                        >
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            v-model="email"
+                            required
+                        />
+                        <div class="invalid-feedback">
+                            Please select a valid email.
+                        </div>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="password"
-                        min="6"
-                        max="32"
-                        v-model="password"
-                        required
-                    />
-                    <div class="invalid-feedback">
-                        Password must be 6 characters or more.
+                    <div class="mb-3">
+                        <label for="password" class="form-label"
+                            >Password</label
+                        >
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            min="6"
+                            max="32"
+                            v-model="password"
+                            required
+                        />
+                        <div class="invalid-feedback">
+                            Password must be 6 characters or more.
+                        </div>
                     </div>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        :disabled="loading"
+                    >
+                        Login
+                    </button>
                 </div>
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                    :disabled="loading"
-                >
-                    Login
-                </button>
+                <div v-else class="alert alert-success mb-0 mt-3">
+                    {{ loginSuccess }}
+                </div>
 
                 <div v-if="loginError" class="alert alert-danger mb-0 mt-3">
                     {{ loginError }}
@@ -77,7 +86,7 @@ const loading = ref<boolean>(false);
 const email = ref<string>('');
 const password = ref<string>('');
 const loginError = ref<string>('');
-const loginSuccess = ref<boolean>(false);
+const loginSuccess = ref<string>('');
 
 async function signInWithEmail(event: Event) {
     event.preventDefault();
@@ -92,7 +101,10 @@ async function signInWithEmail(event: Event) {
     if (error) {
         loginError.value = error.message;
     } else {
-        loginSuccess.value = true;
+        loginSuccess.value = 'Login successfully. Redirecting...';
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 1000);
     }
 
     loading.value = false;

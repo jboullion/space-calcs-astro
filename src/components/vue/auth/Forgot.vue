@@ -4,6 +4,7 @@
             <h1 class="mb-3">Forgot Password</h1>
 
             <form
+                v-if="!forgotSuccess"
                 class="needs-validation"
                 @submit="forgotPassword"
                 novalidate
@@ -30,6 +31,10 @@
                     Send Reset
                 </button>
             </form>
+            <div v-else class="alert alert-success mb-0 mt-3">
+                {{ forgotSuccess }}
+            </div>
+
             <div v-if="forgotError" class="alert alert-danger mb-0 mt-3">
                 {{ forgotError }}
             </div>
@@ -43,7 +48,7 @@ import { supabase } from '../../../lib/supabaseClient.js';
 const loading = ref<boolean>(false);
 const email = ref<string>('');
 const forgotError = ref<string>('');
-const forgotSuccess = ref<boolean>(false);
+const forgotSuccess = ref<string>('');
 const forgotForm = ref<HTMLFormElement>();
 
 async function forgotPassword(event: Event) {
@@ -63,7 +68,7 @@ async function forgotPassword(event: Event) {
     if (error) {
         forgotError.value = error.message;
     } else {
-        forgotSuccess.value = true;
+        forgotSuccess.value = 'Check your email for a reset link.';
     }
 
     loading.value = false;

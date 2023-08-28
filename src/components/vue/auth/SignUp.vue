@@ -4,10 +4,10 @@
             <h1 class="mb-3">Sign Up</h1>
 
             <form
+                v-if="!signupSuccess"
                 class="needs-validation mb-3"
                 @submit="signUpWithEmail"
                 novalidate
-                v-if="!signupSuccess"
             >
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
@@ -45,8 +45,11 @@
                     Sign Up
                 </button>
             </form>
-            <div v-if="signupSuccess">
-                <p>Check your email for a confirmation link.</p>
+            <div v-else class="alert alert-success mb-0 mt-3">
+                {{ signupSuccess }}
+            </div>
+            <div v>
+                <p></p>
             </div>
             <div v-if="signupError" class="alert alert-danger mb-0">
                 {{ signupError }}
@@ -67,7 +70,7 @@ const loading = ref<boolean>(false);
 const email = ref<string>('');
 const password = ref<string>('');
 const signupError = ref<string>('');
-const signupSuccess = ref<boolean>(false);
+const signupSuccess = ref<string>('');
 
 async function signUpWithEmail(event: Event) {
     event.preventDefault();
@@ -83,7 +86,7 @@ async function signUpWithEmail(event: Event) {
     if (error) {
         signupError.value = error.message;
     } else {
-        signupSuccess.value = true;
+        signupSuccess.value = 'Check your email for a confirmation link.';
     }
 
     loading.value = false;
