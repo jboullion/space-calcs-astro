@@ -1,4 +1,4 @@
-#loginForm {
+.login-form {
     max-width: 500px;
     margin: 0 auto;
 }
@@ -22,7 +22,7 @@
         border-color 0.2s ease-in-out 0s;
 } */
 
-#loginForm .oauth-button span.icon {
+.login-form .oauth-button span.icon {
     display: inline-block;
     border-radius: 1px;
     width: 18px;
@@ -30,6 +30,16 @@
     vertical-align: middle;
 }
 
-#loginForm #google-icon {
+.login-form #google-icon {
     background: url('/images/google-icon.svg') 0 50% no-repeat;
+}
+
+.login-form .password-wrapper {
+    position: relative;
+}
+
+.login-form .password-wrapper button {
+    position: absolute;
+    right: 0;
+    top: 0;
 }

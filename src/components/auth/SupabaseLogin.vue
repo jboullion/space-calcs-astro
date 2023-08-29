@@ -14,64 +14,21 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { supabase } from '../../lib/supabaseClient.js';
+import { ref, onMounted, onBeforeMount } from 'vue';
+import { getUser, refreshSession, signOut } from '../../lib/supabaseClient.js';
 import { getWithExpiry, setWithExpiry } from '../vue/utils.js';
+import { User } from '@supabase/supabase-js';
 
-const siteUser = ref<any>(null);
-const localSessionDuration = 1000 * 60 * 5;
+const siteUser = ref<User | null>(null);
 
-onMounted(async () => {
+onBeforeMount(async () => {
     const localSession = getWithExpiry('localSession');
 
     if (localSession) {
         siteUser.value = { ...localSession };
         refreshSession();
     } else {
-        await getUser();
+        siteUser.value = await getUser();
     }
 });
-
-async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    window.location.reload();
-}
-
-// async function getSession() {
-//     const { data, error } = await supabase.auth.getSession();
-// }
-
-async function refreshSession() {
-    const refresh = localStorage.getItem('lastRefresh');
-
-    // Only refresh session once every 5 minutes
-    if (refresh) {
-        const now = new Date().getTime();
-        const diff = now - parseInt(refresh);
-
-        if (diff > localSessionDuration) {
-            const { data, error } = await supabase.auth.refreshSession();
-            const { session, user } = data;
-
-            localStorage.setItem(
-                'lastRefresh',
-                new Date().getTime().toString(),
-            );
-        }
-    } else {
-        const { data, error } = await supabase.auth.refreshSession();
-        //const { session, user } = data;
-        localStorage.setItem('localSession', new Date().getTime().toString());
-    }
-}
-
-async function getUser() {
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
-
-    siteUser.value = user ?? null;
-
-    setWithExpiry('localSession', siteUser.value, localSessionDuration);
-}
 </script>

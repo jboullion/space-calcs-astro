@@ -1,6 +1,6 @@
 <template>
     <div class="py-5 px-3">
-        <div id="loginForm" class="calc-form mb-5 p-3 rounded border">
+        <div id="" class="login-form mb-5 p-3 rounded border">
             <h1 class="mb-3">Update Password</h1>
 
             <form
@@ -8,21 +8,10 @@
                 class="needs-validation"
                 @submit="updatePassword"
                 novalidate
+                ref="updateForm"
             >
                 <div class="mb-4">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="password"
-                        min="6"
-                        max="32"
-                        v-model="newPassword"
-                        required
-                    />
-                    <div class="invalid-feedback">
-                        Password must be 6 characters or more.
-                    </div>
+                    <PasswordInput v-model="newPassword" />
                 </div>
                 <button
                     type="submit"
@@ -32,11 +21,11 @@
                     Update Password
                 </button>
             </form>
+            <div v-else-if="forgotError" class="alert alert-danger mb-0 mt-3">
+                {{ forgotError }}
+            </div>
             <div v-else class="alert alert-success mb-0 mt-3">
                 {{ forgotSuccess }}
-            </div>
-            <div v-if="forgotError" class="alert alert-danger mb-0 mt-3">
-                {{ forgotError }}
             </div>
         </div>
     </div>
@@ -44,18 +33,29 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { supabase } from '../../../lib/supabaseClient.js';
+import { getWithExpiry } from '../utils';
+import PasswordInput from '../../auth/PasswordInput.vue';
 
 const loading = ref<boolean>(false);
 const newPassword = ref<string>('');
 const forgotError = ref<string>('');
 const forgotSuccess = ref<string>('');
+const updateForm = ref<HTMLFormElement>();
+
+onMounted(() => {
+    const localSession = getWithExpiry('localSession');
+    if (localSession) {
+        window.location.href = '/';
+    }
+});
 
 async function updatePassword(event: Event) {
-    event.preventDefault();
-
-    if (!newPassword.value) {
+    if (!updateForm.value?.checkValidity()) {
+        event.preventDefault();
         return;
     }
+
+    event.preventDefault();
 
     loading.value = true;
 
