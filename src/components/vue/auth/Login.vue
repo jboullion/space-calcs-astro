@@ -38,11 +38,30 @@
             <button
                 v-if="!loading && !siteUser"
                 id="googleButton"
-                class="btn btn-outline-light w-100 d-block oauth-button"
+                class="btn btn-outline-light w-100 d-block oauth-button mb-3"
                 @click="signInWithProvider('google')"
             >
                 <span id="google-icon" class="icon"></span>
                 Continue with Google
+            </button>
+            <button
+                v-if="!loading && !siteUser"
+                id="discordButton"
+                class="btn btn-outline-light w-100 d-block oauth-button mb-3"
+                @click="signInWithProvider('discord')"
+            >
+                <span id="discord-icon" class="icon"></span>
+                Continue with Discord
+            </button>
+
+            <button
+                v-if="!loading && !siteUser"
+                id="githubButton"
+                class="btn btn-outline-light w-100 d-block oauth-button mb-3"
+                @click="signInWithProvider('github')"
+            >
+                <span id="github-icon" class="icon"></span>
+                Continue with GitHub
             </button>
         </div>
         <div id="otherOptions" class="text-center">
