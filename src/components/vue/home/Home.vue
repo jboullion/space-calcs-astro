@@ -74,7 +74,6 @@ import Logo from '../shared/Logo.vue';
 
 import { onMounted, ref } from 'vue';
 import { categories } from './constants';
-import SupabaseTest from './SupabaseTest.vue';
 
 const search = ref('');
 

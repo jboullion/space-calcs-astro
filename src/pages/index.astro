@@ -2,55 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import Home from '../components/vue/home/Home.vue';
 import Sponsor from '../components/shared/Sponsor.astro';
-import SupabaseTest from '../components/vue/home/SupabaseTest.vue';
 ---
 
-<script src="https://accounts.google.com/gsi/client" async></script>
 <Layout
     title="Space Calcs"
     description="All the tools you need to calculate your mission to space!"
 >
-    <SupabaseTest client:load />
-
-    <div
-        id="g_id_onload"
-        data-client_id="563525421114-em4m5c4kl0q7tbtnpfnl4ecelskcd1qe.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="popup"
-        data-callback="handleSignInWithGoogle"
-        data-nonce=""
-        data-auto_prompt="false"
-    >
-    </div>
-
-    <div
-        class="g_id_signin"
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="outline"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left"
-    >
-    </div>
-
     <Home client:load />
 
     <Sponsor />
 </Layout>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script is:inline>
-    async function handleSignInWithGoogle(response) {
-        const { data, error } = await supabase.auth.signInWithIdToken({
-            provider: 'google',
-            token: response.credential,
-            nonce: hashedNonce, // must be the same one as provided in data-nonce (if any)
-        });
-
-        console.log(data, error);
-    }
-</script>
-
-<style></style>
