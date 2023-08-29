@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import SupaLogin from '../components/vue/auth/Login.vue';
+// @ts-ignore
+import Login from '../components/vue/auth/Login.vue';
 ---
 
 <Layout title="Login | Space Calcs" description="Login">
-    <SupaLogin client:load />
+    <Login client:load />
 </Layout>
