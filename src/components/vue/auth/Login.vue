@@ -125,6 +125,7 @@ async function signInWithProvider(provider: Provider) {
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
+            redirectTo: window.location.origin,
             queryParams: {
                 access_type: 'offline',
                 prompt: 'consent',
