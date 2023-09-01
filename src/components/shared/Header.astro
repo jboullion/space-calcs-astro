@@ -1,4 +1,5 @@
 ---
+import SupabaseLogin from '../auth/SupabaseLogin.vue';
 import DarkMode from '../vue/shared/DarkMode.vue';
 import Logo from './Logo.astro';
 
@@ -20,7 +21,12 @@ import Logo from './Logo.astro';
                     height="32px"
                 />
             </a>
-            <DarkMode client:load />
+
+            <div class="d-flex">
+                <DarkMode client:load />
+
+                <SupabaseLogin client:load />
+            </div>
         </div>
     </div>
 </header>

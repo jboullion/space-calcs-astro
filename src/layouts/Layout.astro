@@ -3,6 +3,7 @@ import '../styles/bootstrap.min.css';
 import '../styles/global.css';
 import '../styles/buttons.css';
 import '../styles/calculators.css';
+import '../styles/auth.css';
 import '../styles/fontawesome.min.css';
 import '../styles/brands.min.css';
 import '../styles/solid.min.css';
@@ -40,6 +41,32 @@ let theme = localTheme ? localTheme : 'light';
             integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
             crossorigin="anonymous"
         ></script>
+
+        <script is:inline>
+            (function () {
+                'use strict';
+
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.querySelectorAll('.needs-validation');
+
+                // Loop over them and prevent submission
+                Array.prototype.slice.call(forms).forEach(function (form) {
+                    form.addEventListener(
+                        'submit',
+                        function (event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+
+                            form.classList.add('was-validated');
+                        },
+                        false,
+                    );
+                });
+            })();
+        </script>
+
         <style is:global></style>
     </body>
 </html>
