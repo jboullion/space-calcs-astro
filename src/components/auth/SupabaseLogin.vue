@@ -4,7 +4,7 @@
             ><i class="fa-solid fa-right-to-bracket fa-fw"></i
         ></a>
         <div v-else>
-            <a href="/account" class="btn btn-dark fs-4" style="height: 50px"
+            <a href="/account" class="btn btn-dark fs-4"
                 ><i class="fa-solid fa-user fa-fw"></i
             ></a>
             <button class="btn btn-dark fs-4" @click="signOut">
