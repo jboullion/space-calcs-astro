@@ -1,10 +1,14 @@
 import { User, createClient } from '@supabase/supabase-js';
 import { setWithExpiry } from '../components/vue/utils';
 import { SUPA_PROJECT_URL, SUPA_ANON_PUBLIC } from '../utils/public-variables';
+import type { Database, FlyWheelRow } from '../services/database.types';
 
 const localSessionDuration = 1000 * 60 * 10;
 
-export const supabase = createClient(SUPA_PROJECT_URL, SUPA_ANON_PUBLIC);
+export const supabase = createClient<Database>(
+    SUPA_PROJECT_URL,
+    SUPA_ANON_PUBLIC,
+);
 
 export async function signOut() {
     const { error } = await supabase.auth.signOut();
@@ -55,4 +59,16 @@ export async function getUser(): Promise<User | null> {
     }
 
     return returnUser;
+}
+
+export async function getCalculatorSaves(
+    calculatorId: string,
+): Promise<FlyWheelRow[] | null> {
+    // Supabase with only return data that the authenticated user has access to
+    const { data, error } = await supabase
+        .from('calculators')
+        .select()
+        .eq('calculator_id', calculatorId);
+
+    return data;
 }

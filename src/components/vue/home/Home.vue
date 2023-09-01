@@ -74,6 +74,7 @@ import Logo from '../shared/Logo.vue';
 
 import { onMounted, ref } from 'vue';
 import { categories } from './constants';
+import { supabase } from '../../../lib/supabaseClient';
 // import {
 //     SUPA_PROJECT_URL,
 //     SUPA_ANON_PUBLIC,
