@@ -34,7 +34,7 @@
 import { ref, onMounted } from 'vue';
 import { supabase } from '../../../lib/supabaseClient.js';
 import { getWithExpiry } from '../utils';
-import PasswordInput from '../../auth/PasswordInput.vue';
+import PasswordInput from './PasswordInput.vue';
 
 const loading = ref<boolean>(false);
 const newPassword = ref<string>('');

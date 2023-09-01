@@ -14,10 +14,16 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeMount } from 'vue';
-import { getUser, refreshSession, signOut } from '../../lib/supabaseClient.js';
-import { getWithExpiry, setWithExpiry } from '../vue/utils.js';
-import { User } from '@supabase/supabase-js';
+import { ref, onBeforeMount } from 'vue';
+import {
+    getUser,
+    refreshSession,
+    signOut,
+} from '../../../lib/supabaseClient.js';
+import { getWithExpiry, setWithExpiry } from '../utils.js';
+import type { User } from '@supabase/supabase-js';
+
+import { storeUser } from '../store';
 
 const siteUser = ref<User | null>(null);
 
@@ -26,9 +32,14 @@ onBeforeMount(async () => {
 
     if (localSession) {
         siteUser.value = { ...localSession };
+
         refreshSession();
     } else {
         siteUser.value = await getUser();
+    }
+
+    if (siteUser.value) {
+        storeUser.set(siteUser.value);
     }
 });
 </script>

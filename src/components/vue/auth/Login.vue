@@ -74,10 +74,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeMount } from 'vue';
 import { supabase } from '../../../lib/supabaseClient.js';
-import { Provider } from '@supabase/supabase-js';
+import type { Provider } from '@supabase/supabase-js';
 import { getWithExpiry } from '../utils';
-import PasswordInput from '../../auth/PasswordInput.vue';
-import EmailInput from '../../auth/EmailInput.vue';
+import PasswordInput from './PasswordInput.vue';
+import EmailInput from './EmailInput.vue';
 
 const siteUser = ref<any>(null);
 
