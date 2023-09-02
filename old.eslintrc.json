@@ -17,6 +17,7 @@
 	},
 	"plugins": ["vue"],
 	"rules": {
+		"no-tabs": "off"
 		// "sort-imports": [
 		// 	"error",
 		// 	{
