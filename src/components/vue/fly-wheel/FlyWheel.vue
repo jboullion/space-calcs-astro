@@ -2,7 +2,7 @@
 	<div id="fly-wheel__app" class="row justify-content-center calculator">
 		<div id="fly-wheel__form" class="col-lg-4">
 			<FlyWheelForm :formData="formData" />
-			<SaveLoad :data="formData" @loadCalc="loadCalc" />
+			<!-- <SaveLoad :data="formData" @loadCalc="loadCalc" /> -->
 		</div>
 		<div id="fly-wheel__results" class="col-lg-8">
 			<!-- <FlyWheelResults :formData="formData" /> -->
