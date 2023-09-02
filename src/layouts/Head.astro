@@ -1,4 +1,6 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
+
 export interface Props {
     title: string;
     description: string;
@@ -19,6 +21,8 @@ const { title, description } = Astro.props;
     content="Calculators, Space, O'Neill Cylinder, Solar Power, Science Fiction, Hard Science Fiction, Space Settlement"
 />
 
+<ViewTransitions />
+
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,7 +38,7 @@ const { title, description } = Astro.props;
     onload="this.media='all'"
 />
 
-<!-- Store / Load darkmode -->
+<!-- Store / Load darkmode 
 <script is:inline>
     // Credit: https://www.kevinzunigacuellar.com/blog/dark-mode-in-astro/
     const theme = (() => {
@@ -57,7 +61,7 @@ const { title, description } = Astro.props;
     }
 
     window.localStorage.setItem('theme', theme);
-</script>
+</script> -->
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-5QDKHJTWSC"

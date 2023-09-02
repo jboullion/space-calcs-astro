@@ -1,51 +1,156 @@
 <template>
-  <div class="album py-5 flex-fill">
-    <div class="container">
-      <div
-        class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 justify-content-center"
-      >
-        <div class="col" v-for="calc in filteredCalcs">
-          <Calc :calc="calc" />
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="album py-5 flex-fill">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 mb-5">
+					<div id="calcFilters">
+						<div class="input-group mb-3">
+							<input
+								type="text"
+								class="form-control"
+								placeholder="Search for a tool"
+								aria-label="Search for a tool"
+								v-model="search"
+							/>
+							<span class="input-group-text"
+								><i class="fas fa-search"></i
+							></span>
+						</div>
+
+						<!-- <select
+							class="form-select"
+							placeholder="Select Category"
+							aria-label="Select Category"
+							v-model="selectedCategory"
+							@change="toggleCategory()"
+						>
+							<option value="" selected>All</option>
+							<option
+								v-for="category in categories"
+								:key="category.slug"
+								:value="category.slug"
+							>
+								{{ category.name }}
+							</option>
+						</select> -->
+
+						<div
+							class="form-check form-switch"
+							v-for="category in categories"
+							:key="category.slug"
+						>
+							<label
+								class="form-check-label"
+								:for="category.slug + 'Toggle'"
+								><i
+									class="fa-solid fa-fw me-1"
+									:class="[
+										category.icon,
+										'text-' + category.color,
+									]"
+								></i>
+								{{ category.name }}</label
+							>
+							<input
+								class="form-check-input"
+								type="checkbox"
+								role="switch"
+								:value="category"
+								:id="category.slug + 'Toggle'"
+								v-model="activeCategories"
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-9">
+					<a
+						:href="calc.link"
+						class="card mb-3"
+						v-for="calc in filteredCalcs"
+						:key="calc.id"
+					>
+						<h5 class="card-header d-flex justify-content-between">
+							{{ calc.name }}
+
+							<span class="fs-6"
+								><small
+									class="text-body-secondary ms-2"
+									v-for="cat in calc.categories"
+								>
+									<i
+										class="fa-solid fa-fw"
+										:class="[cat.icon, 'text-' + cat.color]"
+									></i> </small
+							></span>
+						</h5>
+						<div class="card-body bg-black">
+							<p class="card-text">
+								{{ calc.description }}
+							</p>
+						</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from 'vue';
 
-import Calc from "./Calc.vue";
-import { calculators } from "../../../utils/calculator-list";
+import { calculators } from '../../../utils/calculator-list';
+import { categories } from './constants';
+import type { Category } from './constants';
 
-const props = defineProps<{
-  search: string;
-  activeCategories: string[];
-}>();
+const search = ref<string>('');
+const activeCategories = ref<Category[]>([]);
 
 const filteredCalcs = computed(() => {
-  if (props.activeCategories.length === 0) {
-    return calculators.filter(
-      (calculator) =>
-        calculator.name.toLowerCase().includes(props.search.toLowerCase()) ||
-        calculator.description
-          .toLowerCase()
-          .includes(props.search.toLowerCase())
-    );
-  }
+	if (activeCategories.value.length === 0) {
+		return calculators.filter(
+			(calculator) =>
+				calculator.name
+					.toLowerCase()
+					.includes(search.value.toLowerCase()) ||
+				calculator.description
+					.toLowerCase()
+					.includes(search.value.toLowerCase()),
+		);
+	}
 
-  return calculators.filter((calculator) => {
-    const catList = calculator.categories.map((cat) => cat.slug);
+	return calculators.filter((calculator) => {
+		const catList = calculator.categories.map((cat) => cat.slug);
 
-    const intersection = props.activeCategories.filter((value) =>
-      catList.includes(value)
-    );
-    return (
-      intersection.length &&
-      (calculator.name.toLowerCase().includes(props.search.toLowerCase()) ||
-        calculator.description
-          .toLowerCase()
-          .includes(props.search.toLowerCase()))
-    );
-  });
+		const intersection = activeCategories.value.filter((value) =>
+			catList.includes(value.slug),
+		);
+
+		return (
+			intersection.length &&
+			(calculator.name
+				.toLowerCase()
+				.includes(search.value.toLowerCase()) ||
+				calculator.description
+					.toLowerCase()
+					.includes(search.value.toLowerCase()))
+		);
+	});
 });
 </script>
+
+<style scoped>
+.form-check.form-switch {
+	display: flex;
+	justify-content: space-between;
+	padding: 0;
+	margin-bottom: 5px;
+}
+
+.form-check.form-switch input {
+	cursor: pointer;
+}
+
+.form-check.form-switch label {
+	flex: 1;
+	cursor: pointer;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="py-5 px-3">
+    <div class="py-5 container">
         <h1 class="mb-3">Account</h1>
 
         <div class="alert alert-warning mb-4">
@@ -9,7 +9,7 @@
 
         <div class="row">
             <div class="col-sm-6">
-                <div class="login-form mb-5 p-3 rounded border">
+                <div class="mb-5 p-3 rounded border">
                     <table class="table table-borderless mb-0">
                         <tbody>
                             <tr>
@@ -62,8 +62,8 @@
 import { computed, onBeforeMount, onMounted, ref } from 'vue';
 import { getWithExpiry } from '../utils';
 import { getUser, supabase } from '../../../lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
-import PasswordInput from '../../auth/PasswordInput.vue';
+import type { User } from '@supabase/supabase-js';
+import PasswordInput from './PasswordInput.vue';
 
 const loading = ref<boolean>(false);
 const newPassword = ref<string>('');

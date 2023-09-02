@@ -49,7 +49,7 @@ const formData = ref<SpaceElevatorForm>({
     planetRotation: 24,
     carSpeed: 500, //km/h
     payloadMass: 1000, //kg
-    material: materials[4],
+    material: materials[8],
     safetyFactor: 1.3,
     counterweightMass: 10000,
 });

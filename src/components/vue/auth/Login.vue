@@ -38,11 +38,30 @@
             <button
                 v-if="!loading && !siteUser"
                 id="googleButton"
-                class="btn btn-outline-light w-100 d-block oauth-button"
+                class="btn btn-outline-light w-100 d-block oauth-button mb-3"
                 @click="signInWithProvider('google')"
             >
                 <span id="google-icon" class="icon"></span>
                 Continue with Google
+            </button>
+            <button
+                v-if="!loading && !siteUser"
+                id="discordButton"
+                class="btn btn-outline-light w-100 d-block oauth-button mb-3"
+                @click="signInWithProvider('discord')"
+            >
+                <span id="discord-icon" class="icon"></span>
+                Continue with Discord
+            </button>
+
+            <button
+                v-if="!loading && !siteUser"
+                id="githubButton"
+                class="btn btn-outline-light w-100 d-block oauth-button mb-3"
+                @click="signInWithProvider('github')"
+            >
+                <span id="github-icon" class="icon"></span>
+                Continue with GitHub
             </button>
         </div>
         <div id="otherOptions" class="text-center">
@@ -55,10 +74,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeMount } from 'vue';
 import { supabase } from '../../../lib/supabaseClient.js';
-import { Provider } from '@supabase/supabase-js';
+import type { Provider } from '@supabase/supabase-js';
 import { getWithExpiry } from '../utils';
-import PasswordInput from '../../auth/PasswordInput.vue';
-import EmailInput from '../../auth/EmailInput.vue';
+import PasswordInput from './PasswordInput.vue';
+import EmailInput from './EmailInput.vue';
 
 const siteUser = ref<any>(null);
 
@@ -106,6 +125,7 @@ async function signInWithProvider(provider: Provider) {
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
+            redirectTo: window.location.origin,
             queryParams: {
                 access_type: 'offline',
                 prompt: 'consent',

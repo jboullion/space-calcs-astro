@@ -129,7 +129,7 @@ const accelTimeUnit = ref(longTimeUnits[0]);
 const decelTimeUnit = ref(longTimeUnits[0]);
 const maxVelocityUnit = ref(longTimeUnits[2]);
 const totalTimeUnit = ref(longTimeUnits[2]);
-const energyRequiredUnit = ref(energyUnits[11]);
+const energyRequiredUnit = ref(energyUnits[8]);
 const accelDistanceUnit = ref(longDistanceUnits[2]);
 const decelDistanceUnit = ref(longDistanceUnits[2]);
 

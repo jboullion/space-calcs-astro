@@ -1,5 +1,6 @@
 ---
 import '../styles/bootstrap.min.css';
+import '../styles/colors.css';
 import '../styles/global.css';
 import '../styles/buttons.css';
 import '../styles/calculators.css';
@@ -19,12 +20,10 @@ export interface Props {
 
 const { title, description } = Astro.props;
 
-let localTheme = localStorage.getItem('theme');
-let theme = localTheme ? localTheme : 'light';
 ---
 
 <!DOCTYPE html>
-<html lang="en" class="h-100" data-bs-theme={theme}>
+<html lang="en" class="h-100" data-bs-theme="dark">
     <head>
         <Head title={title} description={description} />
     </head>
