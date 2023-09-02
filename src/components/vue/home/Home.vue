@@ -74,6 +74,12 @@ import Logo from '../shared/Logo.vue';
 
 import { onMounted, ref } from 'vue';
 import { categories } from './constants';
+import { supabase } from '../../../lib/supabaseClient';
+// import {
+//     SUPA_PROJECT_URL,
+//     SUPA_ANON_PUBLIC,
+// } from '../../../utils/public-variables';
+// import { supabase } from '../../../lib/supabaseClient';
 
 const search = ref('');
 
@@ -87,6 +93,13 @@ function toggleCategory() {
         activeCategories.value = [selectedCategory.value];
     }
 }
+
+onMounted(async () => {
+    // const { data, error } = await supabase.from('calculators').select();
+    // console.log(data, error);
+    // const { data, error } = await supabase.from('countries').select();
+    // console.log(data, error);
+});
 </script>
 
 <style>

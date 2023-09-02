@@ -42,8 +42,8 @@
 import { ref, onMounted } from 'vue';
 import { supabase } from '../../../lib/supabaseClient.js';
 import { getWithExpiry } from '../utils';
-import PasswordInput from '../../auth/PasswordInput.vue';
-import EmailInput from '../../auth/EmailInput.vue';
+import PasswordInput from './PasswordInput.vue';
+import EmailInput from './EmailInput.vue';
 
 const loading = ref<boolean>(false);
 const email = ref<string>('');
