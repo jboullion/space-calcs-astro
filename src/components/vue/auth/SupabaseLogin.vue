@@ -43,4 +43,3 @@ onBeforeMount(async () => {
 	}
 });
 </script>
-../../../utils/store.js

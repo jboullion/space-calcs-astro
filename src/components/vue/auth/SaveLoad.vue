@@ -138,4 +138,3 @@ async function loadCalc() {
 	emit('loadCalc', JSON.parse(JSON.stringify(loadCalc.data)));
 }
 </script>
-../../../utils/store
