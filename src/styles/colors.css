@@ -1,0 +1,40 @@
+:root {
+	--sc-red: #ff6666;
+	--sc-blue: #87cefa;
+	--sc-green: #9de24f;
+	--sc-yellow: #ffff66;
+	--sc-orange: #ffbd55;
+	--sc-purple: #d087fa;
+	--sc-pink: #ffc6ff;
+
+	--sc-primary: #1e4594;
+	--sc-light-primary: #1e4eaf;
+}
+
+.text-sc-red {
+	color: var(--sc-red);
+}
+
+.text-sc-blue {
+	color: var(--sc-blue);
+}
+
+.text-sc-green {
+	color: var(--sc-green);
+}
+
+.text-sc-yellow {
+	color: var(--sc-yellow);
+}
+
+.text-sc-orange {
+	color: var(--sc-orange);
+}
+
+.text-sc-purple {
+	color: var(--sc-purple);
+}
+
+.text-sc-pink {
+	color: var(--sc-pink);
+}

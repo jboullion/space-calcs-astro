@@ -12,51 +12,51 @@ export const HABITAT_CAT = 2;
 export const LIFE_CAT = 3;
 export const ORBIT_CAT = 4;
 export const ROCKET_CAT = 5;
-export const STATION_CAT = 6;
+// export const STATION_CAT = 6;
 
 export const categories: Category[] = [
 	// TODO: Perhaps split this into a different thing. IE Give each calculator a boolean of "advanced" instead of a category. Possibly hide by deafult until it is toggled on
 	{
 		name: 'Advanced',
 		slug: 'advancd',
-		color: 'danger-emphasis',
+		color: 'sc-purple',
 		icon: 'fa-graduation-cap',
 	},
 	{
 		name: 'Energy',
 		slug: 'energy',
-		color: 'warning-emphasis',
+		color: 'sc-yellow',
 		icon: 'fa-bolt-lightning',
 	},
 	{
 		name: 'Habitats',
 		slug: 'habitats',
-		color: 'secondary-emphasis',
+		color: 'white',
 		icon: 'fa-igloo',
 	},
 	{
 		name: 'Life',
 		slug: 'life',
-		color: 'success',
+		color: 'sc-green',
 		icon: 'fa-seedling',
 	},
 
 	{
 		name: 'Orbits',
 		slug: 'orbits',
-		color: 'primary',
+		color: 'sc-blue',
 		icon: 'fa-globe',
 	},
 	{
 		name: 'Rockets',
 		slug: 'rockets',
-		color: 'danger',
+		color: 'sc-red',
 		icon: 'fa-rocket',
 	},
-	{
-		name: 'Stations',
-		slug: 'stations',
-		color: 'white',
-		icon: 'fa-building',
-	},
+	// {
+	// 	name: 'Stations',
+	// 	slug: 'stations',
+	// 	color: 'white',
+	// 	icon: 'fa-building',
+	// },
 ];
