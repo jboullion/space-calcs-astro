@@ -1,4 +1,6 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
+
 export interface Props {
     title: string;
     description: string;
@@ -18,6 +20,8 @@ const { title, description } = Astro.props;
     name="keywords"
     content="Calculators, Space, O'Neill Cylinder, Solar Power, Science Fiction, Hard Science Fiction, Space Settlement"
 />
+
+<ViewTransitions />
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />

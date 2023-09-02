@@ -20,13 +20,10 @@ export interface Props {
 
 const { title, description } = Astro.props;
 
-// NOTE: Theme is currently NOT CHANGEABLE! Can be changed by enabeling the DarkModeToggle in the Header.astro file
-let localTheme = localStorage.getItem('theme');
-let theme = localTheme ? localTheme : 'dark';
 ---
 
 <!DOCTYPE html>
-<html lang="en" class="h-100" data-bs-theme={theme}>
+<html lang="en" class="h-100" data-bs-theme="dark">
     <head>
         <Head title={title} description={description} />
     </head>
