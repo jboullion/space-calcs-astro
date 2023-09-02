@@ -1,8 +1,9 @@
 {
-  "trailingComma": "all",
-  "tabWidth": 4,
-  "useTabs": true,
-  "semi": true,
-  "singleQuote": true,
-  "vueIndentScriptAndStyle": false
+	"trailingComma": "all",
+	"tabWidth": 4,
+	"useTabs": true,
+	"semi": true,
+	"singleQuote": true,
+	"vueIndentScriptAndStyle": false,
+	"endOfLine": "auto"
 }
