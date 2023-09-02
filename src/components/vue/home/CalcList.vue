@@ -67,6 +67,7 @@
 						:href="calc.link"
 						class="card mb-3"
 						v-for="calc in filteredCalcs"
+						:key="calc.id"
 					>
 						<h5 class="card-header d-flex justify-content-between">
 							{{ calc.name }}
@@ -96,9 +97,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import Calc from './Calc.vue';
 import { calculators } from '../../../utils/calculator-list';
-import { Category, categories } from './constants';
+import { categories } from './constants';
+import type { Category } from './constants';
 
 const search = ref<string>('');
 const activeCategories = ref<Category[]>([]);

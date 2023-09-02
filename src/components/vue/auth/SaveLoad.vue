@@ -52,7 +52,6 @@ import {
 } from '../../../lib/supabaseClient.js';
 import { useStore } from '@nanostores/vue';
 import { storeUser } from '../../../utils/store';
-import type { User } from '@supabase/supabase-js';
 import { ref, onMounted } from 'vue';
 
 const props = defineProps<{

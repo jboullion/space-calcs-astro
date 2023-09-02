@@ -1,4 +1,5 @@
-import { User, createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { getWithExpiry, setWithExpiry } from '../components/vue/utils';
 import { SUPA_PROJECT_URL, SUPA_ANON_PUBLIC } from '../utils/public-variables';
 import type { Database, FlyWheelRow } from '../services/database.types';
