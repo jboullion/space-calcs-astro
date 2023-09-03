@@ -1446,6 +1446,9 @@ const formData = ref({
 let resultsChartHTML: GoogleCharts.api.visualization.ColumnChart;
 let crewChartHTML: GoogleCharts.api.visualization.ColumnChart;
 
+// @ts-ignore
+let resizeTimeout: Timer = null;
+
 /**
  *
  *
@@ -2537,13 +2540,17 @@ function timeConvert(num: number) {
  */
 
 function drawCharts() {
-	if (currentResultTab.value == 'results') {
-		drawTotalsChart();
-	} else if (currentResultTab.value == 'crew') {
-		drawCrewCommitments();
-	} else {
-		drawTotalsChart();
-	}
+	if (resizeTimeout) clearTimeout(resizeTimeout);
+
+	resizeTimeout = setTimeout(() => {
+		if (currentResultTab.value == 'results') {
+			drawTotalsChart();
+		} else if (currentResultTab.value == 'crew') {
+			drawCrewCommitments();
+		} else {
+			drawTotalsChart();
+		}
+	}, 500);
 }
 function drawTotalsChart() {
 	if (!GoogleCharts.api.visualization) return;
