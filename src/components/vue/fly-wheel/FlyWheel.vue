@@ -2,9 +2,11 @@
 	<div id="fly-wheel__app" class="row justify-content-center calculator">
 		<div id="fly-wheel__form" class="col-lg-4">
 			<FlyWheelForm :formData="formData" />
+
 			<!-- <SaveLoad :data="formData" @loadCalc="loadCalc" /> -->
 		</div>
 		<div id="fly-wheel__results" class="col-lg-8">
+			<FlyWheelVisual :formData="formData" />
 			<!-- <FlyWheelResults :formData="formData" /> -->
 		</div>
 	</div>
@@ -20,7 +22,7 @@
 import { onMounted, reactive, ref } from 'vue';
 
 import FlyWheelForm from './FlyWheelForm.vue';
-import FlyWheelResults from './FlyWheelResults.vue';
+import FlyWheelVisual from './FlyWheelVisual.vue';
 
 import type { IFlyWheelForm } from './types';
 
@@ -38,19 +40,19 @@ const formData = ref<IFlyWheelForm>({
 	powerDraw: 1,
 });
 
-async function loadCalc(loadCalc: IFlyWheelForm) {
-	formData.value = { ...loadCalc };
+// async function loadCalc(loadCalc: IFlyWheelForm) {
+// 	formData.value = { ...loadCalc };
 
-	const flyWheelType = flyWheelGeometry.find(
-		(geometry) => geometry.value === loadCalc.geometry.value,
-	);
-	formData.value.geometry = flyWheelType ?? flyWheelGeometry[0];
+// 	const flyWheelType = flyWheelGeometry.find(
+// 		(geometry) => geometry.value === loadCalc.geometry.value,
+// 	);
+// 	formData.value.geometry = flyWheelType ?? flyWheelGeometry[0];
 
-	const flyWheelMaterial = materials.find(
-		(material) => material.value === loadCalc.material.value,
-	);
-	formData.value.material = flyWheelMaterial ?? materials[0];
-}
+// 	const flyWheelMaterial = materials.find(
+// 		(material) => material.value === loadCalc.material.value,
+// 	);
+// 	formData.value.material = flyWheelMaterial ?? materials[0];
+// }
 
 // watch(
 //     () => formData.energyUnit,
