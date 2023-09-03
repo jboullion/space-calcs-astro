@@ -374,12 +374,6 @@ function setupThreeJS() {
 		light.shadow.camera.top = 200;
 		light.shadow.camera.bottom = -200;
 
-		const helper = new THREE.DirectionalLightHelper(light, 5);
-		//Create a helper for the shadow camera (optional)
-		const shadowhelper = new THREE.CameraHelper(light.shadow.camera);
-		three.scene.add(shadowhelper);
-
-		three.scene.add(helper);
 		three.scene.add(light);
 	}
 
