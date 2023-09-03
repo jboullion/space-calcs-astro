@@ -5,6 +5,7 @@ import Hero from "../../components/calcs/Hero.astro";
 import HabitatRequirements from "../../components/vue/habitat-requirements/HabitatRequirements.vue";
 import References from "../../components/shared/References.astro";
 import type { Reference } from "../../types/types";
+import SponsorCalc from "../../components/calcs/SponsorCalc.astro";
 
 const title = "Habitat Requirements";
 const description =
@@ -24,7 +25,7 @@ const references: Reference[] = [
     <div style="min-height: 600px;" class="calculator">
       <HabitatRequirements client:load />
     </div>
-
+    <SponsorCalc />
     <References references={references} />
   </div>
 </Layout>

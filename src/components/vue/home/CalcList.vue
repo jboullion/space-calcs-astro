@@ -85,10 +85,11 @@
 											></i> </small
 									></span>
 								</h5>
-								<div class="card-body bg-black">
+								<div class="card-body bg-black d-flex justify-content-between">
 									<p class="card-text">
 										{{ calc.description }}
 									</p>
+									<img v-if="calc.sponsorImg" :src="calc.sponsorImg" :alt="calc.sponsor" :title="calc.sponsor" class="rounded-circle ms-3" width="50" height="50"/>
 								</div>
 							</a>
 						</div>
