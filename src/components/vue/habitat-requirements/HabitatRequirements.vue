@@ -1358,6 +1358,7 @@ import {
 	onBeforeUnmount,
 	onMounted,
 	ref,
+	watch,
 } from 'vue';
 import {
 	results,
@@ -2741,6 +2742,13 @@ function updateElectrical() {
 
 	calcResults();
 }
+
+// watch(formData, (newValue, oldValue) => {
+// 	nextTick(() => {
+// 		calcResults();
+// 		drawCharts();
+// 	});
+// });
 </script>
 
 <style></style>

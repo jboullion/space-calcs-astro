@@ -175,7 +175,7 @@ function updateCamera() {
 	if (!three.renderer) return;
 
 	// Camera
-	const cameraPositionDistance = three.scaleSize;
+	const cameraPositionDistance = props.formData.radius * 4;
 	const cameraZoomDistance = cameraPositionDistance * 3;
 	let rendererSize = new THREE.Vector2();
 	three.renderer.getSize(rendererSize);
@@ -201,18 +201,65 @@ function setupFlywheel() {
 	// if (three.carMesh) {
 	//     planet.group.remove(three.carMesh);
 	// }
+	const flywheelRadius = props.formData.radius;
 
 	const flywheelMaterial = new THREE.MeshPhongMaterial({
 		color: 0x555555,
 		side: THREE.FrontSide,
 	});
 
-	const flywheelRadius = three.scaleSize / 4;
+	var extrudeSettings = {
+		depth: flywheelRadius / 4,
+		steps: 1,
+		bevelEnabled: false,
+		curveSegments: 16,
+	};
 
-	const flywheelGeometry = new THREE.SphereGeometry(flywheelRadius, 24, 24);
+	let flywheelGeometry = null;
+
+	switch (props.formData.geometry.value) {
+		case 'sphere':
+			flywheelGeometry = new THREE.SphereGeometry(flywheelRadius, 16, 16);
+			break;
+		case 'tire':
+			// flywheelGeometry = new THREE.CylinderGeometry(
+			// 	flywheelRadius,
+			// 	flywheelRadius,
+			// 	flywheelRadius / 4,
+			// 	16,
+			// );
+
+			var arcShape = new THREE.Shape();
+			arcShape.absarc(0, 0, flywheelRadius, 0, Math.PI * 2, false);
+
+			//   if (formData.value.hollow) {
+			var holePath = new THREE.Path();
+			holePath.absarc(0, 0, flywheelRadius * 0.9, 0, Math.PI * 2, true);
+			arcShape.holes.push(holePath);
+			flywheelGeometry = new THREE.ExtrudeGeometry(
+				arcShape,
+				extrudeSettings,
+			);
+			break;
+		case 'disk':
+			flywheelGeometry = new THREE.CylinderGeometry(
+				flywheelRadius,
+				flywheelRadius,
+				flywheelRadius / 4,
+				16,
+			);
+		default:
+			flywheelGeometry = new THREE.CylinderGeometry(
+				flywheelRadius,
+				flywheelRadius,
+				flywheelRadius / 4,
+				16,
+			);
+			break;
+	}
 
 	const flywheelMesh = new THREE.Mesh(flywheelGeometry, flywheelMaterial);
-	// flywheelMesh.rotation.x = Math.PI / 2;
+	flywheelMesh.rotation.x = Math.PI / 2;
 	// flywheelMesh.position.z = computedBodyRadiusKM.value + sledRadius + sledRadius;
 
 	//three.scene.add(sledMesh);
@@ -272,7 +319,7 @@ function animate() {
 
 watch(props.formData, (newValue, oldValue) => {
 	nextTick(() => {
-		//setupScene();
+		setupScene();
 	});
 });
 </script>
