@@ -1,9 +1,9 @@
 <template>
-	<div class="album py-5 flex-fill">
+	<div class="album pb-5 flex-fill">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-3 mb-5">
-					<div id="calcFilters">
+				<div class="col-md-3 mb-5 relative">
+					<div id="calcFilters" class="pt-5">
 						<div class="input-group mb-3">
 							<input
 								type="text"
@@ -62,7 +62,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-9">
+				<div class="col-md-9 pt-5">
 					<a
 						:href="calc.link"
 						class="card mb-3"
@@ -138,6 +138,10 @@ const filteredCalcs = computed(() => {
 </script>
 
 <style scoped>
+#calcFilters {
+	position: sticky;
+	top: 0;
+}
 .form-check.form-switch {
 	display: flex;
 	justify-content: space-between;

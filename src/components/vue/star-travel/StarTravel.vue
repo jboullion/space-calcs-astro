@@ -1,16 +1,16 @@
 <template>
-    <div id="star-travel__app" class="row justify-content-center calculator">
-        <div id="star-travel__form" class="col-lg-4">
-            <StarTravelForm
-                :formData="formData"
-                @update-travel-distance="updateTravelDistance"
-                @update-engine="updateEngine"
-            />
-        </div>
-        <div id="star-travel__results" class="col-lg-8">
-            <StarTravelResults :formData="formData" />
-        </div>
-    </div>
+	<div id="star-travel__app" class="row justify-content-center calculator">
+		<div id="star-travel__form" class="col-lg-4">
+			<StarTravelForm
+				:formData="formData"
+				@update-travel-distance="updateTravelDistance"
+				@update-engine="updateEngine"
+			/>
+		</div>
+		<div id="star-travel__results" class="col-lg-8">
+			<StarTravelResults :formData="formData" />
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -27,119 +27,119 @@ import StarTravelResults from './StarTravelResults.vue';
 
 import type { IStarTravelForm } from './types';
 import {
-    accelerationUnits,
-    convertUnitValue,
-    massUnits,
-    lengthUnits,
-    highSpeedUnits,
+	accelerationUnits,
+	convertUnitValue,
+	massUnits,
+	lengthUnits,
+	highSpeedUnits,
 } from '../utils';
-import { NumberUnits } from '../forms/types';
+
 import { travelLocations, exampleEngines } from './constants';
 
 const formData = reactive<IStarTravelForm>({
-    exampleLocation: travelLocations[0],
-    distance: 4.22, // light years
-    acceleration: 9.81, // m/s²
-    accelerationUnit: accelerationUnits[0], // m/s²
-    maxVelocity: 50000, // c
-    maxVelocityUnit: highSpeedUnits[0], // c
-    deceleration: 9.81, // m/s²
-    decelerationUnit: accelerationUnits[0], // m/s²
-    shipMass: 1000, // ton
-    shipMassUnit: massUnits[2], // ton
-    exampleEngine: exampleEngines[0],
-    fuelEfficiency: exampleEngines[0].fuelEfficiency, // km x m x m
+	exampleLocation: travelLocations[0],
+	distance: 4.22, // light years
+	acceleration: 9.81, // m/s²
+	accelerationUnit: accelerationUnits[0], // m/s²
+	maxVelocity: 50000, // c
+	maxVelocityUnit: highSpeedUnits[0], // c
+	deceleration: 9.81, // m/s²
+	decelerationUnit: accelerationUnits[0], // m/s²
+	shipMass: 1000, // ton
+	shipMassUnit: massUnits[2], // ton
+	exampleEngine: exampleEngines[0],
+	fuelEfficiency: exampleEngines[0].fuelEfficiency, // km x m x m
 });
 
 onMounted(() => {});
 
 watch(
-    () => formData.accelerationUnit,
-    (newUnit, oldUnit) => {
-        formData.acceleration = convertUnitValue(
-            formData.acceleration,
-            newUnit,
-            oldUnit,
-        );
-    },
+	() => formData.accelerationUnit,
+	(newUnit, oldUnit) => {
+		formData.acceleration = convertUnitValue(
+			formData.acceleration,
+			newUnit,
+			oldUnit,
+		);
+	},
 );
 
 watch(
-    () => formData.maxVelocityUnit,
-    (newUnit, oldUnit) => {
-        formData.maxVelocity = convertUnitValue(
-            formData.maxVelocity,
-            newUnit,
-            oldUnit,
-        );
-    },
+	() => formData.maxVelocityUnit,
+	(newUnit, oldUnit) => {
+		formData.maxVelocity = convertUnitValue(
+			formData.maxVelocity,
+			newUnit,
+			oldUnit,
+		);
+	},
 );
 
 watch(
-    () => formData.decelerationUnit,
-    (newUnit, oldUnit) => {
-        formData.deceleration = convertUnitValue(
-            formData.deceleration,
-            newUnit,
-            oldUnit,
-        );
-    },
+	() => formData.decelerationUnit,
+	(newUnit, oldUnit) => {
+		formData.deceleration = convertUnitValue(
+			formData.deceleration,
+			newUnit,
+			oldUnit,
+		);
+	},
 );
 
 watch(
-    () => formData.shipMassUnit,
-    (newUnit, oldUnit) => {
-        formData.shipMass = convertUnitValue(
-            formData.shipMass,
-            newUnit,
-            oldUnit,
-        );
-    },
+	() => formData.shipMassUnit,
+	(newUnit, oldUnit) => {
+		formData.shipMass = convertUnitValue(
+			formData.shipMass,
+			newUnit,
+			oldUnit,
+		);
+	},
 );
 
 function updateTravelDistance() {
-    const location = travelLocations.find(
-        (loc) => loc.value === formData.exampleLocation.value,
-    );
+	const location = travelLocations.find(
+		(loc) => loc.value === formData.exampleLocation.value,
+	);
 
-    if (location) formData.distance = location.distance;
+	if (location) formData.distance = location.distance;
 }
 
 function updateEngine() {
-    const engine = exampleEngines.find(
-        (eng) => eng.value === formData.exampleEngine.value,
-    );
+	const engine = exampleEngines.find(
+		(eng) => eng.value === formData.exampleEngine.value,
+	);
 
-    if (engine) {
-        const convertedAccel = convertUnitValue(
-            engine.acceleration,
-            accelerationUnits[0],
-            formData.accelerationUnit,
-            5,
-        );
+	if (engine) {
+		const convertedAccel = convertUnitValue(
+			engine.acceleration,
+			accelerationUnits[0],
+			formData.accelerationUnit,
+			5,
+		);
 
-        formData.acceleration = convertedAccel;
+		formData.acceleration = convertedAccel;
 
-        const convertedMaxVelocity = convertUnitValue(
-            engine.maxVelocity,
-            formData.maxVelocityUnit,
-            highSpeedUnits[0],
-            5,
-        );
+		const convertedMaxVelocity = convertUnitValue(
+			engine.maxVelocity,
+			formData.maxVelocityUnit,
+			highSpeedUnits[0],
+			5,
+		);
 
-        formData.maxVelocity = convertedMaxVelocity;
+		formData.maxVelocity = convertedMaxVelocity;
 
-        const convertedDecel = convertUnitValue(
-            engine.deceleration,
-            accelerationUnits[0],
-            formData.decelerationUnit,
-            5,
-        );
+		const convertedDecel = convertUnitValue(
+			engine.deceleration,
+			accelerationUnits[0],
+			formData.decelerationUnit,
+			5,
+		);
 
-        formData.deceleration = convertedDecel;
+		formData.deceleration = convertedDecel;
 
-        formData.fuelEfficiency = engine.fuelEfficiency;
-    }
+		formData.fuelEfficiency = engine.fuelEfficiency;
+	}
 }
 </script>
 <style></style>
