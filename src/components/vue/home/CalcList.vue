@@ -2,7 +2,7 @@
 	<div class="album pb-5 flex-fill">
 		<div class="container">
 			<div class="row">
-				<div class="col-md-3 mb-5 relative">
+				<div class="col-md-3 relative">
 					<div id="calcFilters" class="pt-5">
 						<div class="input-group mb-3">
 							<input
