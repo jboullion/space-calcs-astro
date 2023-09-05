@@ -1,11 +1,11 @@
 <template>
-	<div class="album pt-0 pt-md-3 pb-5 flex-fill">
+	<div class="album pt-0 pb-5 flex-fill">
 		<div class="container">
 			<div class="row">
 				<div class="col-xxl-8 col-xl-9 col-lg-10 m-auto">
 					<div class="row">
-						<div class="col-lg-3 col-md-4 mb-5">
-							<div id="calcFilters">
+						<div class="col-lg-3 col-md-4 relative">
+							<div id="calcFilters" class="pt-0 pt-md-5">
 								<div class="input-group mb-3">
 									<input
 										type="text"
@@ -64,14 +64,16 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-lg-9 col-md-8">
+						<div class="col-lg-9 col-md-8 pt-5">
 							<a
 								:href="calc.link"
 								class="card mb-3"
 								v-for="calc in filteredCalcs"
 								:key="calc.id"
 							>
-								<h5 class="card-header d-flex justify-content-between">
+								<h5
+									class="card-header d-flex justify-content-between"
+								>
 									{{ calc.name }}
 
 									<span class="fs-6"
@@ -81,22 +83,34 @@
 										>
 											<i
 												class="fa-solid fa-fw"
-												:class="[cat.icon, 'text-' + cat.color]"
+												:class="[
+													cat.icon,
+													'text-' + cat.color,
+												]"
 											></i> </small
 									></span>
 								</h5>
-								<div class="card-body bg-black d-flex justify-content-between">
+								<div
+									class="card-body bg-black d-flex justify-content-between"
+								>
 									<p class="card-text">
 										{{ calc.description }}
 									</p>
-									<img v-if="calc.sponsorImg" :src="calc.sponsorImg" :alt="calc.sponsor" :title="calc.sponsor" class="rounded-circle ms-3" width="50" height="50"/>
+									<img
+										v-if="calc.sponsorImg"
+										:src="calc.sponsorImg"
+										:alt="calc.sponsor"
+										:title="calc.sponsor"
+										class="rounded-circle ms-3"
+										width="50"
+										height="50"
+									/>
 								</div>
 							</a>
 						</div>
 					</div>
 				</div>
 			</div>
-			
 		</div>
 	</div>
 </template>
@@ -144,6 +158,10 @@ const filteredCalcs = computed(() => {
 </script>
 
 <style scoped>
+#calcFilters {
+	position: sticky;
+	top: 0;
+}
 .form-check.form-switch {
 	display: flex;
 	justify-content: space-between;
