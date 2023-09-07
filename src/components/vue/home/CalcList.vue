@@ -1,11 +1,11 @@
 <template>
-	<div class="album pt-0 pb-5 flex-fill">
+	<div class="album pt-3 pb-5 flex-fill">
 		<div class="container">
 			<div class="row">
 				<div class="col-xxl-8 col-xl-9 col-lg-10 m-auto">
 					<div class="row">
 						<div class="col-lg-3 col-md-4 relative">
-							<div id="calcFilters" class="pt-0 pt-md-5">
+							<div id="calcFilters" class="mb-4">
 								<div class="input-group mb-3">
 									<input
 										type="text"
@@ -64,7 +64,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-lg-9 col-md-8 pt-5">
+						<div class="col-lg-9 col-md-8">
 							<a
 								:href="calc.link"
 								class="card mb-3"
@@ -160,7 +160,7 @@ const filteredCalcs = computed(() => {
 <style scoped>
 #calcFilters {
 	position: sticky;
-	top: 0;
+	top: 20px;
 }
 .form-check.form-switch {
 	display: flex;

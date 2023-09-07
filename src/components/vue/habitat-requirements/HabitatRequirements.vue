@@ -2541,17 +2541,17 @@ function timeConvert(num: number) {
  */
 
 function drawCharts() {
-	if (resizeTimeout) clearTimeout(resizeTimeout);
+	// if (resizeTimeout) clearTimeout(resizeTimeout);
 
-	resizeTimeout = setTimeout(() => {
-		if (currentResultTab.value == 'results') {
-			drawTotalsChart();
-		} else if (currentResultTab.value == 'crew') {
-			drawCrewCommitments();
-		} else {
-			drawTotalsChart();
-		}
-	}, 500);
+	// resizeTimeout = setTimeout(() => {
+	if (currentResultTab.value == 'results') {
+		drawTotalsChart();
+	} else if (currentResultTab.value == 'crew') {
+		drawCrewCommitments();
+	} else {
+		drawTotalsChart();
+	}
+	//}, 500);
 }
 function drawTotalsChart() {
 	if (!GoogleCharts.api.visualization) return;

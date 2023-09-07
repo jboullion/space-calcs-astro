@@ -553,21 +553,21 @@ function setupCharts() {
 // @ts-ignore
 let resizeTimeout: Timer = null;
 function drawCharts() {
-	if (resizeTimeout) clearTimeout(resizeTimeout);
+	// if (resizeTimeout) clearTimeout(resizeTimeout);
 
-	resizeTimeout = setTimeout(() => {
-		switch (showResult.value) {
-			case 'payload':
-				drawPayloadChart();
-				break;
-			case 'fuel':
-				drawFuelChart();
-				break;
-			case 'c3':
-				drawC3Chart();
-				break;
-		}
-	}, 500);
+	// resizeTimeout = setTimeout(() => {
+	switch (showResult.value) {
+		case 'payload':
+			drawPayloadChart();
+			break;
+		case 'fuel':
+			drawFuelChart();
+			break;
+		case 'c3':
+			drawC3Chart();
+			break;
+	}
+	// }, 500);
 }
 
 function drawPayloadChart() {
