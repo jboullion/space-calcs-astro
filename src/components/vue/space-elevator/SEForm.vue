@@ -85,7 +85,7 @@
 			label="Safety Factor"
 			v-model.number="formData.safetyFactor"
 			:step="0.1"
-			:min="1"
+			:min="0.1"
 			:max="10"
 			:description="`Cross Sectional Area: ${formatNumber(
 				crossSectionalArea,
@@ -160,6 +160,6 @@ const energyRequired = computed(() => {
 
 	// Total energy required is the sum of potential and kinetic energy changes
 	const requiredEnergy = potentialEnergyChange + kineticEnergyChange;
-	return requiredEnergy / energyUnits[8].value;
+	return requiredEnergy / energyUnits[6].value;
 });
 </script>

@@ -1,14 +1,14 @@
 <template>
 	<div id="fly-wheel__app" class="row justify-content-center calculator">
-		<div id="fly-wheel__form" class="col-lg-4">
+		<div id="fly-wheel__form" class="col-lg-6 m-auto">
 			<FlyWheelForm :formData="formData" />
 
 			<!-- <SaveLoad :data="formData" @loadCalc="loadCalc" /> -->
 		</div>
-		<div id="fly-wheel__results" class="col-lg-8">
-			<!-- <FlyWheelVisual :formData="formData" /> -->
-			<!-- <FlyWheelResults :formData="formData" /> -->
-		</div>
+		<!-- <div id="fly-wheel__results" class="col-lg-8"> -->
+		<!-- <FlyWheelVisual :formData="formData" /> -->
+		<!-- <FlyWheelResults :formData="formData" /> -->
+		<!-- </div> -->
 	</div>
 </template>
 
