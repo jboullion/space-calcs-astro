@@ -1465,6 +1465,11 @@ onMounted(() => {
 
 	// TODO: Debounce this? this.debounce(() => this.drawCharts(), 100)
 	window.addEventListener('resize', drawCharts, { passive: true });
+
+	if (document) {
+		const skeletonLoader = document.querySelector('#skeletonLoader');
+		if (skeletonLoader) skeletonLoader.remove();
+	}
 });
 
 onBeforeUnmount(() => {
