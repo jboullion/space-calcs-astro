@@ -6,7 +6,7 @@
 			<!-- <SaveLoad :data="formData" @loadCalc="loadCalc" /> -->
 		</div>
 		<div id="fly-wheel__results" class="col-lg-8">
-			<FlyWheelVisual :formData="formData" />
+			<!-- <FlyWheelVisual :formData="formData" /> -->
 			<!-- <FlyWheelResults :formData="formData" /> -->
 		</div>
 	</div>
