@@ -1260,4 +1260,41 @@ function getC3Options() {
 }
 </script>
 
-<style></style>
+<style>
+/* DELTA V CALCULATOR */
+#delta-v__map .main {
+	font-size: 30px;
+	text-anchor: middle;
+	fill: #000000;
+	stroke: none;
+	stroke-width: 30px;
+}
+
+#delta-v__map text,
+#delta-v__map use {
+	stroke: none;
+	stroke-width: 0px;
+}
+
+#delta-v__map .object {
+	font-weight: bold;
+	font-style: italic;
+}
+
+#delta-v__map #object {
+	stroke: black;
+}
+
+#delta-v__map #object:hover {
+	stroke: #ba3700;
+}
+
+#delta-v__map .deltav {
+	font-weight: bold;
+	font-style: normal;
+}
+
+#delta-v__map .pack {
+	letter-spacing: -0.1ex;
+}
+</style>
