@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { User } from '@supabase/supabase-js';
 import { getWithExpiry, setWithExpiry } from '../components/vue/utils';
 import { SUPA_PROJECT_URL, SUPA_ANON_PUBLIC } from '../utils/public-variables';
-import type { Database, FlyWheelRow } from '../services/database.types';
+import type { Database, CalculatorRow } from '../services/database.types';
+
 import { useStore } from '@nanostores/vue';
 import { storeUser } from '../utils/store';
 
@@ -83,7 +84,7 @@ async function localStoreCalcs(calculatorId: string) {
 
 export async function getCalculatorSaves(
 	calculatorId: string,
-): Promise<FlyWheelRow[] | null> {
+): Promise<CalculatorRow[] | null> {
 	const localData = getWithExpiry('calcSaves' + calculatorId);
 
 	if (localData) return localData;
@@ -93,8 +94,9 @@ export async function getCalculatorSaves(
 
 export async function updateSavedCalculators(
 	data: any,
-	calculatorId: string,
 	saveName: string,
+	calculatorId: string,
+	version: number = 1,
 ) {
 	if (!$user.value) return;
 
@@ -106,6 +108,7 @@ export async function updateSavedCalculators(
 		name: cleanName,
 		user_id: $user.value.id,
 		calculator_id: calculatorId,
+		version: version,
 	});
 
 	// Resave our calculators to local storage

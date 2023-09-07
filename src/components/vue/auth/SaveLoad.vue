@@ -53,6 +53,7 @@ import {
 import { useStore } from '@nanostores/vue';
 import { storeUser } from '../../../utils/store';
 import { ref, onMounted } from 'vue';
+import type { CalculatorRow } from '../../../services/database.types';
 
 const props = defineProps<{
 	data: any;
@@ -64,21 +65,11 @@ const emit = defineEmits(['loadCalc']);
 const $user = useStore(storeUser);
 const calculatorId = 'flywheel';
 
-// TODO Need to create a type for the calculators table
-type FlyWheelRow = {
-	calculator_id: string | null;
-	created_at: string;
-	data: any; // IFlyWheelForm JSON field
-	id: number;
-	name: string | null;
-	user_id: string | null;
-};
-
 const loading = ref<boolean>(false);
 const loadKey = ref<number>(0);
 const saveName = ref<string>('');
 const saveCalcOptions = ref<{ name: string; value: number }[]>([]);
-const savedCalculators = ref<FlyWheelRow[] | null>([]);
+const savedCalculators = ref<CalculatorRow[] | null>([]);
 const selectedSave = ref<{ name: string; value: number }>({
 	name: 'Select a save',
 	value: 0,
