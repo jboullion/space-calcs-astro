@@ -79,10 +79,7 @@ const stationWidth = computed(() => {
 	// );
 	// return maxDimenstion * 2;
 
-	return (
-		props.formData.structure.cylinderLength +
-		props.formData.structure.radius * 2
-	);
+	return props.formData.structure.cylinderLength;
 });
 
 const internalRadius = computed(() => {
@@ -258,6 +255,8 @@ function setupStation() {
 
 	// Build station
 	buildCylinderStation(stationMaterial);
+
+	three.group.position.z = -props.formData.structure.cylinderLength / 2;
 
 	// else if (formData.value.type.shape === "funnel") {
 	//   buildFunnelStation(stationMaterial);
