@@ -54,6 +54,8 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		advanced: true,
 		image: '',
 		link: '/calcs/habitat-requirements',
+		sponsor: 'Sam Ross',
+		sponsorImg: '/images/sponsors/sam-ross.png',
 	},
 	{
 		id: 'nutrition-requirements',

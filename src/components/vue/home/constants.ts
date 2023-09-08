@@ -19,7 +19,7 @@ export const categories: Category[] = [
 	{
 		name: 'Advanced',
 		slug: 'advancd',
-		color: 'sc-purple',
+		color: 'primary',
 		icon: 'fa-graduation-cap',
 	},
 	{
@@ -31,7 +31,7 @@ export const categories: Category[] = [
 	{
 		name: 'Habitats',
 		slug: 'habitats',
-		color: 'white',
+		color: 'secondary',
 		icon: 'fa-igloo',
 	},
 	{

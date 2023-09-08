@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <!-- <div class="d-flex justify-content-between mb-3 align-items-center">
+	<div>
+		<!-- <div class="d-flex justify-content-between mb-3 align-items-center">
             <button class="btn btn-lg px-5" :class="playColor" @click="play">
                 <i class="fas" :class="playClass"></i>
             </button>
@@ -10,14 +10,14 @@
             </h3>
         </div> -->
 
-        <div
-            id="fly-wheel-canvas"
-            class="canvas-wrapper border"
-            style="position: relative; height: 30%; width: 100%"
-        >
-            <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
-        </div>
-    </div>
+		<div
+			id="fly-wheel-canvas"
+			class="canvas-wrapper border"
+			style="position: relative; padding: 35% 0; width: 100%"
+		>
+			<i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+		</div>
+	</div>
 </template>
 <script setup lang="ts">
 // TODO:
@@ -25,14 +25,13 @@
 // OPTIONAL:
 
 import {
-    computed,
-    nextTick,
-    onBeforeUnmount,
-    onMounted,
-    ref,
-    watch,
+	computed,
+	nextTick,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	watch,
 } from 'vue';
-import type { IStarTravelForm, StarTravelResults } from './types';
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -44,52 +43,50 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import { GUI } from 'dat.gui';
 
 import {
-    hourUnits,
-    convertUnitValue,
-    formatNumber,
-    lengthUnits,
-    physicsConstants,
-    removeAllChildNodes,
+	hourUnits,
+	convertUnitValue,
+	formatNumber,
+	lengthUnits,
+	physicsConstants,
+	removeAllChildNodes,
 } from '../utils';
 import type { Units } from '../forms/types';
+import type { IFlyWheelForm } from './types';
 
 const props = defineProps<{
-    formData: IStarTravelForm;
-    results: StarTravelResults;
+	formData: IFlyWheelForm;
 }>();
 
 const loading = ref(true);
 
 interface Textures {
-    sun: THREE.Texture | null;
+	sun: THREE.Texture | null;
 }
 
 const textures: Textures = {
-    sun: null,
+	sun: null,
 };
 
 const three = {
-    canvas: null as HTMLElement | HTMLCanvasElement | null,
-    renderer: null as THREE.WebGLRenderer | null,
-    scene: new THREE.Scene(),
-    camera: new THREE.OrthographicCamera(),
-    renderWidth: 0,
-    starDistance: 0,
-    starRadius: 0,
-    lastWidth: 0,
-    //controls: null as OrbitControls | null,
-    //labelRenderer: null as CSS2DRenderer | null,
-    //minMovement: null as THREE.Vector3 | null,
-    //maxMovement: null as THREE.Vector3 | null,
+	canvas: null as HTMLElement | HTMLCanvasElement | null,
+	renderer: null as THREE.WebGLRenderer | null,
+	scene: new THREE.Scene(),
+	camera: new THREE.PerspectiveCamera(),
+	controls: null as OrbitControls | null,
+	lastWidth: 0,
+	scaleSize: 1000,
+	//labelRenderer: null as CSS2DRenderer | null,
+	minMovement: null as THREE.Vector3 | null,
+	maxMovement: null as THREE.Vector3 | null,
 };
 
 const animationDefaults = {
-    FPS: 50, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
-    prevTick: 0, // track the last tick timestamp
-    complete: false,
-    play: false,
-    currentFrame: 0,
-    totalFrames: 500,
+	FPS: 50, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
+	prevTick: 0, // track the last tick timestamp
+	complete: false,
+	play: false,
+	currentFrame: 0,
+	totalFrames: 500,
 };
 
 const animation = ref({ ...animationDefaults });
@@ -97,236 +94,179 @@ const animation = ref({ ...animationDefaults });
 const playTime = ref(0);
 
 const ship = {
-    mesh: new THREE.Mesh(),
-    geometry: new THREE.SphereGeometry(),
-    material: new THREE.Material(),
+	mesh: new THREE.Mesh(),
+	geometry: new THREE.SphereGeometry(),
+	material: new THREE.Material(),
 };
 
-// onMounted(() => {
-//     loadModels();
-//     window.addEventListener('resize', resize, { passive: true });
-// });
+onMounted(() => {
+	loading.value = false;
+	setupScene();
 
-// onBeforeUnmount(() => {
-//     window.removeEventListener('resize', resize);
-// });
+	window.addEventListener('resize', resize, { passive: true });
+});
 
-// function resize() {
-//     if (!three.canvas) return;
+onBeforeUnmount(() => {
+	window.removeEventListener('resize', resize);
+});
 
-//     const width = three.canvas.getBoundingClientRect().width;
+function resize() {
+	if (!three.canvas) return;
 
-//     if (width != three.lastWidth) {
-//         setupScene();
-//     }
-// }
+	const width = three.canvas.getBoundingClientRect().width;
 
-// async function loadModels() {
-//     const textureLoader = new THREE.TextureLoader();
+	if (width != three.lastWidth) {
+		setupScene();
+	}
+}
 
-//     textures.sun = await textureLoader.load('/textures/2k_sun.jpg');
+function setupScene() {
+	if (loading.value) return;
 
-//     loading.value = false;
-//     setupScene();
-// }
+	if (three.scene && three.canvas) {
+		removeAllChildNodes(three.canvas);
+	}
 
-// function setupScene() {
-//     if (loading.value) return;
+	animation.value = { ...animationDefaults };
+	playTime.value = 0;
 
-//     if (three.scene && three.canvas) {
-//         removeAllChildNodes(three.canvas);
-//     }
+	setupThreeJS();
 
-//     animation.value = { ...animationDefaults };
-//     playTime.value = 0;
+	setupFlywheel();
 
-//     setupThreeJS();
+	if (!animation.value.prevTick) {
+		animate();
+	}
+}
 
-//     setupStars();
+function setupThreeJS() {
+	three.scene = new THREE.Scene();
 
-//     setupTrack();
+	// Renderer
+	three.renderer = new THREE.WebGLRenderer({
+		antialias: true,
+		logarithmicDepthBuffer: true,
+	}); // { alpha: true }
+	three.canvas = document.getElementById('fly-wheel-canvas');
 
-//     //setupShip();
+	if (!three.canvas) return;
 
-//     if (!animation.value.prevTick) {
-//         animate();
-//     }
-// }
+	three.canvas.appendChild(three.renderer.domElement);
 
-// function setupThreeJS() {
-//     three.scene = new THREE.Scene();
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+	three.canvas.style.padding = `0`;
 
-//     // Renderer
-//     three.renderer = new THREE.WebGLRenderer({
-//         antialias: true,
-//         logarithmicDepthBuffer: true,
-//     }); // { alpha: true }
-//     three.canvas = document.getElementById('fly-wheel-canvas');
+	three.lastWidth = width;
 
-//     if (!three.canvas) return;
+	three.renderer.setSize(width, height);
 
-//     three.canvas.appendChild(three.renderer.domElement);
+	updateCamera();
 
-//     const width = three.canvas.getBoundingClientRect().width;
-//     const height = width * 0.3;
+	// Lights
+	three.scene.add(new THREE.AmbientLight(0x999999));
+	const light = new THREE.DirectionalLight(0xffffff, 0.5);
+	light.position.set(0, 1, 0);
+	light.rotation.x = Math.PI / 2;
+	three.scene.add(light);
+}
 
-//     three.lastWidth = width;
+function updateCamera() {
+	if (!three.renderer) return;
 
-//     three.renderer.setSize(width, height);
+	// Camera
+	const cameraPositionDistance = props.formData.radius * 4;
+	const cameraZoomDistance = cameraPositionDistance * 3;
+	let rendererSize = new THREE.Vector2();
+	three.renderer.getSize(rendererSize);
+	three.camera = new THREE.PerspectiveCamera(
+		45,
+		rendererSize.width / rendererSize.height,
+		0.1,
+		cameraZoomDistance * 2,
+	);
 
-//     updateCamera();
+	three.camera.position.z = cameraPositionDistance;
+	// this.three.controls.enableZoom = false;
 
-//     // Lights
-//     three.scene.add(new THREE.AmbientLight(0x999999));
-//     // const light = new THREE.DirectionalLight(0xffffff, 0.5);
-//     // light.position.set(0, 0, 1);
-//     // three.scene.add(light);
-// }
+	// Controls
+	three.controls = new OrbitControls(three.camera, three.renderer.domElement);
+	three.controls.maxDistance = cameraZoomDistance;
+	three.controls.minDistance = cameraPositionDistance;
+}
 
-// function updateCamera() {
-//     if (!three.renderer) return;
+function setupFlywheel() {
+	//three.sledGroup = new THREE.Group();
 
-//     // Camera
-//     const sceneWidth = 150;
-//     const cameraPositionDistance = sceneWidth;
-//     const cameraZoomDistance = sceneWidth * 4; //this.stationWidth * 10;
-//     let rendererSize = new THREE.Vector2();
-//     three.renderer.getSize(rendererSize);
-//     three.renderWidth = rendererSize.width;
-//     three.camera = new THREE.OrthographicCamera(
-//         rendererSize.width / -2,
-//         rendererSize.width / 2,
-//         rendererSize.height / 2,
-//         rendererSize.height / -2,
-//         1,
-//         1000,
-//     );
+	// if (three.carMesh) {
+	//     planet.group.remove(three.carMesh);
+	// }
+	const flywheelRadius = props.formData.radius;
 
-//     three.camera.position.z = cameraPositionDistance;
-//     // this.three.controls.enableZoom = false;
+	const flywheelMaterial = new THREE.MeshPhongMaterial({
+		color: 0x555555,
+		side: THREE.FrontSide,
+	});
 
-//     // // Controls
-//     // three.controls = new OrbitControls(three.camera, three.renderer.domElement);
-//     // three.controls.maxDistance = cameraZoomDistance;
-//     // three.controls.minDistance = sceneWidth * 2;
-// }
+	var extrudeSettings = {
+		depth: flywheelRadius / 4,
+		steps: 1,
+		bevelEnabled: false,
+		curveSegments: 16,
+	};
 
-// function setupStars() {
-//     if (!three.scene) return;
+	let flywheelGeometry = null;
 
-//     // TODO: Do we want different materials for different "Example" destinations?
-//     const material = new THREE.MeshLambertMaterial({
-//         map: textures.sun,
-//         side: THREE.FrontSide,
-//         color: 0xffff00,
-//         emissive: 0xffff00,
-//         emissiveIntensity: 0.5,
-//     });
+	switch (props.formData.geometry.value) {
+		case 'sphere':
+			flywheelGeometry = new THREE.SphereGeometry(flywheelRadius, 16, 16);
+			break;
+		case 'tire':
+			// flywheelGeometry = new THREE.CylinderGeometry(
+			// 	flywheelRadius,
+			// 	flywheelRadius,
+			// 	flywheelRadius / 4,
+			// 	16,
+			// );
 
-//     three.starDistance = three.renderWidth / 2;
+			var arcShape = new THREE.Shape();
+			arcShape.absarc(0, 0, flywheelRadius, 0, Math.PI * 2, false);
 
-//     // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
-//     three.starRadius = three.starDistance / 20;
+			//   if (formData.value.hollow) {
+			var holePath = new THREE.Path();
+			holePath.absarc(0, 0, flywheelRadius * 0.9, 0, Math.PI * 2, true);
+			arcShape.holes.push(holePath);
+			flywheelGeometry = new THREE.ExtrudeGeometry(
+				arcShape,
+				extrudeSettings,
+			);
+			break;
+		case 'disk':
+			flywheelGeometry = new THREE.CylinderGeometry(
+				flywheelRadius,
+				flywheelRadius,
+				flywheelRadius / 4,
+				16,
+			);
+		default:
+			flywheelGeometry = new THREE.CylinderGeometry(
+				flywheelRadius,
+				flywheelRadius,
+				flywheelRadius / 4,
+				16,
+			);
+			break;
+	}
 
-//     three.starDistance -= three.starRadius * 2;
+	const flywheelMesh = new THREE.Mesh(flywheelGeometry, flywheelMaterial);
+	flywheelMesh.rotation.x = Math.PI / 2;
+	// flywheelMesh.position.z = computedBodyRadiusKM.value + sledRadius + sledRadius;
 
-//     const geometry = new THREE.SphereGeometry(three.starRadius, 32, 32);
-//     const leftSun = new THREE.Mesh(geometry, material);
-//     const rightSun = new THREE.Mesh(geometry, material);
+	//three.scene.add(sledMesh);
 
-//     leftSun.rotation.set(Math.PI / 2, 0, 0);
-//     rightSun.rotation.set(Math.PI / 2, 0, 0);
-
-//     leftSun.position.set(-three.starDistance, 0, 0);
-//     rightSun.position.set(three.starDistance, 0, 0);
-
-//     three.scene.add(leftSun);
-//     three.scene.add(rightSun);
-// }
-
-// function setupTrack() {
-//     // TODO: Do we want different materials for different "Example" destinations?
-//     const accelMaterial = new THREE.MeshLambertMaterial({
-//         side: THREE.FrontSide,
-//         color: 0x00ff00,
-//     });
-//     const maxMaterial = new THREE.MeshLambertMaterial({
-//         side: THREE.FrontSide,
-//         color: 0x0000ff,
-//     });
-//     const decelMaterial = new THREE.MeshLambertMaterial({
-//         side: THREE.FrontSide,
-//         color: 0xff0000,
-//     });
-
-//     const trackRadius = 5;
-//     const trackWidth = three.starDistance * 2;
-
-//     let accelPercent =
-//         props.results.accelDistance / props.results.totalDistance;
-//     let decelPercent =
-//         props.results.decelDistance / props.results.totalDistance;
-
-//     // TODO: What to do if the acceleration takes longer than 50% / trip time?
-//     // TODO: Do we give an error if the acceleration takes longer than 50% / trip time? Or perhaps we instead transition immediately to deceleration time and skip max velocity / set it to 0?
-//     // if (accelPercent > 0.5) {
-//     //     accelPercent = 0.5;
-//     // }
-//     // if (decelPercent > 0.5) {
-//     //     decelPercent = 0.5;
-//     // }
-
-//     // This is the radius of the sun in the simulation. NOT ACCURATE. Just a visual representation.
-//     const accelLength = trackWidth * accelPercent;
-//     const decelLength = trackWidth * decelPercent;
-//     const maxVelocityLength =
-//         trackWidth - accelLength - decelLength - three.starRadius * 2;
-
-//     const accelGeometry = new THREE.CylinderGeometry(
-//         trackRadius,
-//         trackRadius,
-//         accelLength,
-//         12,
-//         1,
-//     );
-//     const maxGeometry = new THREE.CylinderGeometry(
-//         trackRadius,
-//         trackRadius,
-//         maxVelocityLength,
-//         12,
-//         1,
-//     );
-//     const decelGeometry = new THREE.CylinderGeometry(
-//         trackRadius,
-//         trackRadius,
-//         decelLength,
-//         12,
-//         1,
-//     );
-
-//     const accelTrack = new THREE.Mesh(accelGeometry, accelMaterial);
-//     const maxTrack = new THREE.Mesh(maxGeometry, maxMaterial);
-//     const decelTrack = new THREE.Mesh(decelGeometry, decelMaterial);
-
-//     accelTrack.rotation.set(0, 0, Math.PI / 2);
-//     maxTrack.rotation.set(0, 0, Math.PI / 2);
-//     decelTrack.rotation.set(0, 0, Math.PI / 2);
-
-//     accelTrack.position.set(
-//         -three.starDistance + three.starRadius + accelLength / 2,
-//         0,
-//         0,
-//     );
-//     decelTrack.position.set(
-//         three.starDistance - three.starRadius - decelLength / 2,
-//         0,
-//         0,
-//     );
-
-//     three.scene.add(accelTrack);
-//     three.scene.add(maxTrack);
-//     three.scene.add(decelTrack);
-// }
+	//three.sledGroup.add(flywheelMesh);
+	three.scene.add(flywheelMesh);
+}
 
 // /** Play Animation */
 // const playClass = computed(() => {
@@ -361,25 +301,25 @@ const ship = {
 /** End Animation */
 
 function animate() {
-    if (!three.renderer) return;
+	if (!three.renderer) return;
 
-    requestAnimationFrame(animate);
+	requestAnimationFrame(animate);
 
-    three.renderer.render(three.scene, three.camera);
+	three.renderer.render(three.scene, three.camera);
 
-    // clamp to fixed framerate
-    const now = Math.round(
-        (animation.value.FPS * window.performance.now()) / 1000,
-    );
+	// clamp to fixed framerate
+	const now = Math.round(
+		(animation.value.FPS * window.performance.now()) / 1000,
+	);
 
-    if (now == animation.value.prevTick) return;
+	if (now == animation.value.prevTick) return;
 
-    animation.value.prevTick = now;
+	animation.value.prevTick = now;
 }
 
 watch(props.formData, (newValue, oldValue) => {
-    nextTick(() => {
-        setupScene();
-    });
+	nextTick(() => {
+		setupScene();
+	});
 });
 </script>

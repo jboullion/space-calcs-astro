@@ -16,7 +16,7 @@
 							/>
 						</div>
 
-						<p class="lead my-4">
+						<p class="lead mt-4 mb-0">
 							All the tools you need to calculate your mission to
 							space
 						</p>

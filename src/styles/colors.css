@@ -4,15 +4,27 @@
 	--sc-green: #9de24f;
 	--sc-yellow: #ffff66;
 	--sc-orange: #ffbd55;
+	--sc-gold: #FFD700;
 	--sc-purple: #d087fa;
 	--sc-pink: #ffc6ff;
 
 	--sc-primary: #1e4594;
 	--sc-light-primary: #1e4eaf;
+
+	/* $blue:    #0d6efd;
+$indigo:  #6610f2;
+$purple:  #6f42c1;
+$pink:    #d63384;
+$red:     #dc3545;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #198754;
+$teal:    #20c997;
+$cyan:    #0dcaf0; */
 }
 
 .text-sc-red {
-	color: var(--sc-red);
+	color: var(--bs-red);
 }
 
 .text-sc-blue {
@@ -28,13 +40,17 @@
 }
 
 .text-sc-orange {
-	color: var(--sc-orange);
+	color: var(--bs-orange);
 }
 
 .text-sc-purple {
-	color: var(--sc-purple);
+	color: var(--bs-purple);
 }
 
 .text-sc-pink {
 	color: var(--sc-pink);
+}
+
+.text-sc-gold {
+	color: var(--sc-gold);
 }
