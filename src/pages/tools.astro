@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+// @ts-ignore
+import Tools from '../components/vue/tools/Tools.vue';
+import Hero from '../components/calcs/Hero.astro';
+
+const title = 'Tools';
+const description = 'Formula and conversion tools for space planning and design.';
+
+
+---
+
+<Layout title="Tools | Space Calcs" description={description} >
+    <Hero title={title} description={description} />
+
+    <Tools client:load />
+</Layout>

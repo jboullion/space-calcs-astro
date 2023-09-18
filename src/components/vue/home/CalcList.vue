@@ -65,48 +65,11 @@
 							</div>
 						</div>
 						<div class="col-lg-9 col-md-8">
-							<a
-								:href="calc.link"
-								class="card mb-3"
+							<Calc
 								v-for="calc in filteredCalcs"
 								:key="calc.id"
-							>
-								<h5
-									class="card-header d-flex justify-content-between"
-								>
-									{{ calc.name }}
-
-									<span class="fs-6"
-										><small
-											class="text-body-secondary ms-2"
-											v-for="cat in calc.categories"
-										>
-											<i
-												class="fa-solid fa-fw"
-												:class="[
-													cat.icon,
-													'text-' + cat.color,
-												]"
-											></i> </small
-									></span>
-								</h5>
-								<div
-									class="card-body bg-black d-flex justify-content-between"
-								>
-									<p class="card-text">
-										{{ calc.description }}
-									</p>
-									<img
-										v-if="calc.sponsorImg"
-										:src="calc.sponsorImg"
-										:alt="calc.sponsor"
-										:title="calc.sponsor"
-										class="rounded-circle ms-3"
-										width="50"
-										height="50"
-									/>
-								</div>
-							</a>
+								:calc="calc"
+							/>
 						</div>
 					</div>
 				</div>
@@ -120,6 +83,7 @@ import { computed, ref } from 'vue';
 import { calculators } from '../../../utils/calculator-list';
 import { categories } from './constants';
 import type { Category } from './constants';
+import Calc from './Calc.vue';
 
 const search = ref<string>('');
 const activeCategories = ref<Category[]>([]);
