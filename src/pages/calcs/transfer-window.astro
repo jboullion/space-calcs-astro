@@ -1,0 +1,40 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import TransferWindow from "../../components/vue/transfer-window/TransferWindow.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+const title = "Transfer Window Calculator";
+const description =
+  "Calculate the transfer window and delta v requirements for a rocket to travel between two planets.";
+
+const references: Reference[] = [
+  {
+    title: "Space Dynamics Group: EasyPorkchop",
+    url: "http://sdg.aero.upm.es/index.php/online-apps/porkchop-plot",
+  },
+  {
+    title: "Launch Window Planner for KSP",
+    url: "https://alexmoon.github.io/ksp/",
+  },
+  {
+    title: "Planetary Transfer Calculator",
+    url: "https://transfercalculator.com/calculator/",
+  }
+];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <div style="min-height: 600px;" class="calculator">
+      <TransferWindow client:load />
+    </div>
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>
