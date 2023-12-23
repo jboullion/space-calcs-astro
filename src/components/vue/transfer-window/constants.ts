@@ -1,6 +1,8 @@
 // https://transfercalculator.com/calculator/planetData.js
 // minerva@transfercalculator.com
 
+import type { PlanetOrbit } from './types';
+
 /* Format of planetary data
 	loPE: Longitude of Periapsis
     aoPE: Argument of Periapsis
@@ -34,31 +36,6 @@
 // export type SatelliteOrbit = {
 
 // }
-
-export type PlanetOrbit = {
-	name: string;
-	loPE?: number; // (Planets) Longitude of Periapsis
-	aoPE?: number; // (Satellites) Argument of Periapsis
-	loAN: number; // Longitude of Ascending Node
-	e: number; // Orbital Eccentricity
-	a: number; // Semi-major axis
-	i: number; // Orbital Inclination
-	M?: number; // Mean Anomaly at epoch
-	L?: number; // (Planets) Mean Longitude at epoch
-	r: number; // Radius of planet
-	gravParam: number; // gravitational parameter
-	colour: number; // Colour of planetary marker
-	trackColour: number; // Colour of orbital track
-	SOI?: number; // Sphere of Influence
-	center: string; // PLanetary body it is centered on
-	rotation: number; // rotation period in days
-	rotEpoch?: number; // Initial rotation at epoch
-	epoch?: Date; // Epoch of orbital elements
-	axialTilt?: number[]; // Unit vector the north pole points towards
-	satellite?: boolean; // If the planet is a satellite and not an actual planetary body (no surface mesh)
-	tidallyLocked?: boolean; // If the planet is tidally locked to its parent
-	satellites?: PlanetOrbit[]; // We may want to update this to SatelliteOrbit
-};
 
 export const planets: PlanetOrbit[] = [
 	{
