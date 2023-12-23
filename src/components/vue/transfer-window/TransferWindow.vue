@@ -26,7 +26,7 @@ import type { ITransferWindowForm } from './types';
 import { planets } from './constants';
 
 const formData = ref<ITransferWindowForm>({
-	origin: planets[3],
+	origin: planets[2],
 	destination: planets[4],
 	originOrbit: 600,
 	destinationOrbit: 600,
