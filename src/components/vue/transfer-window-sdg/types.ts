@@ -1,5 +1,3 @@
-export type Vector3Tuple = [number, number, number];
-
 // A legacy type to make working with old systems easier
 export type ScalarInput = {
 	value: number;
@@ -108,7 +106,6 @@ export type PlanetOrbit = {
 	satellite?: boolean; // If the planet is a satellite and not an actual planetary body (no surface mesh)
 	tidallyLocked?: boolean; // If the planet is tidally locked to its parent
 	satellites?: PlanetOrbit[]; // We may want to update this to SatelliteOrbit
-	orbitMesh?: THREE.Group; // The orbital track
 };
 
 export interface ITransferWindowForm {

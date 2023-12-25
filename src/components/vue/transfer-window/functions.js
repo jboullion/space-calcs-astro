@@ -1,3 +1,8 @@
+const production = false;
+
+export const gravitationalConstant = 6.67408 * Math.pow(10, -11);
+export const EPOCH = new Date(2000, 0, 1, 12, 0, 0, 0); // January 2000, 12h terrestrial
+
 export function round(value, points) {
 	// Round a value to a certain number of decimal points
 	//return Math.round(value * Math.pow(10, points)) / Math.pow(10, points);
@@ -251,11 +256,10 @@ export function findGravParam(center) {
 
 	if (center != 'sun') {
 		// If around a non-sun body, find the parameter
-		if (planets[center]['mass']) {
-			gravitationalParameter =
-				planets[center]['mass'] * gravitationalConstant;
+		if (center['mass']) {
+			gravitationalParameter = center['mass'] * gravitationalConstant;
 		} else {
-			gravitationalParameter = planets[center]['gravParam'];
+			gravitationalParameter = center['gravParam'];
 		}
 	}
 
@@ -1401,7 +1405,18 @@ export function invTan(value) {
 		);
 	}
 }
+
 // Essential Definitions
+
+export function validTransfer(transferData) {
+	return (
+		!isNaN(transferData.misc.p) &&
+		transferData.numTries > 0 &&
+		transferData.a > 0 &&
+		transferData.misc.p < transferData.misc.highP &&
+		transferData.misc.p > transferData.misc.lowP
+	);
+}
 
 export const baseUnits = {
 	// Empty units array for global use

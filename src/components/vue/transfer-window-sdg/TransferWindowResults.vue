@@ -2,18 +2,28 @@
 	<div>
 		<div class="p-2 rounded border mb-5">
 			<p>Calculating...</p>
+			<button class="btn btn-danger" @click="calculateIPTransfer">
+				Calculate
+			</button>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
+/**
+ * TODO: Must Dos!
+ * Once the calculations are work try to hide them away in functions to clean up this file
+ *
+ *
+ */
 import { ref, computed } from 'vue';
 
 import type {
 	FormatDataType,
 	ITransferWindowForm,
+	Maneuver,
 	PlanetOrbit,
 	ScalarInput,
-	TransitWindow,
+	TransferData,
 	VectorInput,
 } from './types';
 import {
@@ -24,7 +34,6 @@ import {
 	multiply,
 	add,
 	subtract,
-	baseUnits,
 	outputScalar,
 	parseVectorInput,
 	vectorMagnitude,
@@ -33,9 +42,13 @@ import {
 	pow,
 	sin,
 	tan,
+	validTransfer,
+	convertDistance,
+	findPeriod,
+	convertTime,
+	EPOCH,
 } from './functions';
-import { planets } from './constants';
-import { destinations } from '../delta-v/constants';
+import { realMessages } from './constants';
 
 const props = defineProps<{
 	formData: ITransferWindowForm;
@@ -59,6 +72,19 @@ let totalCalculations = 0;
 let inSecondStage = false;
 let lowestDeltaVee: ScalarInput;
 let transTime: Date = new Date();
+let twoStage = false;
+let loggedTransfer = false;
+let loadingMessages = realMessages;
+let message =
+	loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+let timeRatio = 1;
+let lastTimeRatio = 1;
+let storedTransferData: TransferData | null = null;
+var orbitResolution = 2;
+let orbitalTimes: any = {};
+let orbitalPositions: any = {};
+
+let currentDegrees: any = {};
 
 // Primary Interplanetary Transfer Calculator
 
@@ -77,7 +103,7 @@ function calculateIPTransfer() {
 	//document.getElementById("deltaVeeDisplay").style.display = "none";
 
 	// Clear maneuvers list
-	let maneuvers = [];
+	let maneuvers: Maneuver[] = [];
 
 	// Import and format names correctly
 	const properName = props.formData.destination.name.replace('The ', '');
@@ -187,10 +213,7 @@ function calculateLambertTransfer(
 	const aTwo = parseScalarInput(destinationPlanet.a, 'AU');
 
 	// Find and convert gravitational parameter
-	const gravitationalParameter = parseScalarInput(
-		findGravParam(center),
-		'm^3/s^2',
-	);
+	const gravitationalParameter = parseScalarInput(center, 'm^3/s^2');
 
 	// Calculate periods
 	const periodOne = parseScalarInput(
@@ -261,9 +284,9 @@ function calculateLambertTransfer(
 	// Define the resolution - this means looking at resolution squared windows
 	var resolution = 200;
 	if ((timeRatio + lastTimeRatio) / 2 > 1.5 && !twoStage) {
-		// console.log(
-		// 	'Calculating Low Resolution Transfer - Slow Running Computer',
-		// );
+		console.log(
+			'Calculating Low Resolution Transfer - Slow Running Computer',
+		);
 		resolution = 100;
 	}
 	totalCalculations = 0;
@@ -307,7 +330,7 @@ function calculateLambertTransfer(
 	) as unknown as ScalarInput;
 
 	// // Keep track of the timing of the transfer in the console
-	// console.log('Calculating Transfer...');
+	console.log('Calculating Transfer...');
 
 	var calcData = {
 		startTime: startTime,
@@ -410,11 +433,11 @@ function calculateTransferWindow(
 		startTime + deptTime * convertTime('S', 'MS', 1),
 	);
 	var rOne = parseVectorInput(
-		findPlanetLocation(originPlanet.name, departingTime),
+		findPlanetLocation(originPlanet, departingTime),
 		'AU',
 	);
 	var departingVelocity = parseVectorInput(
-		findVelocity(originPlanet.name, departingTime),
+		findVelocity(originPlanet, departingTime),
 		'AU/y',
 	);
 
@@ -423,11 +446,11 @@ function calculateTransferWindow(
 		departingTime.getTime() + outputScalar(travelTimeScalar, 'ms'),
 	);
 	var rTwo = parseVectorInput(
-		findPlanetLocation(destinationPlanet.name, arrivingTime),
+		findPlanetLocation(destinationPlanet, arrivingTime),
 		'AU',
 	);
 	var arrivingVelocity = parseVectorInput(
-		findVelocity(destinationPlanet.name, arrivingTime),
+		findVelocity(destinationPlanet, arrivingTime),
 		'AU/y',
 	);
 
@@ -627,15 +650,15 @@ function calculateTransferWindow(
 	// 	deltaVee = add(deltaVee, DTO);
 	// } else {
 	DTOGrav = parseScalarInput(
-		calculateEscapeVelocity(originPlanet.name, distOne) +
-			calculateExtraVelocity(DTO.value, originPlanet.name, distOne),
+		calculateEscapeVelocity(originPlanet, distOne) +
+			calculateExtraVelocity(DTO.value, originPlanet, distOne),
 		'm/s',
 	);
 	deltaVee = add(
 		deltaVee,
 		parseScalarInput(
-			calculateEscapeVelocity(originPlanet.name, distOne) +
-				calculateExtraVelocity(DTO.value, originPlanet.name, distOne),
+			calculateEscapeVelocity(originPlanet, distOne) +
+				calculateExtraVelocity(DTO.value, originPlanet, distOne),
 			'm/s',
 		),
 	) as unknown as ScalarInput;
@@ -649,10 +672,10 @@ function calculateTransferWindow(
 			deltaVee = add(deltaVee, DCO) as unknown as ScalarInput;
 		} else {
 			DCOGrav = parseScalarInput(
-				calculateEscapeVelocity(destinationPlanet.name, distTwo) +
+				calculateEscapeVelocity(destinationPlanet, distTwo) +
 					calculateExtraVelocity(
 						DCO.value,
-						destinationPlanet.name,
+						destinationPlanet,
 						distTwo,
 					),
 				'm/s',
@@ -660,10 +683,10 @@ function calculateTransferWindow(
 			deltaVee = add(
 				deltaVee,
 				parseScalarInput(
-					calculateEscapeVelocity(destinationPlanet.name, distTwo) +
+					calculateEscapeVelocity(destinationPlanet, distTwo) +
 						calculateExtraVelocity(
 							DCO.value,
-							destinationPlanet.name,
+							destinationPlanet,
 							distTwo,
 						),
 					'm/s',
@@ -843,7 +866,7 @@ function secondTransferStage(
 	// Complete the second stage of the transfer calculations
 
 	// Log how many calculations used in stage one
-	//console.log('Stage 1 Complete: ' + totalCalculations + ' windows analysed');
+	console.log('Stage 1 Complete: ' + totalCalculations + ' windows analysed');
 	var stageOneCalcs = totalCalculations;
 
 	// Set a flag saying that it's in the second stage of the transfer calculations
@@ -967,7 +990,7 @@ function finishLambertCalculation() {
 	var v2 = lowestData['vel2'];
 
 	// Log the data just to be sure for debugging
-	// console.log(lowestData);
+	console.log({ lowestData });
 
 	// Initialise the final choices
 	var selectedR;
@@ -1001,4 +1024,532 @@ function finishLambertCalculation() {
 	returnData = lowestData;
 	transitData = lowestData;
 }
+
+function calculateEscapeVelocity(
+	centerBody: PlanetOrbit,
+	initalRadiusAbove: number,
+) {
+	// Calculate the escape velocity of a body
+
+	// Get initial data
+	var r = centerBody['r'] * convertDistance('AU', 'KM', 1);
+	var gravParam = findGravParam(centerBody);
+
+	// Calculate the total radius
+	var radiusTotal = (r + initalRadiusAbove) * convertDistance('KM', 'M', 1);
+
+	// Plug it into the escape velocity formula
+	var deltaVee =
+		Math.pow((2 * gravParam) / radiusTotal, 0.5) -
+		Math.pow(gravParam / radiusTotal, 0.5);
+
+	return deltaVee;
+}
+
+function calculateExtraVelocity(
+	velocity: number,
+	planet: PlanetOrbit,
+	radius: number,
+) {
+	// Calculate the excess velocity at the bottom of a hyperbolic trajectory given the velocity at insertion
+
+	// Get inital numbers
+	var SOIGravParam = findGravParam(planet);
+	var insertionVelocity = velocity;
+	const SOI = planet['SOI'] ?? 0;
+
+	// Find the size of the SOI and the velocity at the edge
+	var planetSOI = SOI * convertDistance('AU', 'M', 1);
+	var exitSOIA =
+		1 / (2 / planetSOI + Math.pow(insertionVelocity, 2) / SOIGravParam);
+
+	// Calculate height above the planet
+	var planetRadius = planet['r'] * convertDistance('AU', 'KM', 1);
+	var radiusTotal = (planetRadius + radius) * convertDistance('KM', 'M', 1);
+
+	// Calculate the speed at exiting the SOI
+	var deltaVeeExit = Math.pow(
+		SOIGravParam * (2 / radiusTotal + 1 / exitSOIA),
+		0.5,
+	);
+
+	// Return the speed without the escape velcity - this is the hyperbolic EXCESS velocity
+	return deltaVeeExit - Math.pow((2 * SOIGravParam) / radiusTotal, 0.5);
+}
+
+function findPlanetLocation(planet: PlanetOrbit, time: Date) {
+	// Deliver a planet location given the current time
+
+	// Get the data
+	var a = planet['a'];
+	var L = planet['rL'] ?? 1;
+	var center = planet['center'];
+
+	// Find the excesss time since the epoch, less than the period for ease of computiation
+	var period = findPeriod(a, center);
+	var tempEpoch = EPOCH.getTime();
+	// if (planet['epoch']) {
+	// 	// If a custom epoch, use that
+	// 	tempEpoch = planet['epoch'];
+	// }
+	var milliseconds = time.getTime() - tempEpoch; // Milliseconds between EPOCH and current time
+	var years = milliseconds * convertTime('MS', 'Y', 1); // Years since EPOCH
+
+	// Find the remainer of the time from epoch
+	var remainder = years % period;
+	while (remainder < 0) {
+		// Find the remainder from epoch
+		remainder += period;
+	}
+
+	// Start from the epoch position
+	var nextDegree = Math.round(L * orbitResolution) % (360 * orbitResolution);
+
+	// Find the point where it is different
+	var diffPoint = orbitalTimes[planet.value][0];
+
+	// Set the boundaries
+	var lowBound = 0;
+	var midBound = nextDegree;
+	var highBound = 360 * orbitResolution - 1;
+
+	// Find which of the two sections the value is in - and set bounds
+	if (remainder > diffPoint) {
+		highBound = midBound;
+	} else {
+		lowBound = midBound;
+	}
+
+	// Initialise the degree
+	var testDegree;
+
+	// While it hasn't finalised the limits
+	while (highBound - lowBound > 1) {
+		// Find the degree to test and the value at that degree
+		testDegree = Math.ceil((lowBound + highBound) / 2);
+		var testValue = orbitalTimes[planet.value][testDegree];
+
+		// Figure out how to move the boundaries
+		if (testValue > remainder) {
+			highBound = testDegree;
+		} else {
+			lowBound = testDegree;
+		}
+	}
+
+	// Set the degree afterwards to the highest bound
+	nextDegree = highBound;
+
+	// Find out the previous position
+	var previousDegree =
+		(nextDegree + 360 * orbitResolution - 1) % (360 * orbitResolution);
+	var previousArray = orbitalPositions[planet.value][previousDegree];
+
+	// Move it between positions to ensure smooth animation - this is rather than jerking it from position to position
+	var percentageAlong =
+		(remainder - orbitalTimes[planet.value][previousDegree]) /
+		(orbitalTimes[planet.value][nextDegree] -
+			orbitalTimes[planet.value][previousDegree]);
+	if (isNaN(percentageAlong)) {
+		// if an error is throw new Error("Something bad happened.")n, just pick halfway
+		percentageAlong = 0.5;
+	}
+
+	// Save the current position
+	if (planet.value != 'sun') {
+		currentDegrees[planet.value] =
+			(previousDegree + percentageAlong) / orbitResolution;
+	}
+
+	// Find the next position
+	var nextArray = orbitalPositions[planet.value][nextDegree];
+
+	// Find the difference and moderate by the percentage along, and generate the new position vector
+	var diffArray = subVec(nextArray, previousArray);
+	diffArray = multiplyVec(percentageAlong, diffArray);
+
+	// Resolve it into a new position vector
+	var array = addVec(previousArray, diffArray);
+
+	// Return current position vector
+	return array;
+}
+
+// function findPlanetDegree(planet: PlanetOrbit, position) {
+// 	// This entire thing is reverse-deriving it by the same method used to generate the initial coords
+
+// 	// Get initial data
+// 	var e = planet['e'];
+// 	var i = planet['i'];
+// 	var a = planet['a'];
+// 	var loPE = planet['loPE'];
+// 	var loAN = planet['loAN'];
+// 	var center = planet['center'];
+// 	var name = planet['value'];
+
+// 	if (
+// 		center != 'sun' &&
+// 		name != 'luna' &&
+// 		name != 'the moon' &&
+// 		name != 'ship'
+// 	) {
+// 		if (planets[center]['axialTilt']) {
+// 			if (!planet['loANeff'] || !planet['ieff']) {
+// 				calculateEffectiveParams(name);
+// 			}
+
+// 			loAN = planets[name]['loANeff'];
+// 			i = planets[name]['ieff'];
+// 		}
+// 	}
+
+// 	// Eccentric degree is how far away it is from the periapsis
+// 	//var eccentricDegree = (360 + degree + loPE) % 360;
+
+// 	// Convert it into needed formats
+// 	//var degreesFromAN = DtoR(-degree - loAN);
+
+// 	if (i == 0) {
+// 		i = 0.000001;
+// 	}
+
+// 	var o = DtoR(loAN);
+// 	i = DtoR(i);
+
+// 	var distance = magnitude(position);
+
+// 	// Recalculate position - see earlier in the program
+
+// 	// Find initial degrees from the ascending node, set up tests
+// 	var degreesFromAN = Math.asin(position[2] / (distance * Math.sin(i)));
+
+// 	var testXOne =
+// 		distance *
+// 		(Math.cos(o) * Math.cos(degreesFromAN) -
+// 			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i));
+// 	var testYOne =
+// 		distance *
+// 		(Math.sin(o) * Math.cos(degreesFromAN) +
+// 			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i));
+
+// 	var degreesFromANTwo = (Math.PI - degreesFromAN) % (2 * Math.PI);
+
+// 	var testXTwo =
+// 		distance *
+// 		(Math.cos(o) * Math.cos(degreesFromANTwo) -
+// 			Math.sin(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
+// 	var testYTwo =
+// 		distance *
+// 		(Math.sin(o) * Math.cos(degreesFromANTwo) +
+// 			Math.cos(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
+
+// 	// Create test positions
+// 	var primary = [position[0], position[1], position[2]];
+// 	var testOne = [testXOne, testYOne, position[2]];
+// 	var testTwo = [testXTwo, testYTwo, position[2]];
+
+// 	var distOne = magnitude(subVec(primary, testOne));
+// 	var distTwo = magnitude(subVec(primary, testTwo));
+
+// 	// Decide which section of the inverse sin to use based on which is closer
+// 	if (distOne < distTwo) {
+// 		degreesFromAN = RtoD(degreesFromAN);
+// 	} else {
+// 		degreesFromAN = RtoD(degreesFromANTwo);
+// 	}
+
+// 	// Find final degree
+// 	var degree = -degreesFromAN - loAN;
+
+// 	return ((360 - degree) % 360) - 1 / orbitResolution;
+// }
+
+// function findVelocity(name, time) {
+// 	// Return velocity at a given time of a planet
+
+// 	// Find position and then the degree to match with other knowledge
+// 	var position = findPlanetLocation(name, time);
+// 	var degree =
+// 		Math.round((360 + vectorToAngle(position)) * orbitResolution) %
+// 		(360 * orbitResolution);
+
+// 	var newDegree = Math.round(
+// 		findPlanetDegree(name, position) * orbitResolution,
+// 	);
+// 	if (!isNaN(newDegree)) {
+// 		degree = (360 * orbitResolution + newDegree) % (360 * orbitResolution);
+// 	}
+
+// 	// Find the infintesimal change in distance and time
+// 	var deltaTime =
+// 		orbitalTimes[name][(degree + 1) % (360 * orbitResolution)] -
+// 		orbitalTimes[name][degree];
+// 	//deltaTime = findPeriod(planets[name].a, planets[name].center)
+// 	var deltaDist = subVec(
+// 		orbitalPositions[name][(degree + 1) % (360 * orbitResolution)],
+// 		orbitalPositions[name][degree],
+// 	);
+
+// 	// Velocity = distance / time, except to find a vector velocity, use a vector distance
+// 	var velocityVec = multiplyVec(1 / deltaTime, deltaDist);
+
+// 	// Set the magnitude of the velocity according to the viz-viva equation
+// 	var velMag = Math.sqrt(
+// 		M3S2toAU3Y2(findGravParam(planets[name]['center'])) *
+// 			(2 / magnitude(position) - 1 / planets[name]['a']),
+// 	);
+// 	velocityVec = setMagnitude(velocityVec, velMag);
+
+// 	// Return the velocity in vector form
+// 	return velocityVec;
+// }
+
+// // Orbital Data Calculation Functions
+
+// function generateOrbitalCoords(name) {
+// 	// Iterate through and calculate all orbital positions for a planet and store them.
+
+// 	// Initialise the degree and co-ordinates
+// 	var degree = 360;
+// 	var coords = [];
+
+// 	while (degree > 0) {
+// 		// Iterate through every one of the 360 * orbitResolution points and add to array
+// 		degree -= 1 / orbitResolution;
+// 		var array = calculateOrbitalPositionVector(name, degree);
+// 		coords.push(array);
+// 	}
+
+// 	// Store for later use to prevent excessive calculation
+// 	orbitalPositions[name] = coords;
+// }
+
+// function generateOrbitalTimes(name) {
+// 	// Calculate where the planet should be at a given time
+
+// 	// Get the correct data
+// 	var a = planets[name]['a'];
+// 	var L = planets[name]['rL'];
+// 	var center = planets[name]['center'];
+// 	var gravitationalParameter = findGravParam(center);
+// 	gravitationalParameter = M3S2toAU3Y2(gravitationalParameter);
+
+// 	// The inital degree starts at its position at epoch - because the time is zero at 0 remainer time
+// 	var degree = Math.round(L * orbitResolution) % (360 * orbitResolution);
+
+// 	// Initialise storage variables
+// 	orbitalTimes[name] = {};
+// 	orbitalVelocities[name] = {};
+// 	orbitalTimes[name][degree] = 0;
+
+// 	// Initialise iterator variables
+// 	var timesum = 0;
+// 	var counter = 1;
+
+// 	// Iterate through each degree and find the time at each
+// 	while (counter < 360 * orbitResolution) {
+// 		// Move the degree forward
+// 		degree = (degree + 1) % (360 * orbitResolution);
+// 		var currentDegree = degree % (360 * orbitResolution);
+
+// 		// Find the positions, and the distance between
+// 		var arrayOne = orbitalPositions[name][currentDegree];
+// 		var arrayTwo =
+// 			orbitalPositions[name][
+// 				(currentDegree + 1) % (360 * orbitResolution)
+// 			];
+// 		var distance = magnitude(subVec(arrayOne, arrayTwo));
+
+// 		// Find the velocity at this point
+// 		var velocity = Math.pow(
+// 			gravitationalParameter * (2 / magnitude(arrayOne) - 1 / a),
+// 			0.5,
+// 		);
+
+// 		// Also store this velocity in the orbital velocities part
+// 		orbitalVelocities[name][degree] = {
+// 			velocity: velocity,
+// 			distance: distance,
+// 			time: distance / velocity,
+// 		};
+
+// 		// Additive time calculated by how long it takes to get between that small segment
+// 		timesum += distance / velocity;
+// 		orbitalTimes[name][degree] = timesum;
+
+// 		// Move the counter foward
+// 		counter += 1;
+// 	}
+
+// 	// Finish it off by making the last be the full period
+// 	degree =
+// 		(Math.round(L * orbitResolution) - 1 + 360 * orbitResolution) %
+// 		(360 * orbitResolution);
+// 	orbitalTimes[name][degree] = findPeriod(a, center);
+// }
+
+// function calculateOrbitalPositionVector(name, degree) {
+// 	// Given which degree a planet is at, return the position vector
+
+// 	// Get orbital data
+// 	var e = planets[name]['e'];
+// 	var i = planets[name]['i'];
+// 	var a = planets[name]['a'];
+// 	var loPE = planets[name]['loPE'];
+// 	var loAN = planets[name]['loAN'];
+// 	var center = planets[name]['center'];
+
+// 	// Eccentric degree is how far away it is from the periapsis
+// 	var eccentricDegree = (360 + degree + loPE) % 360;
+
+// 	// Find out the magnitude of the position vector
+// 	var distance =
+// 		(a * (1 - e * e)) / (1 + e * Math.cos(DtoR(eccentricDegree)));
+
+// 	// Convert it into needed formats
+// 	var degreesFromAN = DtoR(-degree - loAN);
+// 	var o = DtoR(loAN);
+// 	i = DtoR(i);
+
+// 	// Calculate the X, Y and Z components
+// 	var x =
+// 		distance *
+// 		(Math.cos(o) * Math.cos(degreesFromAN) -
+// 			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i));
+// 	var y =
+// 		distance *
+// 		(Math.sin(o) * Math.cos(degreesFromAN) +
+// 			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i));
+// 	var z = distance * (Math.sin(degreesFromAN) * Math.sin(i));
+
+// 	// Deal with axial tilts of moons (the moon/luna are excepted due to its odd orbit)
+// 	// The only parameters I could find were discounting axial tilt - I think due to how odd it is
+// 	if (
+// 		center != 'sun' &&
+// 		name != 'luna' &&
+// 		name != 'the moon' &&
+// 		name != 'ship'
+// 	) {
+// 		if (planets[center]['axialTilt']) {
+// 			// Calculates angular momentum vector, rotate by the rotation of the parent axial tilt from Z+
+// 			// Then recalculate moderated orbital parameters based on this angular momentum
+
+// 			var axisAN;
+// 			var iAxis;
+
+// 			if (!planets[name]['loANeff'] || !planets[name]['ieff']) {
+// 				calculateEffectiveParams(name);
+// 			}
+// 			axisAN = planets[name]['loANeff'];
+// 			iAxis = planets[name]['ieff'];
+
+// 			// Recalculate position - see earlier in the program
+// 			var degreesFromAxisAN = DtoR(-degree - axisAN);
+// 			var oAxis = DtoR(axisAN);
+// 			iAxis = DtoR(iAxis);
+// 			x =
+// 				distance *
+// 				(Math.cos(oAxis) * Math.cos(degreesFromAxisAN) -
+// 					Math.sin(oAxis) *
+// 						Math.sin(degreesFromAxisAN) *
+// 						Math.cos(iAxis));
+// 			y =
+// 				distance *
+// 				(Math.sin(oAxis) * Math.cos(degreesFromAxisAN) +
+// 					Math.cos(oAxis) *
+// 						Math.sin(degreesFromAxisAN) *
+// 						Math.cos(iAxis));
+// 			z = distance * (Math.sin(degreesFromAxisAN) * Math.sin(iAxis));
+// 		}
+// 	}
+
+// 	// Return position
+// 	return [x, y, z];
+// }
+
+// function calculateEffectiveParams(name) {
+// 	// Find the axial tilt
+// 	var axialTilt = planets[name]['orbitalAxis'];
+
+// 	var zAxis = [0, 0, 1];
+
+// 	// This is the nodes vector - points at AN
+// 	var n = crossProduct(zAxis, axialTilt);
+
+// 	if (axialTilt[0] == 0 && axialTilt[1] == 0) {
+// 		// If it points straight up, deflect marginally to avoid divide by zero errors
+// 		axialTilt = [0, 0.0000000000001, 1];
+// 	}
+
+// 	// Calculate the new axes
+// 	var iAxis = RtoD(Math.acos(axialTilt[2] / magnitude(axialTilt)));
+// 	var axisAN = (360 + RtoD(Math.acos(n[0] / magnitude(n)))) % 360;
+// 	if (n[1] < 0) {
+// 		// Flip to loAN if it is around the way, the inverse cos function can't explain everytihing
+// 		axisAN = 360 - axisAN;
+// 	}
+
+// 	if (isNaN(axisAN)) {
+// 		// If inclination is zero - this can be anything, but zero is easiest
+// 		axisAN = 0;
+// 	}
+
+// 	// Find the effective longitude of the ascending node and inclination
+// 	planets[name]['loANeff'] = axisAN;
+// 	planets[name]['ieff'] = iAxis;
+// }
+
+// function calculateAxialTilt(name) {
+// 	// Rotate the angular momentum vector by the difference between vertical and the center's axis to find the new angular momentum vector
+
+// 	// Get planetary data
+// 	var i = planets[name]['i'];
+// 	var loAN = planets[name]['loAN'];
+// 	var center = planets[name]['center'];
+
+// 	// Initialise the original angular momentum
+// 	var originalAngMom = [0, 0, 0];
+
+// 	// Calculate how far around the AN and inclination are for use in the later sections
+// 	var ANdegree = DtoR((360 + loAN) % 360);
+// 	i = DtoR(i);
+
+// 	// Turn the orbital parameters into an angular momentum vector (reversing paramsFromVec calcs)
+// 	var dist = Math.cos(Math.PI / 2 - i);
+// 	var height = Math.sin(Math.PI / 2 - i);
+
+// 	// Calculate needed sections. The angular momentum points 270 degrees (anticlockwise) from the AN
+// 	var orgX = Math.sin(ANdegree);
+// 	var orgY = -Math.cos(ANdegree);
+// 	var orgZ = height;
+
+// 	// Calculate angular momentum unit vector
+// 	originalAngMom[0] = orgX * dist;
+// 	originalAngMom[1] = orgY * dist;
+// 	originalAngMom[2] = orgZ;
+// 	originalAngMom = setMagnitude(originalAngMom, 1); // Note: Because I'm just looking at direction, the angular momentum is moderated to be 1 - a unit vector
+
+// 	// Initialise major axes
+// 	var zAxis = [0, 0, 1];
+// 	var axialTilt = planets[center]['axialTilt'];
+
+// 	// This finds where it is rotated and how much by
+// 	var rotationAxis = crossProduct(zAxis, axialTilt); // Find the axis to rotate about: Cross product of the axial tilt and "up"
+// 	var rotationDegree = Math.acos(dotProduct(zAxis, axialTilt)); // Find how many degrees to rotate by
+
+// 	// Transform it into a unit vector that's compatible with threejs
+// 	rotationAxis = setMagnitude(rotationAxis, 1);
+// 	rotationAxis = threeVector(rotationAxis);
+
+// 	// Find the new angular momentum
+// 	var newAngMom = threeVector(originalAngMom);
+
+// 	// Use ThreeJS to rotate the vector
+// 	newAngMom.applyAxisAngle(rotationAxis, rotationDegree);
+// 	// To reduce error, an inbuilt ThreeJS function used here instead of a matrix transform
+
+// 	// Return the new angular momentum vector
+// 	axialTilt = reverseThreeVector(newAngMom);
+// 	return axialTilt;
+// }
 </script>

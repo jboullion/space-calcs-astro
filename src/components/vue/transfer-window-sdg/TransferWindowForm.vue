@@ -110,7 +110,7 @@ import SimpleUnit from '../forms/v2/SimpleUnit.vue';
 import CheckboxInput from '../forms/CheckboxInput.vue';
 import DateInput from '../forms/v2/DateInput.vue';
 import type { ITransferWindowForm } from './types';
-import { planets } from './planets';
+import { planets } from './constants';
 
 const props = defineProps<{
 	formData: ITransferWindowForm;

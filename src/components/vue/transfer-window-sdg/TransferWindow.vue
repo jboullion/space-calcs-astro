@@ -7,8 +7,7 @@
 			<TransferWindowForm :formData="formData" />
 		</div>
 		<div id="transfer-window__results" class="col-lg-8">
-			<!-- <TransferWindowResults :formData="formData" /> -->
-			<TransferWindowVisuals :formData="formData" />
+			<TransferWindowResults :formData="formData" />
 		</div>
 	</div>
 </template>
@@ -22,9 +21,9 @@
 
 import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import TransferWindowForm from './TransferWindowForm.vue';
-import TransferWindowVisuals from './TransferWindowVisuals.vue';
+import TransferWindowResults from './TransferWindowResults.vue';
 import type { ITransferWindowForm } from './types';
-import { planets } from './planets';
+import { planets } from './constants';
 
 const formData = ref<ITransferWindowForm>({
 	origin: planets[2],
