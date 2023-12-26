@@ -4,6 +4,7 @@ import { DtoR } from './functions';
 export function calculateOrbitalPositionVector(
 	planet: PlanetOrbit,
 	degree: number,
+	scale: number = 1000,
 ) {
 	// Given which degree a planet is at, return the position vector
 
@@ -31,12 +32,14 @@ export function calculateOrbitalPositionVector(
 	var x =
 		distance *
 		(Math.cos(o) * Math.cos(degreesFromAN) -
-			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i));
+			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i)) *
+		scale;
 	var y =
 		distance *
 		(Math.sin(o) * Math.cos(degreesFromAN) +
-			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i));
-	var z = distance * (Math.sin(degreesFromAN) * Math.sin(i));
+			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i)) *
+		scale;
+	var z = distance * (Math.sin(degreesFromAN) * Math.sin(i)) * scale;
 
 	// // Deal with axial tilts of moons (the moon/luna are excepted due to its odd orbit)
 	// // The only parameters I could find were discounting axial tilt - I think due to how odd it is

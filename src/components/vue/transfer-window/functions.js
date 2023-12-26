@@ -163,20 +163,11 @@ export function RtoD(radians) {
 
 export function threeVector(array) {
 	// Make a normal vector into a ThreeJS Vector3
-	if (webVR) {
-		return new THREE.Vector3(array[1], array[2], array[0]);
-	} else {
-		return new THREE.Vector3(array[0], array[1], array[2]);
-	}
+	return new THREE.Vector3(array[0], array[1], array[2]);
 }
 
 export function reverseThreeVector(threeVector) {
-	// Turn it from a threevector into an array-type vector
-	if (webVR) {
-		return [threeVector.z, threeVector.x, threeVector.y];
-	} else {
-		return [threeVector.x, threeVector.y, threeVector.z];
-	}
+	return [threeVector.x, threeVector.y, threeVector.z];
 }
 
 export function threeColourToRGB(threeColour) {

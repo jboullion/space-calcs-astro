@@ -48,8 +48,10 @@ import {
 	subVec,
 	multiplyVec,
 	addVec,
+	convertDistance,
 } from './functions';
 import { calculateOrbitalPositionVector } from './functions-ts';
+import { getGeometryRoughness } from 'three/examples/jsm/nodes/Nodes.js';
 
 const loading = ref(true);
 const textureDir = '/textures/';
@@ -81,6 +83,9 @@ const orbitalPositions: OrbitalPosition = {};
 const currentDegrees: OrbitalDegree = {};
 
 const sphereGeo = new THREE.SphereGeometry(100, 16, 16);
+const markerScale = (1 / 10) * (3 / 4);
+const totalScale = Math.round(convertDistance('AU', 'M'));
+const geoScale = totalScale;
 
 /**
  *
@@ -97,7 +102,6 @@ onMounted(async () => {
 	planets.map((planet) => {
 		generateOrbitalCoords(planet);
 		generateOrbitalTimes(planet);
-		renderPlanet(planet);
 	});
 
 	// console.log('onMounted');
@@ -269,7 +273,7 @@ function setupSun() {
 
 	const sunRadius = 4.7;
 
-	const geometry = new THREE.SphereGeometry(sunRadius, 32, 32);
+	const geometry = new THREE.SphereGeometry(sunRadius, 16, 16);
 	const mesh = new THREE.Mesh(geometry, material);
 	mesh.rotation.set(Math.PI / 2, 0, 0);
 
@@ -297,53 +301,8 @@ function drawOrbits() {
 
 	// Iterate through all planets
 	planets.map((planet) => {
-		createOrbit(planet);
-		// // The sun is special, so don't do it
+		drawOrbit(planet);
 
-		// // Create the orbit
-		// var fullOrbit = new THREE.Group();
-
-		// // If orbit opacity is on, and not in low res
-		// if (!lowRes && orbitOpacity) {
-		// 	// Split the orbit into 360 * orbitOpacityRes segments for individual opacity control
-		// 	var opacity = baseOrbitOpacity;
-		// 	for (var i = 0; i < 360 * orbitOpacityRes; i++) {
-		// 		var degree = i / orbitOpacityRes;
-		// 		var nextDegree = (i + 1) / orbitOpacityRes;
-		// 		var planetOrbit = createOrbit(planet, degree, nextDegree);
-		// 		var orbitMaterial = new THREE.LineBasicMaterial({
-		// 			color: planet['trackColour'],
-		// 			transparent: true,
-		// 			opacity: opacity,
-		// 		});
-		// 		var orbitPath = new THREE.Line(planetOrbit, orbitMaterial);
-		// 		three.scene.add(orbitPath);
-		// 		orbitPath.scale.set(totalScale, totalScale, totalScale);
-		// 		fullOrbit.add(orbitPath);
-		// 	}
-		// } else {
-		// 	// Make one solid orbit for ease of computation
-		// 	opacity = 1;
-
-		// 	var planetOrbit = createOrbit(planet, 0, 360);
-		// 	var orbitMaterial = new THREE.LineBasicMaterial({
-		// 		color: planet['trackColour'],
-		// 		transparent: true,
-		// 		opacity: opacity,
-		// 	});
-		// 	var orbitPath = new THREE.Line(planetOrbit, orbitMaterial);
-		// 	three.scene.add(orbitPath);
-		// 	orbitPath.scale.set(totalScale, totalScale, totalScale);
-		// 	fullOrbit.add(orbitPath);
-		// }
-
-		// // Add the orbit as the orbit mesh
-		// three.scene.add(fullOrbit);
-		// planet['orbitMesh'] = fullOrbit;
-
-		// // Find the center and central coordinates
-		// // var center = planet['center'];
-		// // var centerCoords = currentPositions[center];
 		var centerCoords = [0, 0, 0];
 
 		// // Find where the planet should be
@@ -353,59 +312,157 @@ function drawOrbits() {
 			centerCoords,
 		) as Vector3Tuple;
 
-		// // Don't initially display the moon orbits - saves computation
-		// planet['orbitMesh'].visible = false;
+		// // multiple all current positions by AUtoDistance
+		// currentPositions[planet.value] = multiplyVec(
+		// 	AUtoDistance,
+		// 	currentPositions[planet.value],
+		// ) as Vector3Tuple;
+
+		const material = new THREE.MeshLambertMaterial({
+			map: planetTextures.sun,
+			side: THREE.FrontSide,
+			color: 0xffa500,
+			emissive: 0xffff00,
+			emissiveIntensity: 0.8,
+		});
+
+		const geometry = new THREE.SphereGeometry(20, 16, 16); // planet.r * 100000
+		const mesh = new THREE.Mesh(geometry, material);
+		console.log('currentPositions', currentPositions[planet.value]);
+		mesh.rotation.set(Math.PI / 2, 0, 0);
+		mesh.position.set(...currentPositions[planet.value]);
+
+		three.scene.add(mesh);
+
+		//renderPlanet(planet);
 	});
 }
 
-function createOrbit(planet: PlanetOrbit) {
-	// Define the EllipseCurve parameters
-	const aX = 0;
-	const aY = 0;
-	const xRadius = planet.a * AUtoDistance; // Semi-major axis
-	const yRadius = (planet.semiMinorAxis ?? planet.a) * AUtoDistance; // Semi-minor axis
-	const aStartAngle = 0;
-	const aEndAngle = 2 * Math.PI;
-	const aClockwise = false;
-	const aRotation = 0;
+function createOrbit(
+	planet: PlanetOrbit,
+	startDegree: number,
+	endDegree: number,
+): THREE.BufferGeometry {
+	// Create the ThreeJS geometry for the orbit track
 
-	// Eccentricity of the ellipse (example value)
-	const eccentricity = planet.e;
+	// Initialise variables
+	const geometry = new THREE.BufferGeometry();
+	let vertexes: THREE.Vector3[] = [];
+	var degree = endDegree * orbitResolution;
 
-	// Calculate the offset (focal distance)
-	const focalDistance = xRadius * eccentricity;
+	// Get the correct initial vertex
+	if (degree < 360 * orbitResolution) {
+		const vertex = new THREE.Vector3(
+			orbitalPositions[planet.value][degree][0],
+			orbitalPositions[planet.value][degree][1],
+			orbitalPositions[planet.value][degree][2],
+		);
+		vertexes.push(vertex);
+	} else {
+		const vertex = new THREE.Vector3(
+			orbitalPositions[planet.value][0][0],
+			orbitalPositions[planet.value][0][1],
+			orbitalPositions[planet.value][0][2],
+		);
+		vertexes.push(vertex);
+	}
 
-	// Create the EllipseCurve
-	const ellipseCurve = new THREE.EllipseCurve(
-		aX,
-		aY,
-		xRadius,
-		yRadius,
-		aStartAngle,
-		aEndAngle,
-		aClockwise,
-		aRotation,
-	);
+	// Iterate through all orbit points between given bounds and add it to the vertexes
+	while (degree > startDegree * orbitResolution) {
+		degree -= 1;
+		var orbitalPosition = orbitalPositions[planet.value][degree];
+		const orbitalPositionVertex = new THREE.Vector3(
+			orbitalPosition[0],
+			orbitalPosition[1],
+			orbitalPosition[2],
+		);
+		vertexes.push(orbitalPositionVertex);
+	}
 
-	// Convert the EllipseCurve to a Path and then to a BufferGeometry
-	//const path = new THREE.Path(ellipseCurve.getPoints(100)); // 100 points for smoothness
-	const geometry = new THREE.BufferGeometry().setFromPoints(
-		ellipseCurve.getPoints(100),
-	);
-
-	// Create the Line material
-	const material = new THREE.LineBasicMaterial({ color: planet.trackColour });
-
-	// Create the Line using the geometry and material
-	const orbit = new THREE.Line(geometry, material);
-
-	// Rotate the orbit to the correct inclination / plane
-	orbit.rotation.x = planet.i * (Math.PI / 180);
-	orbit.position.x = -focalDistance;
-
-	// Add the orbit line to the scene
-	three.scene.add(orbit);
+	return geometry.setFromPoints(vertexes);
 }
+
+function drawOrbit(planet: PlanetOrbit) {
+	// Create the orbit
+	const fullOrbit = new THREE.Group();
+
+	const geometry = createOrbit(planet, 0, 360);
+	const orbitMaterial = new THREE.LineBasicMaterial({
+		color: planet['trackColour'],
+	});
+
+	const orbitPath = new THREE.Line(geometry, orbitMaterial);
+
+	fullOrbit.add(orbitPath);
+
+	// Add the orbit as the orbit mesh
+	three.scene.add(fullOrbit);
+	planet['orbitMesh'] = fullOrbit;
+
+	// Find the center and central coordinates
+	const centerCoords = [0, 0, 0];
+
+	// Find where the planet should be
+	const planetLocation = findPlanetLocation(planet, currentTime.getTime());
+	currentPositions[planet.value] = addVec(
+		planetLocation,
+		centerCoords,
+	) as Vector3Tuple;
+}
+
+/**
+ *
+ * @param a Create an elipse curve for the orbit. For simple visualizatinos this is really nice!
+ * @param planet The planet to use from the planets.ts constants
+ */
+// function createOrbit(planet: PlanetOrbit) {
+// 	// Define the EllipseCurve parameters
+// 	const aX = 0;
+// 	const aY = 0;
+// 	const xRadius = planet.a * AUtoDistance; // Semi-major axis
+// 	const yRadius = (planet.semiMinorAxis ?? planet.a) * AUtoDistance; // Semi-minor axis
+// 	const aStartAngle = 0;
+// 	const aEndAngle = 2 * Math.PI;
+// 	const aClockwise = false;
+// 	const aRotation = 0;
+
+// 	// Eccentricity of the ellipse (example value)
+// 	const eccentricity = planet.e;
+
+// 	// Calculate the offset (focal distance)
+// 	const focalDistance = xRadius * eccentricity;
+
+// 	// Create the EllipseCurve
+// 	const ellipseCurve = new THREE.EllipseCurve(
+// 		aX,
+// 		aY,
+// 		xRadius,
+// 		yRadius,
+// 		aStartAngle,
+// 		aEndAngle,
+// 		aClockwise,
+// 		aRotation,
+// 	);
+
+// 	// Convert the EllipseCurve to a Path and then to a BufferGeometry
+// 	//const path = new THREE.Path(ellipseCurve.getPoints(100)); // 100 points for smoothness
+// 	const geometry = new THREE.BufferGeometry().setFromPoints(
+// 		ellipseCurve.getPoints(100),
+// 	);
+
+// 	// Create the Line material
+// 	const material = new THREE.LineBasicMaterial({ color: planet.trackColour });
+
+// 	// Create the Line using the geometry and material
+// 	const orbit = new THREE.Line(geometry, material);
+
+// 	// Rotate the orbit to the correct inclination / plane
+// 	orbit.rotation.x = planet.i * (Math.PI / 180);
+// 	orbit.position.x = -focalDistance;
+
+// 	// Add the orbit line to the scene
+// 	three.scene.add(orbit);
+// }
 
 function findPeriod(a: number, planet: PlanetOrbit) {
 	// Find the period of a planet given the center and semi-major axis
@@ -717,7 +774,11 @@ function generateOrbitalCoords(planet: PlanetOrbit) {
 	while (degree > 0) {
 		// Iterate through every one of the 360 * orbitResolution points and add to array
 		degree -= 1 / orbitResolution;
-		var array = calculateOrbitalPositionVector(planet, degree);
+		var array = calculateOrbitalPositionVector(
+			planet,
+			degree,
+			AUtoDistance,
+		);
 		coords.push(array);
 	}
 
@@ -764,60 +825,139 @@ function renderPlanet(planet: PlanetOrbit) {
 	// Set a dull default material
 	var settings = {
 		color: colour,
-		specular: 'black',
+		specular: 0x000000,
 		shininess: 0,
 	};
-	var material = new THREE.MeshPhongMaterial({
-		color: settings.color,
-		specular: 0x000000, // Update the specular property to be of type number
-		shininess: settings.shininess,
-	});
+	var material = new THREE.MeshPhongMaterial(settings);
 
-	// if (userOnPhone) {
-	// 	material = new THREE.MeshLambertMaterial(settings);
-	// } else {
+	var sphere = new THREE.Mesh(geometry, material);
+	var size = r * AUtoDistance; //(r * totalScale) / geoScale;
+	sphere.scale.set(size, size, size);
 
-	//	material = new THREE.MeshPhongMaterial(settings);
-	//}
+	//placeSphere(name, mesh);
+	//planet["surfaceMesh"] = sphere;
+	three.scene.add(sphere);
 
-	// Place the planetary mesh in the scene
-	var mesh = new THREE.Mesh(geometry, material);
+	// // Create the marker geometry
+	// geometry = sphereGeo;
 
-	placeSphere(name, mesh);
-	var size = (r * totalScale) / geoScale;
-	mesh.scale.set(size, size, size);
+	// // Create the marker material
+	// var markerMaterial = new THREE.MeshBasicMaterial({
+	// 	color: colour,
+	// 	opacity: 0.3,
+	// 	transparent: true,
+	// 	depthWrite: false,
+	// });
 
-	// // Add the atmosphere if we're not in low res
-	// if (!lowRes) {
-	// 	addAtmo(name);
+	// // Create the marker
+	// var marker = new THREE.Mesh(geometry, markerMaterial);
+
+	// // Set the marker data
+	// marker.position.set(0, 0, 0);
+	// marker.rotation.set(0, 0, 0);
+
+	// // Set the marker name
+	// marker.name = planet.name;
+
+	// // Actually add the marker to the scene
+	// planet['markerMesh'] = marker;
+	// if (planet['center'] != 'sun') {
+	// 	marker.visible = false;
 	// }
+	// three.scene.add(marker);
 
-	// Create the marker material
-	var markerMaterial = new THREE.MeshBasicMaterial({
-		color: colour,
-		opacity: 0.3,
-		transparent: true,
-		depthWrite: false,
-	});
+	// // Scale the marker, as it is not a geometry of the right size
+	// var size = (totalScale * markerSize) / geoScale;
+	// //size = totalScale * planets[name]["SOI"] / geoScale
+	// marker.scale.set(size, size, size);
 
-	// Create the marker
-	var marker = new THREE.Mesh(geometry, markerMaterial);
-
-	// Set the marker data
-	marker.position.set(0, 0, 0);
-	marker.rotation.set(0, 0, 0);
-
-	marker.name = planet.name;
-
-	// Scale the marker, as it is not a geometry of the right size
-	var size = (totalScale * markerSize) / geoScale;
-	//size = totalScale * planets[name]["SOI"] / geoScale
-	marker.scale.set(size, size, size);
-
-	// Actually add the marker to the scene
-	//planet['markerMesh'] = marker;
-	three.scene.add(marker);
+	// // Control marker opacity for the sun
+	// planet.markerMesh.material.opacity = 0.3;
 }
+
+// function renderPlanet(planet: PlanetOrbit) {
+// 	// Create the planetary surface and marker
+
+// 	// Collect initial data
+// 	var radius = planet['r'] * 100000;
+// 	var colour = planet['colour'];
+// 	var a = planet['a'];
+// 	var markerSize = a * markerScale;
+
+// 	// // Load spherical geometry for the planet - copied for efficienct
+// 	// var geometry = sphereGeo;
+
+// 	// // Set a dull default material
+// 	// var settings = {
+// 	// 	color: colour,
+// 	// 	specular: 'black',
+// 	// 	shininess: 0,
+// 	// };
+// 	// var material = new THREE.MeshPhongMaterial({
+// 	// 	color: settings.color,
+// 	// 	specular: 0x000000, // Update the specular property to be of type number
+// 	// 	shininess: settings.shininess,
+// 	// });
+
+// 	// // if (userOnPhone) {
+// 	// // 	material = new THREE.MeshLambertMaterial(settings);
+// 	// // } else {
+
+// 	// //	material = new THREE.MeshPhongMaterial(settings);
+// 	// //}
+
+// 	// // Place the planetary mesh in the scene
+// 	// var planetaryMesh = new THREE.Mesh(geometry, material);
+
+// 	// //placeSphere(name, mesh);
+
+// 	// var size = r; //(r * totalScale) / geoScale;
+// 	// planetaryMesh.scale.set(size, size, size);
+
+// 	// three.scene.add(planetaryMesh);
+
+// 	const material = new THREE.MeshLambertMaterial({
+// 		map: planetTextures.sun,
+// 		side: THREE.FrontSide,
+// 		color: 0xffa500,
+// 		emissive: 0xffff00,
+// 		emissiveIntensity: 0.8,
+// 	});
+
+// 	const geometry = new THREE.SphereGeometry(radius, 16, 16);
+// 	const mesh = new THREE.Mesh(geometry, material);
+// 	mesh.rotation.set(Math.PI / 2, 0, 0);
+
+// 	three.scene.add(mesh);
+
+// 	// Create the marker material
+// 	var markerMaterial = new THREE.MeshBasicMaterial({
+// 		color: colour,
+// 		opacity: 0.3,
+// 		transparent: true,
+// 		depthWrite: false,
+// 	});
+
+// 	// Create the marker
+// 	var marker = new THREE.Mesh(geometry, markerMaterial);
+
+// 	// Set the marker data
+// 	marker.position.set(0, 0, 0);
+// 	marker.rotation.set(0, 0, 0);
+
+// 	marker.name = planet.name;
+
+// 	// Scale the marker, as it is not a geometry of the right size
+// 	var size = (totalScale * markerSize) / geoScale;
+// 	//size = totalScale * planets[name]["SOI"] / geoScale
+// 	marker.scale.set(size, size, size);
+
+// 	console.log({ marker });
+
+// 	// Actually add the marker to the scene
+// 	//planet['markerMesh'] = marker;
+// 	three.scene.add(marker);
+// }
 
 /**
  * WATCHERS
