@@ -135,6 +135,7 @@ export type PlanetOrbit = {
 	tidallyLocked?: boolean; // If the planet is tidally locked to its parent
 	satellites?: PlanetOrbit[]; // We may want to update this to SatelliteOrbit
 	orbitMesh?: THREE.Group; // The orbital track
+	planetMesh?: THREE.Mesh; // The planet mesh
 };
 
 export interface ITransferWindowForm {

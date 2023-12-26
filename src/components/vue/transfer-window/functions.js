@@ -1,8 +1,5 @@
 const production = false;
 
-export const gravitationalConstant = 6.67408 * Math.pow(10, -11);
-export const EPOCH = new Date(2000, 0, 1, 12, 0, 0, 0); // January 2000, 12h terrestrial
-
 export function round(value, points) {
 	// Round a value to a certain number of decimal points
 	//return Math.round(value * Math.pow(10, points)) / Math.pow(10, points);
@@ -229,33 +226,6 @@ export function calculateSynodicPeriod(period1, period2) {
 
 	// Both objects MUST be in the same SOI (kinda obviously, why would you try this if they weren't?)
 	return 1 / Math.abs(1 / period1 - 1 / period2);
-}
-
-// Data Return Functions
-
-export function findGravParam(center) {
-	// Find gravitational parameter of a body
-
-	// Set default mass to sun
-	var mass = 1.98855 * Math.pow(10, 30);
-
-	// Reverse-derive from orbit of the Earth
-	mass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
-
-	// Calculate the gravitational parameter
-	var gravitationalParameter = mass * gravitationalConstant;
-
-	if (center != 'sun') {
-		// If around a non-sun body, find the parameter
-		if (center['mass']) {
-			gravitationalParameter = center['mass'] * gravitationalConstant;
-		} else {
-			gravitationalParameter = center['gravParam'];
-		}
-	}
-
-	// Return the gravitational parameter
-	return gravitationalParameter;
 }
 
 // Vector Manipulation Functions

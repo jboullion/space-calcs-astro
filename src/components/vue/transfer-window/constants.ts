@@ -12,6 +12,8 @@ import type { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.j
 // @ts-ignore
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
+import { AU3Y2toM3S2 } from './functions';
+
 export type Zone = {
 	name: string;
 	color: number;
@@ -101,3 +103,15 @@ export const bolometricCorrection = [
 		value: -2,
 	},
 ];
+
+export const gravitationalConstant = 6.67408 * Math.pow(10, -11);
+export const EPOCH = new Date(2000, 0, 1, 12, 0, 0, 0); // January 2000, 12h terrestrial
+
+// Set default mass to sun
+let SolMass = 1.98855 * Math.pow(10, 30);
+
+// Reverse-derive from orbit of the Earth
+SolMass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
+
+// Calculate the gravitational parameter
+export const gravitationalParameter = SolMass * gravitationalConstant;
