@@ -1,5 +1,31 @@
 export type Vector3Tuple = [number, number, number];
 
+export type OrbitalTime = {
+	[name: string]: {
+		[degree: number]: number;
+	};
+};
+
+export type OrbitalVelocity = {
+	[name: string]: {
+		[degree: number]: {
+			velocity: number;
+			distance: number;
+			time: number;
+		};
+	};
+};
+
+export type OrbitalPosition = {
+	[name: string]: {
+		[degree: number]: number[];
+	};
+};
+
+export type OrbitalDegree = {
+	[name: string]: number;
+};
+
 // A legacy type to make working with old systems easier
 export type ScalarInput = {
 	value: number;
@@ -85,7 +111,7 @@ export type TransitWindow = {
 export type PlanetOrbit = {
 	name: string;
 	value: string;
-	loPE?: number; // (Planets) Longitude of Periapsis
+	loPE: number; // (Planets) Longitude of Periapsis
 	aoPE?: number; // (Satellites) Argument of Periapsis
 	loAN: number; // Longitude of Ascending Node
 	e: number; // Orbital Eccentricity

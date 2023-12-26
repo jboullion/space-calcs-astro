@@ -3,7 +3,7 @@
 		<div
 			id="transfer-window-canvas"
 			class="canvas-wrapper border"
-			style="position: relative; height: 500px; width: 100%"
+			style="position: relative; height: 600px; width: 100%"
 		>
 			<i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
 		</div>
@@ -26,14 +26,30 @@ import {
 	CSS2DRenderer,
 } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
-import { physicsConstants, formatNumber, removeAllChildNodes } from '../utils';
+import { removeAllChildNodes } from '../utils';
 import { planet, planetTextures, three } from './constants';
 
-import type { Zone } from './constants';
-import type { ITransferWindowForm, Vector3Tuple } from './types';
+import type {
+	PlanetOrbit,
+	ITransferWindowForm,
+	OrbitalDegree,
+	OrbitalPosition,
+	OrbitalTime,
+	OrbitalVelocity,
+	Vector3Tuple,
+} from './types';
 
 import { planets } from './planets';
-import type { PlanetOrbit } from '../transfer-window-sdg/types';
+import {
+	M3S2toAU3Y2,
+	EPOCH,
+	convertTime,
+	magnitude,
+	subVec,
+	multiplyVec,
+	addVec,
+} from './functions';
+import { calculateOrbitalPositionVector } from './functions-ts';
 
 const loading = ref(true);
 const textureDir = '/textures/';
@@ -53,11 +69,18 @@ type PlanetPosition = {
 	[key: string]: Vector3Tuple;
 };
 
-var currentPositions: PlanetPosition = {
+const currentPositions: PlanetPosition = {
 	sun: [0, 0, 0],
 };
 
-var orbitResolution = 2;
+const orbitResolution = 2;
+let currentTime = new Date();
+const orbitalTimes: OrbitalTime = {};
+const orbitalVelocities: OrbitalVelocity = {};
+const orbitalPositions: OrbitalPosition = {};
+const currentDegrees: OrbitalDegree = {};
+
+const sphereGeo = new THREE.SphereGeometry(100, 16, 16);
 
 /**
  *
@@ -67,8 +90,21 @@ var orbitResolution = 2;
  *
  */
 
-onMounted(() => {
-	loadModels();
+onMounted(async () => {
+	await loadModels();
+
+	// Setup planet data for current time
+	planets.map((planet) => {
+		generateOrbitalCoords(planet);
+		generateOrbitalTimes(planet);
+		renderPlanet(planet);
+	});
+
+	// console.log('onMounted');
+	// console.log({ orbitalTimes });
+	// console.log({ orbitalPositions });
+
+	setupScene();
 
 	window.addEventListener('resize', setupScene, { passive: true });
 });
@@ -99,33 +135,31 @@ async function loadModels() {
 	// TODO: Do we want to load these dynamically instead of on load?
 	planetTextures.sun = await textureLoader.load(textureDir + '2k_sun.jpg');
 
-	planetTextures.mercury = await textureLoader.load(
-		textureDir + '2k_mercury.jpg',
-	);
-	planetTextures.venus = await textureLoader.load(
-		textureDir + '2k_venus_atmosphere.jpg',
-	);
-	planetTextures.earth = await textureLoader.load(
-		textureDir + '4k_earth_day.jpg',
-	);
-	planetTextures.mars = await textureLoader.load(textureDir + '2k_mars.jpg');
-	planetTextures.jupiter = await textureLoader.load(
-		textureDir + '2k_jupiter.jpg',
-	);
-	planetTextures.saturn = await textureLoader.load(
-		textureDir + '2k_saturn.jpg',
-	);
-	planetTextures.uranus = await textureLoader.load(
-		textureDir + '2k_uranus.jpg',
-	);
-	planetTextures.neptune = await textureLoader.load(
-		textureDir + '2k_neptune.jpg',
-	);
+	// planetTextures.mercury = await textureLoader.load(
+	// 	textureDir + '2k_mercury.jpg',
+	// );
+	// planetTextures.venus = await textureLoader.load(
+	// 	textureDir + '2k_venus_atmosphere.jpg',
+	// );
+	// planetTextures.earth = await textureLoader.load(
+	// 	textureDir + '4k_earth_day.jpg',
+	// );
+	// planetTextures.mars = await textureLoader.load(textureDir + '2k_mars.jpg');
+	// planetTextures.jupiter = await textureLoader.load(
+	// 	textureDir + '2k_jupiter.jpg',
+	// );
+	// planetTextures.saturn = await textureLoader.load(
+	// 	textureDir + '2k_saturn.jpg',
+	// );
+	// planetTextures.uranus = await textureLoader.load(
+	// 	textureDir + '2k_uranus.jpg',
+	// );
+	// planetTextures.neptune = await textureLoader.load(
+	// 	textureDir + '2k_neptune.jpg',
+	// );
 	planetTextures.space = await textureLoader.load(
 		textureDir + '2k_stars_milky_way.jpg',
 	);
-
-	setupScene();
 }
 
 function setupScene() {
@@ -134,12 +168,11 @@ function setupScene() {
 		//clearZones();
 	}
 
-	console.log('setupScene');
-
 	setupThreeJS();
 	setupSun();
 	setupSpace();
 	drawOrbits();
+
 	// setupZones();
 	// setupPlanet();
 	// setupOrbits();
@@ -167,7 +200,7 @@ function setupThreeJS() {
 	three.canvas.appendChild(three.renderer.domElement);
 
 	const width = three.canvas.getBoundingClientRect().width;
-	const height = 500;
+	const height = 600;
 
 	three.renderer.setSize(width, height);
 
@@ -198,7 +231,7 @@ function updateCamera() {
 
 	// Camera
 	const cameraPositionDistance = AUtoDistance * 2.5;
-	const cameraZoomDistance = AUtoDistance * 50;
+	const cameraZoomDistance = AUtoDistance * 60;
 
 	let rendererSize = new THREE.Vector2();
 	three.renderer.getSize(rendererSize);
@@ -210,6 +243,8 @@ function updateCamera() {
 	);
 
 	three.camera.position.z = cameraPositionDistance;
+	three.camera.position.y -= cameraPositionDistance;
+	three.camera.lookAt(0, 0, 0);
 
 	// this.three.controls.enableZoom = false;
 
@@ -242,7 +277,7 @@ function setupSun() {
 }
 
 function setupSpace() {
-	const cameraZoomDistance = AUtoDistance * 50;
+	const cameraZoomDistance = AUtoDistance * 60;
 
 	const spacegeometry = new THREE.SphereGeometry(cameraZoomDistance, 16, 16);
 	const spacematerial = new THREE.MeshBasicMaterial({
@@ -250,6 +285,9 @@ function setupSpace() {
 		side: THREE.BackSide,
 	});
 	const space = new THREE.Mesh(spacegeometry, spacematerial);
+
+	// rotate the sphere so the texture is facing the camera
+	space.rotation.x = Math.PI / 2;
 
 	three.scene.add(space);
 }
@@ -306,11 +344,14 @@ function drawOrbits() {
 		// // Find the center and central coordinates
 		// // var center = planet['center'];
 		// // var centerCoords = currentPositions[center];
-		// var centerCoords = [0, 0, 0];
+		var centerCoords = [0, 0, 0];
 
 		// // Find where the planet should be
-		// var planetLocation = findPlanetLocation(planet, currentTime);
-		// currentPositions[planet.value] = addVec(planetLocation, centerCoords) as Vector3Tuple;
+		var planetLocation = findPlanetLocation(planet, currentTime.getTime());
+		currentPositions[planet.value] = addVec(
+			planetLocation,
+			centerCoords,
+		) as Vector3Tuple;
 
 		// // Don't initially display the moon orbits - saves computation
 		// planet['orbitMesh'].visible = false;
@@ -366,234 +407,323 @@ function createOrbit(planet: PlanetOrbit) {
 	three.scene.add(orbit);
 }
 
-// function createOrbit(planet: PlanetOrbit, startDegree: number, endDegree: number) {
-// 	// Create the ThreeJS geometry for the orbit track
+function findPeriod(a: number, planet: PlanetOrbit) {
+	// Find the period of a planet given the center and semi-major axis
 
-// 	// Initialise variables
-// 	var geometry = new THREE.BufferGeometry();
-// 	var vertexes = [];
-// 	var degree = endDegree * orbitResolution;
+	// Find and convert the gravitational parameter of the center
+	var gravitationalParameter = planet.gravParam;
+	gravitationalParameter = M3S2toAU3Y2(gravitationalParameter);
 
-// 	// // Get the correct initial vertex
-// 	// if (degree < 360 * orbitResolution) {
-// 	// 	geometry.vertices.push(threeVector(orbitalPositions[name][degree]));
-// 	// } else {
-// 	// 	geometry.vertices.push(threeVector(orbitalPositions[name][0]));
-// 	// }
+	// Calculate from Keplar's second law
+	return Math.pow(
+		((4 * Math.pow(Math.PI, 2)) / gravitationalParameter) * Math.pow(a, 3),
+		1 / 2,
+	); // Period in years. 1AU = 1 year
+}
 
-// 	// Iterate through all orbit points between given bounds and add it to the vertexes
-// 	while (degree > startDegree * orbitResolution) {
-// 		degree -= 1;
-// 		var orbitalPosition = orbitalPositions[name][degree];
+function findPlanetLocation(planet: PlanetOrbit, time: number) {
+	// Deliver a planet location given the current time
 
-// 		//geometry.vertices.push(threeVector(orbitalPosition));
-// 		vertexes.push(orbitalPosition[0], orbitalPosition[1], orbitalPosition[2]);
-// 	}
+	// Get the data
+	var a = planet['a'];
+	var L = planet.loPE;
 
-// 	// Return the geometry
-// 	return geometry;
-// }
+	// Find the excesss time since the epoch, less than the period for ease of computiation
+	var period = findPeriod(a, planet);
+	var tempEpoch = EPOCH.getTime();
+	// if (planet['epoch']) {
+	// 	// If a custom epoch, use that
+	// 	tempEpoch = planet['epoch'];
+	// }
+	var milliseconds = time - tempEpoch; // Milliseconds between EPOCH and current time
+	var years = milliseconds * convertTime('MS', 'Y', 1); // Years since EPOCH
 
-// Planetary Rendering
+	// Find the remainer of the time from epoch
+	var remainder = years % period;
+	while (remainder < 0) {
+		// Find the remainder from epoch
+		remainder += period;
+	}
 
-// function setupZones() {
-// 	// At large star sizes the orbit is too small to see
-// 	// let orbitWidth = Math.max(
-// 	// 	4 + Math.floor(props.formData.starRadius / 3),
-// 	// 	10,
-// 	// );
+	// Start from the epoch position
+	var nextDegree = Math.round(L * orbitResolution) % (360 * orbitResolution);
 
-// 	// orbitWidth = Math.min(100, orbitWidth);
+	// Find the point where it is different
+	var diffPoint = orbitalTimes[planet.value][0];
 
-// 	let orbitWidth = 6;
+	// Set the boundaries
+	var lowBound = 0;
+	var midBound = nextDegree;
+	var highBound = 360 * orbitResolution - 1;
 
-// 	const planetOrbit: Zone = {
-// 		name: 'Planet Orbit',
-// 		color: 0xea6730,
-// 		emissive: 0xea6730,
-// 		innerRadius: props.formData.planetOrbit * AUtoDistance,
-// 		outerRadius: props.formData.planetOrbit * AUtoDistance + orbitWidth,
-// 		opacity: 1,
-// 	};
+	// Find which of the two sections the value is in - and set bounds
+	if (remainder > diffPoint) {
+		highBound = midBound;
+	} else {
+		lowBound = midBound;
+	}
 
-// 	createOrbit(planetOrbit, orbitWidth);
+	// Initialise the degree
+	var testDegree;
 
-// 	const earthOrbit: Zone = {
-// 		name: 'Earth Orbit',
-// 		color: 0x0000ff,
-// 		emissive: 0x0000ff,
-// 		innerRadius: 1 * AUtoDistance,
-// 		outerRadius: 1 * AUtoDistance + orbitWidth,
-// 		opacity: 1,
-// 	};
+	// While it hasn't finalised the limits
+	while (highBound - lowBound > 1) {
+		// Find the degree to test and the value at that degree
+		testDegree = Math.ceil((lowBound + highBound) / 2);
+		var testValue = orbitalTimes[planet.value][testDegree];
 
-// 	const marsOrbit: Zone = {
-// 		name: 'Mars Orbit',
-// 		color: 0xff0000,
-// 		emissive: 0xff0000,
-// 		innerRadius: 1.5 * AUtoDistance,
-// 		outerRadius: 1.5 * AUtoDistance + orbitWidth,
-// 		opacity: 1,
-// 	};
+		// Figure out how to move the boundaries
+		if (testValue > remainder) {
+			highBound = testDegree;
+		} else {
+			lowBound = testDegree;
+		}
+	}
 
-// 	const venusOrbit: Zone = {
-// 		name: 'Venus Orbit',
-// 		color: 0xffff00,
-// 		emissive: 0xffff00,
-// 		innerRadius: 0.7 * AUtoDistance,
-// 		outerRadius: 0.7 * AUtoDistance + orbitWidth,
-// 		opacity: 1,
-// 	};
+	// Set the degree afterwards to the highest bound
+	nextDegree = highBound;
 
-// 	const mercuryOrbit: Zone = {
-// 		name: 'Mercury Orbit',
-// 		color: 0xcccccc,
-// 		emissive: 0xcccccc,
-// 		innerRadius: 0.4 * AUtoDistance,
-// 		outerRadius: 0.4 * AUtoDistance + orbitWidth,
-// 		opacity: 1,
-// 	};
+	// Find out the previous position
+	var previousDegree =
+		(nextDegree + 360 * orbitResolution - 1) % (360 * orbitResolution);
+	var previousArray = orbitalPositions[planet.value][previousDegree];
 
-// 	createOrbit(earthOrbit);
-// 	createOrbit(marsOrbit);
-// 	createOrbit(venusOrbit);
-// 	createOrbit(mercuryOrbit);
+	// Move it between positions to ensure smooth animation - this is rather than jerking it from position to position
+	var percentageAlong =
+		(remainder - orbitalTimes[planet.value][previousDegree]) /
+		(orbitalTimes[planet.value][nextDegree] -
+			orbitalTimes[planet.value][previousDegree]);
+	if (isNaN(percentageAlong)) {
+		// if an error is throw new Error("Something bad happened.")n, just pick halfway
+		percentageAlong = 0.5;
+	}
 
-// 	if (props.formData.planetOrbit > 3 || props.formData.starRadius > 200) {
-// 		const jupiterOrbit: Zone = {
-// 			name: 'Jupiter Orbit',
-// 			color: 0xffaa00,
-// 			emissive: 0xffaa00,
-// 			innerRadius: 5.2 * AUtoDistance,
-// 			outerRadius: 5.2 * AUtoDistance + orbitWidth,
-// 			opacity: 1,
-// 		};
+	currentDegrees[planet.value] =
+		(previousDegree + percentageAlong) / orbitResolution;
 
-// 		createOrbit(jupiterOrbit);
-// 	}
+	// Find the next position
+	var nextArray = orbitalPositions[planet.value][nextDegree];
 
-// 	if (props.formData.planetOrbit > 7 || props.formData.starRadius > 300) {
-// 		const saturnOrbit: Zone = {
-// 			name: 'Saturn Orbit',
-// 			color: 0xaaaa00,
-// 			emissive: 0xaaaa00,
-// 			innerRadius: 9.5 * AUtoDistance,
-// 			outerRadius: 9.5 * AUtoDistance + orbitWidth,
-// 			opacity: 1,
-// 		};
+	// Find the difference and moderate by the percentage along, and generate the new position vector
+	var diffArray = subVec(nextArray, previousArray);
+	diffArray = multiplyVec(percentageAlong, diffArray);
 
-// 		createOrbit(saturnOrbit);
-// 	}
+	// Resolve it into a new position vector
+	var array = addVec(previousArray, diffArray);
 
-// 	if (props.formData.planetOrbit > 15 || props.formData.starRadius > 400) {
-// 		const uranusOrbit: Zone = {
-// 			name: 'Uranus Orbit',
-// 			color: 0x00aaff,
-// 			emissive: 0x00aaff,
-// 			innerRadius: 19.8 * AUtoDistance,
-// 			outerRadius: 19.8 * AUtoDistance + orbitWidth,
-// 			opacity: 1,
-// 		};
+	// Return current position vector
+	return array;
+}
 
-// 		createOrbit(uranusOrbit);
-// 	}
+function findPlanetDegree(planet: PlanetOrbit, position: number[]) {
+	// This entire thing is reverse-deriving it by the same method used to generate the initial coords
 
-// 	if (props.formData.planetOrbit > 25 || props.formData.starRadius > 500) {
-// 		const neptuneOrbit: Zone = {
-// 			name: 'Neptune Orbit',
-// 			color: 0x0033ff,
-// 			emissive: 0x0033ff,
-// 			innerRadius: 30 * AUtoDistance,
-// 			outerRadius: 30 * AUtoDistance + orbitWidth,
-// 			opacity: 1,
-// 		};
+	// Get initial data
+	var e = planet['e'];
+	var i = planet['i'];
+	var a = planet['a'];
+	var loPE = planet['loPE'];
+	var loAN = planet['loAN'];
+	var center = planet['center'];
 
-// 		createOrbit(neptuneOrbit);
-// 	}
+	// if (
+	// 	center != 'sun' &&
+	// 	name != 'luna' &&
+	// 	name != 'the moon' &&
+	// 	name != 'ship'
+	// ) {
+	// 	if (planets[center]['axialTilt']) {
+	// 		if (!planets[name]['loANeff'] || !planets[name]['ieff']) {
+	// 			calculateEffectiveParams(name);
+	// 		}
 
-// 	if (props.formData.planetOrbit > 30 || props.formData.starRadius > 600) {
-// 		const plutoOrbit: Zone = {
-// 			name: 'Pluto Orbit',
-// 			color: 0xa020f0,
-// 			emissive: 0xa020f0,
-// 			innerRadius: 39 * AUtoDistance,
-// 			outerRadius: 39 * AUtoDistance + orbitWidth,
-// 			opacity: 1,
-// 		};
+	// 		loAN = planets[name]['loANeff'];
+	// 		i = planets[name]['ieff'];
+	// 	}
+	// }
 
-// 		createOrbit(plutoOrbit);
-// 	}
-// }
+	// Eccentric degree is how far away it is from the periapsis
+	//var eccentricDegree = (360 + degree + loPE) % 360;
 
-// function createOrbit(orbit: Zone, zIndex: number = 0) {
-// 	var extrudeSettings = {
-// 		depth: 3,
-// 		steps: 1,
-// 		bevelEnabled: false,
-// 		curveSegments: 24,
-// 	};
+	// Convert it into needed formats
+	//var degreesFromAN = DtoR(-degree - loAN);
 
-// 	var arcShape = new THREE.Shape();
-// 	arcShape.absarc(0, 0, orbit.outerRadius, 0, Math.PI * 2, false);
+	if (i == 0) {
+		i = 0.000001;
+	}
 
-// 	var holePath = new THREE.Path();
-// 	holePath.absarc(
-// 		0,
-// 		0,
-// 		orbit.innerRadius, // This would be the radius of the smaller circle
-// 		0,
-// 		Math.PI * 2,
-// 		true,
-// 	);
-// 	arcShape.holes.push(holePath);
+	var o = DtoR(loAN);
+	i = DtoR(i);
 
-// 	const zoneMaterial = new THREE.LineDashedMaterial({
-// 		color: orbit.color,
-// 		side: THREE.FrontSide, // DoubleSide, BackSide
-// 		opacity: orbit.opacity,
-// 		transparent: true,
-// 		depthWrite: false,
-// 		linewidth: 100,
-// 		scale: 1,
-// 		dashSize: 300,
-// 		gapSize: 100,
-// 	});
+	var distance = magnitude(position);
 
-// 	const zoneGeometry = new THREE.ExtrudeGeometry(arcShape, extrudeSettings);
+	// Recalculate position - see earlier in the program
 
-// 	const zoneMesh = new THREE.Mesh(zoneGeometry, zoneMaterial);
-// 	three.renderOrder++;
-// 	zoneMesh.position.z = zIndex;
+	// Find initial degrees from the ascending node, set up tests
+	var degreesFromAN = Math.asin(position[2] / (distance * Math.sin(i)));
 
-// 	three.scene.add(zoneMesh);
+	var testXOne =
+		distance *
+		(Math.cos(o) * Math.cos(degreesFromAN) -
+			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i));
+	var testYOne =
+		distance *
+		(Math.sin(o) * Math.cos(degreesFromAN) +
+			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i));
 
-// 	// if (props.formData.showLabels) {
-// 	// 	zoneMesh.layers.enableAll();
+	var degreesFromANTwo = (Math.PI - degreesFromAN) % (2 * Math.PI);
 
-// 	// 	const labelDiv = document.createElement('div');
-// 	// 	labelDiv.className = 'label';
-// 	// 	labelDiv.textContent = orbit.name;
-// 	// 	labelDiv.style.backgroundColor = 'transparent';
-// 	// 	labelDiv.style.color = 'white';
-// 	// 	labelDiv.style.fontSize = '12px';
-// 	// 	labelDiv.style.fontFamily = 'sans-serif';
-// 	// 	labelDiv.style.padding = '0.5em';
-// 	// 	labelDiv.style.borderRadius = '0.5em';
-// 	// 	labelDiv.style.pointerEvents = 'none';
-// 	// 	labelDiv.style.textAlign = 'center';
-// 	// 	labelDiv.style.opacity = '0.8';
-// 	// 	// labelDiv.style.border = "1px solid white";
+	var testXTwo =
+		distance *
+		(Math.cos(o) * Math.cos(degreesFromANTwo) -
+			Math.sin(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
+	var testYTwo =
+		distance *
+		(Math.sin(o) * Math.cos(degreesFromANTwo) +
+			Math.cos(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
 
-// 	// 	const label = new CSS2DObject(labelDiv);
-// 	// 	//const side = zoneMesh.renderOrder % 2 == 0 ? 1 : -1;
-// 	// 	const upOrDown = three.renderOrder % 2 == 0 ? 1 : -1;
-// 	// 	label.position.set(0, upOrDown * orbit.outerRadius - 80, 0);
-// 	// 	// @ts-ignore
-// 	// 	label.center.set(0, 1);
-// 	// 	zoneMesh.add(label);
-// 	// 	label.layers.set(0);
-// 	// }
-// }
+	// Create test positions
+	var primary = [position[0], position[1], position[2]];
+	var testOne = [testXOne, testYOne, position[2]];
+	var testTwo = [testXTwo, testYTwo, position[2]];
+
+	var distOne = magnitude(subVec(primary, testOne));
+	var distTwo = magnitude(subVec(primary, testTwo));
+
+	// Decide which section of the inverse sin to use based on which is closer
+	if (distOne < distTwo) {
+		degreesFromAN = RtoD(degreesFromAN);
+	} else {
+		degreesFromAN = RtoD(degreesFromANTwo);
+	}
+
+	// Find final degree
+	var degree = -degreesFromAN - loAN;
+
+	return ((360 - degree) % 360) - 1 / orbitResolution;
+}
+
+function findVelocity(planet: PlanetOrbit, time: number) {
+	// Return velocity at a given time of a planet
+
+	// Find position and then the degree to match with other knowledge
+	var position = findPlanetLocation(planet, time);
+	var degree =
+		Math.round((360 + vectorToAngle(position)) * orbitResolution) %
+		(360 * orbitResolution);
+
+	var newDegree = Math.round(
+		findPlanetDegree(planet, position) * orbitResolution,
+	);
+	if (!isNaN(newDegree)) {
+		degree = (360 * orbitResolution + newDegree) % (360 * orbitResolution);
+	}
+
+	// Find the infintesimal change in distance and time
+	var deltaTime =
+		orbitalTimes[planet.value][(degree + 1) % (360 * orbitResolution)] -
+		orbitalTimes[planet.value][degree];
+	//deltaTime = findPeriod(planets[name].a, planets[name].center)
+	var deltaDist = subVec(
+		orbitalPositions[planet.value][(degree + 1) % (360 * orbitResolution)],
+		orbitalPositions[planet.value][degree],
+	);
+
+	// Velocity = distance / time, except to find a vector velocity, use a vector distance
+	var velocityVec = multiplyVec(1 / deltaTime, deltaDist);
+
+	// Set the magnitude of the velocity according to the viz-viva equation
+	var velMag = Math.sqrt(
+		M3S2toAU3Y2(planet.gravParam) *
+			(2 / magnitude(position) - 1 / planet['a']),
+	);
+	velocityVec = setMagnitude(velocityVec, velMag);
+
+	// Return the velocity in vector form
+	return velocityVec;
+}
+
+function generateOrbitalTimes(planet: PlanetOrbit) {
+	// Calculate where the planet should be at a given time
+
+	// Get the correct data
+	var a = planet['a'];
+	var L = planet['rL'] ?? planet['loPE'];
+	//var center = planet["center"];
+	var gravitationalParameter = planet.gravParam;
+	gravitationalParameter = M3S2toAU3Y2(gravitationalParameter);
+
+	// The inital degree starts at its position at epoch - because the time is zero at 0 remainer time
+	var degree = Math.round(L * orbitResolution) % (360 * orbitResolution);
+
+	// Initialise storage variables
+	orbitalTimes[planet.value] = {};
+	orbitalVelocities[planet.value] = {};
+	orbitalTimes[planet.value][degree] = 0;
+
+	// Initialise iterator variables
+	var timesum = 0;
+	var counter = 1;
+
+	// Iterate through each degree and find the time at each
+	while (counter < 360 * orbitResolution) {
+		// Move the degree forward
+		degree = (degree + 1) % (360 * orbitResolution);
+		var currentDegree = degree % (360 * orbitResolution);
+
+		// Find the positions, and the distance between
+		var arrayOne = orbitalPositions[planet.value][currentDegree];
+		var arrayTwo =
+			orbitalPositions[planet.value][
+				(currentDegree + 1) % (360 * orbitResolution)
+			];
+		var distance = magnitude(subVec(arrayOne, arrayTwo));
+
+		// Find the velocity at this point
+		var velocity = Math.pow(
+			gravitationalParameter * (2 / magnitude(arrayOne) - 1 / a),
+			0.5,
+		);
+
+		// Also store this velocity in the orbital velocities part
+		orbitalVelocities[planet.value][degree] = {
+			velocity: velocity,
+			distance: distance,
+			time: distance / velocity,
+		};
+
+		// Additive time calculated by how long it takes to get between that small segment
+		timesum += distance / velocity;
+		orbitalTimes[planet.value][degree] = timesum;
+
+		// Move the counter foward
+		counter += 1;
+	}
+
+	// Finish it off by making the last be the full period
+	degree =
+		(Math.round(L * orbitResolution) - 1 + 360 * orbitResolution) %
+		(360 * orbitResolution);
+	orbitalTimes[planet.value][degree] = findPeriod(a, planet);
+}
+
+function generateOrbitalCoords(planet: PlanetOrbit) {
+	// Iterate through and calculate all orbital positions for a planet and store them.
+
+	// Initialise the degree and co-ordinates
+	var degree = 360;
+	var coords = [];
+
+	while (degree > 0) {
+		// Iterate through every one of the 360 * orbitResolution points and add to array
+		degree -= 1 / orbitResolution;
+		var array = calculateOrbitalPositionVector(planet, degree);
+		coords.push(array);
+	}
+
+	// Store for later use to prevent excessive calculation
+	orbitalPositions[planet.value] = coords;
+}
 
 /**
  * ANIMATE
@@ -619,21 +749,91 @@ function animate() {
 	animation.prevTick = now;
 }
 
+function renderPlanet(planet: PlanetOrbit) {
+	// Create the planetary surface and marker
+
+	// Collect initial data
+	var r = planet['r'];
+	var colour = planet['colour'];
+	var a = planet['a'];
+	var markerSize = a * markerScale;
+
+	// Load spherical geometry for the planet - copied for efficienct
+	var geometry = sphereGeo;
+
+	// Set a dull default material
+	var settings = {
+		color: colour,
+		specular: 'black',
+		shininess: 0,
+	};
+	var material = new THREE.MeshPhongMaterial({
+		color: settings.color,
+		specular: 0x000000, // Update the specular property to be of type number
+		shininess: settings.shininess,
+	});
+
+	// if (userOnPhone) {
+	// 	material = new THREE.MeshLambertMaterial(settings);
+	// } else {
+
+	//	material = new THREE.MeshPhongMaterial(settings);
+	//}
+
+	// Place the planetary mesh in the scene
+	var mesh = new THREE.Mesh(geometry, material);
+
+	placeSphere(name, mesh);
+	var size = (r * totalScale) / geoScale;
+	mesh.scale.set(size, size, size);
+
+	// // Add the atmosphere if we're not in low res
+	// if (!lowRes) {
+	// 	addAtmo(name);
+	// }
+
+	// Create the marker material
+	var markerMaterial = new THREE.MeshBasicMaterial({
+		color: colour,
+		opacity: 0.3,
+		transparent: true,
+		depthWrite: false,
+	});
+
+	// Create the marker
+	var marker = new THREE.Mesh(geometry, markerMaterial);
+
+	// Set the marker data
+	marker.position.set(0, 0, 0);
+	marker.rotation.set(0, 0, 0);
+
+	marker.name = planet.name;
+
+	// Scale the marker, as it is not a geometry of the right size
+	var size = (totalScale * markerSize) / geoScale;
+	//size = totalScale * planets[name]["SOI"] / geoScale
+	marker.scale.set(size, size, size);
+
+	// Actually add the marker to the scene
+	//planet['markerMesh'] = marker;
+	three.scene.add(marker);
+}
+
 /**
  * WATCHERS
  */
-watch(props.formData, (newValue, oldValue) => {
-	//updateCamera();
-	const cameraZoomDistance = AUtoDistance * 4;
-	three.camera.far = cameraZoomDistance * 2;
-	three.camera.updateProjectionMatrix();
-	if (three.controls) {
-		three.controls.maxDistance = cameraZoomDistance;
-	}
+// watch(props.formData, (newValue, oldValue) => {
+// 	//updateCamera();
+// 	const cameraZoomDistance = AUtoDistance * 4;
+// 	three.camera.far = cameraZoomDistance * 2;
+// 	three.camera.updateProjectionMatrix();
+// 	if (three.controls) {
+// 		three.controls.maxDistance = cameraZoomDistance;
+// 	}
 
-	//clearZones();
-	setupSun();
-	//setupZones();
-	updateCamera();
-});
+// 	//clearZones();
+// 	setupSun();
+// 	//setupZones();
+// 	updateCamera();
+// });
 </script>
