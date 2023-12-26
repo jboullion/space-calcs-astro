@@ -464,6 +464,9 @@ function findPeriod(a: number, planet: PlanetOrbit) {
 }
 
 function findPlanetLocation(planet: PlanetOrbit, time: number) {
+	// TODO: Currently this is only returning a single position.
+	// It should return the position of the planet at the given time.
+
 	// Deliver a planet location given the current time
 
 	// Get the data
