@@ -136,6 +136,7 @@ export type PlanetOrbit = {
 	satellites?: PlanetOrbit[]; // We may want to update this to SatelliteOrbit
 	orbitMesh?: THREE.Group; // The orbital track
 	planetMesh?: THREE.Mesh; // The planet mesh
+	period: number; // Orbital period
 };
 
 export interface ITransferWindowForm {

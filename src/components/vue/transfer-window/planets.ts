@@ -55,6 +55,7 @@ export const planets: PlanetOrbit[] = [
 		trackColour: 0x505050,
 		center: 'sun',
 		rotation: 58.6458333,
+		period: 87.9691,
 	},
 	{
 		name: 'Venus',
@@ -73,6 +74,7 @@ export const planets: PlanetOrbit[] = [
 		center: 'sun',
 		rotation: 116.75,
 		axialTilt: [-0.03633595624, 0.03633595624, -0.99862953475],
+		period: 224.701,
 	},
 	{
 		name: 'Earth',
@@ -92,6 +94,7 @@ export const planets: PlanetOrbit[] = [
 		rotation: 0.997268519,
 		rotEpoch: Math.PI * 0.6,
 		axialTilt: [0, 0.39777699402, 0.91748213226],
+		period: 365.256,
 	},
 	// {
 	// 	name: 'ISS',
@@ -201,6 +204,7 @@ export const planets: PlanetOrbit[] = [
 		axialTilt: [
 			0.4460741586578732, -0.053781564787631575, 0.89337863656272,
 		],
+		period: 686.971,
 	},
 	// {
 	// 	name: 'Phobos',
@@ -339,6 +343,7 @@ export const planets: PlanetOrbit[] = [
 		rotation: 0.41,
 		//rotationalEpoch: 0,
 		axialTilt: [0.03676955262, 0.03676955262, 0.9986],
+		period: 4332.59,
 	},
 	// {
 	// 	name: 'Io',
@@ -440,6 +445,7 @@ export const planets: PlanetOrbit[] = [
 		axialTilt: [
 			0.08545121452002576, 0.46335874823661466, 0.8820412464106484,
 		],
+		period: 10759.22,
 	},
 	// // {
 	// //     name: 'Mimas',
@@ -557,6 +563,7 @@ export const planets: PlanetOrbit[] = [
 		center: 'sun',
 		rotation: 0.7180555555555556,
 		axialTilt: [-0.22276184614, -0.96488756229, -0.1391731],
+		period: 30688.5,
 	},
 	{
 		name: 'Neptune',
@@ -575,6 +582,7 @@ export const planets: PlanetOrbit[] = [
 		center: 'sun',
 		rotation: 0.67125,
 		axialTilt: [0.32353696988, -0.34695092304, 0.88031181186],
+		period: 60182,
 	},
 	{
 		name: 'Pluto',
@@ -594,6 +602,7 @@ export const planets: PlanetOrbit[] = [
 		rotation: 6.38725,
 		epoch: new Date(2008, 8, 12, 0, 0, 0, 0),
 		axialTilt: [0, 0.8688908169, -0.4950037861],
+		period: 90560,
 		//heightMapScale: 50,
 	},
 	// {

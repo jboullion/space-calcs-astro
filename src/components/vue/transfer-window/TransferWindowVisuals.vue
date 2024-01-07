@@ -85,14 +85,8 @@ const currentPositions: PlanetPosition = {
 
 const now = new Date();
 let displayTime = now;
-let currentTime = new Date(
-	now.getUTCFullYear(),
-	now.getUTCMonth(),
-	now.getUTCDate(),
-	now.getUTCHours(),
-	now.getUTCMinutes(),
-	now.getUTCSeconds(),
-); // May not actually be now, just when it is displayed
+let currentTime = new Date(); // May not actually be now, just when it is displayed
+const newDate = ref(currentTime);
 const timeDiff = displayTime.getTime() - currentTime.getTime();
 const timeScale = 30; // Number of increments per second
 const apparentTimeRate = 3600 * 24; // Rate at which time passes in sim seconds / real second
@@ -100,7 +94,7 @@ const timeRate = 3600 * 24 * 7; // Rate at which time passes in sim seconds / co
 const timeIncrement = (timeRate * 1000) / timeScale; // Simulation time to add per time increment
 
 // Orbit Variables
-const orbitResolution = 2;
+const orbitResolution = 1; // Could probably reduce this to 1 or 0.5 to reduce the number of points calculated
 const orbitalTimes: OrbitalTime = {};
 const orbitalVelocities: OrbitalVelocity = {};
 const orbitalPositions: OrbitalPosition = {};
@@ -389,14 +383,14 @@ function drawOrbit(planet: PlanetOrbit) {
 	planet['orbitMesh'] = fullOrbit;
 
 	// Find the center and central coordinates
-	const centerCoords = [0, 0, 0];
+	//const centerCoords = [0, 0, 0];
 
 	// Find where the planet should be
-	const planetLocation = findPlanetLocation(planet, currentTime.getTime());
-	currentPositions[planet.value] = addVec(
-		planetLocation,
-		centerCoords,
-	) as Vector3Tuple;
+	//const planetLocation = findPlanetLocation(planet, currentTime.getTime());
+	// currentPositions[planet.value] = addVec(
+	// 	planetLocation,
+	// 	centerCoords,
+	// ) as Vector3Tuple;
 }
 
 /**
@@ -463,12 +457,7 @@ function findPeriod(a: number, planet: PlanetOrbit) {
 	); // Period in years. 1AU = 1 year
 }
 
-function findPlanetLocation(planet: PlanetOrbit, time: number) {
-	// TODO: Currently this is only returning a single position.
-	// It should return the position of the planet at the given time.
-
-	// Deliver a planet location given the current time
-
+function getCurrentDegree(planet: PlanetOrbit, time: number) {
 	// Get the data
 	var a = planet['a'];
 	var L = planet.loPE;
@@ -483,17 +472,15 @@ function findPlanetLocation(planet: PlanetOrbit, time: number) {
 
 	// Find the remainder of the time from epoch
 	var remainder = years % period;
+
 	while (remainder < 0) {
 		// Find the remainder from epoch
 		remainder += period;
 	}
 
-	// console.log({ time });
-
 	// Start from the epoch position
-	var nextDegree = currentDegrees[planet.value]; //Math.round(L * orbitResolution) % (360 * orbitResolution);
+	var nextDegree = Math.round(L * orbitResolution) % (360 * orbitResolution);
 
-	console.log({ nextDegree });
 	// Find the point where it is different
 	var diffPoint = orbitalTimes[planet.value][0];
 
@@ -529,36 +516,154 @@ function findPlanetLocation(planet: PlanetOrbit, time: number) {
 	// Set the degree afterwards to the highest bound
 	nextDegree = highBound;
 
-	// Find out the previous position
-	var previousDegree =
-		(nextDegree + 360 * orbitResolution - 1) % (360 * orbitResolution);
-	var previousArray = orbitalPositions[planet.value][previousDegree];
+	return nextDegree;
+}
 
-	// Move it between positions to ensure smooth animation - this is rather than jerking it from position to position
-	var percentageAlong =
-		(remainder - orbitalTimes[planet.value][previousDegree]) /
-		(orbitalTimes[planet.value][nextDegree] -
-			orbitalTimes[planet.value][previousDegree]);
-	if (isNaN(percentageAlong)) {
-		// if an error is throw new Error("Something bad happened.")n, just pick halfway
-		percentageAlong = 0.5;
-	}
+function findPlanetLocation(planet: PlanetOrbit, time: number) {
+	// TODO: We need to find a way to calculate the position of the planet at a given time
+	// I believe we have all the orbital positions calculated, but now we need to find where in that orbit a planet is at a given time
+	// Ideally we will find the # of degrees from the epoch time, and then find the position at that degree
 
-	currentDegrees[planet.value] =
-		(previousDegree + percentageAlong) / orbitResolution;
+	// // // Deliver a planet location given the current time
+	// // Get the data
+	// var a = planet['a'];
+	// var L = planet.loPE;
 
-	// Find the next position
-	var nextArray = orbitalPositions[planet.value][nextDegree];
+	// // Find the excesss time since the epoch, less than the period for ease of computiation
+	// var period = findPeriod(a, planet);
 
-	// Find the difference and moderate by the percentage along, and generate the new position vector
-	var diffArray = subVec(nextArray, previousArray);
-	diffArray = multiplyVec(percentageAlong, diffArray);
+	// var tempEpoch = EPOCH.getTime();
 
-	// Resolve it into a new position vector
-	var array = addVec(previousArray, diffArray);
+	// var milliseconds = time - tempEpoch; // Milliseconds between EPOCH and current time
+	// var years = milliseconds * convertTime('MS', 'Y', 1); // Years since EPOCH
+
+	// // Find the remainder of the time from epoch
+	// var remainder = years % period;
+
+	// while (remainder < 0) {
+	// 	// Find the remainder from epoch
+	// 	remainder += period;
+	// }
+
+	// const currentDegree = Math.floor(360 / 1 + remainder);
+	// var diffPoint = orbitalPositions[planet.value][0];
+	// console.log({ period });
+
+	// Reference date: Jan 12, 2000
+	const reference_date = EPOCH.getTime();
+	// Orbital period of Earth in days (approximate)
+	const orbital_period_days = planet.period;
+
+	// Current date
+	const current_date = EPOCH.getTime();
+
+	// Calculate the number of days since the reference date
+	const elapsed_days =
+		(current_date - reference_date) / (1000 * 60 * 60 * 24);
+
+	// Calculate the percentage of the orbital period completed
+	const orbital_progress =
+		(elapsed_days % orbital_period_days) / orbital_period_days;
+
+	// Calculate the position in degrees (0 to 360)
+	const position_degrees = Math.floor(orbital_progress * 360);
+
+	console.log({ elapsed_days, position_degrees });
 
 	// Return current position vector
-	return array;
+	return orbitalPositions[planet.value][position_degrees] as Vector3Tuple;
+
+	// // Get the data
+	// var a = planet['a'];
+	// var L = planet.loPE;
+
+	// // Find the excesss time since the epoch, less than the period for ease of computiation
+	// var period = findPeriod(a, planet);
+
+	// var tempEpoch = EPOCH.getTime();
+
+	// var milliseconds = time - tempEpoch; // Milliseconds between EPOCH and current time
+	// var years = milliseconds * convertTime('MS', 'Y', 1); // Years since EPOCH
+
+	// // Find the remainder of the time from epoch
+	// var remainder = years % period;
+
+	// while (remainder < 0) {
+	// 	// Find the remainder from epoch
+	// 	remainder += period;
+	// }
+
+	// // console.log({ time });
+
+	// // Start from the epoch position
+	// //var nextDegree = currentDegrees[planet.value]; //Math.round(L * orbitResolution) % (360 * orbitResolution);
+	// var nextDegree = Math.round(L * orbitResolution) % (360 * orbitResolution);
+
+	// // Find the point where it is different
+	// var diffPoint = orbitalTimes[planet.value][0];
+
+	// // Set the boundaries
+	// var lowBound = 0;
+	// var midBound = nextDegree;
+	// var highBound = 360 * orbitResolution - 1;
+
+	// // Find which of the two sections the value is in - and set bounds
+	// if (remainder > diffPoint) {
+	// 	highBound = midBound;
+	// } else {
+	// 	lowBound = midBound;
+	// }
+
+	// // Initialise the degree
+	// var testDegree;
+
+	// // While it hasn't finalised the limits
+	// while (highBound - lowBound > 1) {
+	// 	// Find the degree to test and the value at that degree
+	// 	testDegree = Math.ceil((lowBound + highBound) / 2);
+	// 	var testValue = orbitalTimes[planet.value][testDegree];
+
+	// 	// Figure out how to move the boundaries
+	// 	if (testValue > remainder) {
+	// 		highBound = testDegree;
+	// 	} else {
+	// 		lowBound = testDegree;
+	// 	}
+	// }
+
+	// // Set the degree afterwards to the highest bound
+	// nextDegree = highBound;
+
+	// // Find out the previous position
+	// var previousDegree =
+	// 	(nextDegree + 360 * orbitResolution - 1) % (360 * orbitResolution);
+	// var previousArray = orbitalPositions[planet.value][previousDegree];
+
+	// // Move it between positions to ensure smooth animation - this is rather than jerking it from position to position
+	// var percentageAlong =
+	// 	(remainder - orbitalTimes[planet.value][previousDegree]) /
+	// 	(orbitalTimes[planet.value][nextDegree] -
+	// 		orbitalTimes[planet.value][previousDegree]);
+	// if (isNaN(percentageAlong)) {
+	// 	// if an error is throw new Error("Something bad happened.")n, just pick halfway
+	// 	percentageAlong = 0.5;
+	// }
+
+	// currentDegrees[planet.value] =
+	// 	(previousDegree + percentageAlong) / orbitResolution;
+
+	// // Find the next position
+	// var nextArray = orbitalPositions[planet.value][nextDegree];
+
+	// // Find the difference and moderate by the percentage along, and generate the new position vector
+	// var diffArray = subVec(nextArray, previousArray);
+	// diffArray = multiplyVec(percentageAlong, diffArray);
+
+	// // Resolve it into a new position vector
+	// var array = addVec(previousArray, diffArray);
+
+	// // Return current position vector
+	// return array;
 }
 
 function findPlanetDegree(planet: PlanetOrbit, position: number[]) {
@@ -723,13 +828,17 @@ function generateOrbitalTimes(planet: PlanetOrbit) {
 			orbitalPositions[planet.value][
 				(currentDegree + 1) % (360 * orbitResolution)
 			];
+
+		//console.log({ arrayOne, arrayTwo });
 		var distance = magnitude(subVec(arrayOne, arrayTwo));
 
 		// Find the velocity at this point
-		var velocity = Math.pow(
-			gravitationalParameter * (2 / magnitude(arrayOne) - 1 / a),
-			0.5,
-		);
+		var velocity = 1;
+
+		// Math.pow(
+		// 	gravitationalParameter * (2 / magnitude(arrayOne) - 1 / a),
+		// 	0.5,
+		// );
 
 		// Also store this velocity in the orbital velocities part
 		orbitalVelocities[planet.value][degree] = {
@@ -750,7 +859,13 @@ function generateOrbitalTimes(planet: PlanetOrbit) {
 	degree =
 		(Math.round(L * orbitResolution) - 1 + 360 * orbitResolution) %
 		(360 * orbitResolution);
+
 	orbitalTimes[planet.value][degree] = findPeriod(a, planet);
+	// console.log('orbitalTimes', orbitalTimes);
+	// console.log(
+	// 	'orbitalTimes[planet.value][degree]',
+	// 	orbitalTimes[planet.value][degree],
+	// );
 }
 
 function generateOrbitalCoords(planet: PlanetOrbit) {
@@ -797,20 +912,20 @@ function animate() {
 	if (now == animation.prevTick) return;
 	// only do logic updates once every fixed frame. To reduce logic calls.
 
-	// Move time forward
-	currentTime = new Date(currentTime.getTime() + timeIncrement);
-	displayTime = new Date(currentTime.getTime() + timeDiff);
+	// // Move time forward only during simulation
+	// currentTime = new Date(currentTime.getTime() + timeIncrement);
+	// displayTime = new Date(currentTime.getTime() + timeDiff);
 
-	updatePlanets();
+	//updatePlanets();
 
 	animation.prevTick = now;
 }
 
-function updatePlanets() {
-	planets.map((planet) => {
-		updatePlanet(planet);
-	});
-}
+// function updatePlanets() {
+// 	planets.map((planet) => {
+// 		updatePlanet(planet);
+// 	});
+// }
 
 function updatePlanet(planet: PlanetOrbit) {
 	if (!planet.planetMesh) return;
@@ -822,31 +937,22 @@ function updatePlanet(planet: PlanetOrbit) {
 	var centerCoords = [0, 0, 0]; //currentPositions[center];
 
 	// Find position relative to the center and to Sol
-	//console.log({ currentTime });
+
 	var relCenterPos = findPlanetLocation(planet, currentTime.getTime());
+	console.log({ relCenterPos });
+
 	var relSolPos = addVec(relCenterPos, centerCoords) as Vector3Tuple;
 
-	// Update current positions
-	currentPositions[planet.value] = relSolPos;
-	planet.planetMesh.position.set(...relSolPos);
-	//var position = relSolPos;
+	// // Update current positions
+	// currentPositions[planet.value] = relSolPos;
 
-	// Move all aspects to correct position
-	// planets[name]['markerMesh'].position.copy(position);
+	//console.log({ relSolPos });
+
+	planet.planetMesh.position.set(...relSolPos);
 }
 
 function renderPlanet(planet: PlanetOrbit) {
 	// Create the planetary surface and marker
-
-	var centerCoords = [0, 0, 0];
-
-	// // Find where the planet should be
-	var planetLocation = findPlanetLocation(planet, currentTime.getTime());
-	currentPositions[planet.value] = addVec(
-		planetLocation,
-		centerCoords,
-	) as Vector3Tuple;
-
 	const material = new THREE.MeshLambertMaterial({
 		side: THREE.FrontSide,
 		color: planet.colour,
@@ -857,146 +963,9 @@ function renderPlanet(planet: PlanetOrbit) {
 	const geometry = new THREE.SphereGeometry(20, 16, 16); // planet.r * 100000
 	planet.planetMesh = new THREE.Mesh(geometry, material);
 	planet.planetMesh.rotation.set(Math.PI / 2, 0, 0);
-	planet.planetMesh.position.set(...currentPositions[planet.value]);
+
+	updatePlanet(planet);
 
 	three.scene.add(planet.planetMesh);
-
-	// // Create the marker geometry
-	// geometry = sphereGeo;
-
-	// // Create the marker material
-	// var markerMaterial = new THREE.MeshBasicMaterial({
-	// 	color: colour,
-	// 	opacity: 0.3,
-	// 	transparent: true,
-	// 	depthWrite: false,
-	// });
-
-	// // Create the marker
-	// var marker = new THREE.Mesh(geometry, markerMaterial);
-
-	// // Set the marker data
-	// marker.position.set(0, 0, 0);
-	// marker.rotation.set(0, 0, 0);
-
-	// // Set the marker name
-	// marker.name = planet.name;
-
-	// // Actually add the marker to the scene
-	// planet['markerMesh'] = marker;
-	// if (planet['center'] != 'sun') {
-	// 	marker.visible = false;
-	// }
-	// three.scene.add(marker);
-
-	// // Scale the marker, as it is not a geometry of the right size
-	// var size = (totalScale * markerSize) / geoScale;
-	// //size = totalScale * planets[name]["SOI"] / geoScale
-	// marker.scale.set(size, size, size);
-
-	// // Control marker opacity for the sun
-	// planet.markerMesh.material.opacity = 0.3;
 }
-
-// function renderPlanet(planet: PlanetOrbit) {
-// 	// Create the planetary surface and marker
-
-// 	// Collect initial data
-// 	var radius = planet['r'] * 100000;
-// 	var colour = planet['colour'];
-// 	var a = planet['a'];
-// 	var markerSize = a * markerScale;
-
-// 	// // Load spherical geometry for the planet - copied for efficienct
-// 	// var geometry = sphereGeo;
-
-// 	// // Set a dull default material
-// 	// var settings = {
-// 	// 	color: colour,
-// 	// 	specular: 'black',
-// 	// 	shininess: 0,
-// 	// };
-// 	// var material = new THREE.MeshPhongMaterial({
-// 	// 	color: settings.color,
-// 	// 	specular: 0x000000, // Update the specular property to be of type number
-// 	// 	shininess: settings.shininess,
-// 	// });
-
-// 	// // if (userOnPhone) {
-// 	// // 	material = new THREE.MeshLambertMaterial(settings);
-// 	// // } else {
-
-// 	// //	material = new THREE.MeshPhongMaterial(settings);
-// 	// //}
-
-// 	// // Place the planetary mesh in the scene
-// 	// var planetaryMesh = new THREE.Mesh(geometry, material);
-
-// 	// //placeSphere(name, mesh);
-
-// 	// var size = r; //(r * totalScale) / geoScale;
-// 	// planetaryMesh.scale.set(size, size, size);
-
-// 	// three.scene.add(planetaryMesh);
-
-// 	const material = new THREE.MeshLambertMaterial({
-// 		map: planetTextures.sun,
-// 		side: THREE.FrontSide,
-// 		color: 0xffa500,
-// 		emissive: 0xffff00,
-// 		emissiveIntensity: 0.8,
-// 	});
-
-// 	const geometry = new THREE.SphereGeometry(radius, 16, 16);
-// 	const mesh = new THREE.Mesh(geometry, material);
-// 	mesh.rotation.set(Math.PI / 2, 0, 0);
-
-// 	three.scene.add(mesh);
-
-// 	// Create the marker material
-// 	var markerMaterial = new THREE.MeshBasicMaterial({
-// 		color: colour,
-// 		opacity: 0.3,
-// 		transparent: true,
-// 		depthWrite: false,
-// 	});
-
-// 	// Create the marker
-// 	var marker = new THREE.Mesh(geometry, markerMaterial);
-
-// 	// Set the marker data
-// 	marker.position.set(0, 0, 0);
-// 	marker.rotation.set(0, 0, 0);
-
-// 	marker.name = planet.name;
-
-// 	// Scale the marker, as it is not a geometry of the right size
-// 	var size = (totalScale * markerSize) / geoScale;
-// 	//size = totalScale * planets[name]["SOI"] / geoScale
-// 	marker.scale.set(size, size, size);
-
-// 	console.log({ marker });
-
-// 	// Actually add the marker to the scene
-// 	//planet['markerMesh'] = marker;
-// 	three.scene.add(marker);
-// }
-
-/**
- * WATCHERS
- */
-// watch(props.formData, (newValue, oldValue) => {
-// 	//updateCamera();
-// 	const cameraZoomDistance = AUtoDistance * 4;
-// 	three.camera.far = cameraZoomDistance * 2;
-// 	three.camera.updateProjectionMatrix();
-// 	if (three.controls) {
-// 		three.controls.maxDistance = cameraZoomDistance;
-// 	}
-
-// 	//clearZones();
-// 	setupSun();
-// 	//setupZones();
-// 	updateCamera();
-// });
 </script>
