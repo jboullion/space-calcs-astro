@@ -13,6 +13,8 @@ import type { PlanetOrbit } from './types';
 	i: Orbital Inclination
     M: Mean Anomaly at epoch
 	L: Mean Longitude at epoch
+	rL: Real Longitude at epoch
+	periodDays: Orbital period
 	gravParam: gravitational parameter
 	colour: Colour of planetary marker
 	trackColour: Colour of orbital track
@@ -29,6 +31,7 @@ import type { PlanetOrbit } from './types';
 	model: If the planet has a specific model associated with it
 	heightMapScale: The scale of the bump/normalMap map
 	modelScale: The scale of the model
+	surfaceMesh: planet mesh
 	
 	viewingClass: Whether the body should be displayed given various settings
 	mapClass: What mapping systems should be used to display (Defaults are it does have a surface, no normal or height map, and no model)
@@ -49,13 +52,19 @@ export const planets: PlanetOrbit[] = [
 		semiMinorAxis: 0.379,
 		i: 7.00487,
 		L: 252.25084,
+		SOI: 0.001475085965499384,
 		r: 0.0000163083872,
 		gravParam: 2.2032 * Math.pow(10, 13),
 		colour: 0xb0b0b0,
 		trackColour: 0x505050,
 		center: 'sun',
 		rotation: 58.6458333,
-		period: 87.9691,
+		period: 0.2408467,
+		periodDays: 87.9691,
+		M: 174.79439000000002,
+		epoch: new Date('1999-11-20T00:56:16.773Z'),
+		epochDegree: 77,
+		rL: 77.45645,
 	},
 	{
 		name: 'Venus',
@@ -74,7 +83,13 @@ export const planets: PlanetOrbit[] = [
 		center: 'sun',
 		rotation: 116.75,
 		axialTilt: [-0.03633595624, 0.03633595624, -0.99862953475],
-		period: 224.701,
+		period: 0.61519726,
+		periodDays: 224.701,
+		SOI: 0.0067589623320117925,
+		M: 50.44674999999998,
+		epoch: new Date('1999-12-01T06:20:05.469Z'),
+		epochDegree: 132,
+		rL: 131.53298,
 	},
 	{
 		name: 'Earth',
@@ -94,7 +109,13 @@ export const planets: PlanetOrbit[] = [
 		rotation: 0.997268519,
 		rotEpoch: Math.PI * 0.6,
 		axialTilt: [0, 0.39777699402, 0.91748213226],
-		period: 365.256,
+		period: 1,
+		periodDays: 365.256,
+		SOI: 0.010003607521190132,
+		M: -2.48284000000001,
+		epoch: new Date('2000-01-04T06:27:21.106Z'),
+		epochDegree: 103,
+		rL: 102.94719,
 	},
 	// {
 	// 	name: 'ISS',
@@ -204,7 +225,13 @@ export const planets: PlanetOrbit[] = [
 		axialTilt: [
 			0.4460741586578732, -0.053781564787631575, 0.89337863656272,
 		],
-		period: 686.971,
+		period: 1.8808476,
+		periodDays: 686.971,
+		SOI: 0.007246194036237512,
+		M: 19.412480000000016,
+		epoch: new Date('1999-11-25T16:59:44.977Z'),
+		epochDegree: 336,
+		rL: 336.04084,
 	},
 	// {
 	// 	name: 'Phobos',
@@ -307,7 +334,8 @@ export const planets: PlanetOrbit[] = [
 	// 	trackColour: 0x909090,
 	// 	center: 'sun',
 	// 	rotation: 0.37808333,
-	// 	epoch: new Date(2008, 4, 18, 0, 0, 0, 0),
+	// 	epoch: new Date("2004-07-08T16:39:27.922Z"),
+	// 	rL: 153.12903007532702,
 	// },
 	/*pallas: {
 		loPE: 309.99921460477,
@@ -343,7 +371,13 @@ export const planets: PlanetOrbit[] = [
 		rotation: 0.41,
 		//rotationalEpoch: 0,
 		axialTilt: [0.03676955262, 0.03676955262, 0.9986],
-		period: 4332.59,
+		period: 11.862615,
+		periodDays: 4332.59,
+		SOI: 0.3552262048377925,
+		M: -66.15177,
+		epoch: new Date('2002-03-08T08:39:19.827Z'),
+		epochDegree: 101,
+		rL: 100.55615,
 	},
 	// {
 	// 	name: 'Io',
@@ -445,7 +479,13 @@ export const planets: PlanetOrbit[] = [
 		axialTilt: [
 			0.08545121452002576, 0.46335874823661466, 0.8820412464106484,
 		],
-		period: 10759.22,
+		period: 29.447498,
+		periodDays: 10759.22,
+		SOI: 0.4355698882153196,
+		M: -63.770720000000004,
+		epoch: new Date('2005-03-21T07:23:59.589Z'),
+		epochDegree: 114,
+		rL: 113.71504,
 	},
 	// // {
 	// //     name: 'Mimas',
@@ -563,7 +603,13 @@ export const planets: PlanetOrbit[] = [
 		center: 'sun',
 		rotation: 0.7180555555555556,
 		axialTilt: [-0.22276184614, -0.96488756229, -0.1391731],
-		period: 30688.5,
+		period: 84.016846,
+		periodDays: 30688.5,
+		SOI: 0.4685316536552077,
+		M: 239.00230000000005,
+		epoch: new Date('1944-03-09T13:37:56.236Z'),
+		epochDegree: 74,
+		rL: 74.22988,
 	},
 	{
 		name: 'Neptune',
@@ -582,7 +628,13 @@ export const planets: PlanetOrbit[] = [
 		center: 'sun',
 		rotation: 0.67125,
 		axialTilt: [0.32353696988, -0.34695092304, 0.88031181186],
-		period: 60182,
+		period: 164.79132,
+		periodDays: 60182,
+		SOI: 0.7757237998197399,
+		M: 173.15833999999998,
+		epoch: new Date('1920-09-11T00:21:17.545Z'),
+		epochDegree: 132,
+		rL: 131.72169,
 	},
 	{
 		name: 'Pluto',
@@ -600,9 +652,14 @@ export const planets: PlanetOrbit[] = [
 		trackColour: 0xb4a7d6,
 		center: 'sun',
 		rotation: 6.38725,
-		epoch: new Date(2008, 8, 12, 0, 0, 0, 0),
 		axialTilt: [0, 0.8688908169, -0.4950037861],
-		period: 90560,
+		period: 247.92065,
+		periodDays: 90560,
+		SOI: 0.05125219496150835,
+		M: 25.247189700000007,
+		epoch: new Date('1991-04-20T15:42:57.489Z'),
+		epochDegree: 223,
+		rL: 222.90061,
 		//heightMapScale: 50,
 	},
 	// {

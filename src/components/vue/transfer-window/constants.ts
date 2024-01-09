@@ -104,7 +104,7 @@ export const bolometricCorrection = [
 	},
 ];
 
-export const gravitationalConstant = 6.67408 * Math.pow(10, -11);
+export const gravitationalConstant = 6.67408 * Math.pow(10, -11); // m3 kg-1 s-2
 export const EPOCH = new Date(2000, 0, 1, 12, 0, 0, 0); // January 2000, 12h terrestrial
 
 // Set default mass to sun
@@ -114,4 +114,17 @@ let SolMass = 1.98855 * Math.pow(10, 30);
 SolMass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
 
 // Calculate the gravitational parameter
-export const gravitationalParameter = SolMass * gravitationalConstant;
+export const gravitationalParameter = SolMass * gravitationalConstant; // m3 s-2
+
+export class Vector3 {
+	constructor(public x: number, public y: number, public z: number) {}
+
+	// Linearly interpolates between two vectors
+	static lerp(start: Vector3, end: Vector3, t: number): Vector3 {
+		return new Vector3(
+			start.x + (end.x - start.x) * t,
+			start.y + (end.y - start.y) * t,
+			start.z + (end.z - start.z) * t,
+		);
+	}
+}

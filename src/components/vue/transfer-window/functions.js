@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 const production = false;
 
 export function round(value, points) {

@@ -119,9 +119,9 @@ export type PlanetOrbit = {
 	semiMinorAxis?: number; // Semi-minor axis
 	i: number; // Orbital Inclination
 	M?: number; // Mean Anomaly at epoch
-	L?: number; // (Planets) Mean Longitude at epoch
+	L: number; // (Planets) Mean Longitude at epoch
 	r: number; // Radius of planet
-	rL?: number; // ...
+	rL: number; // ...
 	gravParam: number; // gravitational parameter
 	colour: number; // Colour of planetary marker
 	trackColour: number; // Colour of orbital track
@@ -129,7 +129,8 @@ export type PlanetOrbit = {
 	center: string; // PLanetary body it is centered on
 	rotation: number; // rotation period in days
 	rotEpoch?: number; // Initial rotation at epoch
-	epoch?: Date; // Epoch of orbital elements
+	epoch: Date; // Epoch of orbital elements
+	epochDegree: number; // Degree at epoch
 	axialTilt?: number[]; // Unit vector the north pole points towards
 	satellite?: boolean; // If the planet is a satellite and not an actual planetary body (no surface mesh)
 	tidallyLocked?: boolean; // If the planet is tidally locked to its parent
@@ -137,6 +138,7 @@ export type PlanetOrbit = {
 	orbitMesh?: THREE.Group; // The orbital track
 	planetMesh?: THREE.Mesh; // The planet mesh
 	period: number; // Orbital period
+	periodDays: number; // Orbital period in days
 };
 
 export interface ITransferWindowForm {

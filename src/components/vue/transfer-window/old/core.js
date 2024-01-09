@@ -4474,52 +4474,52 @@ function moveCameraChase() {
 
 // Internal Program Updating Functions
 
-function checkTimeRatio() {
-	// This system outputs the ratio of actual time to simulation "time"
-	// It also acts to keep the system running at a constant rate regardless of computional power
+// function checkTimeRatio() {
+// 	// This system outputs the ratio of actual time to simulation "time"
+// 	// It also acts to keep the system running at a constant rate regardless of computional power
 
-	// If it should check the time
-	if (checkTimeRemaining <= 0 && calculatingTransfer == false) {
-		// Establish time differences and ratio
-		var now = new Date();
-		var timeDiff = now.getTime() - checkTime.getTime();
-		checkTime = now;
-		checkTimeRemaining = checkTimeSection;
-		var timeRatio = timeDiff / checkTimeSection;
+// 	// If it should check the time
+// 	if (checkTimeRemaining <= 0 && calculatingTransfer == false) {
+// 		// Establish time differences and ratio
+// 		var now = new Date();
+// 		var timeDiff = now.getTime() - checkTime.getTime();
+// 		checkTime = now;
+// 		checkTimeRemaining = checkTimeSection;
+// 		var timeRatio = timeDiff / checkTimeSection;
 
-		// Regulate the time ratio to prevent excess
-		if (timeRatio > 10) {
-			timeRatio = 10;
-		}
+// 		// Regulate the time ratio to prevent excess
+// 		if (timeRatio > 10) {
+// 			timeRatio = 10;
+// 		}
 
-		// Take the geometric mean of the time ratios
-		var logTimeRatio = Math.log10(timeRatio);
-		var logLastTimeRatio = Math.log10(lastTimeRatio);
-		var avgLog = (logTimeRatio + logLastTimeRatio) / 2;
+// 		// Take the geometric mean of the time ratios
+// 		var logTimeRatio = Math.log10(timeRatio);
+// 		var logLastTimeRatio = Math.log10(lastTimeRatio);
+// 		var avgLog = (logTimeRatio + logLastTimeRatio) / 2;
 
-		// Keep the time ratio as the geometric mean of the current and last time ratios
-		var effectiveTimeRatio = Math.pow(10, avgLog);
+// 		// Keep the time ratio as the geometric mean of the current and last time ratios
+// 		var effectiveTimeRatio = Math.pow(10, avgLog);
 
-		// If it has reached the scheduled interval, log the time ratio
-		if (logTracker <= 0) {
-			if (timeRatioLog) {
-				console.log('Time Ratio: ' + round(effectiveTimeRatio, 5));
-			}
-			logTracker = logInterval;
-		} else {
-			logTracker -= checkTimeSection * effectiveTimeRatio;
-		}
+// 		// If it has reached the scheduled interval, log the time ratio
+// 		if (logTracker <= 0) {
+// 			if (timeRatioLog) {
+// 				console.log('Time Ratio: ' + round(effectiveTimeRatio, 5));
+// 			}
+// 			logTracker = logInterval;
+// 		} else {
+// 			logTracker -= checkTimeSection * effectiveTimeRatio;
+// 		}
 
-		// Adjust the rate at which time passes for the simulation to keep everything running at the correct speed
-		timeRate = apparentTimeRate * effectiveTimeRatio;
-		timeIncrement = timeRate * (1000 / timeScale);
+// 		// Adjust the rate at which time passes for the simulation to keep everything running at the correct speed
+// 		timeRate = apparentTimeRate * effectiveTimeRatio;
+// 		timeIncrement = timeRate * (1000 / timeScale);
 
-		lastTimeRatio = timeRatio;
-	} else {
-		// Move it closer to the next time check
-		checkTimeRemaining -= 1000 / timeScale;
-	}
-}
+// 		lastTimeRatio = timeRatio;
+// 	} else {
+// 		// Move it closer to the next time check
+// 		checkTimeRemaining -= 1000 / timeScale;
+// 	}
+// }
 
 function addTime() {
 	// Add time to system
