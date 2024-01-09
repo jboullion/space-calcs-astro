@@ -115,16 +115,3 @@ SolMass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
 
 // Calculate the gravitational parameter
 export const gravitationalParameter = SolMass * gravitationalConstant; // m3 s-2
-
-export class Vector3 {
-	constructor(public x: number, public y: number, public z: number) {}
-
-	// Linearly interpolates between two vectors
-	static lerp(start: Vector3, end: Vector3, t: number): Vector3 {
-		return new Vector3(
-			start.x + (end.x - start.x) * t,
-			start.y + (end.y - start.y) * t,
-			start.z + (end.z - start.z) * t,
-		);
-	}
-}

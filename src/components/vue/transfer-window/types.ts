@@ -139,6 +139,8 @@ export type PlanetOrbit = {
 	planetMesh?: THREE.Mesh; // The planet mesh
 	period: number; // Orbital period
 	periodDays: number; // Orbital period in days
+	previousDegree?: number; // The previous degree of the planet
+	degreePercent?: number; // The percentage of the way through a degree of orbit
 };
 
 export interface ITransferWindowForm {

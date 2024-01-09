@@ -20,14 +20,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 import { removeAllChildNodes } from '../utils';
-import {
-	planet,
-	planetTextures,
-	three,
-	EPOCH,
-	gravitationalParameter,
-	Vector3,
-} from './constants';
+import { planet, planetTextures, three, EPOCH } from './constants';
 
 import type {
 	PlanetOrbit,
@@ -88,7 +81,7 @@ const timeScale = 30; // Number of increments per second
 const apparentTimeRate = 3600 * 24; // Rate at which time passes in sim seconds / real second
 let timeRate = 3600 * 24 * 7; // Rate at which time passes in sim seconds / computational second
 let timeIncrement = (timeRate * 1000) / timeScale; // Simulation time to add per time increment
-const FPS = 4; // TODO: Increase to 24 or 30 when done testing
+const FPS = 24; // TODO: Increase to 24 or 30 when done testing
 
 // Orbit Variables
 const orbitResolution = 1; // Could probably reduce this to 1 or 0.5 to reduce the number of points calculated
@@ -469,294 +462,30 @@ function findPlanetLocation(planet: PlanetOrbit, time: number): Vector3Tuple {
 
 	// Calculate the remainder of the orbital period
 	const totalOrbits = elapsedYears / period;
-	const remainder = elapsedYears % period;
 
 	// Convert the remainder to degrees
 	const degreesMoved = totalOrbits * 360;
 	const percentageAlong = degreesMoved % 1;
 
 	// Calculate the current degree position in the orbit and normalize it to the range [0, 360]
-	let nextDegree = Math.round((epochDegree + degreesMoved) % 360);
+	let nextDegree = Math.floor((epochDegree + degreesMoved) % 360);
 
 	nextDegree = nextDegree == 360 ? 0 : nextDegree;
 
-	// Find the next position
 	const nextPosition = orbitalPositions[planet.value][
 		nextDegree
 	] as Vector3Tuple;
 
-	return nextPosition;
+	let previousDegree = nextDegree - 1;
+	previousDegree = previousDegree == -1 ? 359 : previousDegree;
 
-	// const nextPosition = orbitalPositions[planet.value][
-	// 	nextDegree
-	// ] as Vector3Tuple;
+	const previousPosition = orbitalPositions[planet.value][previousDegree];
 
-	// // Find out the previous position
-	// let previousDegree = nextDegree - 1;
-	// previousDegree = previousDegree == -1 ? 359 : previousDegree;
+	let diffArray = subVec(nextPosition, previousPosition);
+	diffArray = multiplyVec(percentageAlong, diffArray);
 
-	// if (planet.value == 'earth') {
-	// 	console.log(animation.prevTick, {
-	// 		percentageAlong,
-	// 		nextDegree,
-	// 		previousDegree,
-	// 	});
-	// }
-
-	// const previousPosition = orbitalPositions[planet.value][previousDegree];
-
-	// let diffArray = subVec(nextPosition, previousPosition);
-	// diffArray = multiplyVec(percentageAlong, diffArray);
-
-	// // 	// Resolve it into a new position vector
-	// return addVec(previousPosition, diffArray) as Vector3Tuple;
-
-	//planet.currentPercentage =
-
-	//return nextPosition;
-
-	// // let diffArray = subVec(nextPosition, previousPosition);
-	// // diffArray = multiplyVec(percentageAlong, diffArray);
-
-	// // // 	// Resolve it into a new position vector
-	// // return addVec(previousPosition, diffArray) as Vector3Tuple;
-
-	// // //const nextPosition = orbitalPositions[planet.value][nextDegree];
-	// const nextPosition = new Vector3(
-	// 	orbitalPositions[planet.value][nextDegree][0],
-	// 	orbitalPositions[planet.value][nextDegree][1],
-	// 	orbitalPositions[planet.value][nextDegree][2],
-	// );
-
-	// // // Find out the previous position
-	// // let previousDegree = nextDegree - 1;
-	// // previousDegree = previousDegree == -1 ? 359 : previousDegree;
-
-	// const previousPosition = new Vector3(
-	// 	orbitalPositions[planet.value][previousDegree][0],
-	// 	orbitalPositions[planet.value][previousDegree][1],
-	// 	orbitalPositions[planet.value][previousDegree][2],
-	// );
-
-	// const exactPosition = interpolateBetweenVectors(
-	// 	previousPosition,
-	// 	nextPosition,
-	// 	percentageAlong,
-	// );
-
-	// // if (planet.value == 'earth') {
-	// // 	console.log({ previousPosition, exactPosition, nextPosition });
-	// // }
-
-	// const returnPosition: Vector3Tuple = [
-	// 	exactPosition.x,
-	// 	exactPosition.y,
-	// 	exactPosition.z,
-	// ];
-
-	// return returnPosition;
-}
-
-function interpolateBetweenVectors(
-	start: Vector3,
-	end: Vector3,
-	percentageAlong: number,
-): Vector3 {
-	// Ensure the percentage is clamped between 0 and 1
-	const clampedPercentage = Math.max(0, Math.min(1, percentageAlong));
-
-	// Use the lerp function to interpolate between the two vectors
-	return Vector3.lerp(start, end, clampedPercentage);
-}
-
-// // Deliver a planet location given the current time
-// function findPlanetLocation(planet: PlanetOrbit, time: number) {
-// 	const L = planet['rL'];
-
-// 	// Find the excesss time since the epoch, less than the period for ease of computiation
-// 	const period = planet.period;
-// 	let tempEpoch = EPOCH;
-// 	if (planet['epoch']) {
-// 		// If a custom epoch, use that
-// 		tempEpoch = planet['epoch'];
-// 	}
-// 	const milliseconds = time - tempEpoch.getTime(); // Milliseconds between EPOCH and current time
-// 	const years = milliseconds * convertTime('MS', 'Y', 1); // Years since EPOCH
-
-// 	// Find the remainer of the time from epoch
-// 	let remainder = years % period;
-// 	while (remainder < 0) {
-// 		// Find the remainder from epoch
-// 		remainder += period;
-// 	}
-
-// 	// Start from the epoch position
-// 	let nextDegree = Math.round(L * orbitResolution) % (360 * orbitResolution);
-
-// 	// Find the point where it is different
-// 	const diffPoint = orbitalTimes[planet.value][0];
-
-// 	// Set the boundaries
-// 	let lowBound = 0;
-// 	const midBound = nextDegree;
-// 	let highBound = 360 * orbitResolution - 1;
-
-// 	// Find which of the two sections the value is in - and set bounds
-// 	if (remainder > diffPoint) {
-// 		highBound = midBound;
-// 	} else {
-// 		lowBound = midBound;
-// 	}
-
-// 	// Initialise the degree
-// 	let testDegree;
-
-// 	// While it hasn't finalised the limits
-// 	while (highBound - lowBound > 1) {
-// 		// Find the degree to test and the value at that degree
-// 		testDegree = Math.ceil((lowBound + highBound) / 2);
-// 		const testValue = orbitalTimes[planet.value][testDegree];
-
-// 		// Figure out how to move the boundaries
-// 		if (testValue > remainder) {
-// 			highBound = testDegree;
-// 		} else {
-// 			lowBound = testDegree;
-// 		}
-// 	}
-
-// 	// Set the degree afterwards to the highest bound
-// 	nextDegree = highBound;
-
-// 	// Find out the previous position
-// 	const previousDegree =
-// 		(nextDegree + 360 * orbitResolution - 1) % (360 * orbitResolution);
-
-// 	const previousArray = orbitalPositions[planet.value][previousDegree];
-
-// 	// if (planet.value == 'mars') {
-// 	// 	console.log({ nextDegree, previousDegree, remainder });
-// 	// }
-
-// 	// Move it between positions to ensure smooth animation - this is rather than jerking it from position to position
-// 	let percentageAlong =
-// 		(remainder - orbitalTimes[planet.value][previousDegree]) /
-// 		(orbitalTimes[planet.value][nextDegree] -
-// 			orbitalTimes[planet.value][previousDegree]);
-
-// 	// if (planet.value == 'mars') {
-// 	// 	console.log({ nextDegree, highBound });
-// 	// }
-
-// 	if (isNaN(percentageAlong)) {
-// 		// if an error is throw new Error("Something bad happened.")n, just pick halfway
-// 		percentageAlong = 0.5;
-// 	}
-
-// 	// // Save the current position
-// 	// currentDegrees[planet.value] =
-// 	// 	(previousDegree + percentageAlong) / orbitResolution;
-
-// 	// Find the next position
-// 	const nextArray = orbitalPositions[planet.value][nextDegree];
-
-// 	// Find the difference and moderate by the percentage along, and generate the new position vector
-// 	let diffArray = subVec(nextArray, previousArray);
-// 	diffArray = multiplyVec(percentageAlong, diffArray);
-
-// 	// Resolve it into a new position vector
-// 	const array = addVec(previousArray, diffArray);
-
-// 	// Return current position vector
-// 	return array;
-// }
-
-function findPlanetDegree(planet: PlanetOrbit, position: number[]) {
-	// This entire thing is reverse-deriving it by the same method used to generate the initial coords
-
-	// Get initial data
-	var e = planet['e'];
-	var i = planet['i'];
-	var a = planet['a'];
-	var loPE = planet['loPE'];
-	var loAN = planet['loAN'];
-	var center = planet['center'];
-
-	// if (
-	// 	center != 'sun' &&
-	// 	name != 'luna' &&
-	// 	name != 'the moon' &&
-	// 	name != 'ship'
-	// ) {
-	// 	if (planets[center]['axialTilt']) {
-	// 		if (!planets[name]['loANeff'] || !planets[name]['ieff']) {
-	// 			calculateEffectiveParams(name);
-	// 		}
-
-	// 		loAN = planets[name]['loANeff'];
-	// 		i = planets[name]['ieff'];
-	// 	}
-	// }
-
-	// Eccentric degree is how far away it is from the periapsis
-	//var eccentricDegree = (360 + degree + loPE) % 360;
-
-	// Convert it into needed formats
-	//var degreesFromAN = DtoR(-degree - loAN);
-
-	if (i == 0) {
-		i = 0.000001;
-	}
-
-	var o = DtoR(loAN);
-	i = DtoR(i);
-
-	var distance = magnitude(position);
-
-	// Recalculate position - see earlier in the program
-
-	// Find initial degrees from the ascending node, set up tests
-	var degreesFromAN = Math.asin(position[2] / (distance * Math.sin(i)));
-
-	var testXOne =
-		distance *
-		(Math.cos(o) * Math.cos(degreesFromAN) -
-			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i));
-	var testYOne =
-		distance *
-		(Math.sin(o) * Math.cos(degreesFromAN) +
-			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i));
-
-	var degreesFromANTwo = (Math.PI - degreesFromAN) % (2 * Math.PI);
-
-	var testXTwo =
-		distance *
-		(Math.cos(o) * Math.cos(degreesFromANTwo) -
-			Math.sin(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
-	var testYTwo =
-		distance *
-		(Math.sin(o) * Math.cos(degreesFromANTwo) +
-			Math.cos(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
-
-	// Create test positions
-	var primary = [position[0], position[1], position[2]];
-	var testOne = [testXOne, testYOne, position[2]];
-	var testTwo = [testXTwo, testYTwo, position[2]];
-
-	var distOne = magnitude(subVec(primary, testOne));
-	var distTwo = magnitude(subVec(primary, testTwo));
-
-	// Decide which section of the inverse sin to use based on which is closer
-	if (distOne < distTwo) {
-		degreesFromAN = RtoD(degreesFromAN);
-	} else {
-		degreesFromAN = RtoD(degreesFromANTwo);
-	}
-
-	// Find final degree
-	var degree = -degreesFromAN - loAN;
-
-	return ((360 - degree) % 360) - 1 / orbitResolution;
+	// Resolve it into a new position vector
+	return addVec(previousPosition, diffArray) as Vector3Tuple;
 }
 
 function generateOrbitalTimes(planet: PlanetOrbit) {
