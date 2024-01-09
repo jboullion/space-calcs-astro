@@ -74,7 +74,7 @@ let lastTimeRatio = 1;
 let timeRatio = 1;
 const now = new Date();
 let displayTime = now;
-let currentTime = new Date('2010-05-05'); // May not actually be now, just when it is displayed
+let currentTime = new Date(); // May not actually be now, just when it is displayed
 const newDate = ref(currentTime);
 const timeDiff = displayTime.getTime() - currentTime.getTime();
 const timeScale = 30; // Number of increments per second
@@ -599,8 +599,7 @@ function animate() {
 	const now = Math.round((FPS * window.performance.now()) / 1000);
 
 	if (now == animation.prevTick) return;
-	// only do logic updates once every fixed frame. To reduce logic calls.
-	// updateConstants();
+
 	// Move time forward only during simulation
 	currentTime = new Date(currentTime.getTime() + timeIncrement);
 	// displayTime = new Date(currentTime.getTime() + timeDiff);
