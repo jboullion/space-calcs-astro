@@ -601,10 +601,8 @@ function animate() {
 	if (now == animation.prevTick) return;
 
 	// Move time forward only during simulation
-	// currentTime = new Date(currentTime.getTime() + timeIncrement);
+	currentTime = new Date(currentTime.getTime() + timeIncrement);
 	// displayTime = new Date(currentTime.getTime() + timeDiff);
-
-	console.log(currentTime);
 
 	updatePlanets();
 
