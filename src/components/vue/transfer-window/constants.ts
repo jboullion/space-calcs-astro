@@ -115,3 +115,9 @@ SolMass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
 
 // Calculate the gravitational parameter
 export const gravitationalParameter = SolMass * gravitationalConstant; // m3 s-2
+
+export const MS_SECOND = 1000;
+export const MS_MINUTE = 60 * 1000;
+export const MS_HOUR = 60 * 60 * 1000;
+export const MS_DAY = 24 * 60 * 60 * 1000;
+export const MS_YEAR = 365.25 * 24 * 60 * 60 * 1000;

@@ -1,5 +1,11 @@
 <template>
-	<div>
+	<div class="calc-form">
+		<div class="d-flex justify-content-between mb-3">
+			<button class="btn btn-primary btn-lg px-5" @click="play">
+				<i class="fas" :class="playClass"></i>
+			</button>
+			<h3 class="mb-0">{{ displayTime.toDateString() }}</h3>
+		</div>
 		<div
 			id="transfer-window-canvas"
 			class="canvas-wrapper border"
@@ -11,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import {
@@ -51,6 +57,9 @@ const textureDir = '/textures/';
 
 const animation = {
 	prevTick: 0,
+	play: false,
+	complete: false,
+	FPS: 24,
 };
 
 // const AURatio = 100000; // dividing our actual AU by this number to make it easier to work with
@@ -60,51 +69,19 @@ const props = defineProps<{
 	formData: ITransferWindowForm;
 }>();
 
-type PlanetPosition = {
-	[key: string]: Vector3Tuple;
-};
-
-const currentPositions: PlanetPosition = {
-	sun: [0, 0, 0],
-};
-
 // Time Variables
-const clock = new THREE.Clock();
-let lastTimeRatio = 1;
-let timeRatio = 1;
-const now = new Date();
-let displayTime = now;
 let currentTime = new Date(); // May not actually be now, just when it is displayed
-const newDate = ref(currentTime);
-const timeDiff = displayTime.getTime() - currentTime.getTime();
+const displayTime = ref(new Date()); // The time that is displayed on the screen
 const timeScale = 30; // Number of increments per second
 const apparentTimeRate = 3600 * 24; // Rate at which time passes in sim seconds / real second
 let timeRate = 3600 * 24 * 7; // Rate at which time passes in sim seconds / computational second
 let timeIncrement = (timeRate * 1000) / timeScale; // Simulation time to add per time increment
-const FPS = 24; // TODO: Increase to 24 or 30 when done testing
 
 // Orbit Variables
 const orbitResolution = 1; // Could probably reduce this to 1 or 0.5 to reduce the number of points calculated
 const orbitalTimes: OrbitalTime = {};
 const orbitalVelocities: OrbitalVelocity = {};
 const orbitalPositions: OrbitalPosition = {};
-const currentDegrees: OrbitalDegree = {
-	sun: 0,
-	mercury: 0,
-	venus: 0,
-	earth: 0,
-	mars: 0,
-	jupiter: 0,
-	saturn: 0,
-	uranus: 0,
-	neptune: 0,
-	pluto: 0,
-};
-
-const sphereGeo = new THREE.SphereGeometry(100, 16, 16);
-const markerScale = (1 / 10) * (3 / 4);
-const totalScale = Math.round(convertDistance('AU', 'M'));
-const geoScale = totalScale;
 
 /**
  *
@@ -139,6 +116,17 @@ onBeforeUnmount(() => {
  *
  *
  */
+const playClass = computed(() => {
+	if (!animation.complete) {
+		if (!animation.play) {
+			return 'fa-play';
+		} else {
+			return 'fa-pause';
+		}
+	} else {
+		return 'fa-undo';
+	}
+});
 
 // function updateConstants() {
 // 	var delta = clock.getDelta() * 60;
@@ -596,17 +584,29 @@ function animate() {
 
 	// clamp to fixed framerate
 
-	const now = Math.round((FPS * window.performance.now()) / 1000);
+	const now = Math.round((animation.FPS * window.performance.now()) / 1000);
 
 	if (now == animation.prevTick) return;
 
+	if (!animation.play) return;
+
 	// Move time forward only during simulation
 	currentTime = new Date(currentTime.getTime() + timeIncrement);
+	displayTime.value = currentTime;
 	// displayTime = new Date(currentTime.getTime() + timeDiff);
 
 	updatePlanets();
 
 	animation.prevTick = now;
+}
+
+function play() {
+	if (animation.complete) {
+		//reset();
+		return;
+	}
+
+	animation.play = !animation.play;
 }
 
 function updatePlanets() {
