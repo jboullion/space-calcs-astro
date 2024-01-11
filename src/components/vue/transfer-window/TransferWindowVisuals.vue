@@ -9,15 +9,18 @@
 		<div
 			id="transfer-window-canvas"
 			class="canvas-wrapper border"
-			style="position: relative; height: 600px; width: 100%"
+			style="position: relative; padding-top: 75%; width: 100%"
 		>
-			<i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+			<i
+				v-if="loading"
+				class="fas fa-cog fa-spin mb-0 h1 position-absolute top-50 start-50"
+			></i>
 		</div>
 	</div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import {
@@ -26,6 +29,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 import { removeAllChildNodes } from '../utils';
+import { throttle } from '../../../utils/utils';
 import { planet, planetTextures, three, EPOCH } from './constants';
 
 import type {
@@ -83,6 +87,7 @@ const orbitalTimes: OrbitalTime = {};
 const orbitalVelocities: OrbitalVelocity = {};
 const orbitalPositions: OrbitalPosition = {};
 
+const debouncedResize = throttle(onWindowResize, 32);
 /**
  *
  *
@@ -94,19 +99,15 @@ const orbitalPositions: OrbitalPosition = {};
 onMounted(async () => {
 	await loadModels();
 
-	// Setup planet data for current time
-	planets.map((planet) => {
-		generateOrbitalCoords(planet);
-		generateOrbitalTimes(planet);
-	});
+	updateCoords();
 
 	setupScene();
 
-	window.addEventListener('resize', setupScene, { passive: true });
+	window.addEventListener('resize', debouncedResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', debouncedResize);
 });
 
 /**
@@ -155,6 +156,14 @@ const playClass = computed(() => {
  *
  */
 
+function updateCoords() {
+	// Setup planet data for current time
+	planets.map((planet) => {
+		generateOrbitalCoords(planet);
+		generateOrbitalTimes(planet);
+	});
+}
+
 async function loadModels() {
 	const textureLoader = new THREE.TextureLoader();
 
@@ -167,11 +176,6 @@ async function loadModels() {
 }
 
 function setupScene() {
-	if (three.scene && three.canvas) {
-		removeAllChildNodes(three.canvas);
-		//clearZones();
-	}
-
 	setupThreeJS();
 	setupSun();
 	setupSpace();
@@ -181,6 +185,12 @@ function setupScene() {
 
 	if (!animation.prevTick) {
 		animate();
+	}
+}
+
+function clearScene(): void {
+	while (three.scene.children.length > 0) {
+		three.scene.remove(three.scene.children[0]);
 	}
 }
 
@@ -199,10 +209,9 @@ function setupThreeJS() {
 
 	three.canvas.appendChild(three.renderer.domElement);
 
-	const width = three.canvas.getBoundingClientRect().width;
-	const height = 600;
+	updateRenderSize();
 
-	three.renderer.setSize(width, height);
+	setupCamera();
 
 	// three.labelRenderer = new CSS2DRenderer();
 
@@ -211,8 +220,6 @@ function setupThreeJS() {
 	// three.labelRenderer.domElement.style.top = '0px';
 	// three.labelRenderer.domElement.style.pointerEvents = 'none';
 	// three.canvas.appendChild(three.labelRenderer.domElement);
-
-	updateCamera();
 
 	// Lights
 	three.scene.add(new THREE.AmbientLight(0x404040));
@@ -226,7 +233,28 @@ function setupThreeJS() {
 	// this.three.canvas.appendChild(this.three.gui.domElement);
 }
 
-function updateCamera() {
+function updateRenderSize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
+
+function onWindowResize(): void {
+	updateRenderSize();
+}
+
+function setupCamera() {
 	if (!three.renderer) return;
 
 	// Camera
@@ -294,6 +322,9 @@ function setupSpace() {
 
 function drawOrbits() {
 	// Draw orbital lines for each planet
+	if (three.scene) {
+		clearScene();
+	}
 
 	// Iterate through all planets
 	planets.map((planet) => {
@@ -644,4 +675,17 @@ function renderPlanet(planet: PlanetOrbit) {
 
 	three.scene.add(planet.planetMesh);
 }
+
+/**
+ * Watchers
+ */
+watch(
+	() => props.formData.departureDateMin,
+	(newVal: Date) => {
+		currentTime = newVal;
+		displayTime.value = currentTime;
+		console.log({ newVal, currentTime, displayTime });
+		drawOrbits();
+	},
+);
 </script>

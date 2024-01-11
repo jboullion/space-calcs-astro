@@ -100,6 +100,7 @@ import CheckboxInput from '../forms/CheckboxInput.vue';
 import DateInput from '../forms/v2/DateInput.vue';
 import type { ITransferWindowForm } from './types';
 import { planets } from './planets';
+import { createDateFromDate, createDateFromInput } from '../utils';
 
 const props = defineProps<{
 	modelValue: ITransferWindowForm;
@@ -114,23 +115,28 @@ function handleMinInput(event: InputEvent) {
 	if (!event.target || !(event.target instanceof HTMLInputElement)) {
 		return;
 	}
-	localDepartureDateMin.value = new Date(event.target.value);
+	localDepartureDateMin.value = createDateFromInput(event.target.value);
 }
 
 function handleMaxInput(event: Event) {
 	if (!event.target || !(event.target instanceof HTMLInputElement)) {
 		return;
 	}
-	localDepartureDateMax.value = new Date(event.target.value);
+	localDepartureDateMax.value = createDateFromInput(event.target.value);
 }
 
-watch(localDepartureDateMin, (newValue) => {
-	props.modelValue.departureDateMin = new Date(newValue);
+watch(localDepartureDateMin, (newDate: Date) => {
+	console.log('newDate', newDate);
+	props.modelValue.departureDateMin = createDateFromDate(newDate);
+	console.log(
+		'props.modelValue.departureDateMin',
+		props.modelValue.departureDateMin,
+	);
 	emit('update:modelValue', props.modelValue);
 });
 
-watch(localDepartureDateMax, (newValue) => {
-	props.modelValue.departureDateMax = new Date(newValue);
+watch(localDepartureDateMax, (newDate: Date) => {
+	props.modelValue.departureDateMax = createDateFromDate(newDate);
 	emit('update:modelValue', props.modelValue);
 });
 </script>

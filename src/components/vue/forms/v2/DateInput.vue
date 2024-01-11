@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
-import { clampNumber } from '../../utils';
+import { createDateFromInput } from '../../utils';
 import InputWrapper from './InputWrapper.vue';
 import { useAttrs } from 'vue';
 
@@ -36,16 +36,18 @@ const internalMin = computed(() => {
 	return props.min ? props.min.toISOString().slice(0, 10) : '';
 });
 const internalMax = computed(() => {
-	console.log('internalMax', props.max?.toISOString().slice(0, 10));
 	return props.max ? props.max.toISOString().slice(0, 10) : '';
 });
 
 onMounted(() => {
+	console.log('props.modelValue', props.modelValue);
 	internalValue.value = props.modelValue.toISOString().slice(0, 10); //.toISOString().split('T')[0];props.modelValue.toISOString().slice(0, 10)
+
+	console.log('internalValue.value', internalValue.value);
 });
 const updateValue = (event: Event) => {
 	const target = event.target as HTMLInputElement;
-	const value = target.value;
+	const newDate = target.value;
 
 	// // Clamp our value between our min and max
 	// const clampedDate = clampNumber(
@@ -54,7 +56,9 @@ const updateValue = (event: Event) => {
 	// 	new Date(internalMax.value).getTime()
 	// );
 
-	const date = new Date(value);
+	const date = createDateFromInput(newDate);
+
+	console.log('date', date);
 	emit('update:modelValue', date);
 };
 </script>
