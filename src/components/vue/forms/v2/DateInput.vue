@@ -34,10 +34,6 @@ const internalValue = ref<string>();
 const dateInput = ref(null);
 const internalMin = computed(() => {
 	if (!props.min) return '';
-	console.log(
-		'props.min',
-		createDateFromDate(props.min).toISOString().slice(0, 10),
-	);
 	return createDateFromDate(props.min).toISOString().slice(0, 10);
 });
 const internalMax = computed(() => {
@@ -63,7 +59,6 @@ const updateValue = (event: Event) => {
 
 	const date = createDateFromInput(newDate);
 
-	console.log('date', date);
 	emit('update:modelValue', date);
 };
 </script>

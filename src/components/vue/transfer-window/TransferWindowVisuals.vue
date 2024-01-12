@@ -179,7 +179,7 @@ async function loadModels() {
 	const textureLoader = new THREE.TextureLoader();
 
 	// TODO: Do we want to load these dynamically instead of on load?
-	planetTextures.sun = await textureLoader.load(textureDir + '2k_sun.jpg');
+	// planetTextures.sun = await textureLoader.load(textureDir + '2k_sun.jpg');
 
 	planetTextures.space = await textureLoader.load(
 		textureDir + '2k_stars_milky_way.jpg',
@@ -188,15 +188,23 @@ async function loadModels() {
 
 function setupScene() {
 	setupThreeJS();
-	setupSun();
-	setupSpace();
-	drawOrbits();
+	setupSceneObjects();
 
 	loading.value = false;
 
 	if (!animation.prevTick) {
 		animate();
 	}
+}
+
+function setupSceneObjects() {
+	if (three.scene) {
+		clearScene();
+	}
+
+	setupSun();
+	setupSpace();
+	drawOrbits();
 }
 
 function clearScene(): void {
@@ -270,7 +278,7 @@ function setupCamera() {
 
 	// Camera
 	const cameraPositionDistance = AUtoDistance * 2.5;
-	const cameraZoomDistance = AUtoDistance * 60;
+	const cameraZoomDistance = AUtoDistance * 100;
 
 	let rendererSize = new THREE.Vector2();
 	three.renderer.getSize(rendererSize);
@@ -299,7 +307,7 @@ function setupSun() {
 	if (!three.scene) return;
 
 	const material = new THREE.MeshLambertMaterial({
-		map: planetTextures.sun,
+		//map: planetTextures.sun,
 		side: THREE.FrontSide,
 		color: 0xffa500,
 		emissive: 0xffff00,
@@ -332,12 +340,6 @@ function setupSpace() {
 }
 
 function drawOrbits() {
-	// Draw orbital lines for each planet
-	if (three.scene) {
-		clearScene();
-	}
-
-	// Iterate through all planets
 	planets.map((planet) => {
 		drawOrbit(planet);
 
@@ -691,7 +693,7 @@ watch(
 	() => props.formData.departureDateMin,
 	(newVal: Date) => {
 		currentTime.value = newVal;
-		drawOrbits();
+		setupSceneObjects();
 	},
 );
 </script>

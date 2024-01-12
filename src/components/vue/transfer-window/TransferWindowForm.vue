@@ -67,6 +67,7 @@
 				label="Departure Date Min"
 				:model-value="localDepartureDateMin"
 				:max="localDepartureDateMax"
+				:min="EPOCH"
 				@input="handleMinInput"
 			/>
 
@@ -75,6 +76,7 @@
 				label="Departure Date Max"
 				:model-value="localDepartureDateMax"
 				:min="localDepartureDateMin"
+				:max="maxDate"
 				@input="handleMaxInput"
 			/>
 		</div>
@@ -101,6 +103,7 @@ import DateInput from '../forms/v2/DateInput.vue';
 import type { ITransferWindowForm } from './types';
 import { planets } from './planets';
 import { createDateFromDate, createDateFromInput } from '../utils';
+import { EPOCH, MS_YEAR } from './constants';
 
 const props = defineProps<{
 	modelValue: ITransferWindowForm;
@@ -110,6 +113,11 @@ const emit = defineEmits(['update:modelValue']);
 
 const localDepartureDateMin = ref(props.modelValue.departureDateMin);
 const localDepartureDateMax = ref(props.modelValue.departureDateMax);
+const maxDate = computed(() => {
+	// Limit to only 10 years from start date.
+	// May want to limit this further to reduce processing time.
+	return new Date(localDepartureDateMin.value.getTime() + 10 * MS_YEAR);
+});
 
 function handleMinInput(event: InputEvent) {
 	if (!event.target || !(event.target instanceof HTMLInputElement)) {
@@ -123,6 +131,7 @@ function handleMaxInput(event: Event) {
 		return;
 	}
 	localDepartureDateMax.value = createDateFromInput(event.target.value);
+	console.log('localDepartureDateMax.value', localDepartureDateMax.value);
 }
 
 watch(localDepartureDateMin, (newDate: Date) => {
