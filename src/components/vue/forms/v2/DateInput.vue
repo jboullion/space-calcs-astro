@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
-import { createDateFromInput } from '../../utils';
+import { createDateFromDate, createDateFromInput } from '../../utils';
 import InputWrapper from './InputWrapper.vue';
 import { useAttrs } from 'vue';
 
@@ -33,17 +33,22 @@ const props = defineProps<{
 const internalValue = ref<string>();
 const dateInput = ref(null);
 const internalMin = computed(() => {
-	return props.min ? props.min.toISOString().slice(0, 10) : '';
+	if (!props.min) return '';
+	console.log(
+		'props.min',
+		createDateFromDate(props.min).toISOString().slice(0, 10),
+	);
+	return createDateFromDate(props.min).toISOString().slice(0, 10);
 });
 const internalMax = computed(() => {
-	return props.max ? props.max.toISOString().slice(0, 10) : '';
+	if (!props.max) return '';
+	return createDateFromDate(props.max).toISOString().slice(0, 10);
 });
 
 onMounted(() => {
-	console.log('props.modelValue', props.modelValue);
-	internalValue.value = props.modelValue.toISOString().slice(0, 10); //.toISOString().split('T')[0];props.modelValue.toISOString().slice(0, 10)
-
-	console.log('internalValue.value', internalValue.value);
+	internalValue.value = createDateFromDate(props.modelValue)
+		.toISOString()
+		.slice(0, 10);
 });
 const updateValue = (event: Event) => {
 	const target = event.target as HTMLInputElement;

@@ -91,7 +91,7 @@
 
 // ? NOTE: Optional Improvements!
 
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import InputWrapper from '../forms/v2/InputWrapper.vue';
 import NumberInput from '../forms/v2/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
@@ -126,12 +126,7 @@ function handleMaxInput(event: Event) {
 }
 
 watch(localDepartureDateMin, (newDate: Date) => {
-	console.log('newDate', newDate);
 	props.modelValue.departureDateMin = createDateFromDate(newDate);
-	console.log(
-		'props.modelValue.departureDateMin',
-		props.modelValue.departureDateMin,
-	);
 	emit('update:modelValue', props.modelValue);
 });
 

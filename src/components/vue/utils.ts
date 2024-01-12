@@ -378,6 +378,7 @@ export function setWithExpiry(key: string, value: any, ttl: number) {
 	localStorage.setItem(key, JSON.stringify(item));
 }
 
+// Avoid various timezone issues by just getting a date object with no time
 export function createDateFromInput(dateString: string) {
 	const [year, month, day] = dateString
 		.split('-')
@@ -385,6 +386,7 @@ export function createDateFromInput(dateString: string) {
 	return new Date(year, month - 1, day);
 }
 
+// Avoid various timezone issues by just getting a date object with no time
 export function createDateFromDate(date: Date) {
 	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }

@@ -1,10 +1,10 @@
 <template>
 	<div class="calc-form">
 		<div class="d-flex justify-content-between mb-3">
-			<button class="btn btn-primary btn-lg px-5" @click="play">
+			<button class="btn btn-primary btn-lg px-5" @click="playTransfer">
 				<i class="fas" :class="playClass"></i>
 			</button>
-			<h3 class="mb-0">{{ displayTime.toDateString() }}</h3>
+			<h3 class="mb-0">{{ currentDateString }}</h3>
 		</div>
 		<div
 			id="transfer-window-canvas"
@@ -61,10 +61,10 @@ const textureDir = '/textures/';
 
 const animation = {
 	prevTick: 0,
-	play: false,
 	complete: false,
 	FPS: 24,
 };
+const play = ref(false);
 
 // const AURatio = 100000; // dividing our actual AU by this number to make it easier to work with
 const AUtoDistance = 1000; // Turn AU into on screen distance
@@ -74,8 +74,8 @@ const props = defineProps<{
 }>();
 
 // Time Variables
-let currentTime = new Date(); // May not actually be now, just when it is displayed
-const displayTime = ref(new Date()); // The time that is displayed on the screen
+let currentTime = ref(new Date()); // May not actually be now, just when it is displayed
+
 const timeScale = 30; // Number of increments per second
 const apparentTimeRate = 3600 * 24; // Rate at which time passes in sim seconds / real second
 let timeRate = 3600 * 24 * 7; // Rate at which time passes in sim seconds / computational second
@@ -119,7 +119,7 @@ onBeforeUnmount(() => {
  */
 const playClass = computed(() => {
 	if (!animation.complete) {
-		if (!animation.play) {
+		if (!play.value) {
 			return 'fa-play';
 		} else {
 			return 'fa-pause';
@@ -127,6 +127,17 @@ const playClass = computed(() => {
 	} else {
 		return 'fa-undo';
 	}
+});
+
+const currentDateString = computed(() => {
+	const options = {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+	};
+
+	// @ts-ignore
+	return currentTime.value.toLocaleDateString('en-us', options);
 });
 
 // function updateConstants() {
@@ -619,25 +630,22 @@ function animate() {
 
 	if (now == animation.prevTick) return;
 
-	if (!animation.play) return;
+	if (!play.value) return;
 
 	// Move time forward only during simulation
-	currentTime = new Date(currentTime.getTime() + timeIncrement);
-	displayTime.value = currentTime;
-	// displayTime = new Date(currentTime.getTime() + timeDiff);
+	currentTime.value = new Date(currentTime.value.getTime() + timeIncrement);
 
 	updatePlanets();
 
 	animation.prevTick = now;
 }
 
-function play() {
+function playTransfer() {
 	if (animation.complete) {
-		//reset();
 		return;
 	}
 
-	animation.play = !animation.play;
+	play.value = !play.value;
 }
 
 function updatePlanets() {
@@ -651,7 +659,7 @@ function updatePlanet(planet: PlanetOrbit) {
 
 	const position = findPlanetLocation(
 		planet,
-		currentTime.getTime(),
+		currentTime.value.getTime(),
 	) as Vector3Tuple;
 
 	planet.planetMesh.position.set(...position);
@@ -682,9 +690,7 @@ function renderPlanet(planet: PlanetOrbit) {
 watch(
 	() => props.formData.departureDateMin,
 	(newVal: Date) => {
-		currentTime = newVal;
-		displayTime.value = currentTime;
-		console.log({ newVal, currentTime, displayTime });
+		currentTime.value = newVal;
 		drawOrbits();
 	},
 );
