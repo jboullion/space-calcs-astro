@@ -181,6 +181,8 @@ async function loadModels() {
 	// TODO: Do we want to load these dynamically instead of on load?
 	planetTextures.sun = await textureLoader.load(textureDir + '2k_sun.jpg');
 
+	console.log(planetTextures.sun);
+
 	planetTextures.space = await textureLoader.load(
 		textureDir + '2k_stars_milky_way.jpg',
 	);
@@ -188,15 +190,23 @@ async function loadModels() {
 
 function setupScene() {
 	setupThreeJS();
-	setupSun();
-	setupSpace();
-	drawOrbits();
+	setupSceneObjects();
 
 	loading.value = false;
 
 	if (!animation.prevTick) {
 		animate();
 	}
+}
+
+function setupSceneObjects() {
+	if (three.scene) {
+		clearScene();
+	}
+
+	setupSun();
+	setupSpace();
+	drawOrbits();
 }
 
 function clearScene(): void {
@@ -312,6 +322,8 @@ function setupSun() {
 	const mesh = new THREE.Mesh(geometry, material);
 	mesh.rotation.set(Math.PI / 2, 0, 0);
 
+	console.log(mesh);
+
 	three.scene.add(mesh);
 }
 
@@ -332,12 +344,6 @@ function setupSpace() {
 }
 
 function drawOrbits() {
-	// Draw orbital lines for each planet
-	if (three.scene) {
-		clearScene();
-	}
-
-	// Iterate through all planets
 	planets.map((planet) => {
 		drawOrbit(planet);
 
@@ -691,7 +697,7 @@ watch(
 	() => props.formData.departureDateMin,
 	(newVal: Date) => {
 		currentTime.value = newVal;
-		drawOrbits();
+		setupSceneObjects();
 	},
 );
 </script>
