@@ -179,9 +179,7 @@ async function loadModels() {
 	const textureLoader = new THREE.TextureLoader();
 
 	// TODO: Do we want to load these dynamically instead of on load?
-	planetTextures.sun = await textureLoader.load(textureDir + '2k_sun.jpg');
-
-	console.log(planetTextures.sun);
+	// planetTextures.sun = await textureLoader.load(textureDir + '2k_sun.jpg');
 
 	planetTextures.space = await textureLoader.load(
 		textureDir + '2k_stars_milky_way.jpg',
@@ -280,7 +278,7 @@ function setupCamera() {
 
 	// Camera
 	const cameraPositionDistance = AUtoDistance * 2.5;
-	const cameraZoomDistance = AUtoDistance * 60;
+	const cameraZoomDistance = AUtoDistance * 100;
 
 	let rendererSize = new THREE.Vector2();
 	three.renderer.getSize(rendererSize);
@@ -309,7 +307,7 @@ function setupSun() {
 	if (!three.scene) return;
 
 	const material = new THREE.MeshLambertMaterial({
-		map: planetTextures.sun,
+		//map: planetTextures.sun,
 		side: THREE.FrontSide,
 		color: 0xffa500,
 		emissive: 0xffff00,
@@ -321,8 +319,6 @@ function setupSun() {
 	const geometry = new THREE.SphereGeometry(sunRadius, 16, 16);
 	const mesh = new THREE.Mesh(geometry, material);
 	mesh.rotation.set(Math.PI / 2, 0, 0);
-
-	console.log(mesh);
 
 	three.scene.add(mesh);
 }
