@@ -1,17 +1,26 @@
 <template>
-	<div>
+	<div class="calc-form">
+		<div class="d-flex justify-content-between mb-3">
+			<button class="btn btn-primary btn-lg px-5" @click="playTransfer">
+				<i class="fas" :class="playClass"></i>
+			</button>
+			<h3 class="mb-0">{{ currentDateString }}</h3>
+		</div>
 		<div
 			id="transfer-window-canvas"
 			class="canvas-wrapper border"
-			style="position: relative; height: 600px; width: 100%"
+			style="position: relative; padding-top: 75%; width: 100%"
 		>
-			<i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+			<i
+				v-if="loading"
+				class="fas fa-cog fa-spin mb-0 h1 position-absolute top-50 start-50"
+			></i>
 		</div>
 	</div>
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // import {
@@ -20,6 +29,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 // } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 import { removeAllChildNodes } from '../utils';
+import { throttle } from '../../../utils/utils';
 import { planet, planetTextures, three, EPOCH } from './constants';
 
 import type {
@@ -51,7 +61,10 @@ const textureDir = '/textures/';
 
 const animation = {
 	prevTick: 0,
+	complete: false,
+	FPS: 24,
 };
+const play = ref(false);
 
 // const AURatio = 100000; // dividing our actual AU by this number to make it easier to work with
 const AUtoDistance = 1000; // Turn AU into on screen distance
@@ -60,52 +73,21 @@ const props = defineProps<{
 	formData: ITransferWindowForm;
 }>();
 
-type PlanetPosition = {
-	[key: string]: Vector3Tuple;
-};
-
-const currentPositions: PlanetPosition = {
-	sun: [0, 0, 0],
-};
-
 // Time Variables
-const clock = new THREE.Clock();
-let lastTimeRatio = 1;
-let timeRatio = 1;
-const now = new Date();
-let displayTime = now;
-let currentTime = new Date(); // May not actually be now, just when it is displayed
-const newDate = ref(currentTime);
-const timeDiff = displayTime.getTime() - currentTime.getTime();
+let currentTime = ref(new Date()); // May not actually be now, just when it is displayed
+
 const timeScale = 30; // Number of increments per second
 const apparentTimeRate = 3600 * 24; // Rate at which time passes in sim seconds / real second
 let timeRate = 3600 * 24 * 7; // Rate at which time passes in sim seconds / computational second
 let timeIncrement = (timeRate * 1000) / timeScale; // Simulation time to add per time increment
-const FPS = 24; // TODO: Increase to 24 or 30 when done testing
 
 // Orbit Variables
 const orbitResolution = 1; // Could probably reduce this to 1 or 0.5 to reduce the number of points calculated
 const orbitalTimes: OrbitalTime = {};
 const orbitalVelocities: OrbitalVelocity = {};
 const orbitalPositions: OrbitalPosition = {};
-const currentDegrees: OrbitalDegree = {
-	sun: 0,
-	mercury: 0,
-	venus: 0,
-	earth: 0,
-	mars: 0,
-	jupiter: 0,
-	saturn: 0,
-	uranus: 0,
-	neptune: 0,
-	pluto: 0,
-};
 
-const sphereGeo = new THREE.SphereGeometry(100, 16, 16);
-const markerScale = (1 / 10) * (3 / 4);
-const totalScale = Math.round(convertDistance('AU', 'M'));
-const geoScale = totalScale;
-
+const debouncedResize = throttle(onWindowResize, 32);
 /**
  *
  *
@@ -117,19 +99,15 @@ const geoScale = totalScale;
 onMounted(async () => {
 	await loadModels();
 
-	// Setup planet data for current time
-	planets.map((planet) => {
-		generateOrbitalCoords(planet);
-		generateOrbitalTimes(planet);
-	});
+	updateCoords();
 
 	setupScene();
 
-	window.addEventListener('resize', setupScene, { passive: true });
+	window.addEventListener('resize', debouncedResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', debouncedResize);
 });
 
 /**
@@ -139,6 +117,28 @@ onBeforeUnmount(() => {
  *
  *
  */
+const playClass = computed(() => {
+	if (!animation.complete) {
+		if (!play.value) {
+			return 'fa-play';
+		} else {
+			return 'fa-pause';
+		}
+	} else {
+		return 'fa-undo';
+	}
+});
+
+const currentDateString = computed(() => {
+	const options = {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+	};
+
+	// @ts-ignore
+	return currentTime.value.toLocaleDateString('en-us', options);
+});
 
 // function updateConstants() {
 // 	var delta = clock.getDelta() * 60;
@@ -167,6 +167,14 @@ onBeforeUnmount(() => {
  *
  */
 
+function updateCoords() {
+	// Setup planet data for current time
+	planets.map((planet) => {
+		generateOrbitalCoords(planet);
+		generateOrbitalTimes(planet);
+	});
+}
+
 async function loadModels() {
 	const textureLoader = new THREE.TextureLoader();
 
@@ -179,11 +187,6 @@ async function loadModels() {
 }
 
 function setupScene() {
-	if (three.scene && three.canvas) {
-		removeAllChildNodes(three.canvas);
-		//clearZones();
-	}
-
 	setupThreeJS();
 	setupSun();
 	setupSpace();
@@ -193,6 +196,12 @@ function setupScene() {
 
 	if (!animation.prevTick) {
 		animate();
+	}
+}
+
+function clearScene(): void {
+	while (three.scene.children.length > 0) {
+		three.scene.remove(three.scene.children[0]);
 	}
 }
 
@@ -211,10 +220,9 @@ function setupThreeJS() {
 
 	three.canvas.appendChild(three.renderer.domElement);
 
-	const width = three.canvas.getBoundingClientRect().width;
-	const height = 600;
+	updateRenderSize();
 
-	three.renderer.setSize(width, height);
+	setupCamera();
 
 	// three.labelRenderer = new CSS2DRenderer();
 
@@ -223,8 +231,6 @@ function setupThreeJS() {
 	// three.labelRenderer.domElement.style.top = '0px';
 	// three.labelRenderer.domElement.style.pointerEvents = 'none';
 	// three.canvas.appendChild(three.labelRenderer.domElement);
-
-	updateCamera();
 
 	// Lights
 	three.scene.add(new THREE.AmbientLight(0x404040));
@@ -238,7 +244,28 @@ function setupThreeJS() {
 	// this.three.canvas.appendChild(this.three.gui.domElement);
 }
 
-function updateCamera() {
+function updateRenderSize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
+
+function onWindowResize(): void {
+	updateRenderSize();
+}
+
+function setupCamera() {
 	if (!three.renderer) return;
 
 	// Camera
@@ -306,6 +333,9 @@ function setupSpace() {
 
 function drawOrbits() {
 	// Draw orbital lines for each planet
+	if (three.scene) {
+		clearScene();
+	}
 
 	// Iterate through all planets
 	planets.map((planet) => {
@@ -596,17 +626,26 @@ function animate() {
 
 	// clamp to fixed framerate
 
-	const now = Math.round((FPS * window.performance.now()) / 1000);
+	const now = Math.round((animation.FPS * window.performance.now()) / 1000);
 
 	if (now == animation.prevTick) return;
 
+	if (!play.value) return;
+
 	// Move time forward only during simulation
-	currentTime = new Date(currentTime.getTime() + timeIncrement);
-	// displayTime = new Date(currentTime.getTime() + timeDiff);
+	currentTime.value = new Date(currentTime.value.getTime() + timeIncrement);
 
 	updatePlanets();
 
 	animation.prevTick = now;
+}
+
+function playTransfer() {
+	if (animation.complete) {
+		return;
+	}
+
+	play.value = !play.value;
 }
 
 function updatePlanets() {
@@ -620,7 +659,7 @@ function updatePlanet(planet: PlanetOrbit) {
 
 	const position = findPlanetLocation(
 		planet,
-		currentTime.getTime(),
+		currentTime.value.getTime(),
 	) as Vector3Tuple;
 
 	planet.planetMesh.position.set(...position);
@@ -644,4 +683,15 @@ function renderPlanet(planet: PlanetOrbit) {
 
 	three.scene.add(planet.planetMesh);
 }
+
+/**
+ * Watchers
+ */
+watch(
+	() => props.formData.departureDateMin,
+	(newVal: Date) => {
+		currentTime.value = newVal;
+		drawOrbits();
+	},
+);
 </script>

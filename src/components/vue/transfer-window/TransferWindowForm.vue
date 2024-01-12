@@ -4,14 +4,14 @@
 			<SelectInput
 				id="origin-location"
 				label="Origin Planet"
-				v-model="formData.origin"
+				v-model="modelValue.origin"
 				:options="planets"
 			/>
 
 			<SelectInput
 				id="destination-location"
 				label="Destination Planet"
-				v-model="formData.destination"
+				v-model="modelValue.destination"
 				:options="planets"
 			/>
 
@@ -19,10 +19,10 @@
 				<template v-slot:input>
 					<NumberInput
 						id="departure"
-						:key="`departure-${formData.originOrbit}`"
+						:key="`departure-${modelValue.originOrbit}`"
 						type="number"
 						class="form-control"
-						v-model.number="formData.originOrbit"
+						v-model.number="modelValue.originOrbit"
 						:min="1"
 						:max="100000"
 						:step="1"
@@ -41,10 +41,10 @@
 				<template v-slot:input>
 					<NumberInput
 						id="departure"
-						:key="`departure-${formData.destinationOrbit}`"
+						:key="`departure-${modelValue.destinationOrbit}`"
 						type="number"
 						class="form-control"
-						v-model.number="formData.destinationOrbit"
+						v-model.number="modelValue.destinationOrbit"
 						:min="1"
 						:max="100000"
 						:step="1"
@@ -58,35 +58,24 @@
 			<CheckboxInput
 				id="aerobrake"
 				label="Aerobrake?"
-				v-model="formData.aerobrake"
-				:value="false"
-			/>
-			<!-- 
-			<CheckboxInput
-				id="porkchop"
-				label="Porkchp Plot"
-				v-model="formData.porkchop"
-				:value="true"
-			/> -->
-
-			<CheckboxInput
-				id="depart-today"
-				label="Depart Today?"
-				v-model="formData.departureToday"
+				v-model="modelValue.aerobrake"
 				:value="false"
 			/>
 
 			<DateInput
 				id="departure-date-min"
 				label="Departure Date Min"
-				v-model="formData.departureDateMin"
+				:model-value="localDepartureDateMin"
+				:max="localDepartureDateMax"
+				@input="handleMinInput"
 			/>
 
 			<DateInput
 				id="departure-date-max"
 				label="Departure Date Max"
-				v-model="formData.departureDateMax"
-				:value="formData.departureDateMax"
+				:model-value="localDepartureDateMax"
+				:min="localDepartureDateMin"
+				@input="handleMaxInput"
 			/>
 		</div>
 	</div>
@@ -102,7 +91,7 @@
 
 // ? NOTE: Optional Improvements!
 
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import InputWrapper from '../forms/v2/InputWrapper.vue';
 import NumberInput from '../forms/v2/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
@@ -111,12 +100,38 @@ import CheckboxInput from '../forms/CheckboxInput.vue';
 import DateInput from '../forms/v2/DateInput.vue';
 import type { ITransferWindowForm } from './types';
 import { planets } from './planets';
+import { createDateFromDate, createDateFromInput } from '../utils';
 
 const props = defineProps<{
-	formData: ITransferWindowForm;
+	modelValue: ITransferWindowForm;
 }>();
 
-const emit = defineEmits([]);
+const emit = defineEmits(['update:modelValue']);
 
-onMounted(() => {});
+const localDepartureDateMin = ref(props.modelValue.departureDateMin);
+const localDepartureDateMax = ref(props.modelValue.departureDateMax);
+
+function handleMinInput(event: InputEvent) {
+	if (!event.target || !(event.target instanceof HTMLInputElement)) {
+		return;
+	}
+	localDepartureDateMin.value = createDateFromInput(event.target.value);
+}
+
+function handleMaxInput(event: Event) {
+	if (!event.target || !(event.target instanceof HTMLInputElement)) {
+		return;
+	}
+	localDepartureDateMax.value = createDateFromInput(event.target.value);
+}
+
+watch(localDepartureDateMin, (newDate: Date) => {
+	props.modelValue.departureDateMin = createDateFromDate(newDate);
+	emit('update:modelValue', props.modelValue);
+});
+
+watch(localDepartureDateMax, (newDate: Date) => {
+	props.modelValue.departureDateMax = createDateFromDate(newDate);
+	emit('update:modelValue', props.modelValue);
+});
 </script>

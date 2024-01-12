@@ -4,7 +4,10 @@
 		class="row justify-content-center calculator"
 	>
 		<div id="transfer-window__form" class="col-lg-4">
-			<TransferWindowForm :formData="formData" />
+			<TransferWindowForm
+				v-model="formData"
+				@update:model-value="formData = $event"
+			/>
 		</div>
 		<div id="transfer-window__results" class="col-lg-8">
 			<!-- <TransferWindowResults :formData="formData" /> -->
@@ -25,6 +28,7 @@ import TransferWindowForm from './TransferWindowForm.vue';
 import TransferWindowVisuals from './TransferWindowVisuals.vue';
 import type { ITransferWindowForm } from './types';
 import { planets } from './planets';
+import { MS_YEAR } from './constants';
 
 const formData = ref<ITransferWindowForm>({
 	origin: planets[2],
@@ -33,15 +37,15 @@ const formData = ref<ITransferWindowForm>({
 	destinationOrbit: 600,
 	aerobrake: false,
 	// porkchop: true,
-	departureToday: true,
+	departureToday: false, // TODO: Probably remove this
 	departureDateMin: new Date(),
-	departureDateMax: new Date(
-		new Date().getTime() + 1000 * 60 * 60 * 24 * 365,
-	),
+	departureDateMax: new Date(new Date().getTime() + MS_YEAR),
 });
 
 onBeforeMount(() => {});
 
 onMounted(() => {});
+
+// watch our formdata departureDateMin and departureDateMax values
 </script>
 <style></style>
