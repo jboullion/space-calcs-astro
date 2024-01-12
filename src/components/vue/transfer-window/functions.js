@@ -209,7 +209,7 @@ export function calculateVectorFromRADE(RA, DE) {
 
 // Orbital Calculation Functions
 
-export function findPeriod(a, center) {
+function findPeriod(a, center) {
 	// Find the period of a planet given the center and semi-major axis
 
 	// Find and convert the gravitational parameter of the center
@@ -221,6 +221,32 @@ export function findPeriod(a, center) {
 		((4 * Math.pow(Math.PI, 2)) / gravitationalParameter) * Math.pow(a, 3),
 		1 / 2,
 	); // Period in years. 1AU = 1 year
+}
+
+function findGravParam(center) {
+	// Find gravitational parameter of a body
+
+	// Set default mass to sun
+	var mass = 1.98855 * Math.pow(10, 30);
+
+	// Reverse-derive from orbit of the Earth
+	mass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
+
+	// Calculate the gravitational parameter
+	var gravitationalParameter = mass * gravitationalConstant;
+
+	if (center != 'sun') {
+		// If around a non-sun body, find the parameter
+		if (planets[center]['mass']) {
+			gravitationalParameter =
+				planets[center]['mass'] * gravitationalConstant;
+		} else {
+			gravitationalParameter = planets[center]['gravParam'];
+		}
+	}
+
+	// Return the gravitational parameter
+	return gravitationalParameter;
 }
 
 export function calculateSynodicPeriod(period1, period2) {

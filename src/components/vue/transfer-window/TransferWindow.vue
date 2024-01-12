@@ -32,11 +32,11 @@ import { MS_YEAR } from './constants';
 
 const formData = ref<ITransferWindowForm>({
 	origin: planets[2],
-	destination: planets[4],
+	destination: planets[3],
 	originOrbit: 600,
 	destinationOrbit: 600,
 	aerobrake: false,
-	// porkchop: true,
+	// porkchop: true, // TODO: Properly implement porkchop
 	departureToday: false, // TODO: Probably remove this
 	departureDateMin: new Date(),
 	departureDateMax: new Date(new Date().getTime() + MS_YEAR),

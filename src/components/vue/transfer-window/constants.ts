@@ -1,3 +1,10 @@
+import * as THREE from 'three';
+import type { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+// @ts-ignore
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+import { M3S2toAU3Y2 } from './functions';
+
 export type SolarEnergyForm = {
 	starRadius: number; // Solar radii
 	starTemperature: number; // K
@@ -6,13 +13,6 @@ export type SolarEnergyForm = {
 	solarPanelEfficiency: number; // 0-100% of light reflected
 	showLabels: boolean;
 };
-
-import * as THREE from 'three';
-import type { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-// @ts-ignore
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
-import { AU3Y2toM3S2 } from './functions';
 
 export type Zone = {
 	name: string;
@@ -110,11 +110,12 @@ export const EPOCH = new Date(2000, 0, 1, 12, 0, 0, 0); // January 2000, 12h ter
 // Set default mass to sun
 let SolMass = 1.98855 * Math.pow(10, 30);
 
-// Reverse-derive from orbit of the Earth
-SolMass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
+// // Reverse-derive from orbit of the Earth
+// SolMass = AU3Y2toM3S2(4 * Math.PI * Math.PI) / gravitationalConstant;
 
 // Calculate the gravitational parameter
 export const gravitationalParameter = SolMass * gravitationalConstant; // m3 s-2
+export const gravitationalParameterAU = M3S2toAU3Y2(gravitationalParameter);
 
 export const MS_SECOND = 1000;
 export const MS_MINUTE = 60 * 1000;

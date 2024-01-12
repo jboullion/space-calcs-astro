@@ -41,6 +41,12 @@ import type { PlanetOrbit } from './types';
 
 // }
 
+export const SUN = {
+	r: 0.00464913034,
+	mass: 1.98855 * Math.pow(10, 30),
+	//a: sunMarkerSize / markerScale,
+};
+
 export const planets: PlanetOrbit[] = [
 	{
 		name: 'Mercury',
