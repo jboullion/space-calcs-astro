@@ -54,6 +54,8 @@ import type {
 	ScalarInput,
 	VectorInput,
 	TransferFormat,
+	TransferData,
+	Maneuver,
 } from './types';
 
 import { SUN, planets } from './planets';
@@ -78,6 +80,8 @@ import {
 	pow,
 	sin,
 	tan,
+	convertDistance,
+	vectorToAngle,
 } from './functions';
 
 import { calculateOrbitalPositionVector } from './functions-ts';
@@ -120,6 +124,12 @@ let inSecondStage = false;
 let storedWindows: TransferFormat[] = [];
 let lowestDeltaVee: ScalarInput = parseScalarInput(Math.pow(10, 10), 'm/s');
 let transTime: Date;
+let twoStage = false;
+let lastTimeRatio = 1;
+let timeRatio = 1;
+let lowestData: TransferFormat;
+let storedTransferData: TransferData;
+let returnData: any;
 
 const debouncedResize = throttle(onWindowResize, 32);
 /**
@@ -635,16 +645,16 @@ function calculateIPTransfer() {
 	// Set the initial transit time - this is used for evaluating efficiency
 	transTime = new Date();
 
-	// Stop a transit if one is in progress
-	if (shipEndTime) {
-		endShipTransit();
-	}
+	// // Stop a transit if one is in progress
+	// if (shipEndTime) {
+	// 	endShipTransit();
+	// }
 
 	// // Hide the delta vee display, to reset
 	// document.getElementById('deltaVeeDisplay').style.display = 'none';
 
 	// Clear maneuvers list
-	var maneuvers = [];
+	let maneuvers: Maneuver[] = [];
 
 	// Import and format names correctly
 	var properNameTwo = props.formData.destination.name; //document.getElementById('toTarget').value.replace('The ', '');
@@ -668,7 +678,10 @@ function calculateIPTransfer() {
 		maneuvers.push({
 			name: 'T' + properNameTwo[0] + 'I',
 			title: 'Trans-' + properNameTwo + ' Injection',
-			deltaVee: calculateEscapeVelocity(nameOne, fromRadius),
+			deltaVee: calculateEscapeVelocity(
+				props.formData.origin,
+				fromRadius,
+			),
 		});
 
 		// Stop people from activating transfer  too many times
@@ -685,9 +698,10 @@ function calculateIPTransfer() {
 		);
 
 		storedTransferData = {
+			//@ts-ignore
 			maneuvers: maneuvers,
-			nameOne: nameOne,
-			nameTwo: nameTwo,
+			originPlanet: props.formData.origin,
+			destinationPlanet: props.formData.destination,
 			properNameTwo: properNameTwo,
 			fromRadius: fromRadius,
 			toRadius: toRadius,
@@ -864,6 +878,7 @@ function calculateLambertTransfer(
 	// var rTwo = [];
 
 	// Keep track of the data - lowest data contains the best transit data, the lowest DV keeps track of whether a new one is better
+	// @ts-ignore
 	lowestData = {};
 	lowestDeltaVee = parseScalarInput(Math.pow(10, 10), 'm/s');
 
@@ -975,7 +990,7 @@ function calculateTransferWindow(
 		'AU',
 	);
 	var departingVelocity = parseVectorInput(
-		findVelocity(originPlanet, departingTime),
+		findVelocity(originPlanet, departingTime.getTime()),
 		'AU/y',
 	);
 
@@ -988,7 +1003,7 @@ function calculateTransferWindow(
 		'AU',
 	);
 	var arrivingVelocity = parseVectorInput(
-		findVelocity(destinationPlanet, arrivingTime),
+		findVelocity(destinationPlanet, arrivingTime.getTime()),
 		'AU/y',
 	);
 
@@ -1344,22 +1359,110 @@ function calculateTransferWindow(
 	} else {
 		messageUpdated = false;
 	}
+}
 
-	// // Update loading text
-	// var displayText =
-	// 	'Calculating Transfer<br>' +
-	// 	round((100 * deptTime) / synodicPeriod.value, 0) +
-	// 	'%';
+function findVelocity(planet: PlanetOrbit, time: number) {
+	// Return velocity at a given time of a planet
 
-	// displayText += lastTimeMessage;
-	// document.getElementById('loadingText').innerHTML = displayText;
-	// document.getElementById('loadingTextAux').innerHTML = displayText;
+	// Find position and then the degree to match with other knowledge
+	var position = findPlanetLocation(planet, time);
+	var degree =
+		Math.round((360 + vectorToAngle(position)) * orbitResolution) %
+		(360 * orbitResolution);
 
-	// // Otherwise, keep adding dots
-	// document.getElementById('wittyText').innerHTML =
-	// 	message + '.'.repeat(Math.floor(seconds));
-	// document.getElementById('wittyTextAux').innerHTML =
-	// 	message + '.'.repeat(Math.floor(seconds));
+	var newDegree = Math.round(
+		findPlanetDegree(planet, position) * orbitResolution,
+	);
+	if (!isNaN(newDegree)) {
+		degree = (360 * orbitResolution + newDegree) % (360 * orbitResolution);
+	}
+
+	// Find the infintesimal change in distance and time
+	var deltaTime =
+		orbitalTimes[planet.value][(degree + 1) % (360 * orbitResolution)] -
+		orbitalTimes[planet.value][degree];
+	//deltaTime = findPeriod(planets[name].a, planets[name].center)
+	var deltaDist = subVec(
+		orbitalPositions[planet.value][(degree + 1) % (360 * orbitResolution)],
+		orbitalPositions[planet.value][degree],
+	);
+
+	// Velocity = distance / time, except to find a vector velocity, use a vector distance
+	var velocityVec = multiplyVec(1 / deltaTime, deltaDist);
+
+	// Set the magnitude of the velocity according to the viz-viva equation
+	var velMag = Math.sqrt(
+		gravitationalParameterAU * (2 / magnitude(position) - 1 / planet['a']),
+	);
+	velocityVec = setMagnitude(velocityVec, velMag);
+
+	// Return the velocity in vector form
+	return velocityVec;
+}
+
+function findPlanetDegree(planet: PlanetOrbit, position: Vector3Tuple) {
+	// This entire thing is reverse-deriving it by the same method used to generate the initial coords
+
+	// Get initial data
+	var e = planet['e'];
+	var i = planet['i'];
+	var a = planet['a'];
+	var loPE = planet['loPE'];
+	var loAN = planet['loAN'];
+
+	if (i == 0) {
+		i = 0.000001;
+	}
+
+	var o = DtoR(loAN);
+	i = DtoR(i);
+
+	var distance = magnitude(position);
+
+	// Recalculate position - see earlier in the program
+
+	// Find initial degrees from the ascending node, set up tests
+	var degreesFromAN = Math.asin(position[2] / (distance * Math.sin(i)));
+
+	var testXOne =
+		distance *
+		(Math.cos(o) * Math.cos(degreesFromAN) -
+			Math.sin(o) * Math.sin(degreesFromAN) * Math.cos(i));
+	var testYOne =
+		distance *
+		(Math.sin(o) * Math.cos(degreesFromAN) +
+			Math.cos(o) * Math.sin(degreesFromAN) * Math.cos(i));
+
+	var degreesFromANTwo = (Math.PI - degreesFromAN) % (2 * Math.PI);
+
+	var testXTwo =
+		distance *
+		(Math.cos(o) * Math.cos(degreesFromANTwo) -
+			Math.sin(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
+	var testYTwo =
+		distance *
+		(Math.sin(o) * Math.cos(degreesFromANTwo) +
+			Math.cos(o) * Math.sin(degreesFromANTwo) * Math.cos(i));
+
+	// Create test positions
+	var primary = [position[0], position[1], position[2]];
+	var testOne = [testXOne, testYOne, position[2]];
+	var testTwo = [testXTwo, testYTwo, position[2]];
+
+	var distOne = magnitude(subVec(primary, testOne));
+	var distTwo = magnitude(subVec(primary, testTwo));
+
+	// Decide which section of the inverse sin to use based on which is closer
+	if (distOne < distTwo) {
+		degreesFromAN = RtoD(degreesFromAN);
+	} else {
+		degreesFromAN = RtoD(degreesFromANTwo);
+	}
+
+	// Find final degree
+	var degree = -degreesFromAN - loAN;
+
+	return ((360 - degree) % 360) - 1 / orbitResolution;
 }
 
 function calculateEscapeVelocity(
@@ -1370,7 +1473,7 @@ function calculateEscapeVelocity(
 
 	// Get initial data
 	var r = centerBody['r'] * convertDistance('AU', 'KM', 1);
-	var gravParam = findGravParam(centerBody);
+	var gravParam = centerBody.gravParam; //findGravParam(centerBody);
 
 	// Calculate the total radius
 	var radiusTotal = (r + initalRadiusAbove) * convertDistance('KM', 'M', 1);
@@ -1391,7 +1494,7 @@ function calculateExtraVelocity(
 	// Calculate the excess velocity at the bottom of a hyperbolic trajectory given the velocity at insertion
 
 	// Get inital numbers
-	var SOIGravParam = findGravParam(name);
+	var SOIGravParam = planet.gravParam;
 	var insertionVelocity = velocity;
 
 	// Find the size of the SOI and the velocity at the edge
@@ -1432,87 +1535,95 @@ function findPeriod(a: number) {
 // 	}
 // }
 
-// function delayIPTransfer() {
-// 	// Set timeouts to get the results afterwards - Lambert uses these to stop program shutdown during computation
-// 	if (twoStage) {
-// 		setTimeout(function () {
-// 			setTimeout(function () {
-// 				finishIPTransfer();
-// 			}, 0);
-// 		}, 0);
-// 	} else {
-// 		setTimeout(function () {
-// 			setTimeout(function () {
-// 				finishIPTransfer();
-// 			}, 0);
-// 		}, 0);
-// 	}
-// }
+function delayIPTransfer() {
+	// Set timeouts to get the results afterwards - Lambert uses these to stop program shutdown during computation
+	if (twoStage) {
+		setTimeout(function () {
+			setTimeout(function () {
+				finishIPTransfer();
+			}, 0);
+		}, 0);
+	} else {
+		setTimeout(function () {
+			setTimeout(function () {
+				finishIPTransfer();
+			}, 0);
+		}, 0);
+	}
+}
 
-// function finishIPTransfer() {
-// 	// Finish off the IP Transfer
+function finishIPTransfer() {
+	// Finish off the IP Transfer
 
-// 	// Parse stored data
-// 	var maneuvers = storedTransferData.maneuvers;
-// 	var nameOne = storedTransferData.nameOne;
-// 	var nameTwo = storedTransferData.nameTwo;
-// 	var properNameTwo = storedTransferData.properNameTwo;
-// 	var fromRadius = storedTransferData.fromRadius;
-// 	var toRadius = storedTransferData.toRadius;
+	// Parse stored data
+	var maneuvers = storedTransferData.maneuvers;
+	var originPlanet = storedTransferData.originPlanet;
+	var destinationPlanet = storedTransferData.destinationPlanet;
+	var properNameTwo = storedTransferData.properNameTwo ?? 'pn2';
+	var fromRadius = storedTransferData.fromRadius;
+	var toRadius = storedTransferData.toRadius;
 
-// 	// Keep the returned data in a local variable
-// 	var array = returnData;
+	// Keep the returned data in a local variable
+	var array = returnData;
 
-// 	// Calculate the extra velocity needed for the transfer (note that these two both happen at once from the parking orbit)
-// 	var deltaVeeExit = calculateExtraVelocity(array['TO'], nameOne, fromRadius);
-// 	maneuvers.push({
-// 		// Add NAME Transfer orbit in the maneuvers list
-// 		name: properNameTwo[0] + 'TO',
-// 		title: properNameTwo + ' Transfer Orbit',
-// 		deltaVee: deltaVeeExit,
-// 	});
+	// Calculate the extra velocity needed for the transfer (note that these two both happen at once from the parking orbit)
+	var deltaVeeExit = calculateExtraVelocity(
+		array['TO'],
+		originPlanet,
+		fromRadius,
+	);
+	maneuvers.push({
+		// Add NAME Transfer orbit in the maneuvers list
+		name: properNameTwo[0] + 'TO',
+		title: properNameTwo + ' Transfer Orbit',
+		deltaVee: deltaVeeExit,
+	});
 
-// 	// Set ship parameters
-// 	shipParameters = array['params'];
+	// Set ship parameters
+	shipParameters = array['params'];
 
-// 	// Find hyperbolic excess velocity at arrival
-// 	var deltaVeeEnter = calculateExtraVelocity(array['CO'], nameTwo, toRadius);
+	// Find hyperbolic excess velocity at arrival
+	var deltaVeeEnter = calculateExtraVelocity(
+		array['CO'],
+		destinationPlanet,
+		toRadius,
+	);
 
-// 	// Add the next two maneuvers - Both occur at the final parking orbit
-// 	maneuvers.push({
-// 		name: properNameTwo[0] + 'CO',
-// 		hide: document.getElementById('IPAero').checked,
-// 		title: properNameTwo + ' Capture Orbit',
-// 		deltaVee: deltaVeeEnter,
-// 	});
-// 	maneuvers.push({
-// 		name: properNameTwo[0] + 'OI',
-// 		hide: document.getElementById('IPAero').checked,
-// 		title: properNameTwo + ' Orbit Insertion',
-// 		deltaVee: calculateEscapeVelocity(nameTwo, toRadius),
-// 	});
+	// Add the next two maneuvers - Both occur at the final parking orbit
+	maneuvers.push({
+		name: properNameTwo[0] + 'CO',
+		hide: props.formData.aerobrake,
+		title: properNameTwo + ' Capture Orbit',
+		deltaVee: deltaVeeEnter,
+	});
+	maneuvers.push({
+		name: properNameTwo[0] + 'OI',
+		hide: props.formData.aerobrake,
+		title: properNameTwo + ' Orbit Insertion',
+		deltaVee: calculateEscapeVelocity(destinationPlanet, toRadius),
+	});
 
-// 	// Show the maneuver list
-// 	displayManeuvers(maneuvers, array);
+	// Show the maneuver list
+	// displayManeuvers(maneuvers, array);
 
-// 	// Start the ship display
-// 	shipCenter = 'sun';
-// 	startShipDisplay(array['depTime'], array['capTime'], array['capTime']);
+	// Start the ship display
+	shipCenter = 'sun';
+	//startShipDisplay(array['depTime'], array['capTime'], array['capTime']);
 
-// 	// Reset everything for more transfers
-// 	document.getElementById('IPTransferButton').disabled = false;
-// 	document.getElementById('ILTransferButton').disabled = false;
+	// // Reset everything for more transfers
+	// document.getElementById('IPTransferButton').disabled = false;
+	// document.getElementById('ILTransferButton').disabled = false;
 
-// 	// Calculate total delta vee
-// 	var DV =
-// 		calculateEscapeVelocity(nameTwo, toRadius) +
-// 		deltaVeeExit +
-// 		deltaVeeEnter +
-// 		calculateEscapeVelocity(nameOne, fromRadius);
+	// Calculate total delta vee
+	var DV =
+		calculateEscapeVelocity(destinationPlanet, toRadius) +
+		deltaVeeExit +
+		deltaVeeEnter +
+		calculateEscapeVelocity(originPlanet, fromRadius);
 
-// 	// Print the porkchop
-// 	printPorkchop(array.dTime, array.tTime, returnData['deltaVee']);
-// }
+	// Print the porkchop
+	//printPorkchop(array.dTime, array.tTime, returnData['deltaVee']);
+}
 
 /**
  * Watchers

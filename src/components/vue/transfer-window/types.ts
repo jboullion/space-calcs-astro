@@ -43,7 +43,8 @@ export type TransferData = {
 	maneuvers: Maneuver[];
 	originPlanet: PlanetOrbit;
 	destinationPlanet: PlanetOrbit;
-	properName: string;
+	properName?: string;
+	properNameTwo?: string;
 	fromRadius: number;
 	toRadius: number;
 };
@@ -52,6 +53,7 @@ export type Maneuver = {
 	name: string;
 	title: string;
 	deltaVee: number;
+	hide?: boolean;
 };
 
 // Format ALL THE LOGGING DATA

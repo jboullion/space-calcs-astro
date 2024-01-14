@@ -5786,7 +5786,7 @@ function findPlanetLocation(name, time) {
 	return array;
 }
 
-function findPlanetDegree(name, position) {
+function findPlanetDegree(planet, position) {
 	// This entire thing is reverse-deriving it by the same method used to generate the initial coords
 
 	// Get initial data
