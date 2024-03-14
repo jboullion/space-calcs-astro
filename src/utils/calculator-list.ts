@@ -143,6 +143,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/fly-wheel',
 	},
+	{
+		id: 'syrtis',
+		name: 'Syrtis',
+		description:
+			'Rapidly modelel the thermal performance of crewed space habitats on Mars',
+		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/syrtis',
+	},
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>

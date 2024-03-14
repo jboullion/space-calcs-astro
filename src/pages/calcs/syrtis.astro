@@ -1,0 +1,46 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import SponsorCalc from "../../components/calcs/SponsorCalc.astro";
+import References from '../../components/shared/References.astro';
+import type { Reference } from '../../types/types';
+import { calculators } from '../../utils/calculator-list';
+import SkeletonLoader from '../../components/shared/SkeletonLoader.astro';
+import Syrtis from '../../components/vue/syrtis/Syrtis.vue';
+
+const calculator = calculators.find((calc) => calc.id === 'syrtis');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+const references: Reference[] = [
+    {
+        title: 'Syrtis: Github Repository',
+        url: 'https://github.com/smross106/Syrtis',
+    }
+];
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div style="min-height: 600px;" class="calculator">
+            <SkeletonLoader />
+            <Syrtis client:only="vue" />
+        </div>
+        <SponsorCalc />
+        <References references={references} />
+    </div>
+</Layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loader = document.querySelector('#skeletonLoader');
+        if (loader) {
+            loader.remove();
+        }
+    });
+</script>
+<style></style>
