@@ -39,7 +39,7 @@ const formData = ref<ITransferWindowForm>({
 	// porkchop: true, // TODO: Properly implement porkchop
 	departureToday: false, // TODO: Probably remove this
 	departureDateMin: new Date(),
-	departureDateMax: new Date(new Date().getTime() + MS_YEAR),
+	departureDateMax: new Date(new Date().getTime() + MS_YEAR / 52),
 });
 
 onBeforeMount(() => {});

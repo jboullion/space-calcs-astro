@@ -82,6 +82,12 @@ import {
 	tan,
 	convertDistance,
 	vectorToAngle,
+	DtoR,
+	RtoD,
+	setMagnitude,
+	angleBetweenVectors,
+	calculateTime,
+	validTransfer,
 } from './functions';
 
 import { calculateOrbitalPositionVector } from './functions-ts';
@@ -130,6 +136,8 @@ let timeRatio = 1;
 let lowestData: TransferFormat;
 let storedTransferData: TransferData;
 let returnData: any;
+let timeEstimateUpdated = false;
+let messageUpdated = false;
 
 const debouncedResize = throttle(onWindowResize, 32);
 /**
@@ -428,6 +436,7 @@ function drawOrbit(planet: PlanetOrbit) {
 function animate() {
 	if (!three.renderer) return;
 	if (!three.controls) return;
+	if (loading.value) return;
 
 	requestAnimationFrame(animate);
 
@@ -835,7 +844,7 @@ function calculateLambertTransfer(
 	//var periodT = findPeriod(transitA, center);
 
 	// Define the resolution - this means looking at resolution squared windows
-	var resolution = 200;
+	var resolution = 100; //200;
 	if ((timeRatio + lastTimeRatio) / 2 > 1.5 && !twoStage) {
 		console.log(
 			'Calculating Low Resolution Transfer - Slow Running Computer',
@@ -856,7 +865,7 @@ function calculateLambertTransfer(
 	inSecondStage = false;
 
 	// Define limits
-	var upperTransitBound = 0.9;
+	var upperTransitBound = 0.3; //0.9; TODO: SET THIS BACK TO 0.9
 	var lowerTransitBound = 0.1;
 	// @ts-ignore
 	var increment = divide(
@@ -871,6 +880,9 @@ function calculateLambertTransfer(
 		),
 		parseScalarInput(resolution, ''),
 	) as ScalarInput;
+
+	console.log({ increment, timeIncrement });
+
 	//var timeIncrement = (upperTransitBound - lowerTransitBound) * periodT / resolution;
 
 	// // Define the radial position vectors
@@ -954,6 +966,187 @@ function calculateLambertTransfer(
 	}
 }
 
+function finaliseTransferCalc() {
+	console.log('Deriving Parameters...');
+
+	finishLambertCalculation();
+
+	// // Keep track  of name data for eventual display
+	// //lowestData["nameOne"] = nameOne;
+	// //lowestData["nameTwo"] = nameTwo;
+
+	// // Open up the user UI and let them use it again
+	// if (!webVR) {
+	// 	document.getElementById('shipViewDiv').style.display = 'block';
+	// }
+	// document.getElementById('loadingScreen').style.display = 'none';
+	// document.getElementById('loadingScreenAux').style.display = 'none';
+	// document.getElementById('disabledCover').style.display = 'none';
+
+	// // Let the user know it's done
+	// console.log(
+	// 	'Lambert Transfer Calculated: ' +
+	// 		round((new Date().getTime() - transTime.getTime()) / 1000, 2) +
+	// 		's',
+	// );
+	// console.log('Calculated with ' + totalCalculations + ' windows analysed');
+	// swal({
+	// 	title: 'Transfer Calculated',
+	// 	html: 'Look at the simulation for the gray ship and its orbit, or the bottom right for the &Delta;V Breakdown',
+	// 	type: 'success',
+	// }).then((result) => {
+	// 	if (result.value) {
+	// 		// Resume simulation running
+	// 		endTransferCalc();
+	// 	}
+	// });
+}
+
+function finishLambertCalculation() {
+	// Finalise the lambert calculation for display
+
+	// var center = planets[lowestData['nameOne']]['center'];
+	console.log('lowestData', lowestData);
+
+	// Extract the position and velocity vectors for ease
+	var r = lowestData['pos'];
+	var v = lowestData['vel'];
+
+	var r2 = lowestData['pos2'];
+	var v2 = lowestData['vel2'];
+
+	// // Log the data just to be sure for debugging
+	// console.log(lowestData);
+
+	// Initialise the final choices
+	var selectedR;
+	var selectedV;
+	var selectedTime;
+
+	if (magnitude(r) < magnitude(r2)) {
+		// Look at the higher energy planet, tends to be more accurate (not by much, but a bit)
+		selectedR = r;
+		selectedV = v;
+		selectedTime = lowestData['depTime'];
+	} else {
+		selectedR = r2;
+		selectedV = v2;
+		selectedTime = lowestData['capTime'];
+	}
+
+	selectedR = r;
+	selectedV = v;
+	selectedTime = lowestData['depTime'];
+
+	// Upon recieveing parameters, proceed to return data and signal success
+	// @ts-ignore
+	lowestData['params'] = paramsFromVec(selectedR, selectedV, selectedTime);
+
+	// Return data to IP or IL transfer
+	returnData = lowestData;
+	transitData = lowestData;
+}
+
+function paramsFromVec(r: number, v: number, time: number) {
+	// Calculate orbital parameters given orbital state vectors and a given time
+	// IMPORTANT NOTE - I will try to explain the equations, but the derivations/explanations are not here (because that's not what this is). It's in the credits section BTW
+
+	// Define some needed axes
+	var z = [0, 0, 1];
+	var x = [1, 0, 0];
+
+	// H is the angular momentum vector (without the mass)
+	var h = crossProduct(r, v);
+
+	if (h[0] == 0 && h[1] == 0) {
+		// If angular velocity is straight up, deflect negligibly to avoid divide by 0 errors
+		h = [0, 0.0000000000001, 1];
+	}
+
+	// N is the nodes vector - point towards ascending node with relation to the ecliptic
+	var n = crossProduct(z, h);
+
+	// Eccentricity is split to make it more easily maintainable
+	var ePartOne = multiplyVec(
+		Math.pow(magnitude(v), 2) - gravitationalParameter / magnitude(r),
+		r,
+	);
+	var ePartTwo = multiplyVec(dotProduct(r, v), v);
+
+	// E is the eccentricity vector - points at the periapsis with a magnitude equal to the eccentricity
+	var e = multiplyVec(1 / gravitationalParameter, subVec(ePartOne, ePartTwo));
+
+	// A is the semi-major axis, this is a reverse vis-viva equation
+	var a =
+		1 /
+		(2 / magnitude(r) - Math.pow(magnitude(v), 2) / gravitationalParameter);
+
+	// I is the orbital inclination
+	var i = RtoD(Math.acos(h[2] / magnitude(h)));
+
+	// L is the mean longitude at epoch - NOTE THAT THIS EQUATION IS NOT USED, L is calculated separately
+	var L =
+		(360 +
+			RtoD(Math.acos(dotProduct(e, r) / (magnitude(e) * magnitude(r))))) %
+		360;
+
+	// Calculate the longitude of the Ascending Node
+	var loAN = (360 + RtoD(Math.acos(n[0] / magnitude(n)))) % 360;
+	if (n[1] < 0) {
+		// Flip to loAN if it is around the way, the inverse cos function can't explain everytihing
+		loAN = 360 - loAN;
+	}
+
+	// Make sure it's got the right magnitude (0-loAN-360)
+	loAN = loAN % 360;
+
+	// Calculate the longitude of the PEriapsis
+	var aoPE = RtoD(
+		Math.acos(dotProduct(n, e) / (magnitude(n) * magnitude(e))),
+	);
+	if (e[2] < 0) {
+		aoPE = 360 - aoPE;
+	}
+
+	var loPE = (aoPE + loAN) % 360;
+
+	var params = {
+		// Set the parameters
+		e: magnitude(e),
+		a: a,
+		i: i,
+		loAN: loAN,
+		loPE: loPE % 360,
+	};
+
+	// Find the position at a given time
+	var A = RtoD(Math.acos(dotProduct(e, r) / (magnitude(e) * magnitude(r))));
+	if (dotProduct(r, v) < 0) {
+		A = 360 - A;
+	}
+	var rL = (A + loPE) % 360;
+
+	// // Initialise the ship
+	// planets['ship'] = params;
+	// planets['ship']['center'] = center;
+	// planets['ship']['epoch'] = time;
+	// planets['ship'].viewingClass = {
+	// 	minorBody: false,
+	// 	minorSatellite: false,
+	// 	expanse: false,
+	// 	expanseHide: false,
+	// 	easterEgg: false,
+	// };
+	// planets['ship'].mapClass = {};
+
+	// // Clear the ship out - it was needed only for the existing functions to run
+	// delete planets['ship'];
+
+	// Return the correct parameters
+	// params['rL'] = rL;
+	return params;
+}
+
 function calculateTransferWindow(
 	deptTime: number,
 	travelTimeSec: number,
@@ -1006,6 +1199,15 @@ function calculateTransferWindow(
 		findVelocity(destinationPlanet, arrivingTime.getTime()),
 		'AU/y',
 	);
+
+	// console.log({
+	// 	departingTime,
+	// 	arrivingTime,
+	// 	rOne,
+	// 	rTwo,
+	// 	departingVelocity,
+	// 	arrivingVelocity,
+	// });
 
 	// Define some handy variables for the magnitudes of vectors
 	var rOneMag = vectorMagnitude(rOne);
@@ -1301,7 +1503,9 @@ function calculateTransferWindow(
 	transitWindows[deptTime][outputScalar(travelTime, 'y')] = formatData;
 
 	// If it is an invaid transfer, disregard as the most efficient. Invalid is hyperbolic, not number values, or if the convergence went outside allowed boundaries
+
 	if (validTransfer(formatData)) {
+		console.log('validTransfer');
 		// Decide which lowest data tracking method
 		if (twoStage && !inSecondStage) {
 			// Choose whether to add a new piece of data
@@ -1334,10 +1538,10 @@ function calculateTransferWindow(
 				(new Date().getTime() - transTime.getTime()) / 1000;
 			var predictedTime =
 				(elapsedTime * (synodicPeriod.value - deptTime)) / deptTime;
-			lastTimeMessage =
-				'<br><br>Estimated time remaining<br>' +
-				round(predictedTime) +
-				' s';
+			// lastTimeMessage =
+			// 	'<br><br>Estimated time remaining<br>' +
+			// 	Math.round(predictedTime) +
+			// 	' s';
 
 			timeEstimateUpdated = true;
 		}
@@ -1350,10 +1554,10 @@ function calculateTransferWindow(
 	if (seconds < 1) {
 		// Update the message after 4 seconds
 		if (messageUpdated == false) {
-			message =
-				loadingMessages[
-					Math.floor(Math.random() * loadingMessages.length)
-				];
+			// message =
+			// 	loadingMessages[
+			// 		Math.floor(Math.random() * loadingMessages.length)
+			// 	];
 			messageUpdated = true;
 		}
 	} else {
@@ -1390,11 +1594,20 @@ function findVelocity(planet: PlanetOrbit, time: number) {
 	// Velocity = distance / time, except to find a vector velocity, use a vector distance
 	var velocityVec = multiplyVec(1 / deltaTime, deltaDist);
 
+	const posMag = magnitude(position);
+	console.log({ posMag });
+	console.log({ gravitationalParameterAU });
+	console.log({ planet });
 	// Set the magnitude of the velocity according to the viz-viva equation
-	var velMag = Math.sqrt(
-		gravitationalParameterAU * (2 / magnitude(position) - 1 / planet['a']),
-	);
+	const velMagStep =
+		gravitationalParameterAU * (2 / posMag - 1 / planet['a']);
+	var velMag = Math.sqrt(velMagStep);
+	//console.log({ gravitationalParameterAU, posMag, planet });
+	// console.log({ velMagStep });
+	// console.log({ velMag });
 	velocityVec = setMagnitude(velocityVec, velMag);
+
+	//console.log({ velocityVec });
 
 	// Return the velocity in vector form
 	return velocityVec;

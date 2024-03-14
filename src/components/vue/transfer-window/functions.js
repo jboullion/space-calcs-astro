@@ -304,7 +304,7 @@ export function setMagnitude(vector, mag) {
 	return multiplyVec(mag / magnitude(vector), vector);
 }
 
-export function vectorToAngle(vector) {
+export function vectorToAngle(vector, orbitResolution = 1) {
 	// Find what angle a given vector is at from the vernal equinox - ANTICLOCKWISE
 
 	// Use tangents to find out what angle it is
@@ -1393,6 +1393,100 @@ export function invTan(value) {
 			'ERROR: You must take the inverse tan of a dimensionless scalar',
 		);
 	}
+}
+
+export function calculateTime(p, rOne, rTwo, k, l, m, deltaV, gravParam) {
+	// Given the parameters, calculate the transfer time for the convergence algorithm
+	// This one is another that has complex, not necessarily self-explanatory maths. Check the website in the credits section
+
+	// Convert the gravitational parameter's units
+	//gravParam = gravParam * convertTime("Y", "S", -2);
+
+	// Easy magnitude of the vectors
+	var rOneMag = vectorMagnitude(rOne);
+	var rTwoMag = vectorMagnitude(rTwo);
+
+	// Calculate the semi-major axis
+	var a = divide(
+		multiply(multiply(m, k), p),
+		add(
+			multiply(subtract(multiply(2, m), pow(l, 2)), pow(p, 2)),
+			subtract(multiply(multiply(k, 2), multiply(l, p)), pow(k, 2)),
+		),
+	);
+
+	// Calculate a bunch of variables with no real counterpart
+	var f = subtract(1, multiply(divide(rTwoMag, p), subtract(1, cos(deltaV))));
+	//var f = 1 - (rTwoMag / p) * (1 - Math.cos(deltaV));
+
+	// Change parameter to keep units consistent
+	//gravitationalParameter = gravitationalParameter * convertTime("Y", "S", -2);
+
+	// Calculate more variables that don't have a physical correlate - see previous maths comment
+	var g = divide(
+		multiply(multiply(rOneMag, rTwoMag), sin(deltaV)),
+		pow(multiply(gravParam, p), 0.5),
+	);
+	//var g = rOneMag * rTwoMag * Math.sin(deltaV) / Math.pow(gravitationalParameter * p, 0.5);
+	var fDot = multiply(
+		multiply(pow(divide(gravParam, p), 0.5), tan(divide(deltaV, 2))),
+		subtract(
+			subtract(
+				divide(subtract(1, cos(deltaV)), p),
+				divide(parseScalarInput(1, ''), rOneMag),
+			),
+			divide(parseScalarInput(1, ''), rTwoMag),
+		),
+	);
+	var deltaE = invCos(
+		subtract(
+			1,
+			multiply(divide(rOneMag, a), subtract(parseScalarInput(1, ''), f)),
+		),
+	);
+	if (
+		invSin(
+			divide(
+				multiply(multiply(-1, rOneMag), multiply(rTwoMag, fDot)),
+				pow(multiply(gravParam, a), 0.5),
+			),
+		).value < 0
+	) {
+		// Check to see if it should flip it - in the dead zone of arccos
+		deltaE.value = 2 * Math.PI - deltaE.value;
+	}
+
+	// Calculate transfer time
+	var t = add(
+		g,
+		multiply(
+			pow(divide(pow(a, 3), gravParam), 0.5),
+			subtract(deltaE, sin(deltaE)),
+		),
+	);
+
+	if (a.value < 0) {
+		// Calculate it differently if it's hyperbolic
+		var deltaF = Math.acosh(
+			outputScalar(
+				subtract(1, multiply(divide(rOneMag, a), subtract(1, f))),
+				'',
+			),
+		);
+		if (deltaF < 0) {
+			deltaF = 2 * Math.PI + deltaF;
+		}
+		t = add(
+			g,
+			multiply(
+				pow(divide(multiply(-1, pow(a, 3)), gravParam), 0.5),
+				Math.sinh(deltaF) - deltaF,
+			),
+		);
+	}
+
+	// Return the time, converting it into the years used
+	return t;
 }
 
 // Essential Definitions
