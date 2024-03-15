@@ -70,7 +70,7 @@
                                 :min="1"
                                 :max="10"
                                 @change="updateSimulationSpeed"
-                                tooltip="How much faster should the simulation run?"
+                                tooltip="How fast should the simulation run?"
                             />
 
                             <CheckboxInput
