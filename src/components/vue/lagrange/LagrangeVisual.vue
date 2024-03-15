@@ -76,6 +76,7 @@ import type { ILagrangeForm } from './types';
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { throttle } from '../../../utils/utils';
 
 import {
 	CSS2DObject,
@@ -131,15 +132,38 @@ const animation = {
 
 const scaledDistance = 1000;
 
+const throttledResize = throttle(onWindowResize, 32);
+
 onMounted(() => {
 	load();
 
-	window.addEventListener('resize', setupScene, { passive: true });
+	window.addEventListener('resize', throttledResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', throttledResize);
 });
+
+function updateRenderSize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
+
+function onWindowResize() {
+	updateRenderSize();
+}
 
 const bodyOneName = computed<string>(() => {
 	return props.formData.relationship.value === 'star' ? 'Star' : 'Planet';
