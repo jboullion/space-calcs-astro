@@ -1,34 +1,34 @@
 <template>
-    <div>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <button class="btn btn-primary btn-lg px-5" @click="play">
-                <i class="fas" :class="playClass"></i>
-            </button>
-            <h3 class="mb-0">Time: {{ currentTime }}</h3>
-        </div>
+	<div>
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<button class="btn btn-primary btn-lg px-5" @click="play">
+				<i class="fas" :class="playClass"></i>
+			</button>
+			<h3 class="mb-0">Time: {{ currentTime }}</h3>
+		</div>
 
-        <div
-            id="space-elevator-canvas"
-            class="canvas-wrapper border"
-            style="position: relative; height: 500px"
-        >
-            <i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
-        </div>
+		<div
+			id="space-elevator-canvas"
+			class="canvas-wrapper border"
+			style="position: relative; height: 500px"
+		>
+			<i v-if="loading" class="fas fa-cog fa-spin mb-0 h1"></i>
+		</div>
 
-        <div class="pb-2">
-            <p>
-                <b>Note:</b> We are assuming a constant radius cylinder for the
-                Space Elevator geometry. You could taper the tether for optimal
-                mass savings.
-            </p>
-            <p>
-                The elevator height should be to scale with the planet. The
-                elevator width is not visually accurate because it would be too
-                small to see.
-            </p>
-        </div>
+		<div class="pb-2">
+			<p>
+				<b>Note:</b> We are assuming a constant radius cylinder for the
+				Space Elevator geometry. You could taper the tether for optimal
+				mass savings.
+			</p>
+			<p>
+				The elevator height should be to scale with the planet. The
+				elevator width is not visually accurate because it would be too
+				small to see.
+			</p>
+		</div>
 
-        <!-- <ResultTable>
+		<!-- <ResultTable>
             <tr>
                 <th>Planet Mass</th>
                 <td class="text-end">{{ planetMass.toExponential(3) }} kg</td>
@@ -62,7 +62,7 @@
                 <td class="text-end"></td>
             </tr> 
         </ResultTable> -->
-    </div>
+	</div>
 </template>
 <script setup lang="ts">
 // TODO:
@@ -74,84 +74,87 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
-    computed,
-    nextTick,
-    onBeforeMount,
-    onBeforeUnmount,
-    onMounted,
-    ref,
-    watch,
+	computed,
+	nextTick,
+	onBeforeMount,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	watch,
 } from 'vue';
 import type { SpaceElevatorForm } from './types';
 import ResultTable from '../forms/v2/ResultTable.vue';
 import { physicsConstants } from '../utils';
+import { throttle } from '../../../utils/utils';
 
 const props = defineProps<{
-    formData: SpaceElevatorForm;
-    crossSectionalArea: number;
-    geostationaryOrbit: number;
+	formData: SpaceElevatorForm;
+	crossSectionalArea: number;
+	geostationaryOrbit: number;
 }>();
 
 const loading = ref(true);
 
 interface Textures {
-    space: THREE.Texture | null;
-    earth: THREE.Texture | null;
-    mars: THREE.Texture | null;
-    moon: THREE.Texture | null;
+	space: THREE.Texture | null;
+	earth: THREE.Texture | null;
+	mars: THREE.Texture | null;
+	moon: THREE.Texture | null;
 }
 
 const textures: Textures = {
-    space: null,
-    earth: null,
-    mars: null,
-    moon: null,
+	space: null,
+	earth: null,
+	mars: null,
+	moon: null,
 };
 
 const planet = {
-    gravityConstant: 0.000000000066743, //6.67408 * Math.pow(10, -11), // m3 kg-1 s-2
-    mesh: new THREE.Mesh(),
-    clouds: new THREE.Mesh(),
-    axis: new THREE.Vector3(0, 1, 0),
-    geometry: new THREE.SphereGeometry(),
-    material: new THREE.Material(),
-    group: new THREE.Group() as THREE.Group,
+	gravityConstant: 0.000000000066743, //6.67408 * Math.pow(10, -11), // m3 kg-1 s-2
+	mesh: new THREE.Mesh(),
+	clouds: new THREE.Mesh(),
+	axis: new THREE.Vector3(0, 1, 0),
+	geometry: new THREE.SphereGeometry(),
+	material: new THREE.Material(),
+	group: new THREE.Group() as THREE.Group,
 };
 
 const three = {
-    canvas: null as HTMLElement | HTMLCanvasElement | null,
-    renderer: null as THREE.WebGLRenderer | null,
-    scene: new THREE.Scene(),
-    camera: new THREE.PerspectiveCamera(),
-    controls: null as OrbitControls | null,
-    carMesh: null as THREE.Mesh | null,
-    // group: null,
-    // stats: null, // used for debugging
-    // gui: null, // used for debugging
-    // raycaster: null,
-    // mouse: null,
-    minMovement: new THREE.Vector3(),
-    maxMovement: new THREE.Vector3(),
+	canvas: null as HTMLElement | HTMLCanvasElement | null,
+	renderer: null as THREE.WebGLRenderer | null,
+	scene: new THREE.Scene(),
+	camera: new THREE.PerspectiveCamera(),
+	controls: null as OrbitControls | null,
+	carMesh: null as THREE.Mesh | null,
+	// group: null,
+	// stats: null, // used for debugging
+	// gui: null, // used for debugging
+	// raycaster: null,
+	// mouse: null,
+	minMovement: new THREE.Vector3(),
+	maxMovement: new THREE.Vector3(),
 };
 
 const textureDir = '/textures/';
 
 const animationDefaults = {
-    play: false,
-    FPS: 30, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
-    prevTick: 0, // track the last tick timestamp
-    orbitRotationVector: new THREE.Vector3(0, 0, 1),
-    simulationSpeed: 1000, // how much faster than real time does the animation play?
-    currentFrame: 1,
-    complete: false,
-    duration: 10, // seconds
-    durationFrames: 0, // The total number of frames in the animation
+	play: false,
+	FPS: 30, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
+	prevTick: 0, // track the last tick timestamp
+	orbitRotationVector: new THREE.Vector3(0, 0, 1),
+	simulationSpeed: 1000, // how much faster than real time does the animation play?
+	currentFrame: 1,
+	complete: false,
+	duration: 10, // seconds
+	durationFrames: 0, // The total number of frames in the animation
 };
 
 animationDefaults.durationFrames =
-    animationDefaults.duration * animationDefaults.FPS;
+	animationDefaults.duration * animationDefaults.FPS;
 
 const animationConstants = ref({ ...animationDefaults });
+
+const throttledResize = throttle(onWindowResize, 32);
 
 /**
  *
@@ -164,17 +167,38 @@ const animationConstants = ref({ ...animationDefaults });
  */
 
 onBeforeMount(() => {
-    //calcOrbitalVelocity();
+	//calcOrbitalVelocity();
 });
 
 onMounted(() => {
-    loadModels();
-    window.addEventListener('resize', setupScene, { passive: true });
+	loadModels();
+	window.addEventListener('resize', throttledResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-    window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', throttledResize);
 });
+
+function updateRenderSize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
+
+function onWindowResize() {
+	updateRenderSize();
+}
 
 /**
  *
@@ -186,67 +210,67 @@ onBeforeUnmount(() => {
  *
  */
 const elevatorTopHeight = computed(() => {
-    return props.geostationaryOrbit + props.formData.planetRadius;
+	return props.geostationaryOrbit + props.formData.planetRadius;
 });
 
 const estimatedTetherRadius = computed(() => {
-    const radius = Math.sqrt(props.crossSectionalArea / Math.PI);
-    return radius;
+	const radius = Math.sqrt(props.crossSectionalArea / Math.PI);
+	return radius;
 });
 
 const carTravelTimeTotalHours = computed(() => {
-    return (
-        (elevatorTopHeight.value - props.formData.planetRadius) /
-        props.formData.carSpeed
-    );
+	return (
+		(elevatorTopHeight.value - props.formData.planetRadius) /
+		props.formData.carSpeed
+	);
 });
 
 const rotationSpeed = computed(() => {
-    const totalNumberOfRotations =
-        carTravelTimeTotalHours.value / props.formData.planetRotation;
+	const totalNumberOfRotations =
+		carTravelTimeTotalHours.value / props.formData.planetRotation;
 
-    const oneRotation = Math.PI * 2;
+	const oneRotation = Math.PI * 2;
 
-    const totalRotationRadians = oneRotation * totalNumberOfRotations;
+	const totalRotationRadians = oneRotation * totalNumberOfRotations;
 
-    const result =
-        totalRotationRadians / animationConstants.value.durationFrames;
+	const result =
+		totalRotationRadians / animationConstants.value.durationFrames;
 
-    return result;
+	return result;
 });
 
 const carAnimationSpeed = computed(() => {
-    if (!three.carMesh) return 0;
+	if (!three.carMesh) return 0;
 
-    return (
-        (elevatorTopHeight.value - props.formData.planetRadius) /
-        animationDefaults.durationFrames
-    );
+	return (
+		(elevatorTopHeight.value - props.formData.planetRadius) /
+		animationDefaults.durationFrames
+	);
 });
 
 const carTravelTimeDays = computed(() => {
-    return carTravelTimeTotalHours.value / 24;
+	return carTravelTimeTotalHours.value / 24;
 });
 
 const carTravelRemainingHours = computed(() => {
-    return (carTravelTimeDays.value % 1) * 24;
+	return (carTravelTimeDays.value % 1) * 24;
 });
 
 const travelTime = computed(() => {
-    return `${Math.floor(carTravelTimeDays.value)} days, ${Math.floor(
-        carTravelRemainingHours.value,
-    )} hours`;
+	return `${Math.floor(carTravelTimeDays.value)} days, ${Math.floor(
+		carTravelRemainingHours.value,
+	)} hours`;
 });
 
 const currentTime = computed(() => {
-    const percentComplete =
-        animationConstants.value.currentFrame /
-        animationConstants.value.durationFrames;
+	const percentComplete =
+		animationConstants.value.currentFrame /
+		animationConstants.value.durationFrames;
 
-    const currentDay = (carTravelTimeTotalHours.value * percentComplete) / 24;
-    const currentHour = (currentDay % 1) * 24;
+	const currentDay = (carTravelTimeTotalHours.value * percentComplete) / 24;
+	const currentHour = (currentDay % 1) * 24;
 
-    return `${Math.floor(currentDay)} days, ${Math.floor(currentHour)} hours`;
+	return `${Math.floor(currentDay)} days, ${Math.floor(currentHour)} hours`;
 });
 
 /**
@@ -260,170 +284,170 @@ const currentTime = computed(() => {
  */
 
 async function loadModels() {
-    const textureLoader = new THREE.TextureLoader();
-    // //this.textures.space = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_stars.jpg');
-    textures.earth = textureLoader.load(textureDir + '2k_earth_daymap.jpg');
-    textures.mars = textureLoader.load(textureDir + '2k_mars.jpg');
-    textures.moon = textureLoader.load(textureDir + '2k_moon.jpg');
+	const textureLoader = new THREE.TextureLoader();
+	// //this.textures.space = await textureLoader.load('/wp-content/themes/nexus-aurora/assets/images/2k_stars.jpg');
+	textures.earth = textureLoader.load(textureDir + '2k_earth_daymap.jpg');
+	textures.mars = textureLoader.load(textureDir + '2k_mars.jpg');
+	textures.moon = textureLoader.load(textureDir + '2k_moon.jpg');
 
-    loading.value = false;
-    setupScene();
+	loading.value = false;
+	setupScene();
 }
 
 function removeAllChildNodes(parent: HTMLElement) {
-    while (parent.firstChild) {
-        parent.removeChild(parent.firstChild);
-    }
+	while (parent.firstChild) {
+		parent.removeChild(parent.firstChild);
+	}
 }
 
 function setupScene() {
-    if (loading.value) return;
+	if (loading.value) return;
 
-    if (three.scene && three.canvas) {
-        removeAllChildNodes(three.canvas);
-    }
+	if (three.scene && three.canvas) {
+		removeAllChildNodes(three.canvas);
+	}
 
-    setupThreeJS();
+	setupThreeJS();
 
-    setupPlanet();
+	setupPlanet();
 
-    setupElevator();
+	setupElevator();
 
-    //setupAxesHelper();
+	//setupAxesHelper();
 
-    if (!animationConstants.value.prevTick) {
-        animate();
-    }
+	if (!animationConstants.value.prevTick) {
+		animate();
+	}
 }
 
 function setupThreeJS() {
-    three.scene = new THREE.Scene();
-    planet.group = new THREE.Group();
+	three.scene = new THREE.Scene();
+	planet.group = new THREE.Group();
 
-    // Renderer
-    three.renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        logarithmicDepthBuffer: true,
-    }); // { alpha: true }
-    three.canvas = document.getElementById('space-elevator-canvas');
+	// Renderer
+	three.renderer = new THREE.WebGLRenderer({
+		antialias: true,
+		logarithmicDepthBuffer: true,
+	}); // { alpha: true }
+	three.canvas = document.getElementById('space-elevator-canvas');
 
-    if (!three.canvas) return;
+	if (!three.canvas) return;
 
-    three.canvas.appendChild(three.renderer.domElement);
+	three.canvas.appendChild(three.renderer.domElement);
 
-    const width = three.canvas.getBoundingClientRect().width;
-    const height = 500;
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = 500;
 
-    three.renderer.setSize(width, height);
+	three.renderer.setSize(width, height);
 
-    updateCamera();
+	updateCamera();
 
-    // Lights
-    three.scene.add(new THREE.AmbientLight(0x404040));
-    const light = new THREE.DirectionalLight(0xffffff, 0.5);
-    light.position.set(0, 0, 1);
-    three.scene.add(light);
+	// Lights
+	three.scene.add(new THREE.AmbientLight(0x404040));
+	const light = new THREE.DirectionalLight(0xffffff, 0.5);
+	light.position.set(0, 0, 1);
+	three.scene.add(light);
 
-    // // GUI
-    // this.three.gui = new dat.GUI( { autoPlace: false } );
-    // this.three.canvas.appendChild(this.three.gui.domElement);
+	// // GUI
+	// this.three.gui = new dat.GUI( { autoPlace: false } );
+	// this.three.canvas.appendChild(this.three.gui.domElement);
 }
 
 function updateCamera() {
-    if (!three.renderer) return;
+	if (!three.renderer) return;
 
-    // Camera
-    const cameraPositionDistance = elevatorTopHeight.value * 3;
-    const cameraZoomDistance = cameraPositionDistance * 2;
-    let rendererSize = new THREE.Vector2();
-    three.renderer.getSize(rendererSize);
-    three.camera = new THREE.PerspectiveCamera(
-        45,
-        rendererSize.width / rendererSize.height,
-        0.1,
-        cameraZoomDistance * 4,
-    );
+	// Camera
+	const cameraPositionDistance = elevatorTopHeight.value * 3;
+	const cameraZoomDistance = cameraPositionDistance * 2;
+	let rendererSize = new THREE.Vector2();
+	three.renderer.getSize(rendererSize);
+	three.camera = new THREE.PerspectiveCamera(
+		45,
+		rendererSize.width / rendererSize.height,
+		0.1,
+		cameraZoomDistance * 4,
+	);
 
-    three.camera.position.y = cameraPositionDistance;
-    three.camera.rotation.x = -Math.PI / 2;
-    // this.three.controls.enableZoom = false;
+	three.camera.position.y = cameraPositionDistance;
+	three.camera.rotation.x = -Math.PI / 2;
+	// this.three.controls.enableZoom = false;
 
-    // Controls
-    three.controls = new OrbitControls(three.camera, three.renderer.domElement);
-    three.controls.maxDistance = cameraZoomDistance;
-    three.controls.minDistance = props.formData.planetRadius * 1.5;
+	// Controls
+	three.controls = new OrbitControls(three.camera, three.renderer.domElement);
+	three.controls.maxDistance = cameraZoomDistance;
+	three.controls.minDistance = props.formData.planetRadius * 1.5;
 }
 
 function setupPlanet() {
-    planet.group = new THREE.Group();
-    //planet.axis = new THREE.Vector3(0, 1, 0); // TODO: formData.location.axis
+	planet.group = new THREE.Group();
+	//planet.axis = new THREE.Vector3(0, 1, 0); // TODO: formData.location.axis
 
-    if (props.formData.planetRadius > physicsConstants.earthRadius * 1.15) {
-        planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
-    } else if (
-        props.formData.planetRadius >
-        physicsConstants.marsRadius * 1.5
-    ) {
-        planet.material = new THREE.MeshLambertMaterial({
-            map: textures.earth,
-        });
-    } else if (
-        props.formData.planetRadius >
-        physicsConstants.moonRadius * 1.25
-    ) {
-        planet.material = new THREE.MeshLambertMaterial({
-            map: textures.mars,
-        });
-    } else if (
-        props.formData.planetRadius >
-        physicsConstants.moonRadius * 0.5
-    ) {
-        planet.material = new THREE.MeshLambertMaterial({
-            map: textures.moon,
-        });
-    } else {
-        planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
-    }
+	if (props.formData.planetRadius > physicsConstants.earthRadius * 1.15) {
+		planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
+	} else if (
+		props.formData.planetRadius >
+		physicsConstants.marsRadius * 1.5
+	) {
+		planet.material = new THREE.MeshLambertMaterial({
+			map: textures.earth,
+		});
+	} else if (
+		props.formData.planetRadius >
+		physicsConstants.moonRadius * 1.25
+	) {
+		planet.material = new THREE.MeshLambertMaterial({
+			map: textures.mars,
+		});
+	} else if (
+		props.formData.planetRadius >
+		physicsConstants.moonRadius * 0.5
+	) {
+		planet.material = new THREE.MeshLambertMaterial({
+			map: textures.moon,
+		});
+	} else {
+		planet.material = new THREE.MeshBasicMaterial({ color: 0x333333 });
+	}
 
-    // planet.material = new THREE.MeshLambertMaterial({
-    //     map: textures.earth,
-    //     // transparent: true,
-    //     // opacity: 0.1,
-    // });
+	// planet.material = new THREE.MeshLambertMaterial({
+	//     map: textures.earth,
+	//     // transparent: true,
+	//     // opacity: 0.1,
+	// });
 
-    // // switch (formData.value.location.name) {
-    // //	 case "Earth":
-    // //		 planet.material = new THREE.MeshLambertMaterial({
-    // //			 map: textures.earth,
-    // //		 });
-    // //		 break;
-    // //	 case "Mars":
-    // //		 planet.material = new THREE.MeshLambertMaterial({
-    // //			 map: textures.mars,
-    // //		 });
-    // //		 break;
-    // //	 case "Moon":
-    // //		 planet.material = new THREE.MeshLambertMaterial({
-    // //			 map: textures.moon,
-    // //		 });
-    // //		 break;
-    // // }
+	// // switch (formData.value.location.name) {
+	// //	 case "Earth":
+	// //		 planet.material = new THREE.MeshLambertMaterial({
+	// //			 map: textures.earth,
+	// //		 });
+	// //		 break;
+	// //	 case "Mars":
+	// //		 planet.material = new THREE.MeshLambertMaterial({
+	// //			 map: textures.mars,
+	// //		 });
+	// //		 break;
+	// //	 case "Moon":
+	// //		 planet.material = new THREE.MeshLambertMaterial({
+	// //			 map: textures.moon,
+	// //		 });
+	// //		 break;
+	// // }
 
-    planet.geometry = new THREE.SphereGeometry(
-        props.formData.planetRadius,
-        64,
-        64,
-    );
+	planet.geometry = new THREE.SphereGeometry(
+		props.formData.planetRadius,
+		64,
+		64,
+	);
 
-    //planet.material.transparent = true;
+	//planet.material.transparent = true;
 
-    planet.mesh = new THREE.Mesh(
-        planet.geometry,
-        planet.material as THREE.Material,
-    );
+	planet.mesh = new THREE.Mesh(
+		planet.geometry,
+		planet.material as THREE.Material,
+	);
 
-    planet.group.add(planet.mesh);
-    three.scene.add(planet.group);
+	planet.group.add(planet.mesh);
+	three.scene.add(planet.group);
 }
 
 // function setupAxesHelper() {
@@ -434,152 +458,152 @@ function setupPlanet() {
 // }
 
 function setupElevator() {
-    const stationMaterial = new THREE.MeshPhongMaterial({
-        color: 0xdddddd,
-        side: THREE.FrontSide,
-    });
+	const stationMaterial = new THREE.MeshPhongMaterial({
+		color: 0xdddddd,
+		side: THREE.FrontSide,
+	});
 
-    // Trying to show the correct width of tether makes it too small to see!
-    // const tetherPercentWidth =
-    //     estimatedTetherRadius.value / 1000 / props.formData.planetRadius;
+	// Trying to show the correct width of tether makes it too small to see!
+	// const tetherPercentWidth =
+	//     estimatedTetherRadius.value / 1000 / props.formData.planetRadius;
 
-    // const elevatorRadius = props.formData.planetRadius * tetherPercentWidth;
+	// const elevatorRadius = props.formData.planetRadius * tetherPercentWidth;
 
-    const elevatorRadius = props.geostationaryOrbit / 500;
+	const elevatorRadius = props.geostationaryOrbit / 500;
 
-    const elevatorGeometry = new THREE.CylinderGeometry(
-        elevatorRadius,
-        elevatorRadius,
-        props.geostationaryOrbit,
-        24,
-    );
+	const elevatorGeometry = new THREE.CylinderGeometry(
+		elevatorRadius,
+		elevatorRadius,
+		props.geostationaryOrbit,
+		24,
+	);
 
-    const elevatorMesh = new THREE.Mesh(elevatorGeometry, stationMaterial);
-    elevatorMesh.rotation.x = Math.PI / 2;
-    elevatorMesh.position.z =
-        props.formData.planetRadius + props.geostationaryOrbit / 2;
+	const elevatorMesh = new THREE.Mesh(elevatorGeometry, stationMaterial);
+	elevatorMesh.rotation.x = Math.PI / 2;
+	elevatorMesh.position.z =
+		props.formData.planetRadius + props.geostationaryOrbit / 2;
 
-    planet.group.add(elevatorMesh);
+	planet.group.add(elevatorMesh);
 
-    const elevatorTopGeometry = new THREE.SphereGeometry(
-        elevatorRadius * 6,
-        24,
-        24,
-    );
+	const elevatorTopGeometry = new THREE.SphereGeometry(
+		elevatorRadius * 6,
+		24,
+		24,
+	);
 
-    const elevatorTopMesh = new THREE.Mesh(
-        elevatorTopGeometry,
-        stationMaterial,
-    );
-    elevatorTopMesh.position.z = elevatorTopHeight.value;
+	const elevatorTopMesh = new THREE.Mesh(
+		elevatorTopGeometry,
+		stationMaterial,
+	);
+	elevatorTopMesh.position.z = elevatorTopHeight.value;
 
-    planet.group.add(elevatorTopMesh);
-    //three.scene.add(elevatorMesh);
+	planet.group.add(elevatorTopMesh);
+	//three.scene.add(elevatorMesh);
 
-    setupCar();
+	setupCar();
 }
 
 function setupCar() {
-    if (three.carMesh) {
-        planet.group.remove(three.carMesh);
-    }
+	if (three.carMesh) {
+		planet.group.remove(three.carMesh);
+	}
 
-    const carMaterial = new THREE.MeshPhongMaterial({
-        color: 0xea6730,
-        emissive: 0xea6730,
-        emissiveIntensity: 1,
-        side: THREE.FrontSide,
-    });
+	const carMaterial = new THREE.MeshPhongMaterial({
+		color: 0xea6730,
+		emissive: 0xea6730,
+		emissiveIntensity: 1,
+		side: THREE.FrontSide,
+	});
 
-    const carRadius = props.geostationaryOrbit / 80;
+	const carRadius = props.geostationaryOrbit / 80;
 
-    const carGeometry = new THREE.SphereGeometry(carRadius, 24, 24);
+	const carGeometry = new THREE.SphereGeometry(carRadius, 24, 24);
 
-    three.carMesh = new THREE.Mesh(carGeometry, carMaterial);
-    three.carMesh.rotation.x = Math.PI / 2;
-    three.carMesh.position.z = props.formData.planetRadius + carRadius;
+	three.carMesh = new THREE.Mesh(carGeometry, carMaterial);
+	three.carMesh.rotation.x = Math.PI / 2;
+	three.carMesh.position.z = props.formData.planetRadius + carRadius;
 
-    planet.group.add(three.carMesh);
+	planet.group.add(three.carMesh);
 }
 
 function animate() {
-    if (!three.renderer) return;
-    if (!three.controls) return;
+	if (!three.renderer) return;
+	if (!three.controls) return;
 
-    requestAnimationFrame(animate);
+	requestAnimationFrame(animate);
 
-    three.controls.update();
+	three.controls.update();
 
-    three.renderer.render(three.scene, three.camera);
+	three.renderer.render(three.scene, three.camera);
 
-    //if (formData.value.pause) return;
+	//if (formData.value.pause) return;
 
-    // clamp to fixed framerate
-    const now = Math.round(
-        (animationConstants.value.FPS * window.performance.now()) / 1000,
-    );
+	// clamp to fixed framerate
+	const now = Math.round(
+		(animationConstants.value.FPS * window.performance.now()) / 1000,
+	);
 
-    if (now == animationConstants.value.prevTick) return;
+	if (now == animationConstants.value.prevTick) return;
 
-    animationConstants.value.prevTick = now;
+	animationConstants.value.prevTick = now;
 
-    if (animationConstants.value.complete || !animationConstants.value.play)
-        return;
+	if (animationConstants.value.complete || !animationConstants.value.play)
+		return;
 
-    planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
+	planet.group.rotateOnAxis(planet.axis, rotationSpeed.value);
 
-    if (three.carMesh) {
-        three.carMesh.position.z += carAnimationSpeed.value;
-    }
+	if (three.carMesh) {
+		three.carMesh.position.z += carAnimationSpeed.value;
+	}
 
-    animationConstants.value.currentFrame++;
+	animationConstants.value.currentFrame++;
 
-    if (
-        animationConstants.value.currentFrame >=
-        animationConstants.value.durationFrames
-    ) {
-        animationConstants.value.play = false;
-        animationConstants.value.complete = true;
-    }
+	if (
+		animationConstants.value.currentFrame >=
+		animationConstants.value.durationFrames
+	) {
+		animationConstants.value.play = false;
+		animationConstants.value.complete = true;
+	}
 }
 
 function radiansPerSecond(radius: number, speed: number) {
-    const circumference = 2 * Math.PI * radius;
+	const circumference = 2 * Math.PI * radius;
 
-    return (speed / circumference) * (Math.PI * 2);
+	return (speed / circumference) * (Math.PI * 2);
 }
 
 const playClass = computed(() => {
-    if (!animationConstants.value.complete) {
-        if (!animationConstants.value.play) {
-            return 'fa-play';
-        } else {
-            return 'fa-pause';
-        }
-    } else {
-        return 'fa-undo';
-    }
+	if (!animationConstants.value.complete) {
+		if (!animationConstants.value.play) {
+			return 'fa-play';
+		} else {
+			return 'fa-pause';
+		}
+	} else {
+		return 'fa-undo';
+	}
 });
 
 function play() {
-    if (animationConstants.value.complete) {
-        reset();
-        return;
-    }
+	if (animationConstants.value.complete) {
+		reset();
+		return;
+	}
 
-    animationConstants.value.play = !animationConstants.value.play;
+	animationConstants.value.play = !animationConstants.value.play;
 }
 
 function reset() {
-    animationConstants.value = { ...animationDefaults };
+	animationConstants.value = { ...animationDefaults };
 
-    setupCar();
+	setupCar();
 }
 
 // NOTE: This is not very optimal, but should be fine for now
 watch(props.formData, () => {
-    nextTick(() => {
-        setupScene();
-    });
+	nextTick(() => {
+		setupScene();
+	});
 });
 </script>

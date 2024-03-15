@@ -54,8 +54,8 @@ import {
 } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { physicsConstants, removeAllChildNodes } from '../utils';
-import { formatNumber } from '../utils';
+import { physicsConstants, removeAllChildNodes, formatNumber } from '../utils';
+import { throttle } from '../../../utils/utils';
 import { planet, planetTextures, three } from './constants';
 
 import type { HabitableZoneForm, Zone } from './constants';
@@ -134,6 +134,8 @@ const hzOuterEquation = computed(() => {
 	return `sqrt((L / L☉) / 0.53)`;
 });
 
+const debouncedResize = throttle(onWindowResize, 32);
+
 /**
  *
  *
@@ -144,13 +146,29 @@ const hzOuterEquation = computed(() => {
 onMounted(() => {
 	loadModels();
 
-	window.addEventListener('resize', setupScene, { passive: true });
+	window.addEventListener('resize', debouncedResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', debouncedResize);
 });
 
+function onWindowResize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
 /**
  *
  *

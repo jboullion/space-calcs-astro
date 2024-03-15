@@ -81,6 +81,7 @@ import {
 } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 import { physicsConstants, formatNumber, removeAllChildNodes } from '../utils';
+import { throttle } from '../../../utils/utils';
 import { planet, planetTextures, three } from './constants';
 
 import type { SolarEnergyForm, Zone } from './constants';
@@ -99,6 +100,8 @@ const props = defineProps<{
 	formData: SolarEnergyForm;
 }>();
 
+const throttledResize = throttle(onWindowResize, 32);
+
 /**
  *
  *
@@ -110,12 +113,33 @@ const props = defineProps<{
 onMounted(() => {
 	loadModels();
 
-	window.addEventListener('resize', setupScene, { passive: true });
+	window.addEventListener('resize', throttledResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', throttledResize);
 });
+
+function updateRenderSize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
+
+function onWindowResize() {
+	updateRenderSize();
+}
 
 /**
  *
