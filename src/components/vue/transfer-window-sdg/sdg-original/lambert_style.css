@@ -1,0 +1,20 @@
+html {max-width:1000px;width:100%;}
+
+.Lambert_inputblock {padding:2px 0 4px;text-align:center;margin:0.5em 2px;min-width:260px;border-radius:3px;}
+.Lambert_backgroundColor {background-color:#9dccd2;}
+.Lambert_inputtitle {font-weight:bold;padding:5px 0;}
+.Lambert_inputfield {display:inline-block;margin:6px 1em;}
+.Lambert_DepDate_Full {display:inline-block;}
+.Lambert_DepDate_Year {width:4em;text-align:right;margin-left:0.5em;}
+.Lambert_tof_field {width:6em;text-align:right;margin-left:0.5em;}
+.Lambert_OrbElem_Dropdown {width:100%;text-align:center;text-align-last:center;border-style:none;background-color:#5da9b6;padding:3px;font-size:100%;margin-bottom:3px;}
+.Lambert_OrbElem_FormField {display:inline-block;text-align:center;margin:3px 0.5em;}
+.Lambert_OrbElem_FormField label {display:inline-block;width:8em;text-align:center;}
+.Lambert_OrbElem_FormField input {display:inline-block;width:10em;text-align:right;}
+.Lambert_fig {margin:1em 0 0.5em;width:100%;}
+.Lambert_fig_title {font-size:140%;font-weight:bold;margin:0.5em 0;}
+.Lambert_fig_canvas {border:none; display:inline-block;}
+.Lambert_fig_mouseover {position:fixed;top:0;left:0;background-color:white;border:solid 2px black;padding:0.5em;display:none}
+.Lambert_button {width:13em;margin:1em 1.5em;padding:1em;background-color:#6eb5e9;border-color:#59aae5;border-radius:12px;}
+.Lambert_button:focus {outline:0 none;background-color:#2d93df;border-color:#1e7cc3;} /*Use color to indicate button focus rather than the standard browser-dependent outline (which is notably ugly in FF*/
+.Lambert_button::-moz-focus-inner {border:0;}

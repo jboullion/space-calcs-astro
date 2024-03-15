@@ -8,14 +8,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import {
-	computed,
-	defineProps,
-	onBeforeUnmount,
-	onMounted,
-	ref,
-	watch,
-} from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { ONeillCylinderForm } from './types';
 
 import * as THREE from 'three';
