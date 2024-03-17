@@ -4,6 +4,7 @@ import Hero from "../../components/calcs/Hero.astro";
 
 import TransferWindow from "../../components/vue/transfer-window/TransferWindow.vue";
 import References from "../../components/shared/References.astro";
+import SkeletonLoader from '../../components/shared/SkeletonLoader.astro';
 import type { Reference } from "../../types/types";
 
 const title = "Transfer Window Calculator";
@@ -30,11 +31,20 @@ const references: Reference[] = [
   <div class="container">
     <Hero title={title} description={description} />
     <div style="min-height: 600px;" class="calculator">
-      <TransferWindow client:load />
+      <SkeletonLoader />
+      <TransferWindow client:only />
     </div>
 
     <References references={references} />
   </div>
 </Layout>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const loader = document.querySelector('#skeletonLoader');
+      if (loader) {
+          loader.remove();
+      }
+  });
+</script>
 <style></style>

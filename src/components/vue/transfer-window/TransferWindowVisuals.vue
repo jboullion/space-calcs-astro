@@ -12,6 +12,7 @@
 			</button>
 			<h3 class="mb-0">{{ currentDateString }}</h3>
 		</div>
+		<div id="yourPlotDivId"></div>
 		<div
 			id="transfer-window-canvas"
 			class="canvas-wrapper border"
@@ -29,6 +30,8 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import Plotly from 'plotly.js-dist';
+
 // import {
 // 	CSS2DObject,
 // 	CSS2DRenderer,
@@ -659,7 +662,7 @@ type PlanetaryPosition = {
 	z: number;
 };
 
-function calculateIPTransfer() {
+async function calculateIPTransfer() {
 	// Calculate an interplanetary transfer
 
 	// Set the initial transit time - this is used for evaluating efficiency
@@ -690,12 +693,84 @@ function calculateIPTransfer() {
 		// TODO: Figure out how to show an error to the user. Possibly do so on the form side?
 		// swal('Error', 'You must select two different planets', 'error');
 	} else {
-		const results = generatePorkchopPlotData(
+		if (loading.value) return;
+
+		loading.value = true;
+
+		const porkchopData = await generatePorkchopDataAsync(
 			props.formData.departureDateMin,
 			props.formData.departureDateMax,
 		);
 
-		console.log({ results });
+		console.log({ porkchopData });
+
+		const departureDates: string[] = [];
+		const arrivalDates: string[] = [];
+		const deltaVMatrix: number[][] = [];
+
+		// Assume your data is sorted by departure then arrival date
+		porkchopData.forEach((data) => {
+			// Convert dates to strings or timestamps if necessary
+			const departureDateString = data.departureDate
+				.toISOString()
+				.split('T')[0];
+			const arrivalDateString = data.arrivalDate
+				.toISOString()
+				.split('T')[0];
+
+			if (!departureDates.includes(departureDateString)) {
+				departureDates.push(departureDateString);
+			}
+
+			const arrivalIndex =
+				arrivalDates.indexOf(arrivalDateString) === -1
+					? arrivalDates.push(arrivalDateString) - 1
+					: arrivalDates.indexOf(arrivalDateString);
+			const departureIndex = departureDates.indexOf(departureDateString);
+
+			if (!deltaVMatrix[departureIndex]) {
+				deltaVMatrix[departureIndex] = [];
+			}
+
+			deltaVMatrix[departureIndex][arrivalIndex] = data.deltaV;
+		});
+
+		const data: Plotly.Data[] = [
+			{
+				z: deltaVMatrix,
+				x: departureDates,
+				y: arrivalDates,
+				type: 'heatmap',
+				colorscale: [
+					[0, 'blue'], // Start with blue at the lowest non-zero delta-v value
+					[0.5, 'green'], // Use green or another color for mid-range values
+					[1, 'red'], // End with red at the highest delta-v value
+				],
+				zmin: 12000, // Assuming delta-v values start at 1 (adjust based on your data)
+				zmax: Math.max(...deltaVMatrix.flat()), // Find the maximum delta-v value for the scale
+				colorbar: {
+					title: 'Delta-V (km/s)',
+					titleside: 'right',
+				},
+			},
+		];
+
+		const layout: Partial<Plotly.Layout> = {
+			title: 'Porkchop Plot',
+			xaxis: {
+				title: 'Departure Date',
+				type: 'date',
+			},
+			yaxis: {
+				title: 'Arrival Date',
+				type: 'date',
+			},
+		};
+
+		Plotly.newPlot('yourPlotDivId', data, layout);
+
+		loading.value = false;
+
 		// // Import parking orbit parameters
 		// var fromRadius = props.formData.originOrbit; // document.getElementById('fromDistanceAbove').value;
 		// var toRadius = props.formData.destinationOrbit; //document.getElementById('fromDistanceAbove').value;
@@ -737,17 +812,26 @@ interface PorkchopData {
 	arrivalDate: Date;
 	deltaV: number;
 }
-function generatePorkchopPlotData(
+
+// A utility function to break the processing into asynchronous chunks
+function asyncSetTimeout(delay: number = 0) {
+	return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
+async function generatePorkchopDataAsync(
 	startDate: Date,
 	endDate: Date,
-): PorkchopData[] {
+): Promise<PorkchopData[]> {
 	const porkchopData: PorkchopData[] = [];
 	let departureDate = new Date(startDate);
 
 	while (departureDate <= endDate) {
 		let arrivalDate = new Date(departureDate);
+		arrivalDate.setDate(arrivalDate.getDate() + 7);
 
 		while (arrivalDate <= endDate) {
+			// Your existing logic to calculate porkchop data
+			// For example:
 			const departurePosition = findPlanetLocation(
 				props.formData.origin,
 				departureDate.getTime(),
@@ -786,19 +870,86 @@ function generatePorkchopPlotData(
 			);
 
 			porkchopData.push({
-				departureDate: new Date(departureDate), // Clone to ensure independence
+				departureDate: new Date(departureDate),
 				arrivalDate: new Date(arrivalDate),
 				deltaV,
 			});
 
-			arrivalDate.setDate(arrivalDate.getDate() + 1); // Increment the arrival date
+			arrivalDate.setDate(arrivalDate.getDate() + 7);
+
+			// Break up the loop by awaiting a zero-timeout
+			// This gives the JavaScript event loop a chance to handle other pending tasks
+			await asyncSetTimeout();
 		}
 
-		departureDate.setDate(departureDate.getDate() + 1); // Increment the departure date
+		departureDate.setDate(departureDate.getDate() + 7);
 	}
 
 	return porkchopData;
 }
+
+// function generatePorkchopPlotData(
+// 	startDate: Date,
+// 	endDate: Date,
+// ): PorkchopData[] {
+// 	const porkchopData: PorkchopData[] = [];
+// 	let departureDate = new Date(startDate);
+
+// 	while (departureDate <= endDate) {
+// 		let arrivalDate = new Date(departureDate);
+
+// 		while (arrivalDate <= endDate) {
+// 			const departurePosition = findPlanetLocation(
+// 				props.formData.origin,
+// 				departureDate.getTime(),
+// 			); // planetPositions(departureDate);
+// 			const arrivalPosition = findPlanetLocation(
+// 				props.formData.destination,
+// 				arrivalDate.getTime(),
+// 			); // planetPositions(arrivalDate);
+
+// 			const departurePosObj: PlanetaryPosition = {
+// 				x: departurePosition[0],
+// 				y: departurePosition[1],
+// 				z: departurePosition[2],
+// 			};
+
+// 			const arrivalPosObj: PlanetaryPosition = {
+// 				x: arrivalPosition[0],
+// 				y: arrivalPosition[1],
+// 				z: arrivalPosition[2],
+// 			};
+
+// 			// Calculate time of flight in seconds
+// 			const timeOfFlight =
+// 				(arrivalDate.getTime() - departureDate.getTime()) / 1000;
+
+// 			const { initialVelocity, finalVelocity } = solveLambertsProblem(
+// 				departurePosObj,
+// 				arrivalPosObj,
+// 				timeOfFlight,
+// 			);
+
+// 			// Simplified delta-v calculation (for demonstration purposes)
+// 			const deltaV = Math.sqrt(
+// 				Math.pow(finalVelocity.vx - initialVelocity.vx, 2) +
+// 					Math.pow(finalVelocity.vy - initialVelocity.vy, 2),
+// 			);
+
+// 			porkchopData.push({
+// 				departureDate: new Date(departureDate), // Clone to ensure independence
+// 				arrivalDate: new Date(arrivalDate),
+// 				deltaV,
+// 			});
+
+// 			arrivalDate.setDate(arrivalDate.getDate() + 1); // Increment the arrival date
+// 		}
+
+// 		departureDate.setDate(departureDate.getDate() + 1); // Increment the departure date
+// 	}
+
+// 	return porkchopData;
+// }
 
 // function generatePorkchopData(departurePlanet: PlanetOrbit, arrivalPlanet: PlanetOrbit): void {
 //     const deltaVData = [];
@@ -885,13 +1036,13 @@ function solveLambertsProblem(
 	const tofHohmann = Math.PI * Math.sqrt((a * a * a) / mu);
 
 	if (timeOfFlight < tofHohmann) {
-		console.error('Time of flight is too short for a Hohmann transfer.');
+		//console.error('Time of flight is too short for a Hohmann transfer.');
 		return {
 			initialVelocity: { vx: 0, vy: 0 },
 			finalVelocity: { vx: 0, vy: 0 },
 		};
 	}
-	console.log('Time of flight is long enough for a Hohmann transfer.');
+	//console.log('Time of flight is long enough for a Hohmann transfer.');
 
 	// Simplified calculation of velocity vectors at departure and arrival
 	// For a real application, more complex calculations involving solving Kepler's equation are needed
