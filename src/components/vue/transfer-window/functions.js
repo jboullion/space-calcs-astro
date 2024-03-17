@@ -1492,6 +1492,7 @@ export function calculateTime(p, rOne, rTwo, k, l, m, deltaV, gravParam) {
 // Essential Definitions
 
 export function validTransfer(transferData) {
+	console.log({ transferData });
 	return (
 		!isNaN(transferData.misc.p) &&
 		transferData.numTries > 0 &&
