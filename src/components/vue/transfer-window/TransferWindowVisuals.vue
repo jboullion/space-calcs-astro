@@ -29,7 +29,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
 // import {
 // 	CSS2DObject,
 // 	CSS2DRenderer,
@@ -89,7 +88,6 @@ import {
 	angleBetweenVectors,
 	calculateTime,
 	validTransfer,
-	AU3Y2toM3S2,
 } from './functions';
 
 import { calculateOrbitalPositionVector } from './functions-ts';
@@ -649,17 +647,35 @@ function findPlanetLocation(planet: PlanetOrbit, time: number): Vector3Tuple {
 /**
  * TRANSFER FUNCTIONS
  */
-interface OrbitResult {
-	tof: number;
-	points: THREE.Vector3[];
-}
 
-interface LambertResult {
-	v1: number[];
-	v2: number[];
-}
+type DateRange = {
+	startDate: Date;
+	endDate: Date;
+};
+
+type PlanetaryPosition = {
+	x: number;
+	y: number;
+	z: number;
+};
 
 function calculateIPTransfer() {
+	// Calculate an interplanetary transfer
+
+	// Set the initial transit time - this is used for evaluating efficiency
+	transTime = new Date();
+
+	// // Stop a transit if one is in progress
+	// if (shipEndTime) {
+	// 	endShipTransit();
+	// }
+
+	// // Hide the delta vee display, to reset
+	// document.getElementById('deltaVeeDisplay').style.display = 'none';
+
+	// Clear maneuvers list
+	let maneuvers: Maneuver[] = [];
+
 	// Import and format names correctly
 	var properNameTwo = props.formData.destination.name; //document.getElementById('toTarget').value.replace('The ', '');
 	var nameOne = props.formData.origin.value; //document.getElementById('fromTarget').value.toLowerCase();
@@ -670,229 +686,557 @@ function calculateIPTransfer() {
 	twoStage = false; //!document.getElementById('IPPorkchop').checked;
 
 	if (nameOne == nameTwo) {
-		// TODO: Prevent this situation from happening in the form
+		// Stop them fron transferring between the same planets - doesn't really work
+		// TODO: Figure out how to show an error to the user. Possibly do so on the form side?
+		// swal('Error', 'You must select two different planets', 'error');
 	} else {
-		const originMeters = AU3Y2toM3S2(props.formData.origin.a);
-		const destinationMeters = AU3Y2toM3S2(props.formData.destination.a);
-
-		var rOrigin = [originMeters, 0, 0]; //.originOrbit; // document.getElementById('fromDistanceAbove').value;
-		var rDestination = [destinationMeters, 0, 0]; //.destinationOrbit; //document.getElementById('fromDistanceAbove').value;
-
-		// Define parameters for Lambert transfer
-		const muSun = 1.32712440018e20; // Gravitational parameter of the Sun in m^3/s^2
-
-		// Calculate points for the Lambert transfer orbit
-		const porkchopData = calculateLambertOrbitPoints(
-			rOrigin,
-			rDestination,
-			muSun,
-			1000,
+		const results = generatePorkchopPlotData(
+			props.formData.departureDateMin,
+			props.formData.departureDateMax,
 		);
 
-		console.log({ porkchopData });
-
-		// // get the deltaV for first and second burn
-		// porkchopData
-		// const [v1, v2] = lambertTransfer(rOrigin, rDestination, tof);
-
-		// // Process the results to generate the Porkchop plot data
-		// const tofValues = porkchopData.map(entry => entry.tof);
-		// const dvValues = porkchopData.map(entry => {
-		// 	// Calculate delta-v here if needed
-		// 	return 0; // Dummy value, replace with actual calculation
+		console.log({ results });
+		// // Import parking orbit parameters
+		// var fromRadius = props.formData.originOrbit; // document.getElementById('fromDistanceAbove').value;
+		// var toRadius = props.formData.destinationOrbit; //document.getElementById('fromDistanceAbove').value;
+		// // Add Trans-NAME Injection to the maneuvers list - This is moving out to escape velocity
+		// maneuvers.push({
+		// 	name: 'T' + properNameTwo[0] + 'I',
+		// 	title: 'Trans-' + properNameTwo + ' Injection',
+		// 	deltaVee: calculateEscapeVelocity(
+		// 		props.formData.origin,
+		// 		fromRadius,
+		// 	),
 		// });
-
-		// // Generate the Porkchop plot visualization using the obtained data
-		// // You can use a plotting library like Plotly.js to create the plot
-		// // Example Plotly.js code:
-		// const data = [{
-		// 	z: dvValues,
-		// 	x: tofValues,
-		// 	y: tofValues,
-		// 	type: 'contour'
-		// }];
-		// Plotly.newPlot('porkchopPlot', data);
+		// // Stop people from activating transfer  too many times
+		// // TODO: Freeze the form while the transfer is in progress?
+		// // document.getElementById('IPTransferButton').disabled = true;
+		// // document.getElementById('ILTransferButton').disabled = true;
+		// // Run the main transfer engine
+		// calculateLambertTransfer(
+		// 	props.formData.origin,
+		// 	props.formData.destination,
+		// 	fromRadius,
+		// 	toRadius,
+		// );
+		// storedTransferData = {
+		// 	//@ts-ignore
+		// 	maneuvers: maneuvers,
+		// 	originPlanet: props.formData.origin,
+		// 	destinationPlanet: props.formData.destination,
+		// 	properNameTwo: properNameTwo,
+		// 	fromRadius: fromRadius,
+		// 	toRadius: toRadius,
+		// };
+		// delayIPTransfer();
 	}
 }
 
-// Function to calculate Lambert transfer orbit points
-
-interface LambertResult {
-	v1: number[];
-	v2: number[];
+interface PorkchopData {
+	departureDate: Date;
+	arrivalDate: Date;
+	deltaV: number;
 }
+function generatePorkchopPlotData(
+	startDate: Date,
+	endDate: Date,
+): PorkchopData[] {
+	const porkchopData: PorkchopData[] = [];
+	let departureDate = new Date(startDate);
 
-interface OrbitResult {
-	tof: number;
-	points: THREE.Vector3[];
-}
+	while (departureDate <= endDate) {
+		let arrivalDate = new Date(departureDate);
 
-function lambertTransfer(
-	mu: number,
-	r1: number[],
-	r2: number[],
-	tof: number,
-	M = 0,
-	N = 0,
-	tolerance = 1e-8,
-	maxIter = 100,
-): LambertResult {
-	function lambertFunction(
-		z: number,
-		r1: number[],
-		r2: number[],
-		A: number,
-		B: number,
-	): number {
-		const sqrtC = Math.sqrt(calculateC(r1, r2));
-		const sqrtSinTheta = Math.sqrt(1 - sqrtC / (rNorm(r1) * rNorm(r2)));
-		const sinTheta = Math.min(sqrtC / (rNorm(r1) * rNorm(r2)), 1);
-		const f =
-			(A * Math.sqrt(2) * (1 - (z * sqrtSinTheta) / 2)) / z ** 1.5 -
-			Math.sqrt(2) *
-				Math.sqrt(mu) *
-				(tof -
-					(z * sqrtSinTheta) / 2 +
-					(A ** 1.5 * calculateF(z, sinTheta) +
-						B * sqrtC * calculateG(z, sinTheta) -
-						sqrtC * A) /
-						Math.sqrt(mu));
-		return f;
-	}
+		while (arrivalDate <= endDate) {
+			const departurePosition = findPlanetLocation(
+				props.formData.origin,
+				departureDate.getTime(),
+			); // planetPositions(departureDate);
+			const arrivalPosition = findPlanetLocation(
+				props.formData.destination,
+				arrivalDate.getTime(),
+			); // planetPositions(arrivalDate);
 
-	// Compute necessary quantities
-	const r1Norm = Math.sqrt(r1.reduce((sum, val) => sum + val ** 2, 0));
-	const r2Norm = Math.sqrt(r2.reduce((sum, val) => sum + val ** 2, 0));
+			const departurePosObj: PlanetaryPosition = {
+				x: departurePosition[0],
+				y: departurePosition[1],
+				z: departurePosition[2],
+			};
 
-	const c = [
-		r1[1] * r2[2] - r1[2] * r2[1],
-		r1[2] * r2[0] - r1[0] * r2[2],
-		r1[0] * r2[1] - r1[1] * r2[0],
-	];
-	const sinTheta = Math.min(
-		Math.sqrt(c.reduce((sum, val) => sum + val ** 2, 0)) /
-			(r1Norm * r2Norm),
-		1,
-	);
-	const theta = Math.asin(sinTheta);
-	const dTheta = Math.PI - theta;
+			const arrivalPosObj: PlanetaryPosition = {
+				x: arrivalPosition[0],
+				y: arrivalPosition[1],
+				z: arrivalPosition[2],
+			};
 
-	// Compute orbit determination parameters A and B
-	const A = Math.sqrt(r1Norm * r2Norm * (1 + Math.cos(theta)));
-	const B = Math.sqrt(r1Norm * r2Norm * (1 - Math.cos(theta)));
+			// Calculate time of flight in seconds
+			const timeOfFlight =
+				(arrivalDate.getTime() - departureDate.getTime()) / 1000;
 
-	// Compute guess for the z value
-	let zGuess = 0;
-	if (sinTheta > 1e-6) {
-		zGuess = Math.acosh(
-			(r1Norm + r2Norm + A) / Math.sqrt(4 * r1Norm * r2Norm),
-		);
-	} else {
-		zGuess = Math.sqrt(
-			r1Norm ** 2 + r2Norm ** 2 - 2 * r1Norm * r2Norm * Math.cos(theta),
-		);
-	}
+			const { initialVelocity, finalVelocity } = solveLambertsProblem(
+				departurePosObj,
+				arrivalPosObj,
+				timeOfFlight,
+			);
 
-	// Implement Newton-Raphson method to solve Lambert's problem
-	let zRoot = zGuess;
-	let iter = 0;
-	let fValue = lambertFunction(zRoot, r1, r2, A, B);
+			// Simplified delta-v calculation (for demonstration purposes)
+			const deltaV = Math.sqrt(
+				Math.pow(finalVelocity.vx - initialVelocity.vx, 2) +
+					Math.pow(finalVelocity.vy - initialVelocity.vy, 2),
+			);
 
-	while (Math.abs(fValue) > tolerance && iter < maxIter) {
-		const fPrime =
-			(A * Math.sqrt(1 - (zRoot / 2 / Math.sinh(zRoot)) ** 2) - B) /
-			(2 * zRoot - A * (1 - zRoot / 2 / Math.tanh(zRoot)));
-		zRoot -= fValue / fPrime;
-		fValue = lambertFunction(zRoot, r1, r2, A, B);
-		iter++;
-	}
+			porkchopData.push({
+				departureDate: new Date(departureDate), // Clone to ensure independence
+				arrivalDate: new Date(arrivalDate),
+				deltaV,
+			});
 
-	console.log({ dTheta, r1Norm, r2Norm, A, zRoot });
-
-	// Compute Lagrange coefficients
-	const A0 =
-		(Math.sin(dTheta) * Math.sqrt(1 - (r1Norm + r2Norm) ** 2 / A ** 2)) /
-		Math.sin(zRoot);
-	const A1 =
-		((r1Norm + r2Norm) / A) * Math.sqrt(zRoot / Math.tanh(zRoot) - 1);
-	const A2 =
-		((r1Norm - r2Norm) / A) * Math.sqrt(zRoot / Math.tanh(zRoot) + 1);
-
-	console.log({ A0 });
-
-	// Compute initial and final velocities
-	const v1 = [
-		(r2[0] - A0 * r1[0] - (A1 * c[0]) / r1Norm) *
-			Math.sqrt(mu / (A * Math.tanh(zRoot))),
-		(r2[1] - A0 * r1[1] - (A1 * c[1]) / r1Norm) *
-			Math.sqrt(mu / (A * Math.tanh(zRoot))),
-		(r2[2] - A0 * r1[2] - (A1 * c[2]) / r1Norm) *
-			Math.sqrt(mu / (A * Math.tanh(zRoot))),
-	];
-	const v2 = [
-		(A2 * r2[0] - r1[0] - (A0 * c[0]) / r2Norm) *
-			Math.sqrt(mu / (A * Math.tanh(zRoot))),
-		(A2 * r2[1] - r1[1] - (A0 * c[1]) / r2Norm) *
-			Math.sqrt(mu / (A * Math.tanh(zRoot))),
-		(A2 * r2[2] - r1[2] - (A0 * c[2]) / r2Norm) *
-			Math.sqrt(mu / (A * Math.tanh(zRoot))),
-	];
-
-	return { v1, v2 };
-}
-
-function calculateLambertOrbitPoints(
-	r1: number[],
-	r2: number[],
-	mu: number,
-	numPoints: number,
-): OrbitResult[] {
-	const results: OrbitResult[] = [];
-	// Iterate over a range of possible time of flight values
-	for (let i = 0; i < 100; i++) {
-		const tof = i * 24 * 3600; // Convert each iteration to seconds (assuming 1 day steps)
-		const { v1, v2 } = lambertTransfer(mu, r1, r2, tof);
-		const r1Vector = new THREE.Vector3(r1[0], r1[1], r1[2]);
-		const r2Vector = new THREE.Vector3(r2[0], r2[1], r2[2]);
-		const points: THREE.Vector3[] = [r1Vector];
-		for (let j = 1; j < numPoints; j++) {
-			const t = j / (numPoints - 1);
-			const r = r1Vector.clone().lerp(r2Vector, t);
-			const v = v1[0] > 0 ? v1 : v2; // Select the appropriate velocity vector
-			const vVector = new THREE.Vector3(v[0], v[1], v[2]);
-			const h = r.clone().cross(vVector).normalize();
-			const orbitPoint = r.clone().applyAxisAngle(h, Math.PI / 2);
-			points.push(orbitPoint);
+			arrivalDate.setDate(arrivalDate.getDate() + 1); // Increment the arrival date
 		}
-		points.push(r2Vector);
-		results.push({ tof, points });
+
+		departureDate.setDate(departureDate.getDate() + 1); // Increment the departure date
 	}
-	return results;
+
+	return porkchopData;
 }
 
-function calculateC(r1: number[], r2: number[]): number {
-	return r1[0] * r2[1] - r1[1] * r2[0];
+// function generatePorkchopData(departurePlanet: PlanetOrbit, arrivalPlanet: PlanetOrbit): void {
+//     const deltaVData = [];
+// 	const startDate = props.formData.departureDateMin;
+// 	const endDate = props.formData.departureDateMax;
+
+//     for (let departureDate = new Date(startDate); departureDate <= endDate; departureDate.setDate(departureDate.getDate() + 1)) {
+//         for (let arrivalDate = new Date(departureDate); arrivalDate <= endDate; arrivalDate.setDate(arrivalDate.getDate() + 1)) {
+//             // Assume getPlanetaryPosition returns the position of the planet on the given date
+
+//             const departurePos = findPlanetLocation(departurePlanet, arrivalDate.getTime()); // getPlanetaryPosition(departurePlanet, departureDate);
+//             const arrivalPos = findPlanetLocation(departurePlanet, arrivalDate.getTime()); // getPlanetaryPosition(arrivalPlanet, arrivalDate);
+
+// 			const departurePosObj: PlanetaryPosition = {
+// 				x: departurePos[0],
+// 				y: departurePos[1],
+// 				z: departurePos[2],
+// 			};
+
+// 			const arrivalPosObj: PlanetaryPosition = {
+// 				x: arrivalPos[0],
+// 				y: arrivalPos[1],
+// 				z: arrivalPos[2],
+// 			};
+//             // Solve Lambert's problem for the given positions and dates
+//             const lambertSolution = solveLambertsProblem(departurePosObj, arrivalPosObj, departureDate, arrivalDate);
+
+//             // Calculate delta-V requirements
+//             const totalDeltaV = calculateDeltaV(lambertSolution);
+
+//             deltaVData.push({
+//                 departureDate: new Date(departureDate), // Clone date to avoid mutation issues
+//                 arrivalDate: new Date(arrivalDate),
+//                 deltaV: totalDeltaV,
+//             });
+//         }
+//     }
+
+//     // Use deltaVData to generate porkchop plot
+//     // displayPorkchopPlot(deltaVData);
+// }
+
+// Assuming a two-dimensional space for simplicity
+interface Position {
+	x: number;
+	y: number;
 }
 
-function rNorm(r: number[]): number {
-	return Math.sqrt(r.reduce((sum, val) => sum + val ** 2, 0));
+// Velocity vector
+interface Velocity {
+	vx: number;
+	vy: number;
 }
 
-function calculateF(z: number, sinTheta: number): number {
-	return (z * Math.sqrt(sinTheta) - Math.pow(z, 2) / 2) / 2 - 1;
+/**
+ * Calculates the initial and final velocity vectors required for a Hohmann transfer between two points.
+ * Note: This is a highly simplified version for conceptual purposes only.
+ *
+ * @param start - The starting position {x, y}.
+ * @param end - The ending position {x, y}.
+ * @param timeOfFlight - The time of flight in seconds.
+ * @returns The initial and final velocity vectors { initialVelocity, finalVelocity }.
+ */
+function solveLambertsProblem(
+	start: Position,
+	end: Position,
+	timeOfFlight: number,
+): { initialVelocity: Velocity; finalVelocity: Velocity } {
+	// Simplified gravitational parameter of the central body (e.g., Sun) in km^3/s^2
+	const mu = 132712440018; // For Sun, adjust for other central bodies
+
+	// Calculate the distances
+	const r1 = Math.sqrt(start.x * start.x + start.y * start.y);
+	const r2 = Math.sqrt(end.x * end.x + end.y * end.y);
+
+	// Calculate the delta theta (change in angle) in radians
+	const deltaTheta = Math.atan2(end.y, end.x) - Math.atan2(start.y, start.x);
+	const cosDeltaTheta = Math.cos(deltaTheta);
+
+	// Assume a minimum energy transfer (Hohmann transfer) and calculate semi-major axis of the transfer orbit
+	const a = (r1 + r2) / 2;
+
+	// Time of flight for a minimum energy orbit (Hohmann transfer)
+	const tofHohmann = Math.PI * Math.sqrt((a * a * a) / mu);
+
+	if (timeOfFlight < tofHohmann) {
+		console.error('Time of flight is too short for a Hohmann transfer.');
+		return {
+			initialVelocity: { vx: 0, vy: 0 },
+			finalVelocity: { vx: 0, vy: 0 },
+		};
+	}
+	console.log('Time of flight is long enough for a Hohmann transfer.');
+
+	// Simplified calculation of velocity vectors at departure and arrival
+	// For a real application, more complex calculations involving solving Kepler's equation are needed
+	const v1 = Math.sqrt(mu * (2 / r1 - 1 / a));
+	const v2 = Math.sqrt(mu * (2 / r2 - 1 / a));
+
+	const initialVelocity: Velocity = {
+		vx: -v1 * Math.sin(deltaTheta),
+		vy: v1 * Math.cos(deltaTheta),
+	};
+
+	const finalVelocity: Velocity = {
+		vx: v2 * Math.sin(deltaTheta),
+		vy: -v2 * Math.cos(deltaTheta),
+	};
+
+	return { initialVelocity, finalVelocity };
 }
 
-function calculateG(z: number, sinTheta: number): number {
-	return (z * Math.sqrt(sinTheta) - z) / Math.pow(z, 1.5);
+// // TODO: Set up THREE.JS stop rendering function.
+// function startTransferCalc() {
+// 	// Stop all calculation and rendering while calculating a transfer
+// 	calculatingTransfer = true;
+
+// 	// Stop asking for animation frames
+// 	cancelAnimationFrame(animator);
+// }
+
+// Lambert Ballistic Transfer Calculator Functions
+
+function calculateLambertTransfer(
+	originPlanet: PlanetOrbit,
+	destinationPlanet: PlanetOrbit,
+	originOrbit: number,
+	destinationOrbit: number,
+) {
+	// Calculate the transfer between two planets
+	// I will try and explain the maths, but to see the full derivations, check the credits page - I've used the same variable names
+
+	// // Disable logged transfer
+	// loggedTransfer = false;
+
+	// Stop the simulation from running to speed it up
+	// TODO: Set up THREE.JS stop rendering function.
+	// startTransferCalc();
+
+	// // Reset all systems - stop people from messing it up while the program is busy
+	// document.getElementById('disabledCover').style.display = 'block';
+	// if (!webVR) {
+	// 	document.getElementById('shipViewDiv').style.display = 'block';
+	// }
+
+	// TODO: Reset previous transfer calculations
+	// resetShipSystems();
+
+	// Initialise empty transit windows
+	transitWindows = {};
+
+	// Bring up the loading screen
+	loading.value = true;
+
+	// document.getElementById('loadingScreen').style.display = 'block';
+	// if (stereoDisp) {
+	// 	document.getElementById('loadingScreenAux').style.display = 'block';
+	// }
+
+	// // Get the initial Message
+	// message =
+	// 	loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+
+	// Import needed variables
+	//var center = planets[nameOne]['center'];
+	var startTime = currentTime.value.getTime();
+	var aOne = parseScalarInput(originPlanet['a'], 'AU');
+	var aTwo = parseScalarInput(destinationPlanet['a'], 'AU');
+
+	// // Find and convert gravitational parameter
+	// var gravitationalParameter = parseScalarInput(
+	// 	findGravParam(center),
+	// 	'm^3/s^2',
+	// );
+
+	// Calculate periods
+	// var periodOne = parseScalarInput(
+	// 	findPeriod(aOne.value * convertDistance('M', 'AU'), center),
+	// 	'y',
+	// );
+	// var periodTwo = parseScalarInput(
+	// 	findPeriod(aTwo.value * convertDistance('M', 'AU'), center),
+	// 	'y',
+	// );
+	var synodicPeriod = parseScalarInput(
+		calculateSynodicPeriod(originPlanet.period, destinationPlanet.period),
+		'y',
+	); // Synodic Period in years
+
+	// Calculate boundary limits on the iterator
+	var smallPeriod;
+	if (originPlanet.period > destinationPlanet.period) {
+		smallPeriod = destinationPlanet.period;
+	} else {
+		smallPeriod = originPlanet.period;
+	}
+	var tofMargin = divide(smallPeriod, parseScalarInput(Math.pow(10, 7), ''));
+
+	// Get a guesstimate of the semi-latus rectum (p)
+	var largeSemiMajor;
+	var smallSemiMajor;
+	var largeE;
+	var smallE;
+	if (aOne.value > aTwo.value) {
+		largeSemiMajor = aOne;
+		smallSemiMajor = aTwo;
+		largeE = parseScalarInput(originPlanet['e'], '');
+		smallE = parseScalarInput(destinationPlanet['e'], '');
+	} else {
+		largeSemiMajor = aTwo;
+		smallSemiMajor = aOne;
+		largeE = parseScalarInput(originPlanet['e'], '');
+		smallE = parseScalarInput(destinationPlanet['e'], '');
+	}
+
+	// Define bounding parameters - this is a VERY rough (hence why the rest is needed) Hohmann transfer orbit for dynamic calculation and estimation
+	var outerPoint = multiply(
+		largeSemiMajor,
+		add(parseScalarInput(1, ''), largeE),
+	);
+	var innerPoint = multiply(
+		smallSemiMajor,
+		subtract(parseScalarInput(1, ''), smallE),
+	);
+
+	var transitA = divide(add(outerPoint, innerPoint), parseScalarInput(2, ''));
+	//var transitA = ((largeSemiMajor * (1 + largeE)) + (smallSemiMajor * (1 - smallE))) / 2;
+
+	const transitPeriod = findPeriod(
+		// @ts-ignore
+		transitA.value * convertDistance('M', 'AU'),
+	);
+	var periodT = parseScalarInput(transitPeriod, 'y');
+	//var periodT = findPeriod(transitA, center);
+
+	// Define the resolution - this means looking at resolution squared windows
+	var resolution = 100; //200;
+	if ((timeRatio + lastTimeRatio) / 2 > 1.5 && !twoStage) {
+		console.log(
+			'Calculating Low Resolution Transfer - Slow Running Computer',
+		);
+		resolution = 100;
+	}
+	totalCalculations = 0;
+
+	// Two-stage transfer calculation data
+	var globalResolution = 200;
+	var firstResolution = 20; // This MUST divide cleanly into the global resolution
+	var secondResolution = globalResolution / firstResolution;
+	var windowsNum = 5;
+	storedWindows = [];
+	if (twoStage) {
+		resolution = firstResolution;
+	}
+	inSecondStage = false;
+
+	// Define limits
+	var upperTransitBound = 0.3; //0.9; TODO: SET THIS BACK TO 0.9
+	var lowerTransitBound = 0.1;
+	// @ts-ignore
+	var increment = divide(
+		synodicPeriod,
+		parseScalarInput(resolution, ''),
+	) as ScalarInput;
+	// @ts-ignore
+	var timeIncrement = divide(
+		multiply(
+			parseScalarInput(upperTransitBound - lowerTransitBound, ''),
+			periodT,
+		),
+		parseScalarInput(resolution, ''),
+	) as ScalarInput;
+
+	console.log({ increment, timeIncrement });
+
+	//var timeIncrement = (upperTransitBound - lowerTransitBound) * periodT / resolution;
+
+	// // Define the radial position vectors
+	// var rOne = [];
+	// var rTwo = [];
+
+	// Keep track of the data - lowest data contains the best transit data, the lowest DV keeps track of whether a new one is better
+	// @ts-ignore
+	lowestData = {};
+	lowestDeltaVee = parseScalarInput(Math.pow(10, 10), 'm/s');
+
+	// Keep track of the timing of the transfer in the consolte
+	console.log('Calculating Transfer...');
+
+	var calcData = {
+		startTime: startTime,
+		gravParam: gravitationalParameter,
+		tofMargin: tofMargin,
+		distOne: originOrbit,
+		distTwo: destinationOrbit,
+		synPeriod: synodicPeriod,
+		windowsNum: windowsNum,
+	};
+
+	for (
+		var deptTime = 0;
+		deptTime < synodicPeriod.value;
+		deptTime += increment.value
+	) {
+		// Iterate through departure times - once it reaches the synodic period, it should have found one
+
+		// Clear out a window so it can assign more transfers
+		transitWindows[deptTime] = {};
+
+		for (
+			var travelTime = periodT.value * lowerTransitBound;
+			travelTime < periodT.value * upperTransitBound;
+			travelTime += timeIncrement.value
+		) {
+			// Iterate through transit times
+			setTimeout(
+				function (deptTime, travelTime) {
+					// Set timeout to allow program to function for computation - parameters passed at other end
+
+					calculateTransferWindow(
+						deptTime,
+						travelTime,
+						originPlanet,
+						destinationPlanet,
+						calcData,
+					);
+				},
+				0,
+				deptTime,
+				travelTime,
+			); // This passes the parameters inside so it doesn't calculate 40,000 of just the final variables
+		}
+	}
+
+	if (twoStage) {
+		// TOOD: Set up two stage transfer once single stage is working
+		// var miscData = {
+		// 	secondResolution: secondResolution,
+		// };
+		// setTimeout(function () {
+		// 	// Wait for the transfer calculator to finish up BEFORE running this - it must have found the best one
+		// 	secondTransferStage(
+		// 		nameOne,
+		// 		nameTwo,
+		// 		increment.value,
+		// 		timeIncrement.value,
+		// 		miscData,
+		// 		calcData,
+		// 	);
+		// }, 0);
+	} else {
+		setTimeout(function () {
+			// Wait for the transfer calculator to finish up BEFORE running this - it must have found the best one
+			finaliseTransferCalc();
+		}, 0);
+	}
 }
 
 function finaliseTransferCalc() {
 	console.log('Deriving Parameters...');
 
 	finishLambertCalculation();
+
+	// // Keep track  of name data for eventual display
+	// //lowestData["nameOne"] = nameOne;
+	// //lowestData["nameTwo"] = nameTwo;
+
+	// // Open up the user UI and let them use it again
+	// if (!webVR) {
+	// 	document.getElementById('shipViewDiv').style.display = 'block';
+	// }
+	// document.getElementById('loadingScreen').style.display = 'none';
+	// document.getElementById('loadingScreenAux').style.display = 'none';
+	// document.getElementById('disabledCover').style.display = 'none';
+
+	// // Let the user know it's done
+	// console.log(
+	// 	'Lambert Transfer Calculated: ' +
+	// 		round((new Date().getTime() - transTime.getTime()) / 1000, 2) +
+	// 		's',
+	// );
+	// console.log('Calculated with ' + totalCalculations + ' windows analysed');
+	// swal({
+	// 	title: 'Transfer Calculated',
+	// 	html: 'Look at the simulation for the gray ship and its orbit, or the bottom right for the &Delta;V Breakdown',
+	// 	type: 'success',
+	// }).then((result) => {
+	// 	if (result.value) {
+	// 		// Resume simulation running
+	// 		endTransferCalc();
+	// 	}
+	// });
 }
 
-function finishLambertCalculation() {}
+function finishLambertCalculation() {
+	// Finalise the lambert calculation for display
+
+	// var center = planets[lowestData['nameOne']]['center'];
+	console.log({ lowestData });
+
+	// Extract the position and velocity vectors for ease
+	var r = lowestData['pos'];
+	var v = lowestData['vel'];
+
+	var r2 = lowestData['pos2'];
+	var v2 = lowestData['vel2'];
+
+	// // Log the data just to be sure for debugging
+	// console.log(lowestData);
+
+	// Initialise the final choices
+	var selectedR;
+	var selectedV;
+	var selectedTime;
+
+	if (magnitude(r) < magnitude(r2)) {
+		// Look at the higher energy planet, tends to be more accurate (not by much, but a bit)
+		selectedR = r;
+		selectedV = v;
+		selectedTime = lowestData['depTime'];
+	} else {
+		selectedR = r2;
+		selectedV = v2;
+		selectedTime = lowestData['capTime'];
+	}
+
+	selectedR = r;
+	selectedV = v;
+	selectedTime = lowestData['depTime'];
+
+	// Upon recieveing parameters, proceed to return data and signal success
+	// @ts-ignore
+	lowestData['params'] = paramsFromVec(selectedR, selectedV, selectedTime);
+
+	// Return data to IP or IL transfer
+	returnData = lowestData;
+	transitData = lowestData;
+}
 
 function paramsFromVec(r: number, v: number, time: number) {
 	// Calculate orbital parameters given orbital state vectors and a given time
@@ -992,6 +1336,429 @@ function paramsFromVec(r: number, v: number, time: number) {
 	// Return the correct parameters
 	// params['rL'] = rL;
 	return params;
+}
+
+function calculateTransferWindow(
+	deptTime: number,
+	travelTimeSec: number,
+	originPlanet: PlanetOrbit,
+	destinationPlanet: PlanetOrbit,
+	miscData: any,
+) {
+	// Calculate an individual transfer window
+
+	// Get the raw data
+	var rawDTime = deptTime;
+	var rawTTime = travelTimeSec;
+
+	// Add another to the total calculations for efficiency tracking
+	totalCalculations += 1;
+
+	// Parse all input data
+	var startTime = miscData.startTime;
+	var gravitationalParameter = miscData.gravParam;
+	var tofMargin = miscData.tofMargin;
+	var distOne = miscData.distOne;
+	var distTwo = miscData.distTwo;
+	var synodicPeriod = miscData.synPeriod;
+	var windowsNum = miscData.windowsNum;
+
+	const travelTime = parseScalarInput(travelTimeSec, 's') as ScalarInput;
+
+	// Find initial variables for first planet
+	var departingTime = new Date(
+		startTime + deptTime * convertTime('S', 'MS', 1),
+	);
+	var rOne = parseVectorInput(
+		findPlanetLocation(originPlanet, departingTime.getTime()),
+		'AU',
+	);
+	var departingVelocity = parseVectorInput(
+		findVelocity(originPlanet, departingTime.getTime()),
+		'AU/y',
+	);
+
+	// Find initial variables for second planet
+	var arrivingTime = new Date(
+		departingTime.getTime() + outputScalar(travelTime, 'ms'),
+	);
+	var rTwo = parseVectorInput(
+		findPlanetLocation(destinationPlanet, arrivingTime.getTime()),
+		'AU',
+	);
+	var arrivingVelocity = parseVectorInput(
+		findVelocity(destinationPlanet, arrivingTime.getTime()),
+		'AU/y',
+	);
+
+	// console.log({
+	// 	departingTime,
+	// 	arrivingTime,
+	// 	rOne,
+	// 	rTwo,
+	// 	departingVelocity,
+	// 	arrivingVelocity,
+	// });
+
+	// Define some handy variables for the magnitudes of vectors
+	var rOneMag = vectorMagnitude(rOne);
+	var rTwoMag = vectorMagnitude(rTwo);
+
+	// Find deltaV
+	var deltaV = parseScalarInput(
+		angleBetweenVectors(outputVector(rOne, 'AU'), outputVector(rTwo, 'AU')),
+		'degrees',
+	);
+
+	// Calculate k,m,l
+	var k = multiply(multiply(rOneMag, rTwoMag), subtract(1, cos(deltaV)));
+	var m = multiply(multiply(rOneMag, rTwoMag), add(1, cos(deltaV)));
+	var l = add(rOneMag, rTwoMag);
+	//var k = rOneMag * rTwoMag * (1 - Math.cos(deltaV));
+	//var m = rOneMag * rTwoMag * (1 + Math.cos(deltaV));
+	//var l = rOneMag + rTwoMag;
+
+	// Important bounders for the iterator
+	var pi = divide(k, add(l, pow(multiply(2, m), 0.5)));
+	var pii = divide(k, subtract(l, pow(multiply(2, m), 0.5)));
+	//var pi = k / (l + Math.pow(2 * m, 0.5));
+	//var pii = k / (l - Math.pow(2 * m, 0.5));
+
+	// Some misc variables
+	var low;
+	var high;
+	var p1;
+	var p2;
+
+	// The starting boundaries affect the results quite a bit
+	var startSeed = 2000000; // This MUST be >= 1
+
+	if (deltaV.value > Math.PI) {
+		// These are limits defined by the maths, just roll with it
+		low = parseScalarInput(0, 'm');
+		high = pii;
+		p1 = add(
+			multiply(0.5 + 1 / startSeed, subtract(pii, pi)),
+			pi,
+		) as unknown as ScalarInput;
+		p2 = add(
+			multiply(0.5 - 1 / startSeed, subtract(pii, pi)),
+			pi,
+		) as unknown as ScalarInput;
+	} else {
+		low = pi;
+		//p1 = ((0.5 + 1 / startSeed) * (pii - pi)) + pi;
+		//p2 = ((0.5 - 1 / startSeed) * (pii - pi)) + pi;
+		p1 = add(
+			multiply(0.5 + 1 / startSeed, subtract(pii, pi)),
+			pi,
+		) as unknown as ScalarInput;
+		p2 = add(
+			multiply(0.5 - 1 / startSeed, subtract(pii, pi)),
+			pi,
+		) as unknown as ScalarInput;
+		high = parseScalarInput(Infinity, 'm');
+	}
+
+	// Calculate the first times
+	var t1 = calculateTime(
+		p1,
+		rOne,
+		rTwo,
+		k,
+		l,
+		m,
+		deltaV,
+		gravitationalParameter,
+	);
+	var t2 = calculateTime(
+		p2,
+		rOne,
+		rTwo,
+		k,
+		l,
+		m,
+		deltaV,
+		gravitationalParameter,
+	);
+
+	// How many passes of the iterator before it hits the escape system
+	var numTries = Math.pow(10, 2);
+
+	// Iterative convergence algorithm for semi-latus rectum
+
+	while (
+		Math.abs(t2.value - travelTime.value) > tofMargin.value &&
+		// @ts-ignore
+		!isNaN(p2.value) &&
+		numTries >= 0 &&
+		// @ts-ignore
+		p2.value < high.value &&
+		// @ts-ignore
+		p2.value > low.value
+	) {
+		var pnew = add(
+			p2,
+			divide(
+				multiply(subtract(travelTime, t2), subtract(p2, p1)),
+				subtract(t2, t1),
+			),
+		); // Linear convergence
+
+		// Update variables for the next go
+		p1 = p2;
+		p2 = pnew;
+		t1 = t2;
+		t2 = calculateTime(
+			p2,
+			rOne,
+			rTwo,
+			k,
+			l,
+			m,
+			deltaV,
+			gravitationalParameter,
+		);
+		numTries -= 1;
+	}
+
+	// Final semi-latus rectum is the selected one
+	var p = p2;
+
+	// Calculate f
+	var f = subtract(1, multiply(divide(rTwoMag, p), subtract(1, cos(deltaV))));
+	//var f = 1 - (rTwoMag / p) * (1 - Math.cos(deltaV));
+
+	// Change parameter to keep units consistent
+	//gravitationalParameter = gravitationalParameter * convertTime("Y", "S", -2);
+
+	console.log({ rOneMag, rTwoMag, f, p, deltaV });
+	// Calculate more variables that don't have a physical correlate - see previous maths comment
+	var g = divide(
+		multiply(multiply(rOneMag, rTwoMag), sin(deltaV)),
+		pow(multiply(gravitationalParameter, p), 0.5),
+	);
+	//var g = rOneMag * rTwoMag * Math.sin(deltaV) / Math.pow(gravitationalParameter * p, 0.5);
+	var fDot = multiply(
+		multiply(
+			pow(divide(gravitationalParameter, p), 0.5),
+			tan(divide(deltaV, 2)),
+		),
+		subtract(
+			subtract(divide(subtract(1, cos(deltaV)), p), divide(1, rOneMag)),
+			divide(1, rTwoMag),
+		),
+	);
+	//var fDot = Math.pow(gravitationalParameter / p, 0.5) * Math.tan(deltaV / 2) * (((1 - Math.cos(deltaV)) / p) - (1 / rOneMag) - (1 / rTwoMag));
+	var gDot = subtract(
+		1,
+		multiply(divide(rOneMag, p), subtract(1, cos(deltaV))),
+	);
+	//var gDot = 1 - (rOneMag / p) * (1 - Math.cos(deltaV));
+
+	// console.log({ rOne, rTwo, f, g, fDot, gDot });
+	// Calculate initial and final velocities - relative to FRAME not to PLANETS
+	var vOne = divide(subtract(rTwo, multiply(f, rOne)), g);
+	var vTwo = add(multiply(fDot, rOne), multiply(gDot, vOne));
+	//var vOne = multiplyVec((1 / g), subVec(rTwo, multiplyVec(f, rOne)));
+	//var vTwo = addVec(multiplyVec(fDot, rOne), multiplyVec(gDot, vOne));
+
+	// Change parameter back for other equations
+	//gravitationalParameter = gravitationalParameter * convertTime("S", "Y", -2);
+
+	// Determing velocites in m/s, not m/year
+	//vOne = multiplyVec(convertTime("S", "Y", -1), vOne);
+	//vTwo = multiplyVec(convertTime("S", "Y", -1), vTwo);
+
+	// Calculate Capture and transfer delta vees
+	// console.log({ vTwo, arrivingVelocity });
+	var DCO = vectorMagnitude(subtract(vTwo, arrivingVelocity));
+	var DTO = vectorMagnitude(subtract(vOne, departingVelocity));
+
+	// console.log({ DCO, DTO });
+
+	//var DCO = magnitude(subVec(vTwo, arrivingVelocity)) * convertSpeed("AU/Y", "M/S");
+	//var DTO = magnitude(subVec(vOne, departingVelocity)) * convertSpeed("AU/Y", "M/S");
+
+	// These are the gravitational ones - escape velocities
+	var DCOGrav = parseScalarInput(0, 'm/s');
+	var DTOGrav = parseScalarInput(0, 'm/s');
+	var deltaVee = parseScalarInput(0, 'm/s');
+
+	DTOGrav = parseScalarInput(
+		calculateEscapeVelocity(originPlanet, distOne) +
+			calculateExtraVelocity(DTO.value, originPlanet, distOne),
+		'm/s',
+	);
+
+	// @ts-ignore
+	deltaVee = add(
+		deltaVee,
+		parseScalarInput(
+			calculateEscapeVelocity(originPlanet, distOne) +
+				calculateExtraVelocity(DTO.value, originPlanet, distOne),
+			'm/s',
+		),
+	);
+
+	// If not aerobraking, deal with orbit and satellite possibilities
+	if (!props.formData.aerobrake) {
+		DCOGrav = parseScalarInput(
+			calculateEscapeVelocity(destinationPlanet, distTwo) +
+				calculateExtraVelocity(DCO.value, destinationPlanet, distTwo),
+			'm/s',
+		);
+
+		// @ts-ignore
+		deltaVee = add(
+			deltaVee,
+			parseScalarInput(
+				calculateEscapeVelocity(destinationPlanet, distTwo) +
+					calculateExtraVelocity(
+						DCO.value,
+						destinationPlanet,
+						distTwo,
+					),
+				'm/s',
+			),
+		);
+	}
+
+	// Calculate the semi-major axis for verification
+	//var a = (m * k * p) / (((2 * m) - Math.pow(l, 2)) * Math.pow(p, 2) + (2 * k * l * p) - Math.pow(k, 2));
+	var a = divide(
+		multiply(multiply(m, k), p),
+		add(
+			multiply(subtract(multiply(2, m), pow(l, 2)), pow(p, 2)),
+			subtract(multiply(multiply(k, 2), multiply(l, p)), pow(k, 2)),
+		),
+	);
+
+	// Format ALL THE LOGGING DATA
+	var formatData: TransferFormat = {
+		pos: outputVector(rOne, 'AU') as Vector3Tuple,
+		vel: outputVector(vOne, 'AU/y') as Vector3Tuple,
+		TO: DTO.value,
+		CO: DCO.value,
+		TOGrav: DTOGrav.value,
+		COGrav: DCOGrav.value,
+		capTime: arrivingTime,
+		depTime: departingTime,
+		pos2: outputVector(rTwo, 'AU') as Vector3Tuple,
+		vel2: outputVector(vTwo, 'AU/y') as Vector3Tuple,
+		depVel: outputVector(departingVelocity, 'AU/y') as Vector3Tuple,
+		arrVel: outputVector(arrivingVelocity, 'AU/y') as Vector3Tuple,
+		predictedTime: outputScalar(t2, 'y'),
+		tTime: outputScalar(travelTime, 'y'),
+		timeDiff:
+			(Math.abs(t2.value - travelTime.value) / travelTime.value) * 100 +
+			'%',
+		a: outputScalar(a, 'AU'),
+		misc: {
+			// @ts-ignore
+			p: p.value,
+			// @ts-ignore
+			highP: high.value,
+			// @ts-ignore
+			lowP: low.value,
+			// @ts-ignore
+			m: m.value,
+			// @ts-ignore
+			k: k.value,
+			// @ts-ignore
+			l: l.value,
+			// @ts-ignore
+			f: f.value,
+			// @ts-ignore
+			g: g.value,
+			// @ts-ignore
+			fDot: fDot.value,
+			// @ts-ignore
+			gDot: gDot.value,
+		},
+		numTries: numTries,
+		gravParam: gravitationalParameter,
+		dTime: deptTime,
+		deltaVee: deltaVee.value,
+		originPlanet: originPlanet,
+		destinationPlanet: destinationPlanet,
+		rawDTime: rawDTime,
+		rawTTime: rawTTime,
+	};
+
+	if (miscData.index) {
+		formatData.index = miscData.index;
+	}
+
+	if (!transitWindows[deptTime]) {
+		// Open up the departure time JSON if not initialised
+		transitWindows[deptTime] = {};
+	}
+
+	// Log the data
+	transitWindows[deptTime][outputScalar(travelTime, 'y')] = formatData;
+
+	// If it is an invaid transfer, disregard as the most efficient. Invalid is hyperbolic, not number values, or if the convergence went outside allowed boundaries
+
+	if (validTransfer(formatData)) {
+		console.log('validTransfer');
+		// Decide which lowest data tracking method
+		if (twoStage && !inSecondStage) {
+			// Choose whether to add a new piece of data
+			if (storedWindows.length < windowsNum) {
+				storedWindows.push(formatData);
+			} else if (deltaVee.value < storedWindows[0].deltaVee) {
+				storedWindows[0] = formatData;
+			}
+
+			storedWindows.sort(function (x: TransferFormat, y: TransferFormat) {
+				// This sorts is in descending order, highest first
+				let xdv = x.deltaVee;
+				let ydv = y.deltaVee;
+
+				return ydv - xdv;
+			});
+		} else {
+			if (deltaVee.value < lowestDeltaVee.value) {
+				// If it's better, set it as the new best
+				lowestDeltaVee = deltaVee;
+				lowestData = formatData;
+			}
+		}
+	}
+
+	// Update the estimated time message
+	if ((new Date().getTime() / 1000) % 0.5 < 0.1) {
+		if (timeEstimateUpdated == false) {
+			var elapsedTime =
+				(new Date().getTime() - transTime.getTime()) / 1000;
+			var predictedTime =
+				(elapsedTime * (synodicPeriod.value - deptTime)) / deptTime;
+			// lastTimeMessage =
+			// 	'<br><br>Estimated time remaining<br>' +
+			// 	Math.round(predictedTime) +
+			// 	' s';
+
+			timeEstimateUpdated = true;
+		}
+	} else {
+		timeEstimateUpdated = false;
+	}
+
+	// Update witty text
+	var seconds = (new Date().getTime() / 1000) % 4;
+	if (seconds < 1) {
+		// Update the message after 4 seconds
+		if (messageUpdated == false) {
+			// message =
+			// 	loadingMessages[
+			// 		Math.floor(Math.random() * loadingMessages.length)
+			// 	];
+			messageUpdated = true;
+		}
+	} else {
+		messageUpdated = false;
+	}
 }
 
 function findVelocity(planet: PlanetOrbit, time: number) {
@@ -1167,6 +1934,104 @@ function findPeriod(a: number) {
 			Math.pow(a, 3),
 		1 / 2,
 	); // Period in years. 1AU = 1 year
+}
+
+// function findGravParam(centerBody: PlanetOrbit, isSun = false) {
+// 	if (isSun) {
+// 		return SUN.mass * gravitationalConstant;
+// 	} else {
+// 		return centerBody.gravParam
+// 	}
+// }
+
+function delayIPTransfer() {
+	// Set timeouts to get the results afterwards - Lambert uses these to stop program shutdown during computation
+	if (twoStage) {
+		setTimeout(function () {
+			setTimeout(function () {
+				finishIPTransfer();
+			}, 0);
+		}, 0);
+	} else {
+		setTimeout(function () {
+			setTimeout(function () {
+				finishIPTransfer();
+			}, 0);
+		}, 0);
+	}
+}
+
+function finishIPTransfer() {
+	// Finish off the IP Transfer
+
+	// Parse stored data
+	var maneuvers = storedTransferData.maneuvers;
+	var originPlanet = storedTransferData.originPlanet;
+	var destinationPlanet = storedTransferData.destinationPlanet;
+	var properNameTwo = storedTransferData.properNameTwo ?? 'pn2';
+	var fromRadius = storedTransferData.fromRadius;
+	var toRadius = storedTransferData.toRadius;
+
+	// Keep the returned data in a local variable
+	var array = returnData;
+
+	// Calculate the extra velocity needed for the transfer (note that these two both happen at once from the parking orbit)
+	var deltaVeeExit = calculateExtraVelocity(
+		array['TO'],
+		originPlanet,
+		fromRadius,
+	);
+	maneuvers.push({
+		// Add NAME Transfer orbit in the maneuvers list
+		name: properNameTwo[0] + 'TO',
+		title: properNameTwo + ' Transfer Orbit',
+		deltaVee: deltaVeeExit,
+	});
+
+	// Set ship parameters
+	shipParameters = array['params'];
+
+	// Find hyperbolic excess velocity at arrival
+	var deltaVeeEnter = calculateExtraVelocity(
+		array['CO'],
+		destinationPlanet,
+		toRadius,
+	);
+
+	// Add the next two maneuvers - Both occur at the final parking orbit
+	maneuvers.push({
+		name: properNameTwo[0] + 'CO',
+		hide: props.formData.aerobrake,
+		title: properNameTwo + ' Capture Orbit',
+		deltaVee: deltaVeeEnter,
+	});
+	maneuvers.push({
+		name: properNameTwo[0] + 'OI',
+		hide: props.formData.aerobrake,
+		title: properNameTwo + ' Orbit Insertion',
+		deltaVee: calculateEscapeVelocity(destinationPlanet, toRadius),
+	});
+
+	// Show the maneuver list
+	// displayManeuvers(maneuvers, array);
+
+	// Start the ship display
+	shipCenter = 'sun';
+	//startShipDisplay(array['depTime'], array['capTime'], array['capTime']);
+
+	// // Reset everything for more transfers
+	// document.getElementById('IPTransferButton').disabled = false;
+	// document.getElementById('ILTransferButton').disabled = false;
+
+	// Calculate total delta vee
+	var DV =
+		calculateEscapeVelocity(destinationPlanet, toRadius) +
+		deltaVeeExit +
+		deltaVeeEnter +
+		calculateEscapeVelocity(originPlanet, fromRadius);
+
+	// Print the porkchop
+	//printPorkchop(array.dTime, array.tTime, returnData['deltaVee']);
 }
 
 /**
