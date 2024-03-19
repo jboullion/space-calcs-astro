@@ -236,6 +236,11 @@ export const physicsConstants = {
 	idealGasConstant: 8.3144, // J/(mol·K)
 };
 
+export const scaleConversions = {
+	secondsToDays: 86400,
+	scaleFactor: 100000,
+};
+
 export function gTom2s(g: number) {
 	return g * physicsConstants.g;
 }
@@ -286,6 +291,10 @@ export function relativeDifference(a: number, b: number) {
 
 export function kToC(k: number) {
 	return k - 273.15;
+}
+
+export function clamp(value: number, min: number, max: number) {
+	return Math.min(Math.max(value, min), max);
 }
 
 export function calculateGravitationalForce(

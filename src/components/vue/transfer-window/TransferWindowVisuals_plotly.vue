@@ -12,6 +12,7 @@
 			</button>
 			<h3 class="mb-0">{{ currentDateString }}</h3>
 		</div>
+		<div id="yourPlotDivId"></div>
 		<div
 			id="transfer-window-canvas"
 			class="canvas-wrapper border"
@@ -29,6 +30,8 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import Plotly from 'plotly.js-dist';
+
 // import {
 // 	CSS2DObject,
 // 	CSS2DRenderer,
@@ -648,7 +651,18 @@ function findPlanetLocation(planet: PlanetOrbit, time: number): Vector3Tuple {
  * TRANSFER FUNCTIONS
  */
 
-function calculateIPTransfer() {
+type DateRange = {
+	startDate: Date;
+	endDate: Date;
+};
+
+type PlanetaryPosition = {
+	x: number;
+	y: number;
+	z: number;
+};
+
+async function calculateIPTransfer() {
 	// Calculate an interplanetary transfer
 
 	// Set the initial transit time - this is used for evaluating efficiency
@@ -679,45 +693,264 @@ function calculateIPTransfer() {
 		// TODO: Figure out how to show an error to the user. Possibly do so on the form side?
 		// swal('Error', 'You must select two different planets', 'error');
 	} else {
-		// Import parking orbit parameters
-		var fromRadius = props.formData.originOrbit; // document.getElementById('fromDistanceAbove').value;
-		var toRadius = props.formData.destinationOrbit; //document.getElementById('fromDistanceAbove').value;
+		if (loading.value) return;
 
-		// Add Trans-NAME Injection to the maneuvers list - This is moving out to escape velocity
-		maneuvers.push({
-			name: 'T' + properNameTwo[0] + 'I',
-			title: 'Trans-' + properNameTwo + ' Injection',
-			deltaVee: calculateEscapeVelocity(
-				props.formData.origin,
-				fromRadius,
-			),
-		});
+		loading.value = true;
 
-		// Stop people from activating transfer  too many times
-		// TODO: Freeze the form while the transfer is in progress?
-		// document.getElementById('IPTransferButton').disabled = true;
-		// document.getElementById('ILTransferButton').disabled = true;
-
-		// Run the main transfer engine
-		calculateLambertTransfer(
-			props.formData.origin,
-			props.formData.destination,
-			fromRadius,
-			toRadius,
+		const porkchopData = await generatePorkchopDataAsync(
+			props.formData.departureDateMin,
+			props.formData.departureDateMax,
 		);
 
-		storedTransferData = {
-			//@ts-ignore
-			maneuvers: maneuvers,
-			originPlanet: props.formData.origin,
-			destinationPlanet: props.formData.destination,
-			properNameTwo: properNameTwo,
-			fromRadius: fromRadius,
-			toRadius: toRadius,
+		console.log({ porkchopData });
+
+		const departureDates: string[] = []; // X-axis: Unique departure dates as strings
+		const transitTimes: number[] = []; // Y-axis: Unique transit times as numbers
+		const deltaVMatrix: number[][] = []; // Z-values for heatmap
+
+		// Populate the departureDates, transitTimes, and prepare deltaVMatrix
+		porkchopData.forEach((data) => {
+			const departureStr = data.departureDate.toISOString().split('T')[0];
+			if (!departureDates.includes(departureStr)) {
+				departureDates.push(departureStr);
+			}
+
+			const transitTime = data.transitTime;
+			if (!transitTimes.includes(transitTime)) {
+				transitTimes.push(transitTime);
+			}
+		});
+
+		// Sort transitTimes to ensure correct order on the Y-axis
+		transitTimes.sort((a, b) => a - b);
+
+		// Initialize deltaVMatrix with NaNs
+		for (let i = 0; i < departureDates.length; i++) {
+			deltaVMatrix[i] = new Array(transitTimes.length).fill(NaN);
+		}
+
+		// Fill in deltaVMatrix with actual delta-v values
+		porkchopData.forEach((data) => {
+			const xIndex = departureDates.indexOf(
+				data.departureDate.toISOString().split('T')[0],
+			);
+			const yIndex = transitTimes.indexOf(data.transitTime);
+			deltaVMatrix[xIndex][yIndex] = data.deltaV;
+		});
+
+		const layout = {
+			title: 'Porkchop Plot',
+			xaxis: {
+				title: 'Departure Date',
+				type: 'date',
+				// tickmode: 'linear',
+				// dtick: 604800000, // One week in milliseconds
+				// tickformat: '%Y-%m-%d', // Optional: Customize date format as needed
+			},
+			yaxis: {
+				title: 'Transit Time (days)',
+			},
 		};
 
-		delayIPTransfer();
+		const plotData = [
+			{
+				z: deltaVMatrix,
+				x: departureDates,
+				y: transitTimes,
+				type: 'heatmap',
+				colorscale: 'Jet', // Or any colorscale that fits your needs
+			},
+		];
+
+		Plotly.newPlot('yourPlotDivId', plotData, layout);
+
+		loading.value = false;
+
+		// // Import parking orbit parameters
+		// var fromRadius = props.formData.originOrbit; // document.getElementById('fromDistanceAbove').value;
+		// var toRadius = props.formData.destinationOrbit; //document.getElementById('fromDistanceAbove').value;
+		// // Add Trans-NAME Injection to the maneuvers list - This is moving out to escape velocity
+		// maneuvers.push({
+		// 	name: 'T' + properNameTwo[0] + 'I',
+		// 	title: 'Trans-' + properNameTwo + ' Injection',
+		// 	deltaVee: calculateEscapeVelocity(
+		// 		props.formData.origin,
+		// 		fromRadius,
+		// 	),
+		// });
+		// // Stop people from activating transfer  too many times
+		// // TODO: Freeze the form while the transfer is in progress?
+		// // document.getElementById('IPTransferButton').disabled = true;
+		// // document.getElementById('ILTransferButton').disabled = true;
+		// // Run the main transfer engine
+		// calculateLambertTransfer(
+		// 	props.formData.origin,
+		// 	props.formData.destination,
+		// 	fromRadius,
+		// 	toRadius,
+		// );
+		// storedTransferData = {
+		// 	//@ts-ignore
+		// 	maneuvers: maneuvers,
+		// 	originPlanet: props.formData.origin,
+		// 	destinationPlanet: props.formData.destination,
+		// 	properNameTwo: properNameTwo,
+		// 	fromRadius: fromRadius,
+		// 	toRadius: toRadius,
+		// };
+		// delayIPTransfer();
 	}
+}
+
+interface PorkchopData {
+	departureDate: Date;
+	transitTime: number;
+	deltaV: number;
+}
+
+// A utility function to break the processing into asynchronous chunks
+function asyncSetTimeout(delay: number = 0) {
+	return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
+async function generatePorkchopDataAsync(
+	startDate: Date,
+	endDate: Date,
+): Promise<PorkchopData[]> {
+	const porkchopData: PorkchopData[] = [];
+	let departureDate = new Date(startDate);
+	const dayStep = 1; //7; // Step by one week
+
+	while (departureDate < endDate) {
+		let arrivalDate = new Date(departureDate);
+		arrivalDate.setDate(arrivalDate.getDate() + dayStep); // Start one week after the departure
+
+		while (arrivalDate <= endDate) {
+			const departurePosition = findPlanetLocation(
+				props.formData.origin,
+				departureDate.getTime(),
+			); // planetPositions(departureDate);
+			const arrivalPosition = findPlanetLocation(
+				props.formData.destination,
+				arrivalDate.getTime(),
+			); // planetPositions(arrivalDate);
+
+			const departurePosObj: PlanetaryPosition = {
+				x: departurePosition[0],
+				y: departurePosition[1],
+				z: departurePosition[2],
+			};
+
+			const arrivalPosObj: PlanetaryPosition = {
+				x: arrivalPosition[0],
+				y: arrivalPosition[1],
+				z: arrivalPosition[2],
+			};
+
+			const transitTimeDays =
+				(arrivalDate.getTime() - departureDate.getTime()) /
+				(1000 * 60 * 60 * 24); // Calculate transit time in days
+
+			// Calculate time of flight in seconds
+			const timeOfFlight =
+				(arrivalDate.getTime() - departureDate.getTime()) / 1000;
+
+			const { initialVelocity, finalVelocity } = solveLambertsProblem(
+				departurePosObj,
+				arrivalPosObj,
+				timeOfFlight,
+			);
+
+			// Simplified delta-v calculation (for demonstration purposes)
+			const deltaV = Math.sqrt(
+				Math.pow(finalVelocity.vx - initialVelocity.vx, 2) +
+					Math.pow(finalVelocity.vy - initialVelocity.vy, 2),
+			);
+
+			porkchopData.push({
+				departureDate: new Date(departureDate), // For X-axis
+				transitTime: transitTimeDays, // For Y-axis
+				deltaV, // For heatmap color
+			});
+
+			arrivalDate.setDate(arrivalDate.getDate() + dayStep); // Move to the next week
+			await asyncSetTimeout(); // Break to prevent blocking
+		}
+
+		departureDate.setDate(departureDate.getDate() + dayStep); // Move to the next week
+	}
+
+	return porkchopData;
+}
+
+// Assuming a two-dimensional space for simplicity
+interface Position {
+	x: number;
+	y: number;
+}
+
+// Velocity vector
+interface Velocity {
+	vx: number;
+	vy: number;
+}
+
+/**
+ * Calculates the initial and final velocity vectors required for a Hohmann transfer between two points.
+ * Note: This is a highly simplified version for conceptual purposes only.
+ *
+ * @param start - The starting position {x, y}.
+ * @param end - The ending position {x, y}.
+ * @param timeOfFlight - The time of flight in seconds.
+ * @returns The initial and final velocity vectors { initialVelocity, finalVelocity }.
+ */
+function solveLambertsProblem(
+	start: Position,
+	end: Position,
+	timeOfFlight: number,
+): { initialVelocity: Velocity; finalVelocity: Velocity } {
+	// Simplified gravitational parameter of the central body (e.g., Sun) in km^3/s^2
+	const mu = 132712440018; // For Sun, adjust for other central bodies
+
+	// Calculate the distances
+	const r1 = Math.sqrt(start.x * start.x + start.y * start.y);
+	const r2 = Math.sqrt(end.x * end.x + end.y * end.y);
+
+	// Calculate the delta theta (change in angle) in radians
+	const deltaTheta = Math.atan2(end.y, end.x) - Math.atan2(start.y, start.x);
+	const cosDeltaTheta = Math.cos(deltaTheta);
+
+	// Assume a minimum energy transfer (Hohmann transfer) and calculate semi-major axis of the transfer orbit
+	const a = (r1 + r2) / 2;
+
+	// Time of flight for a minimum energy orbit (Hohmann transfer)
+	const tofHohmann = Math.PI * Math.sqrt((a * a * a) / mu);
+
+	if (timeOfFlight < tofHohmann) {
+		//console.error('Time of flight is too short for a Hohmann transfer.');
+		return {
+			initialVelocity: { vx: 0, vy: 0 },
+			finalVelocity: { vx: 0, vy: 0 },
+		};
+	}
+	//console.log('Time of flight is long enough for a Hohmann transfer.');
+
+	// Simplified calculation of velocity vectors at departure and arrival
+	// For a real application, more complex calculations involving solving Kepler's equation are needed
+	const v1 = Math.sqrt(mu * (2 / r1 - 1 / a));
+	const v2 = Math.sqrt(mu * (2 / r2 - 1 / a));
+
+	const initialVelocity: Velocity = {
+		vx: -v1 * Math.sin(deltaTheta),
+		vy: v1 * Math.cos(deltaTheta),
+	};
+
+	const finalVelocity: Velocity = {
+		vx: v2 * Math.sin(deltaTheta),
+		vy: -v2 * Math.cos(deltaTheta),
+	};
+
+	return { initialVelocity, finalVelocity };
 }
 
 // // TODO: Set up THREE.JS stop rendering function.
@@ -1341,6 +1574,7 @@ function calculateTransferWindow(
 	// Change parameter to keep units consistent
 	//gravitationalParameter = gravitationalParameter * convertTime("Y", "S", -2);
 
+	console.log({ rOneMag, rTwoMag, f, p, deltaV });
 	// Calculate more variables that don't have a physical correlate - see previous maths comment
 	var g = divide(
 		multiply(multiply(rOneMag, rTwoMag), sin(deltaV)),
@@ -1364,6 +1598,7 @@ function calculateTransferWindow(
 	);
 	//var gDot = 1 - (rOneMag / p) * (1 - Math.cos(deltaV));
 
+	// console.log({ rOne, rTwo, f, g, fDot, gDot });
 	// Calculate initial and final velocities - relative to FRAME not to PLANETS
 	var vOne = divide(subtract(rTwo, multiply(f, rOne)), g);
 	var vTwo = add(multiply(fDot, rOne), multiply(gDot, vOne));
@@ -1378,8 +1613,11 @@ function calculateTransferWindow(
 	//vTwo = multiplyVec(convertTime("S", "Y", -1), vTwo);
 
 	// Calculate Capture and transfer delta vees
+	// console.log({ vTwo, arrivingVelocity });
 	var DCO = vectorMagnitude(subtract(vTwo, arrivingVelocity));
 	var DTO = vectorMagnitude(subtract(vOne, departingVelocity));
+
+	// console.log({ DCO, DTO });
 
 	//var DCO = magnitude(subVec(vTwo, arrivingVelocity)) * convertSpeed("AU/Y", "M/S");
 	//var DTO = magnitude(subVec(vOne, departingVelocity)) * convertSpeed("AU/Y", "M/S");

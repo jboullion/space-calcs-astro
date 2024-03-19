@@ -167,7 +167,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { addCommas } from '../utils';
+import { addCommas, clamp } from '../utils';
 import { throttle } from '../../../utils/utils';
 
 import {
@@ -604,7 +604,7 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
 	if (!threeScene) return;
 
 	const orbitSize = orbit.distance / scaleConversions.scaleFactor;
-	const lineSize = farthestOrbitScaled.value / 100;
+	const lineSize = farthestOrbitScaled.value / 200;
 	const planetMaterial = getMaterial(orbit.name);
 
 	const planetGeometry = new THREE.SphereGeometry(lineSize * 2, 32, 32);
@@ -683,7 +683,7 @@ function setupHohmannOrbit() {
 
 	// setup orbit
 	const sMajorAxis = semiMajorAxis.value / scaleConversions.scaleFactor;
-	const lineSize = farthestOrbitScaled.value / 100;
+	const lineSize = farthestOrbitScaled.value / 200;
 
 	const axisMaterial = new THREE.MeshBasicMaterial({
 		color: 0xfd7e14,

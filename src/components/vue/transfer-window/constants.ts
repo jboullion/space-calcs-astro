@@ -116,6 +116,7 @@ let SolMass = 1.98855 * Math.pow(10, 30);
 // Calculate the gravitational parameter
 export const gravitationalParameter = SolMass * gravitationalConstant; // m3 s-2
 export const gravitationalParameterAU = M3S2toAU3Y2(gravitationalParameter);
+export const AUtoKm = 149597870.7; // km
 
 export const MS_SECOND = 1000;
 export const MS_MINUTE = 60 * 1000;
