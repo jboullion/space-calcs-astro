@@ -604,10 +604,10 @@ function setupOrbits(orbit: Location, endOrbit: boolean) {
 	if (!threeScene) return;
 
 	const orbitSize = orbit.distance / scaleConversions.scaleFactor;
-	const lineSize = farthestOrbitScaled.value / 100;
+	const lineSize = farthestOrbitScaled.value / 200;
 	const planetMaterial = getMaterial(orbit.name);
 
-	const planetGeometry = new THREE.SphereGeometry(lineSize * 2, 32, 32);
+	const planetGeometry = new THREE.SphereGeometry(lineSize * 8, 32, 32);
 	const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
 	// Rotate the planet to the (more or less) correct orientation compared to the plane of the system
 	planetMesh.rotation.set(Math.PI / 2, 0, 0);
@@ -683,7 +683,7 @@ function setupHohmannOrbit() {
 
 	// setup orbit
 	const sMajorAxis = semiMajorAxis.value / scaleConversions.scaleFactor;
-	const lineSize = farthestOrbitScaled.value / 100;
+	const lineSize = farthestOrbitScaled.value / 200;
 
 	const axisMaterial = new THREE.MeshBasicMaterial({
 		color: 0xfd7e14,
