@@ -1,5 +1,15 @@
 <template>
 	<div class="calc-form">
+		<div
+			id="transfer-window-canvas"
+			class="canvas-wrapper border"
+			style="position: relative; padding-top: 65%; width: 100%"
+		>
+			<i
+				v-if="loading"
+				class="fas fa-cog fa-spin mb-0 h1 position-absolute top-50 start-50"
+			></i>
+		</div>
 		<div class="d-flex justify-content-between mb-3">
 			<button
 				class="btn btn-primary btn-lg px-5"
@@ -11,16 +21,6 @@
 				<i class="fas" :class="playClass"></i>
 			</button>
 			<h3 class="mb-0">{{ currentDateString }}</h3>
-		</div>
-		<div
-			id="transfer-window-canvas"
-			class="canvas-wrapper border"
-			style="position: relative; padding-top: 75%; width: 100%"
-		>
-			<i
-				v-if="loading"
-				class="fas fa-cog fa-spin mb-0 h1 position-absolute top-50 start-50"
-			></i>
 		</div>
 	</div>
 </template>

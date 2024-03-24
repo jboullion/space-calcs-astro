@@ -143,14 +143,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/fly-wheel',
 	},
-	// {
-	// 	id: 'transfer-window',
-	// 	name: 'Transfer Window',
-	// 	description: 'Calculate the transfer window between two planets',
-	// 	categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
-	// 	image: '',
-	// 	link: '/calcs/transfer-window',
-	// },
+	{
+		id: 'transfer-window',
+		name: 'Transfer Window',
+		description: 'Calculate the transfer window between two planets',
+		categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/transfer-window',
+	},
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>
