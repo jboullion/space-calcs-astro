@@ -108,6 +108,7 @@ const animation = {
 	complete: false,
 	FPS: 24,
 };
+var animator: number;
 
 // Time Variables
 let currentTime = ref(new Date()); // May not actually be now, just when it is displayed
@@ -130,7 +131,6 @@ let inSecondStage = false;
 let storedWindows: TransferFormat[] = [];
 let lowestDeltaVee: ScalarInput = parseScalarInput(Math.pow(10, 10), 'm/s');
 let transTime: Date;
-let twoStage = false;
 let lastTimeRatio = 1;
 let timeRatio = 1;
 let lowestData: TransferFormat;
@@ -438,7 +438,7 @@ function animate() {
 	if (!three.controls) return;
 	if (loading.value) return;
 
-	requestAnimationFrame(animate);
+	animator = requestAnimationFrame(animate);
 
 	three.controls.update();
 
@@ -670,10 +670,6 @@ function calculateIPTransfer() {
 	var nameOne = props.formData.origin.value; //document.getElementById('fromTarget').value.toLowerCase();
 	var nameTwo = props.formData.destination.value; //document.getElementById('toTarget').value.toLowerCase();
 
-	// Decide which mode of Lambert calculation should be used
-	// TODO: Set up a prop for porkchop plot generation on formData
-	twoStage = false; //!document.getElementById('IPPorkchop').checked;
-
 	if (nameOne == nameTwo) {
 		// Stop them fron transferring between the same planets - doesn't really work
 		// TODO: Figure out how to show an error to the user. Possibly do so on the form side?
@@ -721,13 +717,13 @@ function calculateIPTransfer() {
 }
 
 // // TODO: Set up THREE.JS stop rendering function.
-// function startTransferCalc() {
-// 	// Stop all calculation and rendering while calculating a transfer
-// 	calculatingTransfer = true;
+function startTransferCalc() {
+	// Stop all calculation and rendering while calculating a transfer
+	calculatingTransfer = true;
 
-// 	// Stop asking for animation frames
-// 	cancelAnimationFrame(animator);
-// }
+	// Stop asking for animation frames
+	cancelAnimationFrame(animator);
+}
 
 // Lambert Ballistic Transfer Calculator Functions
 
@@ -745,13 +741,9 @@ function calculateLambertTransfer(
 
 	// Stop the simulation from running to speed it up
 	// TODO: Set up THREE.JS stop rendering function.
-	// startTransferCalc();
+	startTransferCalc();
 
-	// // Reset all systems - stop people from messing it up while the program is busy
-	// document.getElementById('disabledCover').style.display = 'block';
-	// if (!webVR) {
-	// 	document.getElementById('shipViewDiv').style.display = 'block';
-	// }
+	// TODO: Disable all form elements while calculating
 
 	// TODO: Reset previous transfer calculations
 	// resetShipSystems();
@@ -845,7 +837,7 @@ function calculateLambertTransfer(
 
 	// Define the resolution - this means looking at resolution squared windows
 	var resolution = 100; //200;
-	if ((timeRatio + lastTimeRatio) / 2 > 1.5 && !twoStage) {
+	if ((timeRatio + lastTimeRatio) / 2 > 1.5) {
 		console.log(
 			'Calculating Low Resolution Transfer - Slow Running Computer',
 		);
@@ -859,9 +851,7 @@ function calculateLambertTransfer(
 	var secondResolution = globalResolution / firstResolution;
 	var windowsNum = 5;
 	storedWindows = [];
-	if (twoStage) {
-		resolution = firstResolution;
-	}
+
 	inSecondStage = false;
 
 	// Define limits
@@ -942,28 +932,10 @@ function calculateLambertTransfer(
 		}
 	}
 
-	if (twoStage) {
-		// TOOD: Set up two stage transfer once single stage is working
-		// var miscData = {
-		// 	secondResolution: secondResolution,
-		// };
-		// setTimeout(function () {
-		// 	// Wait for the transfer calculator to finish up BEFORE running this - it must have found the best one
-		// 	secondTransferStage(
-		// 		nameOne,
-		// 		nameTwo,
-		// 		increment.value,
-		// 		timeIncrement.value,
-		// 		miscData,
-		// 		calcData,
-		// 	);
-		// }, 0);
-	} else {
-		setTimeout(function () {
-			// Wait for the transfer calculator to finish up BEFORE running this - it must have found the best one
-			finaliseTransferCalc();
-		}, 0);
-	}
+	setTimeout(function () {
+		// Wait for the transfer calculator to finish up BEFORE running this - it must have found the best one
+		finaliseTransferCalc();
+	}, 0);
 }
 
 function finaliseTransferCalc() {
@@ -1506,28 +1478,10 @@ function calculateTransferWindow(
 
 	if (validTransfer(formatData)) {
 		console.log('validTransfer');
-		// Decide which lowest data tracking method
-		if (twoStage && !inSecondStage) {
-			// Choose whether to add a new piece of data
-			if (storedWindows.length < windowsNum) {
-				storedWindows.push(formatData);
-			} else if (deltaVee.value < storedWindows[0].deltaVee) {
-				storedWindows[0] = formatData;
-			}
-
-			storedWindows.sort(function (x: TransferFormat, y: TransferFormat) {
-				// This sorts is in descending order, highest first
-				let xdv = x.deltaVee;
-				let ydv = y.deltaVee;
-
-				return ydv - xdv;
-			});
-		} else {
-			if (deltaVee.value < lowestDeltaVee.value) {
-				// If it's better, set it as the new best
-				lowestDeltaVee = deltaVee;
-				lowestData = formatData;
-			}
+		if (deltaVee.value < lowestDeltaVee.value) {
+			// If it's better, set it as the new best
+			lowestDeltaVee = deltaVee;
+			lowestData = formatData;
 		}
 	}
 
@@ -1750,19 +1704,9 @@ function findPeriod(a: number) {
 
 function delayIPTransfer() {
 	// Set timeouts to get the results afterwards - Lambert uses these to stop program shutdown during computation
-	if (twoStage) {
-		setTimeout(function () {
-			setTimeout(function () {
-				finishIPTransfer();
-			}, 0);
-		}, 0);
-	} else {
-		setTimeout(function () {
-			setTimeout(function () {
-				finishIPTransfer();
-			}, 0);
-		}, 0);
-	}
+	setTimeout(function () {
+		finishIPTransfer();
+	}, 0);
 }
 
 function finishIPTransfer() {
