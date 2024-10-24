@@ -11,7 +11,7 @@
 			:description="`Surface Gravity: ${formatNumber(
 				planetGravity,
 				2,
-			)} m/s²`"
+			)} m/s² or ${formatNumber(planetGravity / 9.81, 2)} g`"
 		/>
 
 		<NumberInput
@@ -74,9 +74,7 @@
 			tooltip=""
 			:description="`Max Tensile Strength: ${formatNumber(
 				formData.material.tensileStrength,
-			)} Mpa<br />Minimum Mass: ${estimatedTotalMass.toExponential(
-				2,
-			)} kg`"
+			)} Mpa<br />Estimated Mass: ${estimatedTotalMass} kg`"
 			@update:modelValue=""
 		/>
 
@@ -93,6 +91,13 @@
 				estimatedTetherRadius,
 			)} m`"
 		/>
+
+		<CheckboxInput
+			id="taper"
+			label="Taper Elevator?"
+			v-model="formData.taper"
+			tooltip="Taper the elevator to reduce mass"
+		/>
 	</div>
 </template>
 <script setup lang="ts">
@@ -100,8 +105,9 @@ import { computed } from 'vue';
 import type { SpaceElevatorForm } from './types';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
+import CheckboxInput from '../forms/CheckboxInput.vue';
 import { materials } from './constants';
-import { energyUnits, formatNumber, physicsConstants } from '../utils';
+import { energyUnits, formatNumber, m2sTog, physicsConstants } from '../utils';
 
 const props = defineProps<{
 	formData: SpaceElevatorForm;
@@ -127,7 +133,7 @@ const estimatedTetherRadius = computed(() => {
 	return radius;
 });
 
-const estimatedTotalMass = computed(() => {
+const calculateCylinderMass = computed(() => {
 	// Calculate tether volume using its cross-sectional area
 	const tetherVolume = props.crossSectionalArea * elevatorTopHeight.value;
 
@@ -141,6 +147,28 @@ const estimatedTotalMass = computed(() => {
 		props.formData.counterweightMass;
 
 	return totalMass;
+});
+
+const estimateTaperMass = computed(() => {
+	return (
+		(props.formData.material.density *
+			m2sTog(props.planetGravity) *
+			props.formData.safetyFactor *
+			props.formData.planetRadius ** 2) /
+		props.formData.material.tensileStrength
+	);
+});
+
+const estimatedTotalMass = computed(() => {
+	let totalMass = 0;
+
+	if (props.formData.taper) {
+		totalMass = estimateTaperMass.value;
+	} else {
+		totalMass = calculateCylinderMass.value;
+	}
+
+	return totalMass.toExponential(2);
 });
 
 const energyRequired = computed(() => {

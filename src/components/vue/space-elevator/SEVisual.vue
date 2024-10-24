@@ -16,7 +16,7 @@
 		</div>
 
 		<div class="pb-2">
-			<p>
+			<p v-if="!formData.taper">
 				<b>Note:</b> We are assuming a constant radius cylinder for the
 				Space Elevator geometry. You could taper the tether for optimal
 				mass savings.
