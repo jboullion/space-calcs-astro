@@ -1,0 +1,40 @@
+---
+import type { Reference } from '../../types/types';
+
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import AtmosphericEntry from '../../components/vue/atmospheric-entry/AtmosphericEntry.vue';
+import References from '../../components/shared/References.astro';
+import { calculators } from '../../utils/calculator-list';
+
+const calculator = calculators.find((calc) => calc.id === 'atmospheric-entry');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+const references: Reference[] = [
+    // {
+    //     title: 'Wiki: Space Elevator',
+    //     url: 'https://en.wikipedia.org/wiki/Space_elevator',
+    // },
+    // {
+    //     title: 'Isaac Arthur: Space Elevators',
+    //     url: 'https://www.youtube.com/watch?v=dc8_AuzeYKE',
+    // },
+];
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div style="min-height: 700px;" class="calculator">
+            <AtmosphericEntry client:only />
+        </div>
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>

@@ -143,6 +143,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/fly-wheel',
 	},
+	{
+		id: 'atmospheric-entry',
+		name: 'Atmospheric Entry',
+		description:
+			'Estimate the heating and deceleration of a spacecraft during atmospheric entry',
+		categories: [categories[ROCKET_CAT]],
+		image: '',
+		link: '/calcs/atmospheric-entry',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
