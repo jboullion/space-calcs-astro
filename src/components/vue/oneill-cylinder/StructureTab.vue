@@ -14,8 +14,8 @@
 			id="cylinderLength"
 			label="Cylinder Length"
 			v-model.number="structure.cylinderLength"
-			:step="1"
-			:min="10"
+			:step="0.1"
+			:min="0.1"
 			:max="1000000"
 			:description="`Max Passive Stability: ${formatNumber(
 				maxPassiveStabilty,
