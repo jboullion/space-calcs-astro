@@ -5,7 +5,7 @@
 			label="Floor Height"
 			v-model.number="internal.levelHeight"
 			:step="1"
-			:min="10"
+			:min="4"
 			:max="maxLevelHeight"
 			:description="`Min: 10m, Maximum: ${maxLevelHeight}m`"
 			unit="m"
