@@ -143,6 +143,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/fly-wheel',
 	},
+	{
+		id: 'population-growth',
+		name: 'Population Growth',
+		description: 'Estimate population growth based on initial parameters',
+		categories: [categories[LIFE_CAT]],
+		image: '',
+		link: '/calcs/population-growth',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
