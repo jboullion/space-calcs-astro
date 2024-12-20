@@ -8,12 +8,7 @@
 		</div>
 		<div id="population-growth__results" class="col-xl-8 col-lg-7 col-md-6">
 			<PopulationGrowthResults :formData="formData" />
-			<PopulationGrowthVisuals
-				:ageDistribution="formData.initialAgeDistribution"
-				:totalPopulation="formData.initialPopulation"
-				:maxAge="formData.lifeExpectancy"
-				:ageGroupSize="10"
-			/>
+			<PopulationGrowthVisuals :formData="formData" />
 		</div>
 	</div>
 </template>
@@ -48,4 +43,38 @@ const updateFormData = (newFormData: IPopulationGrowthForm) => {
 	formData.value = newFormData;
 };
 </script>
-<style></style>
+
+<style scoped>
+:deep(.form-range::-webkit-slider-thumb) {
+	border: 1px solid #99f;
+	height: 1.2rem !important;
+	width: 1.2rem !important;
+	margin-top: -0.45rem !important;
+}
+
+:deep(.form-range::-moz-range-thumb) {
+	border: 1px solid #99f;
+	height: 1.2rem !important;
+	width: 1.2rem !important;
+	margin-top: -0.45rem !important;
+}
+
+:deep(.form-range::-ms-thumb) {
+	border: 1px solid #99f;
+	height: 1.2rem !important;
+	width: 1.2rem !important;
+	margin-top: -0.45rem !important;
+}
+
+:deep(.form-range::-webkit-slider-runnable-track) {
+	height: 0.5rem !important;
+}
+
+:deep(.form-range::-moz-range-track) {
+	height: 0.5rem !important;
+}
+
+:deep(.form-range::-ms-track) {
+	height: 0.5rem !important;
+}
+</style>

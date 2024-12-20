@@ -21,7 +21,9 @@
 			</InputWrapper>
 
 			<div class="age-distribution-inputs mb-3">
-				<label class="mb-2 form-label">Age Distribution (%)</label>
+				<label class="mb-2 form-label"
+					>Initial Age Distribution (%)</label
+				>
 				<p class="description">
 					<small class="text-muted">
 						Specify the percentage of population in each 10-year age
@@ -48,10 +50,11 @@
 							:id="`age-group-${index}`"
 							type="range"
 							class="form-range flex-grow-1"
-							v-model.number="ageDistribution[index]"
+							:value="ageDistribution[index]"
 							:min="0"
 							:max="50"
 							:step="1"
+							@input="handleRangeInput($event, index)"
 						/>
 						<span class="flex-shrink-0" style="min-width: 4rem">
 							{{ ageDistribution[index].toFixed(0) }}%
@@ -159,12 +162,6 @@ const ageDistribution = ref<number[]>(
 	props.formData.initialAgeDistribution.map((value) => value * 100),
 );
 
-console.log(
-	'props.formData.initialAgeDistribution',
-	props.formData.initialAgeDistribution,
-);
-console.log('ageDistribution', ageDistribution.value);
-
 // // Watch for changes in life expectancy and update array length
 // watch(
 // 	() => props.formData.lifeExpectancy,
@@ -192,8 +189,7 @@ const totalDistribution = computed(() => {
 
 // Validate distribution
 const isValidDistribution = computed(() => {
-	console.log('totalDistribution', totalDistribution.value);
-	return totalDistribution.value < 101;
+	return totalDistribution.value <= 100;
 });
 
 // Emit changes when distribution is updated
@@ -209,6 +205,23 @@ watch(
 	},
 	{ deep: true },
 );
+
+// Replace v-model with manual handling
+const handleRangeInput = (event: Event, index: number) => {
+	const newValue = Number((event.target as HTMLInputElement).value);
+	const oldValue = ageDistribution.value[index];
+
+	// Only allow the change if:
+	// 1. Value is decreasing, OR
+	// 2. Total would still be <= 100% after the change
+	const totalExcludingCurrent = totalDistribution.value - oldValue;
+	if (newValue < oldValue || totalExcludingCurrent + newValue <= 100) {
+		ageDistribution.value[index] = newValue;
+	} else {
+		// Reset to old value if change would exceed 100%
+		(event.target as HTMLInputElement).value = oldValue.toString();
+	}
+};
 </script>
 
 <style scoped>

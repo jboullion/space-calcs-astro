@@ -1,26 +1,13 @@
 <template>
 	<div class="population-pyramid">
-		<!-- <div class="controls mb-4">
-			<button @click="toggleSimulation" class="btn btn-primary">
-				{{ isPlaying ? 'Pause' : 'Play' }}
-			</button>
-			<span class="ml-4">Year: {{ currentYear }}</span>
-		</div> -->
-
 		<div class="d-flex align-items-center mb-3">
-			<!-- <input
-				type="range"
-				v-model="currentYear"
-				min="1"
-				:max="props.simulatedData?.length || 0"
-			/> -->
 			<div class="d-flex gap-2 align-items-center w-100">
 				<input
 					type="range"
 					class="form-range flex-grow-1"
 					v-model.number="currentYear"
 					:min="1"
-					:max="props.simulatedData?.length || 0"
+					:max="formData.years"
 					:step="1"
 				/>
 				<h3 class="mb-0 text-nowrap">Year {{ currentYear }}</h3>
@@ -108,47 +95,52 @@
 </template>
 
 <script setup lang="ts">
+// TODO:
+
+// 1. Add a slider to control the year
+// 2. Add a button to play/pause the simulation
+// 3. Add a button to reset the simulation
+// 4. Display the number of people in each age group
+
 import { computed, ref, watch, onUnmounted } from 'vue';
+import type { IPopulationGrowthForm } from './types';
 
 const props = defineProps<{
-	ageDistribution: number[];
-	totalPopulation: number;
-	maxAge?: number;
-	ageGroupSize?: number;
-	simulatedData?: Array<{
+	formData: IPopulationGrowthForm;
+}>();
+
+const ageGroupSize = 10;
+
+const simulatedData = ref<
+	Array<{
 		year: number;
 		distribution: number[];
 		total: number;
-	}>;
-}>();
+	}>
+>([]);
 
 // Constants
 const width = 800;
 const barHeight = 60;
 const labelHeight = 40;
 const labelPadding = 10;
-
-// Simulation state
 const currentYear = ref(1);
-const isPlaying = ref(false);
-const isComplete = ref(false);
-let animationInterval: number | null = null;
 
 // Computed values
 const numGroups = computed(() => {
-	return Math.ceil((props.maxAge || 80) / (props.ageGroupSize || 10));
+	return Math.ceil((props.formData.lifeExpectancy || 80) / ageGroupSize);
 });
 
 // Get current distribution based on simulation year
 const currentDistribution = computed(() => {
-	if (!props.simulatedData || props.simulatedData.length === 0) {
+	if (!simulatedData.value || simulatedData.value.length === 0) {
 		return {
-			distribution: props.ageDistribution,
-			total: props.totalPopulation,
+			distribution: props.formData.initialAgeDistribution,
+			total: props.formData.initialPopulation,
 		};
 	}
 	const currentData =
-		props.simulatedData[currentYear.value] || props.simulatedData[0];
+		simulatedData.value[currentYear.value] || simulatedData.value[0];
 	return {
 		distribution: currentData.distribution,
 		total: currentData.total,
@@ -157,17 +149,17 @@ const currentDistribution = computed(() => {
 
 // Transform input data into population pyramid data
 const populationData = computed(() => {
-	return currentDistribution.value.distribution.map((percentage, i) => {
-		const totalInGroup =
-			(percentage / 100) * currentDistribution.value.total;
-		return {
-			ageGroup: `${i * (props.ageGroupSize || 10)}-${
-				(i + 1) * (props.ageGroupSize || 10) - 1
-			}`,
-			male: totalInGroup * 0.49,
-			female: totalInGroup * 0.51,
-		};
-	});
+	return currentDistribution.value.distribution.map(
+		(percentage: number, i: number) => {
+			const totalInGroup =
+				(percentage / 100) * currentDistribution.value.total;
+			return {
+				ageGroup: `${i * ageGroupSize}-${(i + 1) * ageGroupSize - 1}`,
+				male: totalInGroup * 0.49,
+				female: totalInGroup * 0.51,
+			};
+		},
+	);
 });
 
 // Reverse the data for display (oldest at top)
@@ -187,54 +179,6 @@ const height = computed((): number => {
 	// add another numgroup to account for labels
 	const calcHeight = (numGroups.value + 1) * (barHeight + labelPadding);
 	return calcHeight;
-});
-// Simulation controls
-const toggleSimulation = () => {
-	if (isPlaying.value) {
-		pauseSimulation();
-	} else {
-		startSimulation();
-	}
-};
-
-const startSimulation = () => {
-	if (!props.simulatedData) return;
-
-	isPlaying.value = true;
-	animationInterval = window.setInterval(() => {
-		if (currentYear.value >= (props.simulatedData?.length || 0) - 1) {
-			currentYear.value = 0;
-		} else {
-			currentYear.value++;
-		}
-	}, 1000); // Update every second
-};
-
-const pauseSimulation = () => {
-	isPlaying.value = false;
-	if (animationInterval) {
-		clearInterval(animationInterval);
-		animationInterval = null;
-	}
-};
-
-const playClass = computed(() => {
-	if (!isComplete.value) {
-		if (!isPlaying.value) {
-			return 'fa-play';
-		} else {
-			return 'fa-pause';
-		}
-	} else {
-		return 'fa-undo';
-	}
-});
-
-// Clean up on component unmount
-onUnmounted(() => {
-	if (animationInterval) {
-		clearInterval(animationInterval);
-	}
 });
 </script>
 

@@ -6,14 +6,12 @@
 			</template>
 			<tr>
 				<th>Growth Rate</th>
-				<td class="text-end">
-					{{ growthRate }}
-				</td>
+				<td class="text-end">{{ growthRatePercentage.toFixed(2) }}%</td>
 			</tr>
 			<tr>
 				<th>Final Population</th>
 				<td class="text-end">
-					{{ formatNumber(finalPopulation) }}
+					{{ formatNumber(finalPopulation, 0) }}
 				</td>
 			</tr>
 		</ResultTable>
@@ -31,6 +29,10 @@ const props = defineProps<{
 
 const growthRate = computed(() => {
 	return props.formData.birthRate - props.formData.deathRate;
+});
+
+const growthRatePercentage = computed(() => {
+	return growthRate.value * 100;
 });
 
 const finalPopulation = computed(() => {
