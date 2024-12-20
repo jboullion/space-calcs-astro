@@ -1,10 +1,30 @@
 <template>
 	<div class="population-pyramid">
-		<div class="controls mb-4">
+		<!-- <div class="controls mb-4">
 			<button @click="toggleSimulation" class="btn btn-primary">
 				{{ isPlaying ? 'Pause' : 'Play' }}
 			</button>
 			<span class="ml-4">Year: {{ currentYear }}</span>
+		</div> -->
+
+		<div class="d-flex align-items-center mb-3">
+			<!-- <input
+				type="range"
+				v-model="currentYear"
+				min="1"
+				:max="props.simulatedData?.length || 0"
+			/> -->
+			<div class="d-flex gap-2 align-items-center w-100">
+				<input
+					type="range"
+					class="form-range flex-grow-1"
+					v-model.number="currentYear"
+					:min="1"
+					:max="props.simulatedData?.length || 0"
+					:step="1"
+				/>
+				<h3 class="mb-0 text-nowrap">Year {{ currentYear }}</h3>
+			</div>
 		</div>
 
 		<svg :viewBox="`0 0 ${width} ${height}`" class="w-full">
@@ -109,8 +129,9 @@ const labelHeight = 40;
 const labelPadding = 10;
 
 // Simulation state
-const currentYear = ref(0);
+const currentYear = ref(1);
 const isPlaying = ref(false);
+const isComplete = ref(false);
 let animationInterval: number | null = null;
 
 // Computed values
@@ -167,7 +188,6 @@ const height = computed((): number => {
 	const calcHeight = (numGroups.value + 1) * (barHeight + labelPadding);
 	return calcHeight;
 });
-
 // Simulation controls
 const toggleSimulation = () => {
 	if (isPlaying.value) {
@@ -197,6 +217,18 @@ const pauseSimulation = () => {
 		animationInterval = null;
 	}
 };
+
+const playClass = computed(() => {
+	if (!isComplete.value) {
+		if (!isPlaying.value) {
+			return 'fa-play';
+		} else {
+			return 'fa-pause';
+		}
+	} else {
+		return 'fa-undo';
+	}
+});
 
 // Clean up on component unmount
 onUnmounted(() => {

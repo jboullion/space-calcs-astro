@@ -7,6 +7,7 @@
 			/>
 		</div>
 		<div id="population-growth__results" class="col-xl-8 col-lg-7 col-md-6">
+			<PopulationGrowthResults :formData="formData" />
 			<PopulationGrowthVisuals
 				:ageDistribution="formData.initialAgeDistribution"
 				:totalPopulation="formData.initialPopulation"
@@ -28,6 +29,7 @@ import { onMounted, reactive, ref } from 'vue';
 
 import PopulationGrowthForm from './PopulationGrowthForm.vue';
 import PopulationGrowthVisuals from './PopulationGrowthVisuals.vue';
+import PopulationGrowthResults from './PopulationGrowthResults.vue';
 
 import type { IPopulationGrowthForm } from './types';
 

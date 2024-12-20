@@ -50,7 +50,7 @@
 							class="form-range flex-grow-1"
 							v-model.number="ageDistribution[index]"
 							:min="0"
-							:max="100"
+							:max="50"
 							:step="1"
 						/>
 						<span class="flex-shrink-0" style="min-width: 4rem">
@@ -58,7 +58,7 @@
 						</span>
 					</div>
 				</div>
-				<div class="" :class="{ 'text-danger': !isValidDistribution }">
+				<div :class="{ 'text-danger': !isValidDistribution }">
 					Total: {{ totalDistribution.toFixed(0) }}%
 				</div>
 			</div>
@@ -192,7 +192,8 @@ const totalDistribution = computed(() => {
 
 // Validate distribution
 const isValidDistribution = computed(() => {
-	return totalDistribution.value < 100; // Allow for small floating point errors
+	console.log('totalDistribution', totalDistribution.value);
+	return totalDistribution.value < 101;
 });
 
 // Emit changes when distribution is updated
