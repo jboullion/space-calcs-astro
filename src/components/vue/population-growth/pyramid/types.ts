@@ -1,6 +1,8 @@
 export interface IPopulationGrowthForm {
 	initialPopulation: number;
-	childrenPerWoman: number;
+	initialAgeDistribution: number[];
+	birthRate: number;
+	deathRate: number;
 	lifeExpectancy: number;
 	years: number;
 }

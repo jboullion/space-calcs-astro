@@ -5,18 +5,6 @@
 				<h2>Population Growth</h2>
 			</template>
 			<tr>
-				<th>Birth Rate</th>
-				<td class="text-end">
-					{{ (calculateBirthRate * 100).toFixed(2) }}%
-				</td>
-			</tr>
-			<tr>
-				<th>Death Rate</th>
-				<td class="text-end">
-					{{ (calculateDeathRate * 100).toFixed(2) }}%
-				</td>
-			</tr>
-			<tr>
 				<th>Growth Rate</th>
 				<td class="text-end">{{ growthRatePercentage.toFixed(2) }}%</td>
 			</tr>
@@ -39,25 +27,8 @@ const props = defineProps<{
 	formData: IPopulationGrowthForm;
 }>();
 
-const calculateBirthRate = computed(() => {
-	const femaleRatio = 0.5;
-
-	// Simple birth rate calculation based on children per woman over lifetime
-	return (
-		(femaleRatio * props.formData.childrenPerWoman) /
-		props.formData.lifeExpectancy
-	);
-});
-
-const calculateDeathRate = computed(() => {
-	// Base death rate from life expectancy
-	const baseDeathRate = 1 / props.formData.lifeExpectancy;
-
-	return baseDeathRate;
-});
-
 const growthRate = computed(() => {
-	return calculateBirthRate.value - calculateDeathRate.value;
+	return props.formData.birthRate - props.formData.deathRate;
 });
 
 const growthRatePercentage = computed(() => {

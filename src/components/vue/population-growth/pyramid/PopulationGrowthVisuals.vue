@@ -1,3 +1,4 @@
+# PopulationGrowthVisuals.vue
 <template>
 	<div class="population-pyramid">
 		<div class="d-flex align-items-center mb-3">
@@ -57,7 +58,21 @@
 				</title>
 			</rect>
 
-			<!-- Axis labels in dedicated space -->
+			<!-- Age group labels -->
+			<text
+				v-for="(group, i) in reversedPopulationData"
+				:key="`label-${i}`"
+				:x="width / 2"
+				:y="i * barHeight + barHeight / 2"
+				text-anchor="middle"
+				alignment-baseline="middle"
+				class="text-xs"
+				fill="white"
+			>
+				{{ group.ageGroup }}
+			</text>
+
+			<!-- Axis labels -->
 			<text
 				:x="width * 0.25"
 				:y="height"
@@ -76,33 +91,12 @@
 			>
 				Females
 			</text>
-
-			<!-- Age group labels -->
-			<text
-				v-for="(group, i) in reversedPopulationData"
-				:key="`label-${i}`"
-				:x="width / 2"
-				:y="i * barHeight + barHeight / 2"
-				text-anchor="middle"
-				alignment-baseline="middle"
-				class="text-xs"
-				fill="white"
-			>
-				{{ group.ageGroup }}
-			</text>
 		</svg>
 	</div>
 </template>
 
 <script setup lang="ts">
-// TODO:
-
-// 1. Add a slider to control the year
-// 2. Add a button to play/pause the simulation
-// 3. Add a button to reset the simulation
-// 4. Display the number of people in each age group
-
-import { computed, ref, watch, onUnmounted } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { IPopulationGrowthForm } from './types';
 
 const props = defineProps<{
@@ -110,7 +104,12 @@ const props = defineProps<{
 }>();
 
 const ageGroupSize = 10;
+const width = 800;
+const barHeight = 60;
+const labelPadding = 10;
+const currentYear = ref(1);
 
+// State for simulated data
 const simulatedData = ref<
 	Array<{
 		year: number;
@@ -119,17 +118,62 @@ const simulatedData = ref<
 	}>
 >([]);
 
-// Constants
-const width = 800;
-const barHeight = 60;
-const labelHeight = 40;
-const labelPadding = 10;
-const currentYear = ref(1);
+// Function to simulate population growth
+const simulatePopulationGrowth = () => {
+	const years = props.formData.years;
+	const birthRate = props.formData.birthRate;
+	const deathRate = props.formData.deathRate;
 
-// Computed values
-const numGroups = computed(() => {
-	return Math.ceil((props.formData.lifeExpectancy || 80) / ageGroupSize);
-});
+	let newSimulatedData = [];
+	let currentDistribution = [...props.formData.initialAgeDistribution];
+	let currentTotal = props.formData.initialPopulation;
+
+	// Add initial state
+	newSimulatedData.push({
+		year: 0,
+		distribution: [...currentDistribution],
+		total: currentTotal,
+	});
+
+	// Simulate each year
+	for (let year = 1; year <= years; year++) {
+		// Calculate new total based on growth rate
+		const growthRate = birthRate - deathRate;
+		currentTotal = currentTotal * (1 + growthRate);
+
+		// Update age distribution (simple shift for now)
+		currentDistribution = currentDistribution.map((value, index) => {
+			if (index === 0) {
+				// New births get distributed to first age group
+				return birthRate;
+			} else {
+				// Shift population up, accounting for deaths
+				return currentDistribution[index - 1] * (1 - deathRate);
+			}
+		});
+
+		// Normalize distribution to 100%
+		const total = currentDistribution.reduce((a, b) => a + b, 0);
+		currentDistribution = currentDistribution.map((v) => v / total);
+
+		newSimulatedData.push({
+			year,
+			distribution: [...currentDistribution],
+			total: currentTotal,
+		});
+	}
+
+	simulatedData.value = newSimulatedData;
+};
+
+// Trigger simulation when form data changes
+watch(
+	[() => props.formData],
+	() => {
+		simulatePopulationGrowth();
+	},
+	{ immediate: true, deep: true },
+);
 
 // Get current distribution based on simulation year
 const currentDistribution = computed(() => {
@@ -140,19 +184,23 @@ const currentDistribution = computed(() => {
 		};
 	}
 	const currentData =
-		simulatedData.value[currentYear.value] || simulatedData.value[0];
+		simulatedData.value[currentYear.value - 1] || simulatedData.value[0];
 	return {
 		distribution: currentData.distribution,
 		total: currentData.total,
 	};
 });
 
+// Computed values
+const numGroups = computed(() => {
+	return Math.ceil((props.formData.lifeExpectancy || 80) / ageGroupSize);
+});
+
 // Transform input data into population pyramid data
 const populationData = computed(() => {
 	return currentDistribution.value.distribution.map(
 		(percentage: number, i: number) => {
-			const totalInGroup =
-				(percentage / 100) * currentDistribution.value.total;
+			const totalInGroup = percentage * currentDistribution.value.total;
 			return {
 				ageGroup: `${i * ageGroupSize}-${(i + 1) * ageGroupSize - 1}`,
 				male: totalInGroup * 0.49,
@@ -189,7 +237,6 @@ const height = computed((): number => {
 	margin: 0 auto;
 }
 
-/* Smooth transitions for updates */
 rect {
 	transition: all 0.3s ease;
 }

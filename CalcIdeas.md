@@ -5,4 +5,8 @@ Just a place to jot down fun ideas for calculations.
 
 Perhaps we could allow users to adjust the rules of the game of life and see how the patterns change.
 
+Maybe we could have different shapes for the grid.
+
+Could a user place blockers to see how the changes the evolution of the grid?
+
 2.
