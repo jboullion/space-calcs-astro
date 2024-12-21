@@ -4,11 +4,11 @@ import type { Reference } from '../../types/types';
 import Layout from '../../layouts/Layout.astro';
 import Hero from '../../components/calcs/Hero.astro';
 
-import FlyWheelComponent from '../../components/vue/fly-wheel/FlyWheel.vue';
+import GameOfLifeComponent from '../../components/vue/game-of-life/GameOfLife.vue';
 import References from '../../components/shared/References.astro';
 import { calculators } from '../../utils/calculator-list';
 
-const calculator = calculators.find((calc) => calc.id === 'fly-wheel');
+const calculator = calculators.find((calc) => calc.id === 'game-of-life');
 
 if (!calculator) {
     throw new Error('Calculator not found');
@@ -16,12 +16,8 @@ if (!calculator) {
 
 const references: Reference[] = [
     {
-        title: 'Flywheels - Kinetic Energy',
-        url: 'https://www.engineeringtoolbox.com/flywheel-energy-d_945.html'
-    },
-    {
-        title: 'Wiki: Flywheel energy storage',
-        url: 'https://en.wikipedia.org/wiki/Flywheel_energy_storage'
+        title: 'Wiki:Conway\'s Game of Life',
+        url: 'https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'
     }
 ];
 ---
@@ -30,7 +26,7 @@ const references: Reference[] = [
     <div class="container">
         <Hero title={calculator.name} description={calculator.description} />
         <div style="min-height: 700px;" class="calculator">
-            <FlyWheelComponent client:load />
+            <GameOfLifeComponent client:load />
         </div>
 
         <References references={references} />

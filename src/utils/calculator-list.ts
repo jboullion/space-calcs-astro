@@ -151,6 +151,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/population-growth',
 	},
+	{
+		id: 'game-of-life',
+		name: 'Game of Life',
+		description: "Simulate Conway's Game of Life",
+		categories: [categories[LIFE_CAT]],
+		image: '',
+		link: '/calcs/game-of-life',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
