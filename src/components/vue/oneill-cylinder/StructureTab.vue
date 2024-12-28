@@ -3,7 +3,8 @@
 		<NumberInput
 			id="radius"
 			label="Radius"
-			v-model.number="structure.radius"
+			:model-value="structure.radius"
+			@update:model-value="updateStructure('radius', $event)"
 			:step="0.1"
 			:min="0.1"
 			:max="1000000"
@@ -13,7 +14,8 @@
 		<NumberInput
 			id="cylinderLength"
 			label="Cylinder Length"
-			v-model.number="structure.cylinderLength"
+			:model-value="structure.cylinderLength"
+			@update:model-value="updateStructure('cylinderLength', $event)"
 			:step="0.1"
 			:min="0.1"
 			:max="1000000"
@@ -26,7 +28,8 @@
 		<SelectInput
 			id="material"
 			label="Material"
-			v-model="structure.material"
+			:model-value="structure.material"
+			@update:model-value="updateStructure('material', $event)"
 			:options="materials"
 			:description="`Tensile Strength: ${formatNumber(
 				structureTensileStrength,
@@ -37,7 +40,8 @@
 		<NumberInput
 			id="safetyFactor"
 			label="Safety Factor"
-			v-model.number="structure.safetyFactor"
+			:model-value="structure.safetyFactor"
+			@update:model-value="updateStructure('safetyFactor', $event)"
 			:step="0.1"
 			:min="1"
 			:max="10"
@@ -47,7 +51,8 @@
 		<NumberInput
 			id="surfaceGravity"
 			label="Surface Gravity"
-			v-model.number="structure.surfaceGravity"
+			:model-value="structure.surfaceGravity"
+			@update:model-value="updateStructure('surfaceGravity', $event)"
 			:step="0.1"
 			:min="0.1"
 			:max="100"
@@ -60,7 +65,8 @@
 		<NumberInput
 			id="internalPressure"
 			label="Internal Air Pressure"
-			v-model.number="structure.internalPressure"
+			:model-value="structure.internalPressure"
+			@update:model-value="updateStructure('internalPressure', $event)"
 			:step="1"
 			:min="20"
 			:max="1200"
@@ -103,7 +109,8 @@
 			id="shellWallThickness"
 			:key="shellKey"
 			label="Shell Wall Thickness"
-			v-model.number="structure.shellWallThickness"
+			:model-value="structure.shellWallThickness"
+			@update:model-value="updateStructure('shellWallThickness', $event)"
 			:step="1"
 			:min="1"
 			:max="maxShellThickness"
@@ -134,7 +141,10 @@
 		<NumberInput
 			id="internalStructureMass"
 			label="Internal Structure Mass"
-			v-model.number="structure.internalStructureMass"
+			:model-value="structure.internalStructureMass"
+			@update:model-value="
+				updateStructure('internalStructureMass', $event)
+			"
 			:step="1"
 			:min="1"
 			:max="1000000"
@@ -145,15 +155,16 @@
 		<SelectInput
 			id="caps"
 			label="Caps"
-			v-model="structure.caps"
+			:model-value="structure.caps"
+			@update:model-value="updateStructure('caps', $event)"
 			:options="structureCaps"
 		/>
 	</div>
 </template>
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue';
+import { computed, ref } from 'vue';
 
-import type { InternalFloors, Structure } from './types';
+import type { IInternalFloors, IStructure } from './types';
 import { materials, structureCaps } from './constants';
 
 import NumberInput from '../forms/NumberInput.vue';
@@ -161,12 +172,32 @@ import SelectInput from '../forms/SelectInput.vue';
 import { formatNumber, physicsConstants, roundToDecimal } from '../utils';
 import { calcG_Accel, calcSpinRads } from './functions';
 
+const props = defineProps<{
+	structure: IStructure;
+	internal: IInternalFloors;
+}>();
+
+const emit = defineEmits(['update:modelValue']);
+
 const shellKey = ref(0);
 
-const props = defineProps<{
-	structure: Structure;
-	internal: InternalFloors;
-}>();
+function updateStructure(field: keyof IStructure, value: any) {
+	const updatedStructure = {
+		...props.structure,
+		[field]: value,
+	};
+
+	// Handle special case for radius updates
+	if (field === 'radius') {
+		const maxShellThickness = (value / 2) * 1000;
+		if (maxShellThickness < updatedStructure.shellWallThickness) {
+			updatedStructure.shellWallThickness = maxShellThickness;
+			shellKey.value++;
+		}
+	}
+
+	emit('update:modelValue', updatedStructure);
+}
 
 const maxPassiveStabilty = computed(() => {
 	// DataStruc!C2*2*3/4
@@ -355,15 +386,4 @@ const maxShellThickness = computed(() => {
 	const result = (props.structure.radius / 2) * 1000;
 	return result;
 });
-
-/**
- * Watchers / Updates
- */
-const updateRadius = () => {
-	if (maxShellThickness.value < props.structure.shellWallThickness) {
-		props.structure.shellWallThickness = maxShellThickness.value;
-
-		shellKey.value++;
-	}
-};
 </script>

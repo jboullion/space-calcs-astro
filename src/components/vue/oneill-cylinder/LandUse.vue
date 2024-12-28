@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
-import type { LandUse } from './types';
+import type { ILandUse } from './types';
 
 import { populationDensityExamples } from './constants';
 
@@ -63,6 +63,6 @@ import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
 
 const props = defineProps<{
-	landUse: LandUse;
+	landUse: ILandUse;
 }>();
 </script>

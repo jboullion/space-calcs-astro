@@ -111,7 +111,7 @@ function rpmToUpdateSpeed(rpm: number) {
 }
 
 const rotationSpeed = computed(() => {
-	return rpmToUpdateSpeed(rpm.value); //(formData.value.rpm / (this.animation.FPS * 60)) * this.animation.radians;
+	return rpmToUpdateSpeed(props.formData.movementOptions.rotationSpeed); //(formData.value.rpm / (this.animation.FPS * 60)) * this.animation.radians;
 });
 
 const spinRads = computed(() => {
@@ -126,20 +126,20 @@ const G_Accel = computed(() => {
 	return calcG_Accel(props.formData.structure.radius, spinRads.value);
 });
 
-const rpm = computed(() => {
-	const { radius, surfaceGravity } = props.formData.structure;
+// const rpm = computed(() => {
+// 	const { radius, surfaceGravity } = props.formData.structure;
 
-	const radiusM = radius * 1000;
+// 	const radiusM = radius * 1000;
 
-	//const soilDensity = 1500; //TODO: Do we really need this value?
-	const wallDepth = 0; //addedShielding.value / soilDensity + props.formData.structure.shellWallThickness;
+// 	//const soilDensity = 1500; //TODO: Do we really need this value?
+// 	const wallDepth = 0; //addedShielding.value / soilDensity + props.formData.structure.shellWallThickness;
 
-	const result =
-		Math.sqrt(G_Accel.value / (radiusM - wallDepth)) *
-		physicsConstants.radiansPerSecToRpm;
+// 	const result =
+// 		Math.sqrt(G_Accel.value / (radiusM - wallDepth)) *
+// 		physicsConstants.radiansPerSecToRpm;
 
-	return result;
-});
+// 	return result;
+// });
 
 // End Computed Properties ------------------------------
 
@@ -489,7 +489,25 @@ function animate() {
 }
 
 // NOTE: This is not very optimal, but should be fine for now
-watch(props.formData, () => {
-	setupScene();
-});
+// Instead of watching the entire formData object
+watch(
+	props.formData,
+	() => {
+		setupScene();
+	},
+	{ deep: true },
+);
+
+// Consider watching specific properties that affect the visualization
+watch(
+	() => [
+		props.formData.structure.radius,
+		props.formData.structure.cylinderLength,
+		props.formData.structure.caps,
+		props.formData.internal.levels,
+	],
+	() => {
+		setupScene();
+	},
+);
 </script>

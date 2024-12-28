@@ -3,20 +3,21 @@
 		<NumberInput
 			id="floorHeight"
 			label="Floor Height"
-			v-model.number="internal.levelHeight"
+			:model-value.number="internal.levelHeight"
+			@update:model-value="updateLevelHeight"
 			:step="1"
 			:min="4"
 			:max="maxLevelHeight"
 			:description="`Min: 10m, Maximum: ${maxLevelHeight}m`"
 			unit="m"
-			@change="updateLevelHeight"
 		/>
 
 		<NumberInput
 			id="floors"
 			:key="levelsKey"
 			label="# Floors"
-			v-model.number="internal.levels"
+			:model-value.number="internal.levels"
+			@update:model-value="updateLevels"
 			:step="1"
 			:min="1"
 			:max="maxLevels"
@@ -26,7 +27,8 @@
 		<SelectInput
 			id="floorMaterial"
 			label="Floor Material"
-			v-model="internal.floorMaterial"
+			:model-value="internal.floorMaterial"
+			@update:model-value="updateFloorMaterial"
 			:options="materials"
 		/>
 
@@ -56,13 +58,15 @@ import { ref, computed, watch } from 'vue';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
 
-import type { InternalFloors, Structure } from './types';
+import type { IInternalFloors, IStationMaterial, IStructure } from './types';
 import { materials } from './constants';
 
 const props = defineProps<{
-	internal: InternalFloors;
-	structure: Structure;
+	internal: IInternalFloors;
+	structure: IStructure;
 }>();
+
+const emit = defineEmits(['update:modelValue']);
 
 const levelsKey = ref(0);
 
@@ -90,20 +94,42 @@ const maxLevelHeight = computed(() => {
 	return Math.floor((props.structure.radius * 1000) / 2);
 });
 
+const innerRadius = computed(() => {
+	updateLevelHeight();
+	return props.structure.radius * 1000 - props.structure.shellWallThickness;
+});
+
 const updateLevelHeight = () => {
+	let newLevels = props.internal.levels;
 	if (props.internal.levels > maxLevels.value) {
-		props.internal.levels = maxLevels.value;
+		newLevels = maxLevels.value;
 	} else if (props.internal.levels < 1) {
-		props.internal.levels = 1;
+		newLevels = 1;
+	}
+
+	if (newLevels !== props.internal.levels) {
+		emit('update:modelValue', {
+			...props.internal,
+			levels: newLevels,
+		});
 	}
 
 	levelsKey.value += 1;
 };
 
-const innerRadius = computed(() => {
-	updateLevelHeight();
-	return props.structure.radius * 1000 - props.structure.shellWallThickness;
-});
+function updateLevels(value: number) {
+	emit('update:modelValue', {
+		...props.internal,
+		levels: value,
+	});
+}
+
+function updateFloorMaterial(value: IStationMaterial) {
+	emit('update:modelValue', {
+		...props.internal,
+		floorMaterial: value,
+	});
+}
 
 watch(props.structure, () => {
 	updateLevelHeight();
