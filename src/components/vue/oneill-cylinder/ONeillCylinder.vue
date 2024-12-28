@@ -2,10 +2,7 @@
 	<div id="oneill__app" class="row justify-content-center calculator">
 		<div id="oneill__form" class="col-lg-4">
 			<div class="p-2 rounded border mb-5">
-				<ONeillForm
-					:formData="formData"
-					@update:model-value="updateFormData"
-				/>
+				<ONeillForm v-model="formData" />
 			</div>
 		</div>
 		<div id="oneill__results" class="col-lg-8">
@@ -19,13 +16,7 @@
 </template>
 
 <script setup lang="ts">
-// TODO: Must Dos!
-
-// ! BUGS
-
-// ? NOTE: Optional Improvements!
-
-import { computed, onMounted, ref, watch } from 'vue';
+import { ref } from 'vue';
 
 import ONeillForm from './ONeillForm.vue';
 import ONeillResults from './ONeillResults.vue';
@@ -76,18 +67,4 @@ const formData = ref<ONeillCylinderForm>({
 	},
 	diet: {},
 });
-
-function updateFormData(value: ONeillCylinderForm) {
-	console.log('updateFormData', value);
-	formData.value = value;
-}
-
-// watch(
-//     () => formData.value,
-//     (newValue) => {
-//         //console.log('formData changed', newValue);
-//     },
-//     { deep: true },
-// );
 </script>
-<style></style>

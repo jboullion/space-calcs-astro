@@ -23,42 +23,29 @@
 	<div class="calc-form">
 		<StructureTab
 			v-show="currentTab == 'structureTab'"
-			:structure="formData.structure"
-			:internal="formData.internal"
-			@update:model-value="updateStructure"
+			v-model="model.structure"
+			:internal="model.internal"
 		/>
 
 		<InternalFloors
 			v-show="currentTab == 'internalFloors'"
-			:internal="formData.internal"
-			:structure="formData.structure"
-			@update:model-value="updateInternalFloors"
+			v-model="model.internal"
+			:structure="model.structure"
 		/>
 
 		<MovementOptions
 			v-show="currentTab == 'movementOptions'"
-			v-model="formData.movementOptions"
+			v-model="model.movementOptions"
 		/>
 
-		<LandUse v-show="currentTab == 'landUse'" :landUse="formData.landUse" />
+		<LandUse v-show="currentTab == 'landUse'" :landUse="model.landUse" />
 	</div>
 </template>
 
 <script setup lang="ts">
-// TODO: Must Dos!
+import { ref } from 'vue';
 
-// ! BUGS
-
-// ? NOTE: Optional Improvements!
-
-import { computed, onMounted, ref } from 'vue';
-
-import type {
-	ONeillCylinderForm,
-	IInternalFloors,
-	IMovementOptions,
-	IStructure,
-} from './types';
+import type { ONeillCylinderForm } from './types';
 
 import StructureTab from './StructureTab.vue';
 import InternalFloors from './InternalFloors.vue';
@@ -90,28 +77,5 @@ const tabs = [
 
 const emit = defineEmits(['update:modelValue']);
 
-const props = defineProps<{
-	formData: ONeillCylinderForm;
-}>();
-
-function updateStructure(value: IStructure) {
-	emit('update:modelValue', {
-		...props.formData,
-		structure: value,
-	});
-}
-
-function updateInternalFloors(value: IInternalFloors) {
-	emit('update:modelValue', {
-		...props.formData,
-		internal: value,
-	});
-}
-
-function updateMovementOptions(value: IMovementOptions) {
-	emit('update:modelValue', {
-		...props.formData,
-		movementOptions: value,
-	});
-}
+const model = defineModel<ONeillCylinderForm>({ required: true });
 </script>

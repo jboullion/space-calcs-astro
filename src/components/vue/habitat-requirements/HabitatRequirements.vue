@@ -1380,7 +1380,6 @@ import {
 } from './constants';
 import { formatNumber } from '../utils';
 
-// @ts-ignore
 import { GoogleCharts } from 'google-charts';
 import { debounce } from '../../../utils/utils';
 

@@ -17,5 +17,5 @@ import NumberInput from '../forms/NumberInput.vue';
 import type { IMovementOptions } from './types';
 
 // Using defineModel instead of props + emit
-const model = defineModel<IMovementOptions>();
+const model = defineModel<IMovementOptions>({ required: true });
 </script>

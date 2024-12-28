@@ -3,8 +3,7 @@
 		<NumberInput
 			id="radius"
 			label="Radius"
-			:model-value="structure.radius"
-			@update:model-value="updateStructure('radius', $event)"
+			v-model="model.radius"
 			:step="0.1"
 			:min="0.1"
 			:max="1000000"
@@ -14,8 +13,7 @@
 		<NumberInput
 			id="cylinderLength"
 			label="Cylinder Length"
-			:model-value="structure.cylinderLength"
-			@update:model-value="updateStructure('cylinderLength', $event)"
+			v-model="model.cylinderLength"
 			:step="0.1"
 			:min="0.1"
 			:max="1000000"
@@ -28,8 +26,7 @@
 		<SelectInput
 			id="material"
 			label="Material"
-			:model-value="structure.material"
-			@update:model-value="updateStructure('material', $event)"
+			v-model="model.material"
 			:options="materials"
 			:description="`Tensile Strength: ${formatNumber(
 				structureTensileStrength,
@@ -40,8 +37,7 @@
 		<NumberInput
 			id="safetyFactor"
 			label="Safety Factor"
-			:model-value="structure.safetyFactor"
-			@update:model-value="updateStructure('safetyFactor', $event)"
+			v-model="model.safetyFactor"
 			:step="0.1"
 			:min="1"
 			:max="10"
@@ -51,8 +47,7 @@
 		<NumberInput
 			id="surfaceGravity"
 			label="Surface Gravity"
-			:model-value="structure.surfaceGravity"
-			@update:model-value="updateStructure('surfaceGravity', $event)"
+			v-model="model.surfaceGravity"
 			:step="0.1"
 			:min="0.1"
 			:max="100"
@@ -65,8 +60,7 @@
 		<NumberInput
 			id="internalPressure"
 			label="Internal Air Pressure"
-			:model-value="structure.internalPressure"
-			@update:model-value="updateStructure('internalPressure', $event)"
+			v-model="model.internalPressure"
 			:step="1"
 			:min="20"
 			:max="1200"
@@ -75,12 +69,12 @@
 			unit="kpa"
 		/>
 
-		<div class="alert alert-warning" v-if="structure.internalPressure < 65">
+		<div class="alert alert-warning" v-if="model.internalPressure < 65">
 			<strong>Warning:</strong> The internal pressure is low.
 		</div>
 		<div
 			class="alert alert-warning"
-			v-else-if="structure.internalPressure > 202"
+			v-else-if="model.internalPressure > 202"
 		>
 			<strong>Warning:</strong> The internal pressure is high.
 		</div>
@@ -109,8 +103,7 @@
 			id="shellWallThickness"
 			:key="shellKey"
 			label="Shell Wall Thickness"
-			:model-value="structure.shellWallThickness"
-			@update:model-value="updateStructure('shellWallThickness', $event)"
+			v-model="model.shellWallThickness"
 			:step="1"
 			:min="1"
 			:max="maxShellThickness"
@@ -141,10 +134,7 @@
 		<NumberInput
 			id="internalStructureMass"
 			label="Internal Structure Mass"
-			:model-value="structure.internalStructureMass"
-			@update:model-value="
-				updateStructure('internalStructureMass', $event)
-			"
+			v-model="model.internalStructureMass"
 			:step="1"
 			:min="1"
 			:max="1000000"
@@ -155,14 +145,13 @@
 		<SelectInput
 			id="caps"
 			label="Caps"
-			:model-value="structure.caps"
-			@update:model-value="updateStructure('caps', $event)"
+			v-model="model.caps"
 			:options="structureCaps"
 		/>
 	</div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import type { IInternalFloors, IStructure } from './types';
 import { materials, structureCaps } from './constants';
@@ -172,72 +161,76 @@ import SelectInput from '../forms/SelectInput.vue';
 import { formatNumber, physicsConstants, roundToDecimal } from '../utils';
 import { calcG_Accel, calcSpinRads } from './functions';
 
+const model = defineModel<IStructure>({ required: true });
 const props = defineProps<{
-	structure: IStructure;
 	internal: IInternalFloors;
 }>();
 
 const emit = defineEmits(['update:modelValue']);
 
-const shellKey = ref(0);
-
-function updateStructure(field: keyof IStructure, value: any) {
-	const updatedStructure = {
-		...props.structure,
-		[field]: value,
-	};
-
-	// Handle special case for radius updates
-	if (field === 'radius') {
-		const maxShellThickness = (value / 2) * 1000;
-		if (maxShellThickness < updatedStructure.shellWallThickness) {
-			updatedStructure.shellWallThickness = maxShellThickness;
+// Handle special case for radius updates
+watch(
+	() => model.value.radius,
+	(newRadius) => {
+		if (maxShellThickness.value < model.value.shellWallThickness) {
+			model.value = {
+				...model.value,
+				shellWallThickness: maxShellThickness.value,
+			};
 			shellKey.value++;
 		}
-	}
+	},
+);
 
-	emit('update:modelValue', updatedStructure);
-}
+const shellKey = ref(0);
+
+// function updateStructure(field: keyof IStructure, value: any) {
+// 	// Handle special case for radius updates
+// 	if (field === 'radius') {
+// 		const maxShellThickness = (value / 2) * 1000;
+// 		if (maxShellThickness < model.value.shellWallThickness) {
+// 			model.value.shellWallThickness = maxShellThickness;
+// 			shellKey.value++;
+// 		}
+// 	}
+// }
 
 const maxPassiveStabilty = computed(() => {
 	// DataStruc!C2*2*3/4
-	const result = (props.structure.radius * 2 * 3) / 4;
+	const result = (model.value.radius * 2 * 3) / 4;
 	return result;
 });
 
 const cylinderLength = computed(() => {
-	return props.structure.cylinderLength * 1000;
+	return model.value.cylinderLength * 1000;
 });
 
 const structureTensileStrength = computed(() => {
-	return (
-		props.structure.material.tensileStrength / props.structure.safetyFactor
-	);
+	return model.value.material.tensileStrength / model.value.safetyFactor;
 });
 
 const requiredO2 = computed(() => {
 	const stdO2AdjustedToPressure = 21210; // TODO: Magic number based on standard pressure of 101 kPa
 	const ratio =
-		(1 / (props.structure.internalPressure * 1000)) *
-		stdO2AdjustedToPressure;
+		(1 / (model.value.internalPressure * 1000)) * stdO2AdjustedToPressure;
 	const result = Math.min(ratio, 1) * 100; //return as percentage
 	return formatNumber(result);
 });
 
 const addedShielding = computed<number>(() => {
 	const shellMaterialMass =
-		props.structure.shellWallThickness * props.structure.material.density; // kg/m2
-	return props.structure.minShieldingShellMass > shellMaterialMass
-		? props.structure.minShieldingShellMass - shellMaterialMass
+		model.value.shellWallThickness * model.value.material.density; // kg/m2
+	return model.value.minShieldingShellMass > shellMaterialMass
+		? model.value.minShieldingShellMass - shellMaterialMass
 		: 0;
 });
 
 const innerRadius = computed(() => {
-	return props.structure.radius * 1000 - props.structure.shellWallThickness;
+	return model.value.radius * 1000 - model.value.shellWallThickness;
 });
 
 const spinRads = computed(() => {
-	const { radius, surfaceGravity } = props.structure;
+	const { radius, surfaceGravity } = model.value;
 
 	const result = calcSpinRads(radius, surfaceGravity);
 
@@ -245,17 +238,17 @@ const spinRads = computed(() => {
 });
 
 const G_Accel = computed(() => {
-	return calcG_Accel(props.structure.radius, spinRads.value);
+	return calcG_Accel(model.value.radius, spinRads.value);
 });
 
 const rpm = computed(() => {
-	const { radius, surfaceGravity } = props.structure;
+	const { radius, surfaceGravity } = model.value;
 
 	const radiusM = radius * 1000;
 
 	const soilDensity = 1500; //TODO: Do we really need this value?
 	const wallDepth =
-		addedShielding.value / soilDensity + props.structure.shellWallThickness;
+		addedShielding.value / soilDensity + model.value.shellWallThickness;
 
 	const result =
 		Math.sqrt(G_Accel.value / (radiusM - wallDepth)) *
@@ -265,15 +258,13 @@ const rpm = computed(() => {
 });
 
 const shellWallThicknessMultiplier = computed(() => {
-	return props.structure.shellWallThickness > props.structure.radius * 1000
-		? 0
-		: 1;
+	return model.value.shellWallThickness > model.value.radius * 1000 ? 0 : 1;
 });
 
 const totalWallForce = computed(() => {
-	const internalPressure = props.structure.internalPressure * 1000; // kPa to Pa
+	const internalPressure = model.value.internalPressure * 1000; // kPa to Pa
 	const forceOnM1perM2 =
-		(addedShielding.value + props.structure.internalStructureMass) *
+		(addedShielding.value + model.value.internalStructureMass) *
 		G_Accel.value;
 
 	return internalPressure + forceOnM1perM2;
@@ -287,11 +278,11 @@ const drumStress = computed(() => {
 // σt_max
 const tensileTangentialStress = computed(() => {
 	// =(C8*C11^2/4)*(1-C10)*((1-2*C10)*C3^2+(3-2*C10)*C4^2)
-	const C8 = props.structure.material.density;
-	const C10 = props.structure.material.poissonRatio;
+	const C8 = model.value.material.density;
+	const C10 = model.value.material.poissonRatio;
 	const C11 = spinRads.value;
 	const C3 = innerRadius.value;
-	const C4 = props.structure.radius * 1000;
+	const C4 = model.value.radius * 1000;
 
 	const result =
 		((C8 * C11 ** 2) / 4) *
@@ -304,11 +295,11 @@ const tensileTangentialStress = computed(() => {
 // σr1_max
 const tensileRadialStress = computed(() => {
 	// =C8*C11^2*(3-2*C10)/8*(1-C10)*((C4^2-C3^2))
-	const C8 = props.structure.material.density;
-	const C10 = props.structure.material.poissonRatio;
+	const C8 = model.value.material.density;
+	const C10 = model.value.material.poissonRatio;
 	const C11 = spinRads.value;
 	const C3 = innerRadius.value;
-	const C4 = props.structure.radius * 1000;
+	const C4 = model.value.radius * 1000;
 
 	const result =
 		((C8 * C11 ** 2 * (3 - 2 * C10)) / 8) * (1 - C10) * (C4 ** 2 - C3 ** 2);
@@ -319,9 +310,9 @@ const tensileRadialStress = computed(() => {
 // σr2
 const hoopStress = computed(() => {
 	// =C5* C3/C2
-	const C5 = props.structure.internalPressure * 1000; // kPa to Pa
+	const C5 = model.value.internalPressure * 1000; // kPa to Pa
 	const C3 = innerRadius.value;
-	const C2 = props.structure.shellWallThickness;
+	const C2 = model.value.shellWallThickness;
 
 	const result = (C5 * C3) / C2;
 	return result;
@@ -345,19 +336,19 @@ const hoopStressPercent = computed(() => {
 });
 
 const requiredThickness = computed(() => {
-	const result = props.structure.shellWallThickness * hoopStressPercent.value;
+	const result = model.value.shellWallThickness * hoopStressPercent.value;
 	return result;
 });
 
 const shellTooThin = computed(() => {
 	// (C12<D12,K6,K7)
 
-	return requiredThickness.value > props.structure.shellWallThickness;
+	return requiredThickness.value > model.value.shellWallThickness;
 });
 
 // TODO: Left in place for now, but not used.
 const shellTooThick = computed(() => {
-	return false; // requiredThickness.value < props.structure.shellWallThickness;
+	return false; // requiredThickness.value < model.value.shellWallThickness;
 });
 
 const levelsRadius = computed(() => {
@@ -383,7 +374,7 @@ const upperLevelGravity = computed(() => {
 });
 
 const maxShellThickness = computed(() => {
-	const result = (props.structure.radius / 2) * 1000;
+	const result = (model.value.radius / 2) * 1000;
 	return result;
 });
 </script>
