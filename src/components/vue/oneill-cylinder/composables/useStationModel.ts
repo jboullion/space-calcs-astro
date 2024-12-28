@@ -18,7 +18,7 @@ export function useStationModel(
 		}),
 		cap: new THREE.MeshPhongMaterial({
 			color: 0xeeeeee,
-			side: THREE.FrontSide,
+			side: THREE.DoubleSide,
 		}),
 	};
 
@@ -122,6 +122,7 @@ export function useStationModel(
 
 			// Create a new settings object for each floor to avoid reference issues
 			const floorExtrudeSettings = { ...baseExtrudeSettings };
+			//floorExtrudeSettings.depth -= 0.1 * i;
 			floorExtrudeSettings.depth -= 0.1 * i;
 
 			const geometry = new THREE.ExtrudeGeometry(
@@ -153,7 +154,10 @@ export function useStationModel(
 	};
 
 	const buildFlatCaps = (formData: ONeillCylinderForm) => {
-		const capHeight = 1;
+		const capHeight =
+			formData.structure.cylinderLength < 10
+				? formData.structure.cylinderLength / 20
+				: 0.5;
 		const capGeometry = new THREE.CylinderGeometry(
 			formData.structure.radius,
 			formData.structure.radius,

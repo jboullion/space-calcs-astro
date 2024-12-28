@@ -7,6 +7,7 @@ export function useThreeScene(
 	canvasId: string,
 	stationWidth: ComputedRef<number>,
 	rotationSpeed: ComputedRef<number>,
+	radius: ComputedRef<number>,
 ) {
 	const three = {
 		canvas: null as HTMLElement | null,
@@ -21,6 +22,16 @@ export function useThreeScene(
 
 	let prevTick = 0;
 	let animationFrameId: number;
+
+	const calculateOptimalCameraDistance = (): number => {
+		// Calculate the diagonal of the cylinder for better view
+		const cylinderDiagonal = Math.sqrt(
+			Math.pow(stationWidth.value, 2) + Math.pow(radius.value * 2, 2),
+		);
+
+		// Add some padding (1.5x) to ensure the entire structure is visible
+		return cylinderDiagonal * 1.5;
+	};
 
 	const setupThreeJS = () => {
 		three.scene = new THREE.Scene();
@@ -41,8 +52,8 @@ export function useThreeScene(
 		// Initial size
 		updateRenderSize();
 
-		// Camera
-		const cameraDistance = stationWidth.value;
+		// Camera setup with dynamic distance
+		const cameraDistance = calculateOptimalCameraDistance();
 		three.camera = new THREE.PerspectiveCamera(
 			45,
 			three.canvas.getBoundingClientRect().width / 500,
@@ -50,15 +61,25 @@ export function useThreeScene(
 			cameraDistance * 5,
 		);
 
-		three.camera.position.z = cameraDistance;
+		// Position camera at an angle for better initial view
+		three.camera.position.set(
+			cameraDistance * 0.7, // X position for slight offset
+			cameraDistance * 0.3, // Y position for elevation
+			cameraDistance * 0.7, // Z position
+		);
+
+		// Look at the center of the cylinder
+		three.camera.lookAt(new THREE.Vector3(0, 0, -stationWidth.value / 2));
 
 		// Controls
 		three.controls = new OrbitControls(
 			three.camera,
 			three.renderer.domElement,
 		);
-		three.controls.maxDistance = cameraDistance * 4;
-		three.controls.minDistance = cameraDistance / 2;
+		three.controls.maxDistance = cameraDistance * 2;
+		three.controls.minDistance = cameraDistance * 0.1;
+		three.controls.enableDamping = true;
+		three.controls.dampingFactor = 0.05;
 
 		// Lights
 		three.scene.add(new THREE.AmbientLight(0x404040));
@@ -80,8 +101,31 @@ export function useThreeScene(
 		three.camera.updateProjectionMatrix();
 
 		// Update renderer
-		three.renderer.setSize(width, height, false); // false to avoid setting style
+		three.renderer.setSize(width, height, false);
 		three.canvas.style.height = `${height}px`;
+	};
+
+	const updateCameraPosition = () => {
+		if (!three.camera || !three.controls) return;
+
+		const newDistance = calculateOptimalCameraDistance();
+
+		// Update controls limits
+		three.controls.maxDistance = newDistance * 2;
+		three.controls.minDistance = newDistance * 0.3;
+
+		// Only update camera position if it's beyond the new limits
+		const currentDistance = three.camera.position.length();
+		if (
+			currentDistance > newDistance * 2 ||
+			currentDistance < newDistance * 0.3
+		) {
+			const direction = three.camera.position.normalize();
+			three.camera.position.copy(direction.multiplyScalar(newDistance));
+			three.camera.lookAt(
+				new THREE.Vector3(0, 0, -stationWidth.value / 2),
+			);
+		}
 	};
 
 	const animate = () => {
@@ -105,6 +149,7 @@ export function useThreeScene(
 		three,
 		setupThreeJS,
 		updateRenderSize,
+		updateCameraPosition,
 		animate,
 	};
 }

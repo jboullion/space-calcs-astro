@@ -32,8 +32,8 @@ import {
 // TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ONeillCylinderForm>({
 	structure: {
-		radius: 10, // km
-		cylinderLength: 100, // km
+		radius: 1, // km
+		cylinderLength: 1, // km
 		surfaceGravity: 0.3, // g
 		internalPressure: 101, // kPa
 		internalTemperature: 0, // C
@@ -50,7 +50,7 @@ const formData = ref<ONeillCylinderForm>({
 	},
 	internal: {
 		levelHeight: 50, // m
-		levels: 20,
+		levels: 10,
 		floorMaterial: materials[1],
 	},
 	landUse: {

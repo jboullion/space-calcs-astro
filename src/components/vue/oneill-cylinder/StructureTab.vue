@@ -44,7 +44,7 @@
 			description=""
 		/>
 
-		<NumberInput
+		<!-- <NumberInput
 			id="surfaceGravity"
 			label="Surface Gravity"
 			v-model="model.surfaceGravity"
@@ -55,7 +55,7 @@
 				upperLevelGravity,
 			)}G`"
 			unit="G"
-		/>
+		/> -->
 
 		<NumberInput
 			id="internalPressure"
@@ -241,21 +241,21 @@ const G_Accel = computed(() => {
 	return calcG_Accel(model.value.radius, spinRads.value);
 });
 
-const rpm = computed(() => {
-	const { radius, surfaceGravity } = model.value;
+// const rpm = computed(() => {
+// 	const { radius, surfaceGravity } = model.value;
 
-	const radiusM = radius * 1000;
+// 	const radiusM = radius * 1000;
 
-	const soilDensity = 1500; //TODO: Do we really need this value?
-	const wallDepth =
-		addedShielding.value / soilDensity + model.value.shellWallThickness;
+// 	const soilDensity = 1500; //TODO: Do we really need this value?
+// 	const wallDepth =
+// 		addedShielding.value / soilDensity + model.value.shellWallThickness;
 
-	const result =
-		Math.sqrt(G_Accel.value / (radiusM - wallDepth)) *
-		physicsConstants.radiansPerSecToRpm;
+// 	const result =
+// 		Math.sqrt(G_Accel.value / (radiusM - wallDepth)) *
+// 		physicsConstants.radiansPerSecToRpm;
 
-	return formatNumber(result);
-});
+// 	return formatNumber(result);
+// });
 
 const shellWallThicknessMultiplier = computed(() => {
 	return model.value.shellWallThickness > model.value.radius * 1000 ? 0 : 1;
@@ -349,28 +349,6 @@ const shellTooThin = computed(() => {
 // TODO: Left in place for now, but not used.
 const shellTooThick = computed(() => {
 	return false; // requiredThickness.value < model.value.shellWallThickness;
-});
-
-const levelsRadius = computed(() => {
-	const result =
-		innerRadius.value -
-		props.internal.levelHeight * props.internal.levels +
-		props.internal.levelHeight;
-
-	// console.log("CW8 internalRadius", result);
-
-	return result;
-});
-
-const upperLevelGravity = computed(() => {
-	// =if(C22=0,0,InterFloors!C24)/DataStruc!C28
-
-	const upperGravity = Math.pow(spinRads.value, 2) * levelsRadius.value;
-
-	const result =
-		props.internal.levels == 0 ? 0 : upperGravity / physicsConstants.g;
-
-	return result;
 });
 
 const maxShellThickness = computed(() => {

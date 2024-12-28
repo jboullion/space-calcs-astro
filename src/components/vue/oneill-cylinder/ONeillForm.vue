@@ -36,6 +36,8 @@
 		<MovementOptions
 			v-show="currentTab == 'movementOptions'"
 			v-model="model.movementOptions"
+			:structure="model.structure"
+			:internal="model.internal"
 		/>
 
 		<LandUse v-show="currentTab == 'landUse'" :landUse="model.landUse" />

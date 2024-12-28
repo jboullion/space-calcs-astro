@@ -25,11 +25,10 @@ const loading = ref(true);
 const { stationWidth, internalRadius, spinRads, G_Accel, rotationSpeed } =
 	useStationCalculations(props.formData);
 
-const { three, setupThreeJS, updateRenderSize, animate } = useThreeScene(
-	'oneill-canvas',
-	stationWidth,
-	rotationSpeed,
-);
+const radius = computed(() => props.formData.structure.radius);
+
+const { three, setupThreeJS, updateRenderSize, updateCameraPosition, animate } =
+	useThreeScene('oneill-canvas', stationWidth, rotationSpeed, radius);
 
 const { buildStation, updateStation } = useStationModel(three, internalRadius);
 
@@ -58,6 +57,7 @@ watch(
 	],
 	() => {
 		updateStation(props.formData);
+		updateCameraPosition(); // Update camera when dimensions change
 	},
 );
 
