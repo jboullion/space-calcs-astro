@@ -1,0 +1,30 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+
+import EvoSphereComponent from "../../components/vue/evosphere/EvoSphere.vue";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+const title = "EvoSphere";
+const description =
+  "A basic life simulation game.";
+
+const references: Reference[] = [
+//   {
+//     title: "Wiki: Drake Equation",
+//     url: "https://en.wikipedia.org/wiki/Drake_equation",
+//   },
+];
+---
+
+<Layout title={title} description={description}>
+  <div class="container">
+    <Hero title={title} description={description} />
+    <EvoSphereComponent />
+
+    <References references={references} />
+  </div>
+</Layout>
+
+<style></style>

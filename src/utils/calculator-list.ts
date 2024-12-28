@@ -159,6 +159,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/game-of-life',
 	},
+	{
+		id: 'evo-sphere',
+		name: 'EvoSphere',
+		description: 'Simulate a basic life simulation game',
+		categories: [categories[LIFE_CAT]],
+		image: '',
+		link: '/calcs/evo-sphere',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
