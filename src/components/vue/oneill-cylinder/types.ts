@@ -4,15 +4,27 @@ export type IONeillTabs =
 	| 'structureTab'
 	| 'internalFloors'
 	| 'movementOptions'
-	| 'population'
-	| 'landUse';
+	| 'landUse'
+	| 'visuals';
 
 export interface ONeillCylinderForm {
 	structure: IStructure;
 	internal: IInternalFloors;
 	landUse: ILandUse;
 	movementOptions: IMovementOptions;
-	population: IPopulation;
+	visuals: IVisuals;
+}
+
+export interface IVisuals {
+	showVisuals: boolean;
+	pauseAnimation: boolean;
+	showBothCaps: boolean;
+	showCaps: boolean;
+	showBackground: boolean;
+	showFloor?: boolean;
+	showShell?: boolean;
+	showInternal?: boolean;
+	showAir?: boolean;
 }
 
 export type IStructure = {

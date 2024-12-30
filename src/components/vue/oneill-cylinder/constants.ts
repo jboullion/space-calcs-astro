@@ -8,8 +8,8 @@ export const ONEILL_TABS = {
 	structure: 'structureTab',
 	internal: 'internalFloors',
 	movement: 'movementOptions',
-	population: 'population',
 	land: 'landUse',
+	visuals: 'visuals',
 } as const;
 
 export const animation = {

@@ -25,7 +25,7 @@
 			</div>
 		</div>
 		<div id="oneill__results" class="col-lg-7">
-			<ONeillVisual :formData="formData" />
+			<ONeillVisual v-if="visualsVisible" :formData="formData" />
 
 			<div class="p-2 rounded border mb-5">
 				<ONeillResults :formData="formData" />
@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 import ONeillForm from './ONeillForm.vue';
 import ONeillResults from './ONeillResults.vue';
@@ -55,8 +55,8 @@ const tabs = [
 	{ id: ONEILL_TABS.structure, label: 'Structure' },
 	{ id: ONEILL_TABS.internal, label: 'Floors' },
 	{ id: ONEILL_TABS.movement, label: 'Movement' },
-	{ id: ONEILL_TABS.population, label: 'Population' },
 	{ id: ONEILL_TABS.land, label: 'Land Use' },
+	{ id: ONEILL_TABS.visuals, label: 'Visuals' },
 ];
 
 // TODO: Do we want to move the default value to "constants.ts"?
@@ -84,9 +84,9 @@ const formData = ref<ONeillCylinderForm>({
 		floorMaterial: materials[1],
 	},
 	landUse: {
-		urbanDensity: 10,
+		urbanDensity: 20,
 		agriculturalDensity: 60,
-		industrialDensity: 10,
+		industrialDensity: 20,
 		// unusedDensity: number; // % calculated
 		urbanDensityExample: populationDensityExamples[5],
 	},
@@ -95,6 +95,14 @@ const formData = ref<ONeillCylinderForm>({
 		rotationSpeed: 1, // rpm
 		rotationDirection: 'clockwise',
 	},
-	diet: {},
+	visuals: {
+		showVisuals: true,
+		pauseAnimation: false,
+		showBothCaps: false,
+		showCaps: true,
+		showBackground: true,
+	},
 });
+
+const visualsVisible = computed(() => formData.value.visuals.showVisuals);
 </script>
