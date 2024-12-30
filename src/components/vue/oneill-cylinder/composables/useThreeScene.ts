@@ -2,6 +2,8 @@ import { ref, type ComputedRef } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { animation } from '../constants';
+//import { usePhysicsParticleSystem } from './usePhysicsParticleSystem';
+//import { useStationLighting } from './useStationLighting';
 
 export function useThreeScene(
 	canvasId: string,
@@ -19,6 +21,14 @@ export function useThreeScene(
 		floors: new THREE.Group(),
 		group: new THREE.Group(),
 	};
+
+	// const { initParticles, updateParticles, removeParticles } =
+	// 	usePhysicsParticleSystem(three.group, stationWidth, radius);
+
+	// const { initLights, updateLights, removeLights } = useStationLighting(
+	// 	three.group,
+	// 	stationWidth,
+	// );
 
 	let prevTick = 0;
 	let animationFrameId: number;
@@ -128,10 +138,16 @@ export function useThreeScene(
 		}
 	};
 
-	const animate = () => {
+	let lastTime = 0;
+	const animate = (currentTime: number) => {
 		if (!three.renderer || !three.controls) return;
 
+		const deltaTime = (currentTime - lastTime) / 1000;
+		lastTime = currentTime;
+
 		animationFrameId = requestAnimationFrame(animate);
+		// updateParticles(deltaTime); // Pass deltaTime for physics calculations
+		// updateLights();
 
 		three.controls.update();
 		three.renderer.render(three.scene, three.camera);

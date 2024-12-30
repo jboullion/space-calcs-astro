@@ -15,6 +15,8 @@ import { useThreeScene } from './composables/useThreeScene';
 import { useStationModel } from './composables/useStationModel';
 import { throttle } from '../../../utils/utils';
 import { useStationCalculations } from './composables/useStationCalculations';
+// import { usePhysicsParticleSystem } from './composables/usePhysicsParticleSystem';
+import { useStationLighting } from './composables/useStationLighting';
 
 const props = defineProps<{
 	formData: ONeillCylinderForm;
@@ -32,6 +34,14 @@ const { three, setupThreeJS, updateRenderSize, updateCameraPosition, animate } =
 
 const { buildStation, updateStation } = useStationModel(three, internalRadius);
 
+//const { initParticles, updateParticles, removeParticles } =
+//	usePhysicsParticleSystem(three, stationWidth, radius);
+
+// const { initLights, updateLights, removeLights } = useStationLighting(
+// 	three,
+// 	internalRadius,
+// );
+
 // Window resize handler
 const throttledResize = throttle(updateRenderSize, 32);
 
@@ -41,8 +51,11 @@ onMounted(async () => {
 	await load();
 });
 
+// In onBeforeUnmount:
 onBeforeUnmount(() => {
 	window.removeEventListener('resize', throttledResize);
+	//removeParticles(); // Add this line
+	//removeLights();
 });
 
 // Watch for form data changes that affect the geometry
@@ -67,6 +80,8 @@ const load = async () => {
 	setupThreeJS();
 	buildStation(props.formData);
 	three.group.position.z = -props.formData.structure.cylinderLength / 2;
-	animate();
+	animate(0);
+	//initParticles(props.formData);
+	//initLights(props.formData);
 };
 </script>
