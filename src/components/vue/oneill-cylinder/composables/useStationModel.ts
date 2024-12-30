@@ -179,8 +179,8 @@ export function useStationModel(
 	const buildConvexCaps = (formData: ONeillCylinderForm) => {
 		const capGeometry = new THREE.SphereGeometry(
 			formData.structure.radius,
-			curveSegments * 2,
-			curveSegments * 2,
+			curveSegments,
+			curveSegments,
 			0,
 			2 * Math.PI,
 			0,

@@ -1,11 +1,18 @@
 import type { Cap } from './constants';
 
+export type IONeillTabs =
+	| 'structureTab'
+	| 'internalFloors'
+	| 'movementOptions'
+	| 'population'
+	| 'landUse';
+
 export interface ONeillCylinderForm {
 	structure: IStructure;
 	internal: IInternalFloors;
 	landUse: ILandUse;
 	movementOptions: IMovementOptions;
-	diet: {};
+	population: IPopulation;
 }
 
 export type IStructure = {
@@ -41,6 +48,11 @@ export type IMovementOptions = {
 	movementType: 'fixed' | 'rotating';
 	rotationSpeed: number; // rpm
 	rotationDirection: 'clockwise' | 'counterclockwise';
+};
+
+export type IPopulation = {
+	populationDensity: IPopulationDensity;
+	population: number;
 };
 
 export type IAtmosphereComposition = {

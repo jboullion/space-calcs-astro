@@ -1,11 +1,30 @@
 <template>
 	<div id="oneill__app" class="row justify-content-center calculator">
-		<div id="oneill__form" class="col-lg-4">
-			<div class="p-2 rounded border mb-5">
-				<ONeillForm v-model="formData" />
+		<div id="oneill__form" class="col-lg-5">
+			<div class="d-flex mb-3">
+				<div class="nav flex-column nav-pills me-2" role="tablist">
+					<button
+						v-for="tab in tabs"
+						:key="tab.id"
+						class="nav-link mb-2 text-start rounded border"
+						:class="{
+							'active border-primary': currentTab === tab.id,
+						}"
+						:aria-current="currentTab === tab.id"
+						@click="currentTab = tab.id"
+						:id="tab.id"
+						type="button"
+					>
+						{{ tab.label }}
+					</button>
+				</div>
+
+				<div class="p-2 rounded border flex-grow-1">
+					<ONeillForm v-model="formData" :currentTab="currentTab" />
+				</div>
 			</div>
 		</div>
-		<div id="oneill__results" class="col-lg-8">
+		<div id="oneill__results" class="col-lg-7">
 			<ONeillVisual :formData="formData" />
 
 			<div class="p-2 rounded border mb-5">
@@ -22,12 +41,23 @@ import ONeillForm from './ONeillForm.vue';
 import ONeillResults from './ONeillResults.vue';
 import ONeillVisual from './ONeillVisual.vue';
 
-import type { ONeillCylinderForm } from './types';
+import type { IONeillTabs, ONeillCylinderForm } from './types';
 import {
 	atmosphereCompositions,
 	materials,
+	ONEILL_TABS,
 	populationDensityExamples,
 } from './constants';
+
+const currentTab = ref<IONeillTabs>(ONEILL_TABS.structure);
+
+const tabs = [
+	{ id: ONEILL_TABS.structure, label: 'Structure' },
+	{ id: ONEILL_TABS.internal, label: 'Floors' },
+	{ id: ONEILL_TABS.movement, label: 'Movement' },
+	{ id: ONEILL_TABS.population, label: 'Population' },
+	{ id: ONEILL_TABS.land, label: 'Land Use' },
+];
 
 // TODO: Do we want to move the default value to "constants.ts"?
 const formData = ref<ONeillCylinderForm>({

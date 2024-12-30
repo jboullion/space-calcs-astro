@@ -4,6 +4,14 @@ import type {
 	IPopulationDensity,
 } from './types';
 
+export const ONEILL_TABS = {
+	structure: 'structureTab',
+	internal: 'internalFloors',
+	movement: 'movementOptions',
+	population: 'population',
+	land: 'landUse',
+} as const;
+
 export const animation = {
 	FPS: 30, // In order to ensure things run smoothly on all devices we need to set a fixed framerate
 	prevTick: 0, // track the last tick timestamp
