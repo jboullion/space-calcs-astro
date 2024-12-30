@@ -58,7 +58,7 @@ export function useThreeScene(
 			45,
 			three.canvas.getBoundingClientRect().width / 500,
 			0.1,
-			cameraDistance * 5,
+			cameraDistance * 50,
 		);
 
 		// Position camera at an angle for better initial view
