@@ -8,6 +8,7 @@
 		</div>
 		<div id="population-growth__results" class="col-xl-8 col-lg-7 col-md-6">
 			<PopulationGrowthResults :formData="formData" />
+			<PopulationGrowthChart :formData="formData" />
 		</div>
 	</div>
 </template>
@@ -31,6 +32,7 @@ import { onMounted, reactive, ref } from 'vue';
 
 import PopulationGrowthForm from './PopulationGrowthForm.vue';
 import PopulationGrowthResults from './PopulationGrowthResults.vue';
+import PopulationGrowthChart from './PopulationGrowthChart.vue';
 
 import type { IPopulationGrowthForm } from './types';
 
