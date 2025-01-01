@@ -8,6 +8,7 @@
 		</div>
 		<div id="population-pyramid__chart" class="col-xl-8 col-lg-7 col-md-6">
 			<PopulationPyramidChart
+				v-show="populationData.length > 0"
 				:data="populationData"
 				:selectedYear="selectedYear"
 			/>
