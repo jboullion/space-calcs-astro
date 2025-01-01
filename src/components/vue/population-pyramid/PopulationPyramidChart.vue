@@ -22,7 +22,8 @@
 				class="text-lg font-semibold"
 				text-anchor="middle"
 			>
-				Population Pyramid
+				Population Pyramid (Total:
+				{{ totalPopulation.toLocaleString() }})
 			</text>
 
 			<!-- Center line -->
@@ -99,7 +100,7 @@
 
 			<!-- Legend -->
 			<g
-				:transform="`translate(${padding.left}, ${
+				:transform="`translate(${width / 2 - 85}, ${
 					height - padding.bottom + 20
 				})`"
 			>
@@ -187,6 +188,12 @@ const scale = computed(() => {
 		(width - padding.left - padding.right - labelWidth * 2) /
 		(2 * maxValue || 1)
 	);
+});
+
+const totalPopulation = computed(() => {
+	return populationData.value.reduce((sum, group) => {
+		return sum + group.male + group.female;
+	}, 0);
 });
 </script>
 
