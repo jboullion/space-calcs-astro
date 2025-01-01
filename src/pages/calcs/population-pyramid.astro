@@ -1,0 +1,30 @@
+---
+import type { Reference } from '../../types/types';
+
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import PopulationPyramidComponent from '../../components/vue/population-pyramid/PopulationPyramid.vue';
+import References from '../../components/shared/References.astro';
+
+
+const references: Reference[] = [
+    {
+        title: 'Example Simulation',
+        url: 'https://docs.google.com/spreadsheets/d/1hZr1vyPSQ79k6wcDc9i13f0uw8NVCsIQe9EzBkFBSgs/edit?usp=sharing'
+    },
+];
+---
+
+<Layout title="Population Pyramid" description="Population Pyramid">
+    <div class="container">
+        <Hero title="Population Pyramid" description="Population Pyramid" />
+        <div style="min-height: 700px;" class="calculator">
+            <PopulationPyramidComponent client:load />
+        </div>
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>
