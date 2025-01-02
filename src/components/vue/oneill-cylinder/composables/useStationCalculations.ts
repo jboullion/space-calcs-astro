@@ -424,6 +424,16 @@ export function useStationCalculations(formData: ONeillCylinderForm) {
 	const urbanArea = computed(
 		() => (totalFloorArea.value * formData.landUse.urbanDensity) / 100,
 	);
+
+	const agriculturalArea = computed(
+		() =>
+			(totalFloorArea.value * formData.landUse.agriculturalDensity) / 100,
+	);
+
+	const industrialArea = computed(
+		() => (totalFloorArea.value * formData.landUse.industrialDensity) / 100,
+	);
+
 	const unusedArea = computed(() => {
 		const used =
 			formData.landUse.urbanDensity +
@@ -431,6 +441,14 @@ export function useStationCalculations(formData: ONeillCylinderForm) {
 			formData.landUse.industrialDensity;
 		return totalFloorArea.value * (1 - used / 100);
 	});
+
+	// const unusedArea = computed(() => {
+	// 	const used =
+	// 		props.landUse.urbanDensity +
+	// 		props.landUse.agriculturalDensity +
+	// 		props.landUse.industrialDensity;
+	// 	return totalUsableArea.value * (1 - used / 100);
+	// });
 
 	const urbanPopulation = computed(() =>
 		Math.floor(
@@ -493,6 +511,8 @@ export function useStationCalculations(formData: ONeillCylinderForm) {
 		finalTotalMass,
 		showPopulation,
 		urbanArea,
+		agriculturalArea,
+		industrialArea,
 		unusedArea,
 		urbanPopulation,
 		populationDensity,

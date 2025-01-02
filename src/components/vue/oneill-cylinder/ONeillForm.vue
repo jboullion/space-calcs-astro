@@ -22,7 +22,7 @@
 
 			<LandUse
 				v-show="currentTab == ONEILL_TABS.land"
-				:landUse="model.landUse"
+				v-model="model"
 				:totalArea="totalArea"
 			/>
 

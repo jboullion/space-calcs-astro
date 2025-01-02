@@ -3,7 +3,7 @@
 		<NumberInput
 			id="urbanDensity"
 			label="Urban Density"
-			v-model.number="landUse.urbanDensity"
+			v-model.number="model.landUse.urbanDensity"
 			:step="1"
 			:min="1"
 			:max="100"
@@ -14,7 +14,7 @@
 		<NumberInput
 			id="agriculturalDensity"
 			label="Agricultural Density"
-			v-model.number="landUse.agriculturalDensity"
+			v-model.number="model.landUse.agriculturalDensity"
 			:step="1"
 			:min="1"
 			:max="100"
@@ -25,7 +25,7 @@
 		<NumberInput
 			id="industrialDensity"
 			label="Industrial Density"
-			v-model.number="landUse.industrialDensity"
+			v-model.number="model.landUse.industrialDensity"
 			:step="1"
 			:min="1"
 			:max="100"
@@ -36,10 +36,10 @@
 		<SelectInput
 			id="urbanDensityExample"
 			label="Urban Density Example"
-			v-model="landUse.urbanDensityExample"
+			v-model="model.landUse.urbanDensityExample"
 			:options="populationDensityExamples"
 			:description="`${formatNumber(
-				landUse.urbanDensityExample.popKm2,
+				model.landUse.urbanDensityExample.popKm2,
 			)} people / km²`"
 		/>
 
@@ -55,44 +55,24 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { ILandUse } from './types';
+import type { ILandUse, ONeillCylinderForm } from './types';
 import { populationDensityExamples } from './constants';
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
 import { formatNumber } from '../utils';
+import { useStationCalculations } from './composables/useStationCalculations';
+
+const model = defineModel<ONeillCylinderForm>({ required: true });
 
 const props = defineProps<{
-	landUse: ILandUse;
 	totalArea?: number;
 }>();
 
-// Total usable area calculations
-const totalUsableArea = computed(() => props.totalArea || 0);
-
-// Area calculations
-const urbanArea = computed(
-	() => (totalUsableArea.value * props.landUse.urbanDensity) / 100,
-);
-const agriculturalArea = computed(
-	() => (totalUsableArea.value * props.landUse.agriculturalDensity) / 100,
-);
-const industrialArea = computed(
-	() => (totalUsableArea.value * props.landUse.industrialDensity) / 100,
-);
-
-// Unused area calculation
-const unusedArea = computed(() => {
-	const used =
-		props.landUse.urbanDensity +
-		props.landUse.agriculturalDensity +
-		props.landUse.industrialDensity;
-	return totalUsableArea.value * (1 - used / 100);
-});
-
-// Population calculations
-const urbanPopulation = computed(() => {
-	return Math.floor(
-		urbanArea.value * props.landUse.urbanDensityExample.popKm2,
-	);
-});
+const {
+	urbanPopulation,
+	unusedArea,
+	urbanArea,
+	agriculturalArea,
+	industrialArea,
+} = useStationCalculations(model.value);
 </script>
