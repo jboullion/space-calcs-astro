@@ -17,25 +17,29 @@
 				</template>
 			</InputWrapper>
 
-			<!-- <InputWrapper
-				id="yearSlider"
-				label="Simulation Year"
-				:description="`Current Year: ${selectedYear}`"
-			>
-				<template v-slot:input>
-					<input
-						type="range"
-						id="yearSlider"
-						class="form-range"
-						:min="minYear"
-						:max="maxYear"
-						:step="1"
-						:disabled="!hasData"
-						v-model="selectedYear"
-						@input="updateYear"
-					/>
-				</template>
-			</InputWrapper> -->
+			<template v-if="hasData">
+				<InputWrapper id="startYear" label="Start Year">
+					<template v-slot:input>
+						<input
+							type="number"
+							id="startYear"
+							class="form-control"
+							v-model="minYear"
+						/>
+					</template>
+				</InputWrapper>
+
+				<InputWrapper id="endYear" label="End Year">
+					<template v-slot:input>
+						<input
+							type="number"
+							id="endYear"
+							class="form-control"
+							v-model="maxYear"
+						/>
+					</template>
+				</InputWrapper>
+			</template>
 		</div>
 	</div>
 </template>
@@ -50,6 +54,8 @@ import type { IPopulationData } from './types';
 const emit = defineEmits<{
 	'update:data': [data: IPopulationData[]];
 	'update:year': [year: number];
+	'update:startYear': [year: number];
+	'update:endYear': [year: number];
 }>();
 
 const selectedYear = ref<number>(2000);
@@ -80,8 +86,12 @@ const handleFileUpload = async (event: Event) => {
 			const years = data.map((row) =>
 				new Date(row.birthdate).getFullYear(),
 			);
-			minYear.value = Math.min(...years);
-			maxYear.value = Math.max(...years) + 100; // Add 100 years for projection
+			const deathYears = data.map((row) =>
+				new Date(row.dateOfDeath).getFullYear(),
+			);
+
+			minYear.value = Math.min(...years) + 70;
+			maxYear.value = Math.max(...deathYears);
 			selectedYear.value = minYear.value;
 
 			hasData.value = true;
@@ -91,7 +101,17 @@ const handleFileUpload = async (event: Event) => {
 	});
 };
 
-const updateYear = () => {
+// Watch for changes to min/max year
+watch([minYear, maxYear], ([newMin, newMax]) => {
+	emit('update:startYear', newMin);
+	emit('update:endYear', newMax);
+
+	// Ensure selected year stays within bounds
+	if (selectedYear.value < newMin) {
+		selectedYear.value = newMin;
+	} else if (selectedYear.value > newMax) {
+		selectedYear.value = newMax;
+	}
 	emit('update:year', selectedYear.value);
-};
+});
 </script>

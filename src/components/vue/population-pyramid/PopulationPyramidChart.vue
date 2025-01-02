@@ -6,8 +6,8 @@
 					type="range"
 					class="form-range flex-grow-1"
 					v-model.number="currentYear"
-					:min="2380"
-					:max="2460"
+					:min="props.minYear"
+					:max="props.maxYear"
 					:step="1"
 				/>
 				<h3 class="mb-0 text-nowrap">Year {{ currentYear }}</h3>
@@ -125,6 +125,8 @@ import type { IPopulationData } from './types';
 
 interface Props {
 	data: IPopulationData[];
+	minYear: number;
+	maxYear: number;
 }
 
 const props = defineProps<Props>();
@@ -140,7 +142,7 @@ const padding = {
 	left: 60,
 };
 const labelWidth = 50;
-const currentYear = ref(2400);
+const currentYear = ref(props.minYear);
 
 // Calculate population data based on current year
 const populationData = computed(() => {
@@ -194,6 +196,16 @@ const totalPopulation = computed(() => {
 	return populationData.value.reduce((sum, group) => {
 		return sum + group.male + group.female;
 	}, 0);
+});
+
+// Watch for changes to minYear/maxYear props
+watch([() => props.minYear, () => props.maxYear], ([newMin, newMax]) => {
+	// If current year is outside new bounds, update it
+	if (currentYear.value < newMin) {
+		currentYear.value = newMin;
+	} else if (currentYear.value > newMax) {
+		currentYear.value = newMax;
+	}
 });
 </script>
 
