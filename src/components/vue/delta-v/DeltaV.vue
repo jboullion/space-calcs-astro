@@ -217,10 +217,7 @@
 							></small
 						>
 					</p>
-					<img
-						src="/images/Solar_system_delta_v_map.svg"
-						alt="Delta V Map"
-					/>
+					<img :src="deltaVMapImage" alt="Delta V Map" />
 				</div>
 			</div>
 		</div>
@@ -294,6 +291,8 @@ const formData = ref<DeltaVForm>({
 type ResultTabs = 'payload' | 'fuel' | 'c3' | 'map';
 
 const showResult = ref<ResultTabs>('payload');
+
+const deltaVMapImage = ref('/images/Solar_system_delta_v_map.svg');
 
 let deltaVChartHTML: GoogleCharts.api.visualization.LineChart;
 let fuelChartHTML: GoogleCharts.api.visualization.LineChart;

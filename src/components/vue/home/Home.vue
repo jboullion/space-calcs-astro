@@ -2,8 +2,8 @@
 	<div>
 		<section class="py-5 text-center bg-black text-light" id="home-canvas">
 			<div id="homeAccents">
-				<img src="/images/sun.jpg" id="homeSun" alt="" />
-				<img src="/images/earth.jpg" id="homeEarth" alt="" />
+				<img :src="sunImage" id="homeSun" alt="Sun" />
+				<img :src="earthImage" id="homeEarth" alt="Earth" />
 			</div>
 			<div class="container position-relative">
 				<div class="row">
@@ -11,7 +11,7 @@
 						<div class="d-flex justify-content-center gap-3">
 							<img
 								id="homeLogo"
-								src="/logo.svg"
+								:src="logoImage"
 								alt="Space Calcs"
 							/>
 						</div>
@@ -31,6 +31,12 @@
 
 <script setup lang="ts">
 import CalcList from './CalcList.vue';
+import { ref } from 'vue';
+
+// Import images using absolute URLs
+const sunImage = ref('/images/sun.jpg');
+const earthImage = ref('/images/earth.jpg');
+const logoImage = ref('/logo.svg');
 </script>
 
 <style>

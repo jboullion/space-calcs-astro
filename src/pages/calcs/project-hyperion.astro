@@ -1,0 +1,30 @@
+---
+import type { Reference } from '../../types/types';
+
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import ProjectHyperionComponent from '../../components/vue/project-hyperion/ProjectHyperion.vue';
+import References from '../../components/shared/References.astro';
+
+
+const references: Reference[] = [
+    {
+        title: 'Project Hyperion',
+        url: 'https://www.projecthyperion.org/'
+    },
+];
+---
+
+<Layout title="Project Hyperion" description="Project Hyperion">
+    <div class="container">
+        <Hero title="Project Hyperion" description="Project Hyperion" />
+        <div style="min-height: 700px;" class="calculator">
+            <ProjectHyperionComponent client:load />
+        </div>
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>
