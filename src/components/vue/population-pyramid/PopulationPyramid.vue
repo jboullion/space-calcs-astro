@@ -16,6 +16,13 @@
 				:minYear="minYear"
 				:maxYear="maxYear"
 			/>
+
+			<PopulationLineChart
+				v-if="populationData.length > 0"
+				:data="populationData"
+				:minYear="minYear"
+				:maxYear="maxYear"
+			/>
 		</div>
 	</div>
 </template>
@@ -24,6 +31,7 @@
 import { ref, watch } from 'vue';
 import PopulationPyramidForm from './PopulationPyramidForm.vue';
 import PopulationPyramidChart from './PopulationPyramidChart.vue';
+import PopulationLineChart from './PopulationLineChart.vue';
 import type { IPopulationData } from './types';
 
 const populationData = ref<IPopulationData[]>([]);
