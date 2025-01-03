@@ -1,0 +1,27 @@
+---
+import type { Reference } from '../../types/types';
+
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import HyperionStationComponent from '../../components/react/hyperion-station/HyperionStation.tsx';
+import References from '../../components/shared/References.astro';
+
+
+const references: Reference[] = [
+
+];
+---
+
+<Layout title="Hyperion Station" description="Hyperion Station">
+    <div class="container">
+        <Hero title="Population Pyramid" description="Population Pyramid" />
+        <div style="min-height: 700px;" class="calculator">
+            <HyperionStationComponent client:only="react" />
+        </div>
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>
