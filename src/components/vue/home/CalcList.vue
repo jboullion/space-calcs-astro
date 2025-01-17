@@ -70,6 +70,7 @@
 								class="card mb-3"
 								v-for="calc in filteredCalcs"
 								:key="calc.id"
+								:target="calc.newTab ? '_blank' : ''"
 							>
 								<h5
 									class="card-header d-flex justify-content-between"

@@ -51,7 +51,6 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		description:
 			'Esimate the energy, mass, crew, and volume requirements for a habitat',
 		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
-		advanced: true,
 		image: '',
 		link: '/calcs/habitat-requirements',
 		sponsor: 'Sam Ross',
@@ -150,6 +149,18 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		categories: [categories[LIFE_CAT]],
 		image: '',
 		link: '/calcs/population-growth',
+	},
+	{
+		id: 'project-hyperion',
+		name: 'Project Hyperion',
+		description:
+			"O'Neill Cylinder simulator built for the Project Hyperion contest",
+		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/project-hyperion',
+		sponsor: 'Nexus Aurora',
+		sponsorImg: '/images/sponsors/na-logo.png',
+		newTab: true,
 	},
 	// {
 	// 	id: 'transfer-window',
