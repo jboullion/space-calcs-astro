@@ -154,7 +154,7 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		id: 'project-hyperion',
 		name: 'Project Hyperion',
 		description:
-			"O'Neill Cylinder simulator built for the Project Hyperion contest",
+			"O'Neill Cylinder visualizer built for the Project Hyperion contest",
 		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
 		image: '',
 		link: '/calcs/project-hyperion',
