@@ -45,7 +45,7 @@
 				<InputWrapper
 					id="massFlowRate"
 					label="Mass Flow Rate"
-					description="Enter the propellant mass flow rate in kg/s"
+					description="The rate at which propellant is consumed by the rocket engine"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -69,7 +69,7 @@
 				<InputWrapper
 					id="exhaustVelocity"
 					label="Exhaust Velocity"
-					description="Enter the exhaust velocity in m/s"
+					description="The velocity of the propellant exiting the rocket engine"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -87,28 +87,6 @@
 					</template>
 					<template v-slot:unit>
 						<SimpleUnit unit="m/s" />
-					</template>
-				</InputWrapper>
-
-				<InputWrapper
-					id="gravity"
-					label="Standard Gravity"
-					description="Standard gravity constant (default: 9.81 m/s²)"
-				>
-					<template v-slot:input>
-						<NumberInput
-							:key="formData.gravity"
-							id="gravity"
-							type="number"
-							class="form-control"
-							:model-value="formData.gravity"
-							@update:model-value="updateField('gravity', $event)"
-							:min="0"
-							:step="0.01"
-						/>
-					</template>
-					<template v-slot:unit>
-						<SimpleUnit unit="m/s²" />
 					</template>
 				</InputWrapper>
 			</div>

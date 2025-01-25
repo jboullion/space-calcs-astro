@@ -29,6 +29,7 @@
 import { computed } from 'vue';
 import ResultTable from '../forms/v2/ResultTable.vue';
 import type { ISpecificImpulseForm } from './types';
+import { physicsConstants } from '../utils';
 
 const props = defineProps<{
 	formData: ISpecificImpulseForm;
@@ -66,8 +67,7 @@ const effectiveExhaustVelocity = computed(() => {
 });
 
 const specificImpulse = computed(() => {
-	if (props.formData.gravity === 0) return 0;
-	return effectiveExhaustVelocity.value / props.formData.gravity;
+	return effectiveExhaustVelocity.value / physicsConstants.g;
 });
 
 const thrust = computed(() => {
