@@ -162,6 +162,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		sponsorImg: '/images/sponsors/na-logo.png',
 		newTab: true,
 	},
+	{
+		id: 'specific-impulse',
+		name: 'Specific Impulse',
+		description: 'Calculate the specific impulse of a rocket engine',
+		categories: [categories[ROCKET_CAT]],
+		image: '',
+		link: '/calcs/specific-impulse',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
