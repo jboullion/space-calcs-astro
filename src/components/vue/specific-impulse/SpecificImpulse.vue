@@ -25,6 +25,11 @@ const formData = ref<ISpecificImpulseForm>({
 	exhaustVelocity: 3290,
 	gravity: 9.81, // Standard gravity
 	selectedEngineId: exampleEngines[1].id,
+	ambientPressure: 101.325, // Sea level (kPa)
+	expansionRatio: 40, // Typical for vacuum-optimized engines
+	chamberPressure: 25, // 25 MPa, common for modern engines
+	mixtureRatio: 3.6, // Good for methane/LOX
+	combustionEfficiency: 96, // Modern engines typically >95%
 });
 
 const updateFormData = (newFormData: ISpecificImpulseForm) => {

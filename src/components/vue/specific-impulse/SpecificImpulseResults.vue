@@ -2,8 +2,15 @@
 	<div>
 		<ResultTable>
 			<template #title>
-				<h2>Specific Impulse Results</h2>
+				<h2 class="text-center p-2">Specific Impulse Results</h2>
 			</template>
+
+			<tr>
+				<th>Effective Exhaust Velocity</th>
+				<td class="text-end">
+					{{ effectiveExhaustVelocity.toFixed(2) }} m/s
+				</td>
+			</tr>
 			<tr>
 				<th>Specific Impulse (Isp)</th>
 				<td class="text-end">
@@ -27,8 +34,35 @@ const props = defineProps<{
 	formData: ISpecificImpulseForm;
 }>();
 
+const chamberPressureMPa = computed(() => {
+	return props.formData.chamberPressure || 0;
+});
+
 const effectiveExhaustVelocity = computed(() => {
-	return props.formData.exhaustVelocity;
+	let velocity = props.formData.exhaustVelocity;
+
+	// Apply ambient pressure correction if available
+	if (
+		props.formData.chamberPressure &&
+		props.formData.ambientPressure &&
+		props.formData.expansionRatio
+	) {
+		const pc = props.formData.chamberPressure * 1000; // Convert MPa to kPa
+		const pa = props.formData.ambientPressure;
+		const er = props.formData.expansionRatio;
+
+		// Simplified nozzle performance calculation
+		const pressureRatio = pa / pc;
+		const velocityCorrection = Math.sqrt(1 - pressureRatio * er);
+		velocity *= velocityCorrection;
+	}
+
+	// Apply combustion efficiency if available
+	if (props.formData.combustionEfficiency) {
+		velocity *= props.formData.combustionEfficiency / 100;
+	}
+
+	return velocity;
 });
 
 const specificImpulse = computed(() => {
@@ -37,6 +71,6 @@ const specificImpulse = computed(() => {
 });
 
 const thrust = computed(() => {
-	return props.formData.massFlowRate * props.formData.exhaustVelocity;
+	return props.formData.massFlowRate * effectiveExhaustVelocity.value;
 });
 </script>

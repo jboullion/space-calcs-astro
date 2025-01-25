@@ -3,6 +3,12 @@ export interface ISpecificImpulseForm {
 	exhaustVelocity: number; // Exhaust velocity in m/s
 	gravity: number; // Standard gravity (usually 9.81 m/s²)
 	selectedEngineId: string; // Selected example engine ID
+
+	ambientPressure: number; // Ambient pressure in kPa
+	expansionRatio: number; // Expansion ratio
+	chamberPressure: number; // Chamber pressure in MPa
+	mixtureRatio: number; // Mixture ratio
+	combustionEfficiency: number; // Combustion efficiency
 }
 
 export interface IExampleEngine {
@@ -11,15 +17,23 @@ export interface IExampleEngine {
 	massFlowRate: number;
 	exhaustVelocity: number;
 	specificImpulse: number;
+	chamberPressure: number;
+	expansionRatio: number;
+	mixtureRatio: number;
+	combustionEfficiency: number;
 }
 
-export const exampleEngines: IExampleEngine[] = [
+export const exampleEngines = [
 	{
 		id: 'rd-180',
 		name: 'RD-180 (Kerosene/LOX)',
 		massFlowRate: 1200,
 		exhaustVelocity: 3290,
 		specificImpulse: 338,
+		chamberPressure: 25.7,
+		expansionRatio: 36.4,
+		mixtureRatio: 2.72, // Typical for Kerosene/LOX
+		combustionEfficiency: 96,
 	},
 	{
 		id: 'rs-25',
@@ -27,6 +41,10 @@ export const exampleEngines: IExampleEngine[] = [
 		massFlowRate: 468,
 		exhaustVelocity: 4465,
 		specificImpulse: 452,
+		chamberPressure: 20.64,
+		expansionRatio: 69,
+		mixtureRatio: 6.03, // Higher for LH2/LOX engines
+		combustionEfficiency: 97.5,
 	},
 	{
 		id: 'raptor',
@@ -34,5 +52,9 @@ export const exampleEngines: IExampleEngine[] = [
 		massFlowRate: 615,
 		exhaustVelocity: 3570,
 		specificImpulse: 363,
+		chamberPressure: 30,
+		expansionRatio: 40,
+		mixtureRatio: 3.6, // Optimized for Methane/LOX
+		combustionEfficiency: 96.5,
 	},
 ];
