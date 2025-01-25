@@ -13,10 +13,6 @@ const calculator = calculators.find((calc) => calc.id === 'project-hyperion');
 if (!calculator) {
     throw new Error('Calculator not found');
 }
-
-const references: Reference[] = [
-
-];
 ---
 
 <Layout title={calculator.name} description={calculator.description}>
@@ -26,7 +22,7 @@ const references: Reference[] = [
             <ProjectHyperionComponent client:load />
         </div>
 
-        <References references={references} />
+        
     </div>
 </Layout>
 

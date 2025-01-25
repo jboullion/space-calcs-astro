@@ -5,8 +5,13 @@
 				<button
 					v-for="tab in tabs"
 					:key="tab.value"
-					class="btn btn-primary flex-grow-1"
-					:class="[{ active: activeTab === tab.value }]"
+					class="btn flex-grow-1"
+					:class="[
+						{
+							'btn-primary': activeTab === tab.value,
+							'btn-secondary': activeTab !== tab.value,
+						},
+					]"
 					@click="activeTab = tab.value"
 				>
 					{{ tab.label }}
@@ -276,9 +281,4 @@ const selectEngine = (event: Event) => {
 };
 </script>
 
-<style scoped>
-.btn-primary.active {
-	background: var(--background);
-	color: var(--foreground);
-}
-</style>
+<style scoped></style>
