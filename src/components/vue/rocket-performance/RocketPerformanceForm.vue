@@ -67,19 +67,19 @@
 				</InputWrapper>
 
 				<InputWrapper
-					id="exhaustVelocity"
+					id="baseExhaustVelocity"
 					label="Exhaust Velocity"
 					description="The velocity of the propellant exiting the rocket engine"
 				>
 					<template v-slot:input>
 						<NumberInput
-							:key="formData.exhaustVelocity"
-							id="exhaustVelocity"
+							:key="formData.baseExhaustVelocity"
+							id="baseExhaustVelocity"
 							type="number"
 							class="form-control"
-							:model-value="formData.exhaustVelocity"
+							:model-value="formData.baseExhaustVelocity"
 							@update:model-value="
-								updateField('exhaustVelocity', $event)
+								updateField('baseExhaustVelocity', $event)
 							"
 							:min="0"
 							:step="1"
@@ -96,7 +96,7 @@
 				<InputWrapper
 					id="ambientPressure"
 					label="Ambient Pressure"
-					description="The pressure of the surrounding atmosphere"
+					description="Sea level standard pressure: 101.325 kPa"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -120,7 +120,7 @@
 				<InputWrapper
 					id="expansionRatio"
 					label="Nozzle Expansion Ratio"
-					description="The ratio of the nozzle exit area to the nozzle throat area"
+					:description="`Standard expansion ratio: ${standardExpansionRatio}%`"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -141,7 +141,7 @@
 				<InputWrapper
 					id="chamberPressure"
 					label="Chamber Pressure"
-					description="The pressure inside the rocket engine's combustion chamber"
+					:description="`Standard chamber pressure: ${standardChamberPressure}`"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -165,7 +165,7 @@
 				<InputWrapper
 					id="mixtureRatio"
 					label="Mixture Ratio (O/F)"
-					description="The ratio of the oxidizer to fuel in the propellant mixture"
+					:description="`Optimal mixture ratio: ${optimalMixtureRatio}`"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -186,7 +186,7 @@
 				<InputWrapper
 					id="combustionEfficiency"
 					label="Combustion Efficiency"
-					description="The efficiency of the rocket engine's combustion process"
+					:description="`Standard combustion efficiency: ${standardCombustionEfficiency}`"
 				>
 					<template v-slot:input>
 						<NumberInput
@@ -213,19 +213,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import InputWrapper from '../forms/v2/InputWrapper.vue';
 import NumberInput from '../forms/v2/NumberInput.vue';
 import SimpleUnit from '../forms/v2/SimpleUnit.vue';
-import type { ISpecificImpulseForm } from './types';
+import type { IRocketPerformanceForm } from './types';
 import { exampleEngines } from './types';
 
 const props = defineProps<{
-	formData: ISpecificImpulseForm;
+	formData: IRocketPerformanceForm;
 }>();
 
 const emit = defineEmits<{
-	'update:formData': [formData: ISpecificImpulseForm];
+	'update:formData': [formData: IRocketPerformanceForm];
 }>();
 
 const activeTab = ref('basic');
@@ -236,7 +236,7 @@ const tabs = [
 ];
 
 const updateField = (
-	field: keyof ISpecificImpulseForm,
+	field: keyof IRocketPerformanceForm,
 	value: number | string,
 ) => {
 	emit('update:formData', { ...props.formData, [field]: value });
@@ -253,10 +253,43 @@ const selectEngine = (event: Event) => {
 	const tempFormData = { ...props.formData };
 	tempFormData.selectedEngineId = engineId;
 	tempFormData.massFlowRate = selectedEngine.massFlowRate;
-	tempFormData.exhaustVelocity = selectedEngine.exhaustVelocity;
+	tempFormData.baseExhaustVelocity = selectedEngine.baseExhaustVelocity;
+	//tempFormData.ambientPressure = selectedEngine.ambientPressure;
+	tempFormData.expansionRatio = selectedEngine.expansionRatio;
+	tempFormData.chamberPressure = selectedEngine.chamberPressure;
+	tempFormData.mixtureRatio = selectedEngine.mixtureRatio;
+	tempFormData.combustionEfficiency = selectedEngine.combustionEfficiency;
 
 	emit('update:formData', { ...tempFormData });
 };
+
+const optimalMixtureRatio = computed(() => {
+	const selectedEngine = exampleEngines.find(
+		(engine) => engine.id === props.formData.selectedEngineId,
+	);
+	return selectedEngine?.mixtureRatio;
+});
+
+const standardChamberPressure = computed(() => {
+	const selectedEngine = exampleEngines.find(
+		(engine) => engine.id === props.formData.selectedEngineId,
+	);
+	return selectedEngine?.chamberPressure;
+});
+
+const standardExpansionRatio = computed(() => {
+	const selectedEngine = exampleEngines.find(
+		(engine) => engine.id === props.formData.selectedEngineId,
+	);
+	return selectedEngine?.expansionRatio;
+});
+
+const standardCombustionEfficiency = computed(() => {
+	const selectedEngine = exampleEngines.find(
+		(engine) => engine.id === props.formData.selectedEngineId,
+	);
+	return selectedEngine?.combustionEfficiency;
+});
 </script>
 
 <style scoped></style>

@@ -4,11 +4,11 @@ import type { Reference } from '../../types/types';
 import Layout from '../../layouts/Layout.astro';
 import Hero from '../../components/calcs/Hero.astro';
 
-import SpecificImpulseComponent from '../../components/vue/specific-impulse/SpecificImpulse.vue';
+import RocketPerformanceComponent from '../../components/vue/rocket-performance/RocketPerformance.vue';
 import References from '../../components/shared/References.astro';
 import { calculators } from '../../utils/calculator-list';
 
-const calculator = calculators.find((calc) => calc.id === 'specific-impulse');
+const calculator = calculators.find((calc) => calc.id === 'rocket-performance');
 
 if (!calculator) {
     throw new Error('Calculator not found');
@@ -26,7 +26,7 @@ const references: Reference[] = [
     <div class="container">
         <Hero title={calculator.name} description={calculator.description} />
         <div style="min-height: 700px;" class="calculator">
-            <SpecificImpulseComponent client:load />
+            <RocketPerformanceComponent client:load />
         </div>
 
         <References references={references} />

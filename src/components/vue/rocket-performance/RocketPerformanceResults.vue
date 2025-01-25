@@ -2,7 +2,7 @@
 	<div>
 		<ResultTable>
 			<template #title>
-				<h2 class="text-center p-2">Specific Impulse Results</h2>
+				<h2 class="text-center p-2">Results</h2>
 			</template>
 
 			<tr>
@@ -28,37 +28,66 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import ResultTable from '../forms/v2/ResultTable.vue';
-import type { ISpecificImpulseForm } from './types';
+import { exampleEngines, type IRocketPerformanceForm } from './types';
 import { physicsConstants } from '../utils';
 
 const props = defineProps<{
-	formData: ISpecificImpulseForm;
+	formData: IRocketPerformanceForm;
 }>();
 
 const chamberPressureMPa = computed(() => {
 	return props.formData.chamberPressure || 0;
 });
 
-const effectiveExhaustVelocity = computed(() => {
-	let velocity = props.formData.exhaustVelocity;
+const getMixtureRatioEfficiency = (
+	actualRatio: number,
+	optimalRatio: number,
+	propellantType: string,
+) => {
+	const deviation = Math.abs(actualRatio - optimalRatio) / optimalRatio;
+	const penaltyFactors = {
+		kerolox: 0.4,
+		hydrolox: 0.6,
+		methalox: 0.5,
+	};
+	const penalty =
+		penaltyFactors[propellantType as keyof typeof penaltyFactors] || 0.5;
+	return Math.max(0.85, 1 - deviation * penalty);
+};
 
-	// Apply ambient pressure correction if available
+const effectiveExhaustVelocity = computed(() => {
+	let velocity = props.formData.baseExhaustVelocity;
+	const selectedEngine = exampleEngines.find(
+		(e) => e.id === props.formData.selectedEngineId,
+	);
+
+	if (!selectedEngine) return velocity;
+
+	// Mixture ratio efficiency
+	if (props.formData.mixtureRatio) {
+		const mixEfficiency = getMixtureRatioEfficiency(
+			props.formData.mixtureRatio,
+			selectedEngine.mixtureRatio,
+			selectedEngine.propellantType,
+		);
+		velocity *= mixEfficiency;
+	}
+
+	// Pressure correction
 	if (
 		props.formData.chamberPressure &&
 		props.formData.ambientPressure &&
 		props.formData.expansionRatio
 	) {
-		const pc = props.formData.chamberPressure * 1000; // Convert MPa to kPa
+		const pc = props.formData.chamberPressure * 1000;
 		const pa = props.formData.ambientPressure;
 		const er = props.formData.expansionRatio;
-
-		// Simplified nozzle performance calculation
 		const pressureRatio = pa / pc;
 		const velocityCorrection = Math.sqrt(1 - pressureRatio * er);
 		velocity *= velocityCorrection;
 	}
 
-	// Apply combustion efficiency if available
+	// Combustion efficiency
 	if (props.formData.combustionEfficiency) {
 		velocity *= props.formData.combustionEfficiency / 100;
 	}

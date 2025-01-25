@@ -163,12 +163,12 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		newTab: true,
 	},
 	{
-		id: 'specific-impulse',
-		name: 'Specific Impulse',
-		description: 'Calculate the specific impulse of a rocket engine',
+		id: 'rocket-performance',
+		name: 'Rocket Engine Performance',
+		description: 'Calculate the performance of a rocket engine',
 		categories: [categories[ROCKET_CAT]],
 		image: '',
-		link: '/calcs/specific-impulse',
+		link: '/calcs/rocket-performance',
 	},
 	// {
 	// 	id: 'transfer-window',
