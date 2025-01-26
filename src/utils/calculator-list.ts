@@ -170,6 +170,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/rocket-performance',
 	},
+	{
+		id: 'create-planet',
+		name: 'Create Planet',
+		description: 'Create a planet and estimate its properties',
+		categories: [categories[HABITAT_CAT]],
+		image: '',
+		link: '/calcs/create-planet',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',

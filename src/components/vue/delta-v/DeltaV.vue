@@ -217,16 +217,14 @@
 							></small
 						>
 					</p>
-					<img
-						src="/images/Solar_system_delta_v_map.svg"
-						alt="Delta V Map"
-					/>
+					<img :src="deltaVMapImg" alt="Delta V Map" />
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
+import deltaVMapImg from '@images/Solar_system_delta_v_map.svg';
 // TODO: Must Dos!
 
 // ! BUGS

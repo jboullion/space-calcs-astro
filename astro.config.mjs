@@ -1,13 +1,32 @@
-import { defineConfig } from "astro/config";
-import vue from "@astrojs/vue";
+import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'url';
+import vue from '@astrojs/vue';
+import sitemap from '@astrojs/sitemap';
 
-import sitemap from "@astrojs/sitemap";
+import react from '@astrojs/react';
 
 // https://astro.build/config
-export default defineConfig(
-  {
-    site: "https://spacecalcs.com",
-    integrations: [vue(), sitemap()],
-  } //   site: "https://jboullion.github.io",
-  //   base: "/space-calcs-astro",
-);
+export default defineConfig({
+	site: 'https://spacecalcs.com',
+	integrations: [vue(), sitemap(), react()],
+	vite: {
+		resolve: {
+			alias: {
+				'@': fileURLToPath(new URL('./src', import.meta.url)),
+				'@components': fileURLToPath(
+					new URL('./src/components', import.meta.url),
+				),
+				'@lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
+				'@utils': fileURLToPath(
+					new URL('./src/utils', import.meta.url),
+				),
+				'@types': fileURLToPath(
+					new URL('./src/types', import.meta.url),
+				),
+				'@images': fileURLToPath(
+					new URL('./src/assets/images', import.meta.url),
+				),
+			},
+		},
+	},
+});
