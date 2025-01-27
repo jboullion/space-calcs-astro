@@ -8,7 +8,7 @@ import CreatePlanetComponent from '../../components/react/create-planet/CreatePl
 import References from '../../components/shared/References.astro';
 import { calculators } from '../../utils/calculator-list';
 
-const calculator = calculators.find((calc) => calc.id === 'rocket-performance');
+const calculator = calculators.find((calc) => calc.id === 'create-planet');
 
 if (!calculator) {
     throw new Error('Calculator not found');
