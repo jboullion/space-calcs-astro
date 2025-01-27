@@ -2,27 +2,19 @@ import React from 'react';
 import InputWrapper from '../forms/InputWrapper';
 import NumberInput from '../forms/NumberInput';
 import SimpleUnit from '../forms/SimpleUnit';
-
-interface CreatePlanetFormProps {
-	radius: number;
-	density: number;
-	waterLevel: number;
-	roughness: number;
-	onRadiusChange: (value: number) => void;
-	onDensityChange: (value: number) => void;
-	onWaterLevelChange: (value: number) => void;
-	onRoughnessChange: (value: number) => void;
-}
+import type { CreatePlanetFormProps } from './types';
 
 export default function CreatePlanetForm({
 	radius,
 	density,
 	waterLevel,
 	roughness,
+	seed,
 	onRadiusChange,
 	onDensityChange,
 	onWaterLevelChange,
 	onRoughnessChange,
+	onSeedChange,
 }: CreatePlanetFormProps) {
 	return (
 		<div className="p-2 rounded border mb-5">
@@ -94,6 +86,19 @@ export default function CreatePlanetForm({
 						/>
 					}
 					unit={<SimpleUnit unit="roughness" />}
+				/>
+
+				<InputWrapper
+					id="seed"
+					label="Seed"
+					description="The seed for the planet generation"
+					input={
+						<NumberInput
+							id="seed"
+							value={seed}
+							onChange={onSeedChange}
+						/>
+					}
 				/>
 			</form>
 		</div>

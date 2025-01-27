@@ -22,6 +22,7 @@ export default function CreatePlanet() {
 	const [density, setDensity] = useState(5500); // Default Earth-like density
 	const [waterLevel, setWaterLevel] = useState(0);
 	const [roughness, setRoughness] = useState(0.5);
+	const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1000000));
 
 	// Calculate derived properties
 	const planetProperties = useMemo(() => {
@@ -68,10 +69,12 @@ export default function CreatePlanet() {
 					density={density}
 					waterLevel={waterLevel}
 					roughness={roughness}
+					seed={seed}
 					onRadiusChange={setRadius}
 					onDensityChange={setDensity}
 					onWaterLevelChange={setWaterLevel}
 					onRoughnessChange={setRoughness}
+					onSeedChange={setSeed}
 				/>
 				<CreatePlanetResults planetProperties={planetProperties} />
 			</div>
@@ -83,6 +86,7 @@ export default function CreatePlanet() {
 					radius={radius}
 					waterLevel={waterLevel}
 					roughness={roughness}
+					seed={seed}
 				/>
 			</div>
 		</div>
