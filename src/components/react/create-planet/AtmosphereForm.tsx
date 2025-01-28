@@ -22,7 +22,7 @@ const updateGasComposition = (
 	}
 
 	// Calculate the new 'other' value
-	const newOther = Math.max(0, 100 - otherGasesTotal - newValue);
+	const newOther = Math.max(0, 100 - otherGasesTotal - newValue).toFixed(2);
 
 	// Return the updated composition
 	return {
@@ -53,7 +53,7 @@ export default function AtmosphereForm({
 			onAtmosphereChange({
 				...atmosphere,
 				composition:
-					newComposition as AtmosphereProperties['composition'],
+					newComposition as unknown as AtmosphereProperties['composition'],
 			});
 		}
 		// If newComposition is null, the update was invalid and we don't update the state
@@ -107,7 +107,7 @@ export default function AtmosphereForm({
 				unit={<SimpleUnit unit="K" />}
 			/>
 
-			<InputWrapper
+			{/* <InputWrapper
 				id="opacity-toggle"
 				label="Full Opacity"
 				tooltip="Allow atmosphere to fully obscure the surface"
@@ -127,7 +127,7 @@ export default function AtmosphereForm({
 						/>
 					</div>
 				}
-			/>
+			/> */}
 
 			<InputWrapper
 				id="atmosphere-color"
@@ -149,7 +149,7 @@ export default function AtmosphereForm({
 				}
 			/>
 
-			<InputWrapper
+			{/* <InputWrapper
 				id="cloud-seed"
 				label="Cloud Seed"
 				tooltip="Random seed for cloud generation"
@@ -170,7 +170,7 @@ export default function AtmosphereForm({
 						step={1}
 					/>
 				}
-			/>
+			/> */}
 
 			{/* Gas composition inputs */}
 			{[
