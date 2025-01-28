@@ -9,6 +9,7 @@ export default function CreatePlanetVisualization({
 	waterLevel,
 	roughness,
 	seed,
+	atmosphere,
 }: CreatePlanetVisualizationProps) {
 	// Calculate camera distance based on planet radius to ensure it's always in view
 	const cameraDistance = useMemo(() => {
@@ -40,6 +41,7 @@ export default function CreatePlanetVisualization({
 					waterLevel={waterLevel}
 					roughness={roughness}
 					seed={seed}
+					atmosphere={atmosphere}
 				/>
 
 				<OrbitControls

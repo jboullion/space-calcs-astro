@@ -1,14 +1,16 @@
 import { useFrame } from '@react-three/fiber';
-import { useRef, useMemo, useState, useEffect } from 'react';
+import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { generatePlanetTextures } from './functions';
 import type { PlanetProps } from './types';
+import Atmosphere from './Atmosphere';
 
 export default function Planet({
 	radius,
 	waterLevel,
 	roughness,
 	seed,
+	atmosphere,
 }: PlanetProps) {
 	const planetRef = useRef<THREE.Mesh>(null);
 	const waterRef = useRef<THREE.Mesh>(null);
@@ -63,6 +65,11 @@ export default function Planet({
 						thickness={1}
 					/>
 				</mesh>
+			)}
+
+			{/* Atmosphere layer */}
+			{atmosphere?.pressure > 0 && (
+				<Atmosphere radius={radius} atmosphere={atmosphere} />
 			)}
 		</>
 	);

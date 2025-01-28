@@ -9,7 +9,7 @@ const ResultTable: React.FC<ResultTableProps> = ({ children, title }) => {
 	return (
 		<div id="resultsTable" className="p-2 rounded border mb-5">
 			{title}
-			<table className="table mb-0">
+			<table className="table mb-0 ">
 				<tbody className="align-middle">{children}</tbody>
 			</table>
 		</div>

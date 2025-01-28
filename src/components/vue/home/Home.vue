@@ -2,8 +2,8 @@
 	<div>
 		<section class="py-5 text-center bg-black text-light" id="home-canvas">
 			<div id="homeAccents">
-				<img :src="sunImg" id="homeSun" alt="" />
-				<img :src="earthImg" id="homeEarth" alt="" />
+				<img :src="sunImg.src" id="homeSun" alt="" />
+				<img :src="earthImg.src" id="homeEarth" alt="" />
 			</div>
 			<div class="container position-relative">
 				<div class="row">
@@ -11,7 +11,7 @@
 						<div class="d-flex justify-content-center gap-3">
 							<img
 								id="homeLogo"
-								:src="logoImg"
+								:src="logoImg.src"
 								alt="Space Calcs"
 							/>
 						</div>

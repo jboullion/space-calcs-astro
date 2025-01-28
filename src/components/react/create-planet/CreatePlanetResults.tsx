@@ -34,8 +34,10 @@ const CreatePlanetResults: React.FC<CreatePlanetResultsProps> = ({
 				<td>{planetProperties.surfaceGravity} m/s²</td>
 			</tr>
 			<tr>
-				<th>Escape Velocity</th>
-				<td>{planetProperties.escapeVelocity} km/s</td>
+				<th className="border-bottom-0">Escape Velocity</th>
+				<td className="border-bottom-0">
+					{planetProperties.escapeVelocity} km/s
+				</td>
 			</tr>
 		</ResultTable>
 	);

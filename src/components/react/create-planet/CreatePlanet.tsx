@@ -3,6 +3,9 @@ import CreatePlanetForm from './CreatePlanetForm';
 import CreatePlanetVisualization from './CreatePlanetVisualization';
 import ResultTable from '../forms/ResultTable';
 import CreatePlanetResults from './CreatePlanetResults';
+import type { AtmosphereProperties } from './types';
+import { ATMOSPHERIC_CONSTANTS } from './constants';
+import AtmosphereResults from './AtmosphereResults';
 
 // Physical constants
 const G = 6.6743e-11; // Universal gravitational constant in m³/kg/s²
@@ -23,6 +26,17 @@ export default function CreatePlanet() {
 	const [waterLevel, setWaterLevel] = useState(0);
 	const [roughness, setRoughness] = useState(0.5);
 	const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1000000));
+	const [atmosphere, setAtmosphere] = useState<AtmosphereProperties>({
+		pressure: 1.0, // Earth-like defaults
+		temperature: 288,
+		composition: {
+			n2: 78,
+			o2: 21,
+			co2: 0.04,
+			h2o: 0.96,
+			other: 0.01,
+		},
+	});
 
 	// Calculate derived properties
 	const planetProperties = useMemo(() => {
@@ -70,13 +84,22 @@ export default function CreatePlanet() {
 					waterLevel={waterLevel}
 					roughness={roughness}
 					seed={seed}
+					atmosphere={atmosphere}
 					onRadiusChange={setRadius}
 					onDensityChange={setDensity}
 					onWaterLevelChange={setWaterLevel}
 					onRoughnessChange={setRoughness}
 					onSeedChange={setSeed}
+					onAtmosphereChange={setAtmosphere}
 				/>
+
 				<CreatePlanetResults planetProperties={planetProperties} />
+
+				<AtmosphereResults
+					atmosphere={atmosphere}
+					radius={radius}
+					surfaceGravity={parseFloat(planetProperties.surfaceGravity)}
+				/>
 			</div>
 			<div
 				id="create-planet__results"
@@ -87,6 +110,7 @@ export default function CreatePlanet() {
 					waterLevel={waterLevel}
 					roughness={roughness}
 					seed={seed}
+					atmosphere={atmosphere}
 				/>
 			</div>
 		</div>
