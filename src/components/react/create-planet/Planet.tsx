@@ -69,7 +69,11 @@ export default function Planet({
 
 			{/* Atmosphere layer */}
 			{atmosphere?.pressure > 0 && (
-				<Atmosphere radius={radius} atmosphere={atmosphere} />
+				<Atmosphere
+					radius={radius}
+					atmosphere={atmosphere}
+					waterLevel={waterLevel}
+				/>
 			)}
 		</>
 	);

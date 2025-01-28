@@ -32,10 +32,14 @@ export interface CreatePlanetFormProps {
 export interface AtmosphereProperties {
 	pressure: number; // in atmospheres
 	temperature: number; // in Kelvin
+	customColor?: string; // hex color code
+	cloudSeed?: number; // random seed for cloud generation
+	fullOpacity?: boolean; // whether to allow full opacity
 	composition: {
 		n2: number; // percentage
 		o2: number; // percentage
 		co2: number; // percentage
+		ch4: number; // percentage
 		h2o: number; // percentage
 		other: number; // percentage
 	};

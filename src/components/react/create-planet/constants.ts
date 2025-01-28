@@ -6,6 +6,7 @@ export const ATMOSPHERIC_CONSTANTS = {
 		N2: 28.014,
 		O2: 31.999,
 		CO2: 44.009,
+		CH4: 16.043,
 		H2O: 18.015,
 		OTHER: 10.97, // Average for other gases
 	},

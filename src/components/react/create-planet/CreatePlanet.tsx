@@ -1,11 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import CreatePlanetForm from './CreatePlanetForm';
 import CreatePlanetVisualization from './CreatePlanetVisualization';
-import ResultTable from '../forms/ResultTable';
 import CreatePlanetResults from './CreatePlanetResults';
-import type { AtmosphereProperties } from './types';
-import { ATMOSPHERIC_CONSTANTS } from './constants';
 import AtmosphereResults from './AtmosphereResults';
+import { PlanetProvider, usePlanet } from './PlanetContext';
 
 // Physical constants
 const G = 6.6743e-11; // Universal gravitational constant in m³/kg/s²
@@ -19,24 +17,9 @@ function formatNumber(value: number, precision: number = 2): string {
 	return value.toFixed(precision);
 }
 
-export default function CreatePlanet() {
-	// Core planet parameters
-	const [radius, setRadius] = useState(6371); // Default to Earth's radius
-	const [density, setDensity] = useState(5500); // Default Earth-like density
-	const [waterLevel, setWaterLevel] = useState(0);
-	const [roughness, setRoughness] = useState(0.5);
-	const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1000000));
-	const [atmosphere, setAtmosphere] = useState<AtmosphereProperties>({
-		pressure: 1.0, // Earth-like defaults
-		temperature: 288,
-		composition: {
-			n2: 78,
-			o2: 21,
-			co2: 0.04,
-			h2o: 0.96,
-			other: 0.01,
-		},
-	});
+function PlanetCalculator() {
+	const { radius, density, waterLevel, roughness, seed, atmosphere } =
+		usePlanet();
 
 	// Calculate derived properties
 	const planetProperties = useMemo(() => {
@@ -78,23 +61,8 @@ export default function CreatePlanet() {
 				id="create-planet__form"
 				className="col-xl-4 col-lg-5 col-md-6"
 			>
-				<CreatePlanetForm
-					radius={radius}
-					density={density}
-					waterLevel={waterLevel}
-					roughness={roughness}
-					seed={seed}
-					atmosphere={atmosphere}
-					onRadiusChange={setRadius}
-					onDensityChange={setDensity}
-					onWaterLevelChange={setWaterLevel}
-					onRoughnessChange={setRoughness}
-					onSeedChange={setSeed}
-					onAtmosphereChange={setAtmosphere}
-				/>
-
+				<CreatePlanetForm />
 				<CreatePlanetResults planetProperties={planetProperties} />
-
 				<AtmosphereResults
 					atmosphere={atmosphere}
 					radius={radius}
@@ -114,5 +82,14 @@ export default function CreatePlanet() {
 				/>
 			</div>
 		</div>
+	);
+}
+
+// Wrapper component that provides the context
+export default function CreatePlanet() {
+	return (
+		<PlanetProvider>
+			<PlanetCalculator />
+		</PlanetProvider>
 	);
 }
