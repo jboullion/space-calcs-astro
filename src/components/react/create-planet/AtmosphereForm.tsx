@@ -107,32 +107,9 @@ export default function AtmosphereForm({
 				unit={<SimpleUnit unit="K" />}
 			/>
 
-			{/* <InputWrapper
-				id="opacity-toggle"
-				label="Full Opacity"
-				tooltip="Allow atmosphere to fully obscure the surface"
-				input={
-					<div className="form-check form-switch">
-						<input
-							className="form-check-input"
-							type="checkbox"
-							id="opacity-toggle"
-							checked={atmosphere.fullOpacity || false}
-							onChange={(e) =>
-								onAtmosphereChange({
-									...atmosphere,
-									fullOpacity: e.target.checked,
-								})
-							}
-						/>
-					</div>
-				}
-			/> */}
-
 			<InputWrapper
 				id="atmosphere-color"
 				label="Atmosphere Color"
-				tooltip="Color of the atmosphere"
 				input={
 					<input
 						type="color"
@@ -204,7 +181,7 @@ export default function AtmosphereForm({
 					key={key}
 					id={`${key}-percentage`}
 					label={label}
-					tooltip={`Molecular mass: ${mass} g/mol`}
+					description={`Molecular mass: ${mass} g/mol. Affects opacity.`}
 					input={
 						<NumberInput
 							id={`${key}-percentage`}

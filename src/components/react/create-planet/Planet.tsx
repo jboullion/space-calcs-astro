@@ -55,13 +55,19 @@ export default function Planet({
 					<meshPhysicalMaterial
 						color="#006994"
 						transparent={true}
-						opacity={0.6}
+						opacity={Math.max(
+							0,
+							0.6 / (1 + atmosphere.pressure * 0.2),
+						)}
 						roughness={0.1}
 						metalness={0.1}
 						clearcoat={1.0}
 						clearcoatRoughness={0.1}
 						ior={1.333}
-						transmission={0.5}
+						transmission={Math.max(
+							0.1,
+							0.5 / (1 + atmosphere.pressure * 0.2),
+						)}
 						thickness={1}
 					/>
 				</mesh>
