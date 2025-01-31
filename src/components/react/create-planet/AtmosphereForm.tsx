@@ -65,7 +65,7 @@ export default function AtmosphereForm({
 				id="atmospheric-pressure"
 				label="Surface Pressure"
 				tooltip="Atmospheric pressure at the planet's surface"
-				description="Earth = 1 atm, Mars = 0.006 atm, Venus = 92 atm"
+				description="Earth = 1 atm, Mars = 0.006 atm, Jupiter ≈ 100+ atm"
 				input={
 					<NumberInput
 						id="atmospheric-pressure"
@@ -77,7 +77,7 @@ export default function AtmosphereForm({
 							})
 						}
 						min={0}
-						max={100}
+						max={200}
 						step={0.1}
 					/>
 				}
