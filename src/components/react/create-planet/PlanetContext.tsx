@@ -1,21 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import type { AtmosphereProperties } from './types';
-
-interface PlanetContextType {
-	// Core planet parameters
-	radius: number;
-	setRadius: (value: number) => void;
-	density: number;
-	setDensity: (value: number) => void;
-	waterLevel: number;
-	setWaterLevel: (value: number) => void;
-	roughness: number;
-	setRoughness: (value: number) => void;
-	seed: number;
-	setSeed: (value: number) => void;
-	atmosphere: AtmosphereProperties;
-	setAtmosphere: (value: AtmosphereProperties) => void;
-}
+import type { AtmosphereProperties, PlanetContextType } from './types';
 
 const PlanetContext = createContext<PlanetContextType | undefined>(undefined);
 
@@ -36,6 +20,13 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 			ch4: 0.01,
 			h2o: 0.96,
 			other: 0.01,
+		},
+		clouds: {
+			enabled: true,
+			density: 0.8,
+			coverage: 0.6,
+			altitude: 0.02,
+			speed: 1.0,
 		},
 		cloudSeed: Math.floor(Math.random() * 1000000),
 	});

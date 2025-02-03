@@ -3,13 +3,7 @@ import InputWrapper from '../forms/InputWrapper';
 import NumberInput from '../forms/NumberInput';
 import SimpleUnit from '../forms/SimpleUnit';
 import { usePlanet } from './PlanetContext';
-
-const PLANET_PRESETS = {
-	earth: { radius: 6371, density: 5500, atmosphere: 1, waterLevel: 2 },
-	jupiter: { radius: 69911, density: 1326, atmosphere: 100, waterLevel: 0 },
-	mars: { radius: 3389, density: 3900, atmosphere: 0.006, waterLevel: 0 },
-	venus: { radius: 6052, density: 5200, atmosphere: 92, waterLevel: 0 },
-};
+import { PLANET_PRESETS } from './constants';
 
 export default function SizeForm() {
 	const {
@@ -34,6 +28,9 @@ export default function SizeForm() {
 			setAtmosphere({
 				...atmosphere,
 				pressure: preset.atmosphere,
+				composition: preset.composition,
+				customColor: preset.atmosphereColor,
+				temperature: preset.temperature,
 			});
 		}
 	};

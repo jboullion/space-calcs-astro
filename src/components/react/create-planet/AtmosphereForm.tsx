@@ -3,7 +3,7 @@ import InputWrapper from '../forms/InputWrapper';
 import NumberInput from '../forms/NumberInput';
 import SimpleUnit from '../forms/SimpleUnit';
 import { ATMOSPHERIC_CONSTANTS } from './constants';
-import type { AtmosphereProperties } from './types';
+import type { AtmosphereProperties, CloudProperties } from './types';
 
 // Helper function to validate and update gas composition
 const updateGasComposition = (
@@ -11,24 +11,20 @@ const updateGasComposition = (
 	gasKey: string,
 	newValue: number,
 ) => {
-	// Calculate total of all gases except the one being updated and 'other'
 	const otherGasesTotal = Object.entries(currentComposition)
 		.filter(([key]) => key !== gasKey && key !== 'other')
 		.reduce((sum, [_, value]) => sum + value, 0);
 
-	// Check if the new value would exceed 100% when added to other gases
 	if (otherGasesTotal + newValue > 100) {
-		return null; // Return null to indicate invalid update
+		return null;
 	}
 
-	// Calculate the new 'other' value
-	const newOther = Math.max(0, 100 - otherGasesTotal - newValue).toFixed(2);
+	const newOther = Math.max(0, 100 - otherGasesTotal - newValue);
 
-	// Return the updated composition
 	return {
 		...currentComposition,
 		[gasKey]: newValue,
-		other: newOther,
+		other: parseFloat(newOther.toFixed(2)),
 	};
 };
 
@@ -39,9 +35,35 @@ export default function AtmosphereForm({
 	atmosphere: AtmosphereProperties;
 	onAtmosphereChange: (atmosphere: AtmosphereProperties) => void;
 }) {
-	const [cloudSeed, setCloudSeed] = useState(
-		Math.floor(Math.random() * 1000000),
-	);
+	const [showAdvanced, setShowAdvanced] = useState(false);
+
+	// Ensure clouds object exists with defaults
+	// Ensure clouds object exists with defaults
+	const defaultClouds: CloudProperties = {
+		enabled: true,
+		density: 0.8,
+		coverage: 0.6,
+		altitude: 0.02,
+		speed: 1.0,
+		color: '#FFFFFF', // Add default white color
+	};
+
+	const clouds = atmosphere.clouds || defaultClouds;
+
+	const handleCloudPropertyChange = (
+		property: keyof CloudProperties,
+		value: number,
+	) => {
+		const updatedClouds = {
+			...clouds,
+			[property]: value,
+		};
+
+		onAtmosphereChange({
+			...atmosphere,
+			clouds: updatedClouds,
+		});
+	};
 
 	const handleGasChange = (gasKey: string, value: number) => {
 		const newComposition = updateGasComposition(
@@ -53,10 +75,9 @@ export default function AtmosphereForm({
 			onAtmosphereChange({
 				...atmosphere,
 				composition:
-					newComposition as unknown as AtmosphereProperties['composition'],
+					newComposition as AtmosphereProperties['composition'],
 			});
 		}
-		// If newComposition is null, the update was invalid and we don't update the state
 	};
 
 	return (
@@ -126,97 +147,194 @@ export default function AtmosphereForm({
 				}
 			/>
 
-			{/* <InputWrapper
-				id="cloud-seed"
-				label="Cloud Seed"
-				tooltip="Random seed for cloud generation"
-				description="Change this value to generate different cloud patterns"
+			{/* Cloud Properties */}
+			<h5 className="mt-4 mb-3">Cloud Properties</h5>
+
+			<InputWrapper
+				id="cloud-density"
+				label="Cloud Density"
+				description="Higher values create thicker, more opaque clouds"
 				input={
 					<NumberInput
-						id="cloud-seed"
-						value={cloudSeed}
-						onChange={(value) => {
-							setCloudSeed(value);
-							onAtmosphereChange({
-								...atmosphere,
-								cloudSeed: value,
-							});
-						}}
+						id="cloud-density"
+						value={clouds.density}
+						onChange={(value) =>
+							handleCloudPropertyChange('density', value)
+						}
 						min={0}
-						max={999999}
-						step={1}
+						max={5}
+						step={0.1}
+					/>
+				}
+			/>
+
+			{/* <InputWrapper
+				id="cloud-coverage"
+				label="Cloud Coverage"
+				tooltip="Amount of cloud coverage across the planet"
+				description="Higher values create more extensive cloud systems"
+				input={
+					<NumberInput
+						id="cloud-coverage"
+						value={clouds.coverage}
+						onChange={(value) =>
+							handleCloudPropertyChange('coverage', value)
+						}
+						min={0}
+						max={10}
+						step={0.1}
 					/>
 				}
 			/> */}
 
-			{/* Gas composition inputs */}
-			{[
-				{
-					key: 'n2',
-					label: 'Nitrogen (N₂)',
-					mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.N2,
-				},
-				{
-					key: 'o2',
-					label: 'Oxygen (O₂)',
-					mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.O2,
-				},
-				{
-					key: 'co2',
-					label: 'Carbon Dioxide (CO₂)',
-					mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.CO2,
-				},
-				{
-					key: 'ch4',
-					label: 'Methane (CH₄)',
-					mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.CH4,
-				},
-				{
-					key: 'h2o',
-					label: 'Water Vapor (H₂O)',
-					mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.H2O,
-				},
-			].map(({ key, label, mass }) => (
-				<InputWrapper
-					key={key}
-					id={`${key}-percentage`}
-					label={label}
-					description={`Molecular mass: ${mass} g/mol. Affects opacity.`}
-					input={
-						<NumberInput
-							id={`${key}-percentage`}
-							value={
-								atmosphere.composition[
-									key as keyof typeof atmosphere.composition
-								] || 0
-							}
-							onChange={(value) => handleGasChange(key, value)}
-							min={0}
-							max={100}
-							step={0.1}
-						/>
-					}
-					unit={<SimpleUnit unit="%" />}
-				/>
-			))}
-
-			<InputWrapper
-				id="other-percentage"
-				label="Other Gases"
-				description="Automatically calculated from remaining percentage"
+			{/* <InputWrapper
+				id="cloud-scale"
+				label="Cloud Scale"
+				description="Lower values create larger clouds"
 				input={
 					<NumberInput
-						id="other-percentage"
-						value={atmosphere.composition.other}
-						disabled={true}
-						min={0}
-						max={100}
-						step={0.1}
-						onChange={() => {}}
+						id="cloud-scale"
+						value={clouds.altitude}
+						onChange={(value) =>
+							handleCloudPropertyChange('altitude', value)
+						}
+						min={0.01}
+						max={1}
+						step={0.01}
 					/>
 				}
-				unit={<SimpleUnit unit="%" />}
+			/> */}
+
+			<InputWrapper
+				id="cloud-color"
+				label="Cloud Color"
+				description="Choose the color of the cloud layer"
+				input={
+					<input
+						type="color"
+						id="cloud-color"
+						value={clouds.color || '#FFFFFF'}
+						onChange={(e) => {
+							const updatedClouds = {
+								...clouds,
+								color: e.target.value,
+							};
+							onAtmosphereChange({
+								...atmosphere,
+								clouds: updatedClouds,
+							});
+						}}
+						className="form-control form-control-color"
+					/>
+				}
 			/>
+
+			<InputWrapper
+				id="cloud-speed"
+				label="Cloud Movement Speed"
+				description="Higher values create faster-moving cloud systems"
+				input={
+					<NumberInput
+						id="cloud-speed"
+						value={clouds.speed}
+						onChange={(value) =>
+							handleCloudPropertyChange('speed', value)
+						}
+						min={0}
+						max={5}
+						step={0.1}
+					/>
+				}
+			/>
+
+			{/* Advanced Toggle */}
+			<div className="mb-3 mt-4">
+				<button
+					className="btn btn-secondary w-100"
+					onClick={() => setShowAdvanced(!showAdvanced)}
+				>
+					{showAdvanced ? 'Hide' : 'Show'} Advanced Settings
+				</button>
+			</div>
+
+			{/* Gas Composition (Advanced Section) */}
+			{showAdvanced && (
+				<div className="mt-4">
+					<h4>Gas Composition</h4>
+					<p>
+						Values affect atmospheric mass, greenhouse effects, and
+						opacity.
+					</p>
+					{[
+						{
+							key: 'n2',
+							label: 'Nitrogen (N₂)',
+							mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.N2,
+						},
+						{
+							key: 'o2',
+							label: 'Oxygen (O₂)',
+							mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.O2,
+						},
+						{
+							key: 'co2',
+							label: 'Carbon Dioxide (CO₂)',
+							mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.CO2,
+						},
+						{
+							key: 'ch4',
+							label: 'Methane (CH₄)',
+							mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.CH4,
+						},
+						{
+							key: 'h2o',
+							label: 'Water Vapor (H₂O)',
+							mass: ATMOSPHERIC_CONSTANTS.MOLECULAR_MASSES.H2O,
+						},
+					].map(({ key, label, mass }) => (
+						<InputWrapper
+							key={key}
+							id={`${key}-percentage`}
+							label={label}
+							input={
+								<NumberInput
+									id={`${key}-percentage`}
+									value={
+										atmosphere.composition[
+											key as keyof typeof atmosphere.composition
+										] || 0
+									}
+									onChange={(value) =>
+										handleGasChange(key, value)
+									}
+									min={0}
+									max={100}
+									step={0.1}
+								/>
+							}
+							unit={<SimpleUnit unit="%" />}
+						/>
+					))}
+
+					<InputWrapper
+						id="other-percentage"
+						label="Other Gases"
+						description="Automatically calculated from remaining percentage"
+						input={
+							<NumberInput
+								id="other-percentage"
+								value={atmosphere.composition.other}
+								disabled={true}
+								min={0}
+								max={100}
+								step={0.1}
+								onChange={() => {}}
+							/>
+						}
+						unit={<SimpleUnit unit="%" />}
+					/>
+				</div>
+			)}
 		</div>
 	);
 }
