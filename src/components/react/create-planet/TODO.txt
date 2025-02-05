@@ -1,4 +1,4 @@
 TODO:
-- Add Clouds
+- Add Cloud Seed and Update clouds a little bit. Potentially remove opacity effects from gas
 - Biomes and life options
-
+- Update how gas planets work. Thicker atmosphere / smaller surface
