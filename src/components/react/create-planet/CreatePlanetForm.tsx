@@ -4,7 +4,7 @@ import AtmosphereForm from './AtmosphereForm';
 import { usePlanet } from './PlanetContext';
 
 export default function CreatePlanetForm() {
-	const [activeTab, setActiveTab] = useState('size');
+	const [activeTab, setActiveTab] = useState('surface');
 	const { atmosphere, setAtmosphere } = usePlanet();
 
 	const tabs = [
