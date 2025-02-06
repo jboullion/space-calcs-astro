@@ -37,8 +37,6 @@ export default function AtmosphereForm({
 }) {
 	const [showAdvanced, setShowAdvanced] = useState(false);
 
-	// Ensure clouds object exists with defaults
-	// Ensure clouds object exists with defaults
 	const defaultClouds: CloudProperties = {
 		enabled: true,
 		density: 0.8,

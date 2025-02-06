@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import SizeForm from './SizeForm';
-import VisualsForm from './VisualsForm';
 import AtmosphereForm from './AtmosphereForm';
 import { usePlanet } from './PlanetContext';
 
@@ -9,8 +8,7 @@ export default function CreatePlanetForm() {
 	const { atmosphere, setAtmosphere } = usePlanet();
 
 	const tabs = [
-		{ value: 'size', label: 'Size' },
-		{ value: 'visuals', label: 'Visuals' },
+		{ value: 'surface', label: 'Surface' },
 		{ value: 'atmosphere', label: 'Atmosphere' },
 	];
 
@@ -32,8 +30,7 @@ export default function CreatePlanetForm() {
 				))}
 			</div>
 			<form className="calc-form">
-				{activeTab === 'size' && <SizeForm />}
-				{activeTab === 'visuals' && <VisualsForm />}
+				{activeTab === 'surface' && <SizeForm />}
 				{activeTab === 'atmosphere' && (
 					<AtmosphereForm
 						atmosphere={atmosphere}

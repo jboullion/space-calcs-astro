@@ -187,8 +187,9 @@ extend({ CloudMaterial });
 
 export interface CloudLayerProps {
 	radius: number;
+	effectiveSurfaceRadius: number;
 	cloudSeed?: number;
-	cloudScale?: number;
+	cloudAltitude?: number;
 	cloudDensity?: number;
 	cloudColor?: string;
 	rotationSpeed?: number;
@@ -196,8 +197,9 @@ export interface CloudLayerProps {
 
 export default function CloudLayer({
 	radius,
+	effectiveSurfaceRadius,
 	cloudSeed = Math.random() * 100,
-	cloudScale = 1.0,
+	cloudAltitude = 0.2,
 	cloudDensity = 0.5,
 	cloudColor = '#ffffff',
 	rotationSpeed = 0.1,
@@ -207,6 +209,8 @@ export default function CloudLayer({
 	const [time, setTime] = useState(0);
 
 	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
+	const cloudLayerRadius = effectiveSurfaceRadius * 1.01;
+
 	const color = useMemo(() => new THREE.Color(cloudColor), [cloudColor]);
 
 	useFrame((state) => {
@@ -216,7 +220,7 @@ export default function CloudLayer({
 	useFrame(() => {
 		if (materialRef.current) {
 			materialRef.current.uniforms.cloudSeed.value = cloudSeed;
-			materialRef.current.uniforms.cloudScale.value = cloudScale;
+			//materialRef.current.uniforms.cloudScale.value = cloudScale;
 			materialRef.current.uniforms.cloudDensity.value = cloudDensity;
 			materialRef.current.uniforms.cloudColor.value = color;
 			materialRef.current.uniforms.time.value = time;
@@ -226,7 +230,7 @@ export default function CloudLayer({
 
 	return (
 		<mesh ref={meshRef}>
-			<sphereGeometry args={[visualRadius * 1.04, 64, 64]} />
+			<sphereGeometry args={[cloudLayerRadius, 64, 64]} />
 			{/* @ts-ignore */}
 			<cloudMaterial ref={materialRef} />
 		</mesh>

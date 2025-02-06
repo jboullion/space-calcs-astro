@@ -26,6 +26,10 @@ export default function Planet({
 	}, [roughness, seed]);
 
 	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
+	const waterRadius = visualRadius * (1 + waterLevel * 0.001);
+	const maxSurfaceHeight = visualRadius * (1 + roughness * 0.04); // 0.3 matches the displacementScale in the planet material
+	console.log({ waterRadius, maxSurfaceHeight });
+	const effectiveSurfaceRadius = Math.max(waterRadius, maxSurfaceHeight);
 
 	// Calculate cloud properties based on atmosphere
 	const clouds = atmosphere.clouds || {
@@ -34,13 +38,6 @@ export default function Planet({
 		coverage: 0.6,
 		altitude: 0.2,
 		speed: 1.0,
-	};
-
-	// Adjust cloud color based on atmospheric composition and temperature
-	const getCloudColor = () => {
-		if (atmosphere.temperature > 500) return '#FFE4B5'; // Yellowish for hot planets
-		if (atmosphere.composition.co2 > 50) return '#E3D4B0'; // Slight yellow-brown for CO2-rich
-		return '#FFFFFF'; // Default white clouds
 	};
 
 	return (
@@ -62,13 +59,7 @@ export default function Planet({
 			{/* Water layer */}
 			{waterLevel > 0 && (
 				<mesh ref={waterRef}>
-					<sphereGeometry
-						args={[
-							visualRadius * (1 + waterLevel * 0.001),
-							192,
-							192,
-						]}
-					/>
+					<sphereGeometry args={[waterRadius, 192, 192]} />
 					<meshPhysicalMaterial
 						color="#006994"
 						transparent={true}
@@ -97,13 +88,14 @@ export default function Planet({
 					{clouds.enabled && atmosphere.composition.h2o > 0 && (
 						<CloudLayer
 							radius={radius}
+							effectiveSurfaceRadius={effectiveSurfaceRadius}
 							cloudSeed={atmosphere.cloudSeed || seed}
-							cloudScale={1.0 + clouds.altitude * 5}
+							cloudAltitude={clouds.altitude}
 							cloudDensity={
 								clouds.density *
 								Math.min(1, atmosphere.pressure * 0.5)
 							}
-							cloudColor={clouds.color || '#FFFFFF'} // Use cloud color from properties
+							cloudColor={clouds.color || '#FFFFFF'}
 							rotationSpeed={
 								clouds.speed *
 								Math.min(0.2, atmosphere.pressure * 0.02)
