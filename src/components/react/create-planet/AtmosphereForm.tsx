@@ -44,6 +44,7 @@ export default function AtmosphereForm({
 		altitude: 0.02,
 		speed: 1.0,
 		color: '#FFFFFF', // Add default white color
+		cloudSeed: Math.random() * 100,
 	};
 
 	const clouds = atmosphere.clouds || defaultClouds;
@@ -166,43 +167,6 @@ export default function AtmosphereForm({
 				}
 			/>
 
-			{/* <InputWrapper
-				id="cloud-coverage"
-				label="Cloud Coverage"
-				tooltip="Amount of cloud coverage across the planet"
-				description="Higher values create more extensive cloud systems"
-				input={
-					<NumberInput
-						id="cloud-coverage"
-						value={clouds.coverage}
-						onChange={(value) =>
-							handleCloudPropertyChange('coverage', value)
-						}
-						min={0}
-						max={10}
-						step={0.1}
-					/>
-				}
-			/> */}
-
-			{/* <InputWrapper
-				id="cloud-scale"
-				label="Cloud Scale"
-				description="Lower values create larger clouds"
-				input={
-					<NumberInput
-						id="cloud-scale"
-						value={clouds.altitude}
-						onChange={(value) =>
-							handleCloudPropertyChange('altitude', value)
-						}
-						min={0.01}
-						max={1}
-						step={0.01}
-					/>
-				}
-			/> */}
-
 			<InputWrapper
 				id="cloud-color"
 				label="Cloud Color"
@@ -245,11 +209,32 @@ export default function AtmosphereForm({
 				}
 			/>
 
+			{/* <InputWrapper
+				id="cloud-seed"
+				label="Cloud Seed"
+				description="Random seed for cloud generation"
+				input={
+					<NumberInput
+						id="cloud-seed"
+						value={clouds.cloudSeed}
+						onChange={(value) =>
+							handleCloudPropertyChange('cloudSeed', value)
+						}
+						min={0}
+						max={1000000}
+						step={100}
+					/>
+				}
+			/> */}
+
 			{/* Advanced Toggle */}
 			<div className="mb-3 mt-4">
 				<button
 					className="btn btn-secondary w-100"
-					onClick={() => setShowAdvanced(!showAdvanced)}
+					onClick={(e) => {
+						e.preventDefault();
+						setShowAdvanced(!showAdvanced);
+					}}
 				>
 					{showAdvanced ? 'Hide' : 'Show'} Advanced Settings
 				</button>

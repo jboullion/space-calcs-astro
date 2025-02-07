@@ -160,7 +160,6 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		link: '/calcs/project-hyperion',
 		sponsor: 'Nexus Aurora',
 		sponsorImg: '/images/sponsors/na-logo.png',
-		newTab: true,
 	},
 	{
 		id: 'rocket-performance',

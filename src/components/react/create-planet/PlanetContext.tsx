@@ -27,8 +27,9 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 			coverage: 0.6,
 			altitude: 0.02,
 			speed: 1.0,
+			color: '#FFFFFF',
+			cloudSeed: Math.floor(Math.random() * 1000000),
 		},
-		cloudSeed: Math.floor(Math.random() * 1000000),
 	});
 
 	const value = {

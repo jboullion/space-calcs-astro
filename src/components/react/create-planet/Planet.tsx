@@ -28,7 +28,6 @@ export default function Planet({
 	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
 	const waterRadius = visualRadius * (1 + waterLevel * 0.001);
 	const maxSurfaceHeight = visualRadius * (1 + roughness * 0.04); // 0.3 matches the displacementScale in the planet material
-	console.log({ waterRadius, maxSurfaceHeight });
 	const effectiveSurfaceRadius = Math.max(waterRadius, maxSurfaceHeight);
 
 	// Calculate cloud properties based on atmosphere
@@ -38,6 +37,8 @@ export default function Planet({
 		coverage: 0.6,
 		altitude: 0.2,
 		speed: 1.0,
+		color: '#FFFFFF',
+		cloudSeed: Math.floor(Math.random() * 1000000),
 	};
 
 	return (
@@ -86,21 +87,28 @@ export default function Planet({
 				<>
 					{/* Only show clouds if we have enough atmosphere and water vapor */}
 					{clouds.enabled && atmosphere.composition.h2o > 0 && (
-						<CloudLayer
-							radius={radius}
-							effectiveSurfaceRadius={effectiveSurfaceRadius}
-							cloudSeed={atmosphere.cloudSeed || seed}
-							cloudAltitude={clouds.altitude}
-							cloudDensity={
-								clouds.density *
-								Math.min(1, atmosphere.pressure * 0.5)
-							}
-							cloudColor={clouds.color || '#FFFFFF'}
-							rotationSpeed={
-								clouds.speed *
-								Math.min(0.2, atmosphere.pressure * 0.02)
-							}
-						/>
+						<>
+							<CloudLayer
+								radius={radius}
+								effectiveSurfaceRadius={effectiveSurfaceRadius}
+								cloudSeed={clouds.cloudSeed}
+								cloudDensity={clouds.density}
+								cloudColor={clouds?.color || '#FFFFFF'}
+								rotationSpeed={clouds.speed}
+								layerType="puffy"
+							/>
+
+							{/* <CloudLayer
+								radius={radius}
+								effectiveSurfaceRadius={effectiveSurfaceRadius}
+								cloudSeed={clouds.cloudSeed}
+								cloudDensity={clouds.density * 0.25}
+								cloudColor={clouds.color || '#FFFFFF'}
+								rotationSpeed={clouds.speed * 0.5}
+								layerType="stratus"
+								stratusDetail={5.0}
+							/> */}
+						</>
 					)}
 					<Atmosphere
 						radius={radius}
