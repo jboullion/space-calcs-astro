@@ -1,8 +1,11 @@
 TODO:
 - Biomes and life options
 - Update how gas planets work. Thicker atmosphere / smaller surface
-- Fix the cloud height to prevent water
 - Setup export / hashed query params
+
+- Hide surface tab when isGasGiant is true. 
+- Add a new tab for manipulating gas giant parameters
+
 
 
 - bigred Note
