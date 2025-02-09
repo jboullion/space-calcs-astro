@@ -107,6 +107,10 @@ h1 {
 	cursor: pointer;
 }
 
+.cursor-default {
+	cursor: default !important;
+}
+
 .rtl {
 	direction: rtl;
 }

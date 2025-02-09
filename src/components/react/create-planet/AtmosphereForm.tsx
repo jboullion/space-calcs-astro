@@ -147,7 +147,7 @@ export default function AtmosphereForm({
 			/>
 
 			{/* Cloud Properties */}
-			<h5 className="mt-4 mb-3">Cloud Properties</h5>
+			<h5 className="mt-4 mb-3 cursor-default">Cloud Properties</h5>
 
 			<InputWrapper
 				id="cloud-density"
@@ -159,6 +159,24 @@ export default function AtmosphereForm({
 						value={clouds.density}
 						onChange={(value) =>
 							handleCloudPropertyChange('density', value)
+						}
+						min={0}
+						max={5}
+						step={0.1}
+					/>
+				}
+			/>
+
+			<InputWrapper
+				id="cloud-speed"
+				label="Cloud Movement Speed"
+				description="Higher values create faster-moving cloud systems"
+				input={
+					<NumberInput
+						id="cloud-speed"
+						value={clouds.speed}
+						onChange={(value) =>
+							handleCloudPropertyChange('speed', value)
 						}
 						min={0}
 						max={5}
@@ -187,24 +205,6 @@ export default function AtmosphereForm({
 							});
 						}}
 						className="form-control form-control-color"
-					/>
-				}
-			/>
-
-			<InputWrapper
-				id="cloud-speed"
-				label="Cloud Movement Speed"
-				description="Higher values create faster-moving cloud systems"
-				input={
-					<NumberInput
-						id="cloud-speed"
-						value={clouds.speed}
-						onChange={(value) =>
-							handleCloudPropertyChange('speed', value)
-						}
-						min={0}
-						max={5}
-						step={0.1}
 					/>
 				}
 			/>

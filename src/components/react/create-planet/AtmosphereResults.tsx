@@ -90,10 +90,10 @@ const AtmosphereResults: React.FC<AtmosphereResultsProps> = ({
 				<th>Scale Height</th>
 				<td>{formatNumber(scaleHeight)} km</td>
 			</tr>
-			<tr>
+			{/* <tr>
 				<th>Tropopause Height</th>
 				<td>{formatNumber(tropopauseHeight)} km</td>
-			</tr>
+			</tr> */}
 			<tr>
 				<th>Average Molecular Mass</th>
 				<td>{formatNumber(avgMolecularMass)} g/mol</td>

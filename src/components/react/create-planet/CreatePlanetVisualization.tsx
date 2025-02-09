@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import type { CreatePlanetVisualizationProps } from './types';
 import Planet from './Planet';
+import GasGiantAtmosphere from './GasGiantAtmosphere';
 
 export default function CreatePlanetVisualization({
 	radius,
@@ -10,6 +11,7 @@ export default function CreatePlanetVisualization({
 	roughness,
 	seed,
 	atmosphere,
+	planetType,
 }: CreatePlanetVisualizationProps) {
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -24,7 +26,10 @@ export default function CreatePlanetVisualization({
 		return Math.max(20, distance); // Ensure minimum distance of 20
 	}, [radius]);
 
-	// Handle loading state
+	const isGasGiant = useMemo(() => {
+		return ['gas_giant', 'ice_giant'].includes(planetType);
+	}, [planetType]);
+
 	const handleSceneLoad = () => {
 		setIsLoading(false);
 	};
@@ -52,13 +57,20 @@ export default function CreatePlanetVisualization({
 				/>
 				<pointLight position={[-10, -10, -5]} intensity={0.5} />
 
-				<Planet
-					radius={radius}
-					waterLevel={waterLevel}
-					roughness={roughness}
-					seed={seed}
-					atmosphere={atmosphere}
-				/>
+				{isGasGiant ? (
+					<GasGiantAtmosphere
+						radius={radius}
+						atmosphere={atmosphere}
+					/>
+				) : (
+					<Planet
+						radius={radius}
+						waterLevel={waterLevel}
+						roughness={roughness}
+						seed={seed}
+						atmosphere={atmosphere}
+					/>
+				)}
 
 				<OrbitControls
 					enableZoom={true}

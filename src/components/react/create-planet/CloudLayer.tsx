@@ -136,11 +136,17 @@ class CloudMaterial extends THREE.ShaderMaterial {
                     float noise = 0.0;
                     vec3 coords = normalize(vPosition) * cloudScale;
                     
+                    
+                    // Separate base position from movement
+                    float baseRotation = cloudSeed * 0.1;
+                    vec3 baseCoords = rotateY(coords, baseRotation);
+                    
+                    // Apply movement rotation
                     float t1 = time * rotationSpeed;
                     float t2 = time * rotationSpeed * 0.7;
                     float t3 = time * rotationSpeed * 0.3;
                     
-                    vec3 rotatedCoords = rotateY(coords, t1);
+                    vec3 rotatedCoords = rotateY(baseCoords, t1);
                     
                     if (layerType < 0.5) {
                         // Puffy cumulus-style clouds
@@ -220,7 +226,7 @@ export interface CloudLayerProps {
 
 export default function CloudLayer({
 	radius,
-	effectiveSurfaceRadius,
+	effectiveSurfaceRadius = radius,
 	cloudSeed = Math.random() * 100,
 	cloudScale = 1.0,
 	cloudDensity = 0.5,
@@ -234,8 +240,8 @@ export default function CloudLayer({
 	const materialRef = useRef<CloudMaterial>(null);
 	const [time, setTime] = useState(0);
 
-	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
-	const cloudRadius = effectiveSurfaceRadius || visualRadius * 1.04;
+	//const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
+	const cloudRadius = effectiveSurfaceRadius * 1.01;
 	const color = useMemo(() => new THREE.Color(cloudColor), [cloudColor]);
 
 	useFrame((state) => {

@@ -12,6 +12,7 @@ export interface CreatePlanetVisualizationProps {
 	roughness: number;
 	seed: number;
 	atmosphere: AtmosphereProperties;
+	planetType: string;
 }
 
 export interface CreatePlanetFormProps {
@@ -44,7 +45,7 @@ export interface AtmosphereProperties {
 	temperature: number; // in Kelvin
 	customColor?: string; // hex color code
 	fullOpacity?: boolean; // whether to allow full opacity
-	clouds?: CloudProperties;
+	clouds: CloudProperties;
 	composition: {
 		n2: number; // percentage
 		o2: number; // percentage
@@ -69,4 +70,14 @@ export interface PlanetContextType {
 	setSeed: (value: number) => void;
 	atmosphere: AtmosphereProperties;
 	setAtmosphere: (value: AtmosphereProperties) => void;
+	planetType: string;
+	setPlanetType: (value: string) => void;
 }
+
+export type PlanetType =
+	| 'custom'
+	| 'dwarf_planet'
+	| 'terrestrial'
+	| 'super_earth'
+	| 'ice_giant'
+	| 'gas_giant';

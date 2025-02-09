@@ -18,8 +18,15 @@ function formatNumber(value: number, precision: number = 2): string {
 }
 
 function PlanetCalculator() {
-	const { radius, density, waterLevel, roughness, seed, atmosphere } =
-		usePlanet();
+	const {
+		radius,
+		density,
+		waterLevel,
+		roughness,
+		seed,
+		atmosphere,
+		planetType,
+	} = usePlanet();
 
 	// Calculate derived properties
 	const planetProperties = useMemo(() => {
@@ -79,6 +86,7 @@ function PlanetCalculator() {
 					roughness={roughness}
 					seed={seed}
 					atmosphere={atmosphere}
+					planetType={planetType}
 				/>
 			</div>
 		</div>

@@ -1,9 +1,8 @@
 TODO:
-- Move Clouds and atmosphere color to visuals tab
-- Move clouds above water level if it is higher than the surface.
-- Add Cloud Seed and Update clouds a little bit. Potentially remove opacity effects from gas
 - Biomes and life options
 - Update how gas planets work. Thicker atmosphere / smaller surface
+- Fix the cloud height to prevent water
+- Setup export / hashed query params
 
 
 - bigred Note

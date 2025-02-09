@@ -31,6 +31,7 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 			cloudSeed: Math.floor(Math.random() * 1000000),
 		},
 	});
+	const [planetType, setPlanetType] = useState('terrestrial');
 
 	const value = {
 		radius,
@@ -45,6 +46,8 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 		setSeed,
 		atmosphere,
 		setAtmosphere,
+		planetType,
+		setPlanetType,
 	};
 
 	return (

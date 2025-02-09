@@ -1,3 +1,5 @@
+import type { AtmosphereProperties, PlanetType } from './types';
+
 export const ATMOSPHERIC_CONSTANTS = {
 	R: 8.314462618, // Universal gas constant in J/(mol·K)
 	k: 1.380649e-23, // Boltzmann constant in J/K
@@ -13,8 +15,67 @@ export const ATMOSPHERIC_CONSTANTS = {
 	},
 };
 
+export const PLANET_TYPES: { value: PlanetType; label: string }[] = [
+	{ value: 'custom', label: 'Custom' },
+	{ value: 'dwarf_planet', label: 'Dwarf Planet' },
+	{ value: 'terrestrial', label: 'Terrestrial (Earth-like)' },
+	{ value: 'super_earth', label: 'Super Earth' },
+	{ value: 'ice_giant', label: 'Ice Giant (Neptune-like)' },
+	{ value: 'gas_giant', label: 'Gas Giant (Jupiter-like)' },
+];
+
 export const PLANET_PRESETS = {
-	earth: {
+	asteroid: {
+		radius: 500,
+		density: 2000,
+		atmosphere: 0,
+		waterLevel: 0,
+		atmosphereColor: '#88AAFF',
+		composition: {
+			n2: 0,
+			o2: 0,
+			co2: 0,
+			ch4: 0,
+			h2o: 0,
+			other: 0,
+		},
+		temperature: 200,
+		clouds: {
+			enabled: false,
+			density: 0,
+			coverage: 0,
+			altitude: 0,
+			speed: 0,
+			color: '#FFFFFF',
+			cloudSeed: Math.random() * 100,
+		},
+	},
+	dwarf_planet: {
+		radius: 1200,
+		density: 2200,
+		atmosphere: 0,
+		waterLevel: 0,
+		atmosphereColor: '#88AAFF',
+		composition: {
+			n2: 0,
+			o2: 0,
+			co2: 0,
+			ch4: 0,
+			h2o: 0,
+			other: 0,
+		},
+		temperature: 150,
+		clouds: {
+			enabled: false,
+			density: 0,
+			coverage: 0,
+			altitude: 0,
+			speed: 0,
+			color: '#FFFFFF',
+			cloudSeed: Math.random() * 100,
+		},
+	},
+	terrestrial: {
 		radius: 6371,
 		density: 5500,
 		atmosphere: 1,
@@ -36,9 +97,60 @@ export const PLANET_PRESETS = {
 			altitude: 0.02,
 			speed: 1.0,
 			color: '#FFFFFF',
+			cloudSeed: Math.random() * 100,
 		},
 	},
-	jupiter: {
+	super_earth: {
+		radius: 12742, // Double Earth's radius
+		density: 6000,
+		atmosphere: 2,
+		waterLevel: 3,
+		atmosphereColor: '#88AAFF',
+		composition: {
+			n2: 75,
+			o2: 23,
+			co2: 0.1,
+			ch4: 0.01,
+			h2o: 1.5,
+			other: 0.39,
+		},
+		temperature: 295,
+		clouds: {
+			enabled: true,
+			density: 0.9,
+			coverage: 0.7,
+			altitude: 0.02,
+			speed: 1.2,
+			color: '#FFFFFF',
+			cloudSeed: Math.random() * 100,
+		},
+	},
+	ice_giant: {
+		radius: 24622, // Similar to Neptune
+		density: 1638,
+		atmosphere: 50,
+		waterLevel: 0,
+		atmosphereColor: '#4169E1', // Royal Blue
+		composition: {
+			n2: 1.5,
+			o2: 0,
+			co2: 0,
+			ch4: 2.3,
+			h2o: 0.2,
+			other: 96,
+		},
+		temperature: 72,
+		clouds: {
+			enabled: true,
+			density: 0.95,
+			coverage: 0.8,
+			altitude: 0.04,
+			speed: 1.8,
+			color: '#87CEEB', // Sky Blue
+			cloudSeed: Math.random() * 100,
+		},
+	},
+	gas_giant: {
 		radius: 69911,
 		density: 1326,
 		atmosphere: 100,
@@ -55,11 +167,12 @@ export const PLANET_PRESETS = {
 		temperature: 165,
 		clouds: {
 			enabled: true,
-			density: 1.0, // Dense cloud system
-			coverage: 0.9, // High coverage
-			altitude: 0.05, // Higher cloud layer
-			speed: 2.0, // Faster rotation for gas giant
+			density: 1.0,
+			coverage: 0.9,
+			altitude: 0.05,
+			speed: 2.0,
 			color: '#E3D4B0',
+			cloudSeed: Math.random() * 100,
 		},
 	},
 	mars: {
@@ -79,11 +192,12 @@ export const PLANET_PRESETS = {
 		temperature: 210,
 		clouds: {
 			enabled: true,
-			density: 0.3, // Thin clouds
-			coverage: 0.2, // Low coverage
-			altitude: 0.03, // Similar height to Earth
-			speed: 0.8, // Slower rotation
+			density: 0.3,
+			coverage: 0.2,
+			altitude: 0.03,
+			speed: 0.8,
 			color: '#FFFFFF',
+			cloudSeed: Math.random() * 100,
 		},
 	},
 	venus: {
@@ -103,11 +217,12 @@ export const PLANET_PRESETS = {
 		temperature: 737,
 		clouds: {
 			enabled: true,
-			density: 1.0, // Very dense clouds
-			coverage: 1.0, // Complete coverage
-			altitude: 0.04, // Higher cloud layer
-			speed: 1.5, // Faster rotation
-			color: '#FFE4B5',
+			density: 1.0,
+			coverage: 1.0,
+			altitude: 0.04,
+			speed: 1.5,
+			color: '#FFF5E1',
+			cloudSeed: Math.random() * 100,
 		},
 	},
 };

@@ -33,29 +33,27 @@ export default function Atmosphere({
 	};
 
 	// Calculate weighted opacity based on composition
-	const compositionOpacity = Object.entries(atmosphere.composition).reduce(
-		(sum, [gas, percentage]) => {
-			return (
-				sum +
-				(opacityFactors[gas as keyof typeof opacityFactors] *
-					percentage) /
-					100
-			);
-		},
-		0,
-	);
+	// const compositionOpacity = Object.entries(atmosphere.composition).reduce(
+	// 	(sum, [gas, percentage]) => {
+	// 		return (
+	// 			sum +
+	// 			(opacityFactors[gas as keyof typeof opacityFactors] *
+	// 				percentage) /
+	// 				100
+	// 		);
+	// 	},
+	// 	0,
+	// );
 
 	// Calculate final opacity considering both pressure and composition
 	const atmosphereOpacity = Math.min(
 		1,
-		atmosphere.pressure * 0.1 * compositionOpacity,
+		atmosphere.pressure * 0.1, // * compositionOpacity,
 	);
 
 	// Transmission now factors in composition
 	const transmission = Number(
-		(0.98 / (1 + atmosphere.pressure * 0.15 * compositionOpacity)).toFixed(
-			3,
-		),
+		(0.98 / (1 + atmosphere.pressure * 0.15)).toFixed(3), //  * compositionOpacity
 	);
 
 	return (

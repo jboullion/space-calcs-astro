@@ -11,8 +11,6 @@ export default function SizeForm() {
 		setRadius,
 		density,
 		setDensity,
-		atmosphere,
-		setAtmosphere,
 		waterLevel,
 		setWaterLevel,
 		roughness,
@@ -21,45 +19,8 @@ export default function SizeForm() {
 		setSeed,
 	} = usePlanet();
 
-	const handlePresetChange = (
-		event: React.ChangeEvent<HTMLSelectElement>,
-	) => {
-		const preset =
-			PLANET_PRESETS[event.target.value as keyof typeof PLANET_PRESETS];
-		if (preset) {
-			setRadius(preset.radius);
-			setDensity(preset.density);
-			setWaterLevel(preset.waterLevel);
-			setAtmosphere({
-				...atmosphere,
-				pressure: preset.atmosphere,
-				composition: preset.composition,
-				customColor: preset.atmosphereColor,
-				temperature: preset.temperature,
-			});
-		}
-	};
-
 	return (
 		<div>
-			<InputWrapper
-				id="planet-preset"
-				label="Planet Type"
-				description="Select a preset or customize values below"
-				input={
-					<select
-						className="form-select"
-						onChange={handlePresetChange}
-					>
-						<option value="">Custom</option>
-						<option value="earth">Earth-like</option>
-						<option value="jupiter">Gas Giant</option>
-						<option value="mars">Mars-like</option>
-						<option value="venus">Venus-like</option>
-					</select>
-				}
-			/>
-
 			<InputWrapper
 				id="radius"
 				label="Planet Radius"
@@ -132,7 +93,7 @@ export default function SizeForm() {
 
 			<InputWrapper
 				id="seed"
-				label="Seed"
+				label="Surface Seed"
 				description="The seed for the planet generation"
 				input={
 					<NumberInput id="seed" value={seed} onChange={setSeed} />

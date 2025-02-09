@@ -28,5 +28,20 @@ export default defineConfig({
 				),
 			},
 		},
+		assetsInclude: ['**/*.vert', '**/*.frag'],
+		plugins: [
+			{
+				name: 'glsl',
+				transform(code, id) {
+					if (/\.(vert|frag)$/.test(id)) {
+						const content = JSON.stringify(code);
+						return {
+							code: `export default ${content};`,
+							map: null,
+						};
+					}
+				},
+			},
+		],
 	},
 });
