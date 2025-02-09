@@ -6,6 +6,7 @@ import {
 	LIFE_CAT,
 	ORBIT_CAT,
 	ROCKET_CAT,
+	OTHER_CAT,
 	categories,
 } from '../components/vue/home/constants';
 
@@ -177,11 +178,20 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/create-planet',
 	},
+	{
+		id: 'asteroid-impact',
+		name: 'Asteroid Impact',
+		description: 'Calculate the impact of an asteroid on a planet',
+		categories: [categories[OTHER_CAT]],
+		image: '',
+		link: '/calcs/asteroid-impact',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
 	// 	description: 'Calculate the transfer window between two planets',
 	// 	categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
+
 	// 	image: '',
 	// 	link: '/calcs/transfer-window',
 	// },

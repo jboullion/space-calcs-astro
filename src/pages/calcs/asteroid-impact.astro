@@ -1,0 +1,38 @@
+---
+import type { Reference } from '../../types/types';
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+import AsteroidImpactComponent from '../../components/react/asteroid-impact/AsteroidImpact';
+import References from '../../components/shared/References.astro';
+import { calculators } from '../../utils/calculator-list';
+
+const calculator = calculators.find((calc) => calc.id === 'asteroid-impact');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+// const references: Reference[] = [
+//     {
+//         title: 'Earth Impact Effects Program',
+//         url: 'https://impact.ese.ic.ac.uk/ImpactEarth/ImpactEffects/'
+//     },
+//     {
+//         title: 'Impact Cratering Mechanics',
+//         url: 'https://www.lpi.usra.edu/science/kring/epo_web/impact_cratering/intro/'
+//     }
+// ];
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div style="min-height: 700px;" class="calculator">
+            <AsteroidImpactComponent client:load />
+        </div>
+
+        <!-- <References references={references} /> -->
+    </div>
+</Layout>
+
+<style></style>

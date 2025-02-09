@@ -12,6 +12,7 @@ export const HABITAT_CAT = 2;
 export const LIFE_CAT = 3;
 export const ORBIT_CAT = 4;
 export const ROCKET_CAT = 5;
+export const OTHER_CAT = 6;
 // export const STATION_CAT = 6;
 
 export const categories: Category[] = [
@@ -52,6 +53,12 @@ export const categories: Category[] = [
 		slug: 'rockets',
 		color: 'sc-red',
 		icon: 'fa-rocket',
+	},
+	{
+		name: 'Other',
+		slug: 'other',
+		color: 'white',
+		icon: 'fa-toolbox ',
 	},
 	// {
 	// 	name: 'Stations',
