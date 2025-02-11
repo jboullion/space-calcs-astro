@@ -49,6 +49,7 @@ export const PLANET_PRESETS = {
 			color: '#FFFFFF',
 			cloudSeed: Math.random() * 100,
 		},
+		gasGiantVisuals: null,
 	},
 	dwarf_planet: {
 		radius: 1200,
@@ -130,7 +131,7 @@ export const PLANET_PRESETS = {
 		density: 1638,
 		atmosphere: 50,
 		waterLevel: 0,
-		atmosphereColor: '#4169E1', // Royal Blue
+		atmosphereColor: '#4169E1', // Royal Blue for atmosphere glow
 		composition: {
 			n2: 1.5,
 			o2: 0,
@@ -146,8 +147,23 @@ export const PLANET_PRESETS = {
 			coverage: 0.8,
 			altitude: 0.04,
 			speed: 1.8,
-			color: '#87CEEB', // Sky Blue
+			color: '#87CEEB',
 			cloudSeed: Math.random() * 100,
+		},
+		gasGiantVisuals: {
+			bandCount: 8,
+			rotationSpeed: 1.2,
+			bandColors: [
+				'#2E4B8A', // Dark blue
+				'#3A5CA6',
+				'#2E4B8A',
+				'#4169E1',
+				'#2E4B8A',
+				'#3A5CA6',
+				'#2E4B8A',
+				'#4169E1',
+			],
+			bandBlending: 0.4,
 		},
 	},
 	gas_giant: {
@@ -155,7 +171,7 @@ export const PLANET_PRESETS = {
 		density: 1326,
 		atmosphere: 100,
 		waterLevel: 0,
-		atmosphereColor: '#C88B3A',
+		atmosphereColor: '#C88B3A', // Atmosphere glow color
 		composition: {
 			n2: 0.1,
 			o2: 0,
@@ -173,6 +189,21 @@ export const PLANET_PRESETS = {
 			speed: 2.0,
 			color: '#E3D4B0',
 			cloudSeed: Math.random() * 100,
+		},
+		gasGiantVisuals: {
+			bandCount: 8,
+			rotationSpeed: 1.0,
+			bandColors: [
+				'#A86920', // Dark brown
+				'#C88B3A', // Light brown
+				'#A86920',
+				'#D89C4A', // Tan
+				'#A86920',
+				'#C88B3A',
+				'#A86920',
+				'#D89C4A',
+			],
+			bandBlending: 0.4,
 		},
 	},
 	mars: {

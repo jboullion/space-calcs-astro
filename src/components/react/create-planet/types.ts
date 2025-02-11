@@ -3,7 +3,7 @@ export interface PlanetProps {
 	waterLevel: number;
 	roughness: number;
 	seed: number;
-	atmosphere: AtmosphereProperties;
+	atmosphere: AtmosphereProperties | null;
 }
 
 export interface CreatePlanetVisualizationProps {
@@ -54,6 +54,7 @@ export interface AtmosphereProperties {
 		h2o: number; // percentage
 		other: number; // percentage
 	};
+	gasGiantVisuals?: GasGiantVisuals;
 }
 
 export interface PlanetContextType {
@@ -81,3 +82,10 @@ export type PlanetType =
 	| 'super_earth'
 	| 'ice_giant'
 	| 'gas_giant';
+
+export interface GasGiantVisuals {
+	bandCount: number;
+	rotationSpeed: number;
+	bandColors: string[];
+	bandBlending: number;
+}

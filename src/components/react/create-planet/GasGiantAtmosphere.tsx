@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
 import { extend, useFrame } from '@react-three/fiber';
-import type { AtmosphereProperties } from './types';
+import type { AtmosphereProperties, GasGiantVisuals } from './types';
 
 const fragmentShader = `
 uniform float time;
@@ -144,31 +144,40 @@ void main() {
 
 // Custom shader material for gas giant bands
 class GasGiantMaterial extends THREE.ShaderMaterial {
-	constructor() {
+	constructor(gasVisuals?: GasGiantVisuals) {
+		const defaultVisuals: GasGiantVisuals = {
+			bandCount: 8,
+			rotationSpeed: 1.0,
+			bandColors: [
+				'#C88B3A',
+				'#B87A30',
+				'#D89C4A',
+				'#A86920',
+				'#C88B3A',
+				'#B87A30',
+				'#D89C4A',
+				'#A86920',
+			],
+			bandBlending: 0.4,
+		};
+
+		const visuals = gasVisuals || defaultVisuals;
+		const rotationSpeeds = Array.from(
+			{ length: 8 },
+			(_, i) => visuals.rotationSpeed * (1 + (i % 2 ? 0.2 : -0.2)),
+		);
+
+		const bandColorObjects = visuals.bandColors.map(
+			(color) => new THREE.Color(color),
+		);
+
 		super({
 			uniforms: {
 				time: { value: 0 },
-				baseColor: { value: new THREE.Color() },
-				bandCount: { value: 8.0 },
-				turbulence: { value: 0.5 },
-				rotationSpeeds: {
-					value: [1.0, 1.2, 0.8, 1.1, 0.9, 1.3, 0.7, 1.0],
-				},
-				bandColors: {
-					value: [
-						new THREE.Color('#C88B3A'),
-						new THREE.Color('#B87A30'),
-						new THREE.Color('#D89C4A'),
-						new THREE.Color('#A86920'),
-						new THREE.Color('#C88B3A'),
-						new THREE.Color('#B87A30'),
-						new THREE.Color('#D89C4A'),
-						new THREE.Color('#A86920'),
-					],
-				},
-				bandEdgeTurbulence: { value: 0.5 }, // Controls amount of turbulence at band edges
-				vortexStrength: { value: 0.3 }, // Controls strength of vortex formations
-				bandBlending: { value: 0.4 }, // Controls how much bands blend together
+				bandCount: { value: visuals.bandCount },
+				rotationSpeeds: { value: rotationSpeeds },
+				bandColors: { value: bandColorObjects },
+				bandBlending: { value: visuals.bandBlending },
 			},
 			vertexShader: `
                 varying vec3 vNormal;
@@ -183,6 +192,8 @@ class GasGiantMaterial extends THREE.ShaderMaterial {
                 }
             `,
 			fragmentShader: fragmentShader,
+			transparent: true,
+			side: THREE.FrontSide,
 		});
 	}
 }
@@ -202,35 +213,55 @@ export default function GasGiantAtmosphere({
 	const materialRef = useRef<GasGiantMaterial>(null);
 	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
 
-	// Create colors based on atmosphere composition and temperature
-	const colors = useMemo(() => {
-		const baseColor = new THREE.Color(atmosphere.customColor || '#C88B3A');
-		const temp = atmosphere.temperature;
-
-		// Adjust hue and saturation based on temperature and composition
-		const hsl: THREE.HSL = { h: 0, s: 0, l: 0 };
-		baseColor.getHSL(hsl);
-
-		// Create variations for bands
-		return Array.from({ length: 8 }, (_, i) => {
-			const newColor = new THREE.Color();
-			const offset = (i % 2) * 0.1 - 0.05;
-			newColor.setHSL(
-				hsl.h + offset,
-				hsl.s * (0.8 + Math.random() * 0.4),
-				hsl.l * (0.9 + Math.random() * 0.2),
-			);
-			return newColor;
-		});
-	}, [atmosphere.customColor, atmosphere.temperature]);
+	// Get gas giant visuals from atmosphere properties or use defaults
+	const gasVisuals = useMemo(() => {
+		const defaultVisuals: GasGiantVisuals = {
+			bandCount: 8,
+			rotationSpeed: 1.0,
+			bandColors: [
+				'#C88B3A',
+				'#B87A30',
+				'#D89C4A',
+				'#A86920',
+				'#C88B3A',
+				'#B87A30',
+				'#D89C4A',
+				'#A86920',
+			],
+			bandBlending: 0.4,
+		};
+		return atmosphere.gasGiantVisuals || defaultVisuals;
+	}, [atmosphere.gasGiantVisuals]);
 
 	// Animation loop
 	useFrame((state) => {
 		if (materialRef.current) {
 			materialRef.current.uniforms.time.value =
 				state.clock.getElapsedTime();
-			materialRef.current.uniforms.bandColors.value = colors;
-			materialRef.current.uniforms.turbulence.value = 0.5;
+
+			// Update uniforms based on current gas visuals
+			materialRef.current.uniforms.bandCount.value = gasVisuals.bandCount;
+			materialRef.current.uniforms.bandBlending.value =
+				gasVisuals.bandBlending;
+
+			// Update rotation speeds with fixed length array
+			const rotationSpeeds = Array.from(
+				{ length: 16 }, // Maximum possible band count
+				(_, i) => gasVisuals.rotationSpeed * (1 + (i % 2 ? 0.2 : -0.2)),
+			);
+			materialRef.current.uniforms.rotationSpeeds.value = rotationSpeeds;
+
+			// Update band colors with padding
+			const bandColors = [...gasVisuals.bandColors];
+			while (bandColors.length < 16) {
+				bandColors.push(...gasVisuals.bandColors);
+			}
+
+			// Create a fixed-length array of THREE.Color objects
+			const colorObjects = bandColors
+				.slice(0, 16)
+				.map((color) => new THREE.Color(color));
+			materialRef.current.uniforms.bandColors.value = colorObjects;
 		}
 	});
 
@@ -240,14 +271,14 @@ export default function GasGiantAtmosphere({
 			<mesh>
 				<sphereGeometry args={[visualRadius, 64, 64]} />
 				{/* @ts-ignore */}
-				<gasGiantMaterial ref={materialRef} />
+				<gasGiantMaterial ref={materialRef} args={[gasVisuals]} />
 			</mesh>
 
 			{/* Outer atmosphere glow */}
 			<mesh>
 				<sphereGeometry args={[visualRadius * 1.02, 64, 64]} />
 				<meshPhysicalMaterial
-					color={atmosphere.customColor || '#C88B3A'}
+					color={atmosphere.customColor || '#88AAFF'}
 					transparent={true}
 					opacity={0.3}
 					depthWrite={false}
