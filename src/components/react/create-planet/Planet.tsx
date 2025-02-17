@@ -1,10 +1,11 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef, useMemo } from 'react';
 import * as THREE from 'three';
-import { generatePlanetTextures } from './functions';
+import { determineWaterPhase, generatePlanetTextures } from './functions';
 import type { PlanetProps } from './types';
 import Atmosphere from './Atmosphere';
 import CloudLayer from './CloudLayer';
+import IceLayer from './IceLayer';
 
 export default function Planet({
 	radius,
@@ -13,6 +14,7 @@ export default function Planet({
 	seed,
 	atmosphere,
 	surfaceColors,
+	surfaceTemp,
 }: PlanetProps) {
 	const planetRef = useRef<THREE.Mesh>(null);
 	const waterRef = useRef<THREE.Mesh>(null);
@@ -31,10 +33,6 @@ export default function Planet({
 		return maps;
 	}, [roughness, seed, surfaceColors]);
 
-	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
-	const waterRadius = visualRadius * (1 + waterLevel * 0.001);
-	const maxSurfaceHeight = visualRadius * (1 + roughness * 0.04); // 0.3 matches the displacementScale in the planet material
-	const effectiveSurfaceRadius = Math.max(waterRadius, maxSurfaceHeight);
 	// Calculate cloud properties based on atmosphere
 	const clouds = atmosphere?.clouds || {
 		enabled: true,
@@ -46,11 +44,35 @@ export default function Planet({
 		cloudSeed: Math.floor(Math.random() * 1000000),
 	};
 
+	const planetDimensions = useMemo(() => {
+		const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
+		const waterRadius = visualRadius * (1 + waterLevel * 0.001);
+		const maxSurfaceHeight = visualRadius * (1 + roughness * 0.04);
+		const effectiveSurfaceRadius = Math.max(waterRadius, maxSurfaceHeight);
+		const iceRadius = waterRadius * 1.002; // Ice layer slightly above water
+		const cloudRadius = effectiveSurfaceRadius * 1.02; // Clouds above ice
+
+		return {
+			visualRadius,
+			waterRadius,
+			maxSurfaceHeight,
+			effectiveSurfaceRadius,
+			iceRadius,
+			cloudRadius,
+		};
+	}, [radius, waterLevel, roughness]);
+
+	const isFrozen = useMemo(() => {
+		return surfaceTemp < 273.15 && waterLevel > 0;
+	}, [surfaceTemp, waterLevel]);
+
 	return (
 		<>
 			{/* Planet surface */}
 			<mesh ref={planetRef}>
-				<sphereGeometry args={[visualRadius, 192, 192]} />
+				<sphereGeometry
+					args={[planetDimensions.visualRadius, 192, 192]}
+				/>
 				<meshStandardMaterial
 					map={textures.colorMap}
 					normalMap={textures.normalMap}
@@ -62,29 +84,42 @@ export default function Planet({
 				/>
 			</mesh>
 
-			{/* Water layer */}
+			{/* Water and ice layers */}
 			{waterLevel > 0 && (
-				<mesh ref={waterRef}>
-					<sphereGeometry args={[waterRadius, 192, 192]} />
-					<meshPhysicalMaterial
-						color="#006994"
-						transparent={true}
-						opacity={Math.max(
-							0,
-							0.6 / (1 + (atmosphere?.pressure || 0) * 0.2),
-						)}
-						roughness={0.1}
-						metalness={0.1}
-						clearcoat={1.0}
-						clearcoatRoughness={0.1}
-						ior={1.333}
-						transmission={Math.max(
-							0.1,
-							0.5 / (1 + (atmosphere?.pressure || 0) * 0.2),
-						)}
-						thickness={1}
-					/>
-				</mesh>
+				<>
+					{/* Original water layer */}
+					<mesh ref={waterRef}>
+						<sphereGeometry
+							args={[planetDimensions.waterRadius, 192, 192]}
+						/>
+						<meshPhysicalMaterial
+							color="#006994"
+							transparent={true}
+							opacity={Math.max(
+								0,
+								0.6 / (1 + (atmosphere?.pressure || 0) * 0.2),
+							)}
+							roughness={0.1}
+							metalness={0.1}
+							clearcoat={1.0}
+							clearcoatRoughness={0.1}
+							ior={1.333}
+							transmission={Math.max(
+								0.1,
+								0.5 / (1 + (atmosphere?.pressure || 0) * 0.2),
+							)}
+							thickness={1}
+						/>
+					</mesh>
+
+					{isFrozen && (
+						<IceLayer
+							maxSurfaceHeight={planetDimensions.maxSurfaceHeight}
+							waterLevel={waterLevel}
+							temperature={surfaceTemp}
+						/>
+					)}
+				</>
 			)}
 
 			{/* Cloud and Atmosphere layers */}
@@ -94,8 +129,11 @@ export default function Planet({
 					{clouds.enabled && atmosphere.composition.h2o > 0 && (
 						<>
 							<CloudLayer
+								key={`cloud-layer-${isFrozen}`}
 								radius={radius}
-								effectiveSurfaceRadius={effectiveSurfaceRadius}
+								effectiveSurfaceRadius={
+									planetDimensions.effectiveSurfaceRadius
+								}
 								cloudSeed={clouds.cloudSeed}
 								cloudDensity={clouds.density}
 								cloudColor={clouds?.color || '#FFFFFF'}

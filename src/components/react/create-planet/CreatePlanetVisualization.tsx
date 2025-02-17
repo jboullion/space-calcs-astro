@@ -13,6 +13,7 @@ export default function CreatePlanetVisualization({
 	atmosphere,
 	planetType,
 	surfaceColors,
+	surfaceTemp,
 }: CreatePlanetVisualizationProps) {
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -71,6 +72,7 @@ export default function CreatePlanetVisualization({
 						seed={seed}
 						atmosphere={atmosphere}
 						surfaceColors={surfaceColors}
+						surfaceTemp={surfaceTemp}
 					/>
 				)}
 

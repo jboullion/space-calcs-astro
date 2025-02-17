@@ -5,6 +5,7 @@ export interface PlanetProps {
 	seed: number;
 	atmosphere: AtmosphereProperties | null;
 	surfaceColors: SurfaceColors;
+	surfaceTemp: number;
 }
 
 export interface CreatePlanetVisualizationProps {
@@ -15,6 +16,7 @@ export interface CreatePlanetVisualizationProps {
 	atmosphere: AtmosphereProperties;
 	planetType: string;
 	surfaceColors: SurfaceColors;
+	surfaceTemp: number;
 }
 
 export interface CreatePlanetFormProps {
@@ -68,7 +70,8 @@ export interface PlanetContextType {
 	setDensity: (value: number) => void;
 	waterLevel: number;
 	setWaterLevel: (value: number) => void;
-
+	surfaceTemp: number;
+	setSurfaceTemp: (value: number) => void;
 	roughness: number;
 	setRoughness: (value: number) => void;
 	seed: number;

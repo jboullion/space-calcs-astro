@@ -241,7 +241,7 @@ export default function CloudLayer({
 	const [time, setTime] = useState(0);
 
 	//const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
-	const cloudRadius = effectiveSurfaceRadius * 1.01;
+	const cloudRadius = effectiveSurfaceRadius * 1.02;
 	const color = useMemo(() => new THREE.Color(cloudColor), [cloudColor]);
 
 	useFrame((state) => {

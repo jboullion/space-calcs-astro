@@ -42,6 +42,7 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 		midland: '#8B4513', // Saddle Brown
 		highland: '#A9A9A9', // Dark Gray
 	});
+	const [surfaceTemp, setSurfaceTemp] = useState(100); // Default to Earth's average surface temp in K
 
 	const value = {
 		radius,
@@ -60,6 +61,8 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 		setPlanetType,
 		surfaceColors,
 		setSurfaceColors,
+		surfaceTemp,
+		setSurfaceTemp,
 	};
 
 	return (

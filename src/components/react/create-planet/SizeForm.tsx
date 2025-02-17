@@ -17,6 +17,8 @@ export default function SizeForm() {
 		setRoughness,
 		seed,
 		setSeed,
+		surfaceTemp,
+		setSurfaceTemp,
 	} = usePlanet();
 
 	return (
@@ -71,6 +73,24 @@ export default function SizeForm() {
 						step={1}
 					/>
 				}
+			/>
+
+			<InputWrapper
+				id="surface-temp"
+				label="Surface Temperature"
+				tooltip="Average surface temperature of the planet"
+				description="Earth = 288K, Mars = 210K, Venus = 737K"
+				input={
+					<NumberInput
+						id="surface-temp"
+						value={surfaceTemp}
+						onChange={setSurfaceTemp}
+						min={50}
+						max={1000}
+						step={1}
+					/>
+				}
+				unit={<SimpleUnit unit="K" />}
 			/>
 
 			<InputWrapper

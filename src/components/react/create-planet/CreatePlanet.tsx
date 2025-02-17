@@ -27,6 +27,7 @@ function PlanetCalculator() {
 		atmosphere,
 		planetType,
 		surfaceColors,
+		surfaceTemp,
 	} = usePlanet();
 
 	// Calculate derived properties
@@ -83,6 +84,7 @@ function PlanetCalculator() {
 					atmosphere={atmosphere}
 					planetType={planetType}
 					surfaceColors={surfaceColors}
+					surfaceTemp={surfaceTemp}
 				/>
 
 				<CreatePlanetResults planetProperties={planetProperties} />

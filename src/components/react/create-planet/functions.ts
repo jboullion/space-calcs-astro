@@ -20,6 +20,33 @@ class Random {
 	}
 }
 
+// Water phase transitions
+export type WaterPhase = 'ice' | 'liquid' | 'vapor';
+
+export function determineWaterPhase(
+	temperatureK: number,
+	pressureAtm: number,
+): WaterPhase {
+	// Triple point of water: 273.16 K and 0.006 atm
+	// Normal melting point: 273.15 K at 1 atm
+	// Normal boiling point: 373.15 K at 1 atm
+
+	// Simplified phase diagram - we'll use the normal melting/boiling points as primary references
+	// and adjust slightly based on pressure
+
+	// Pressure affects the melting point very little but affects the boiling point significantly
+	const meltingPoint = 273.15 - (pressureAtm - 1) * 0.01; // Slight pressure dependence
+	const boilingPoint = 373.15 + (pressureAtm - 1) * 10; // Strong pressure dependence
+
+	if (temperatureK < meltingPoint) {
+		return 'ice';
+	} else if (temperatureK > boilingPoint) {
+		return 'vapor';
+	} else {
+		return 'liquid';
+	}
+}
+
 function hexToRgb(hex: string) {
 	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	if (!result) {
