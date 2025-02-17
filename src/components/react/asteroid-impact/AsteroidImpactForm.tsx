@@ -14,7 +14,6 @@ export default function AsteroidImpactForm() {
 
 	const tabs = [
 		{ value: 'asteroid', label: 'Asteroid' },
-		{ value: 'target', label: 'Target Body' },
 		{ value: 'impact', label: 'Impact Parameters' },
 	];
 
@@ -46,6 +45,7 @@ export default function AsteroidImpactForm() {
 							type="number"
 							className="form-control"
 							value={asteroid.diameter}
+							max={10000000}
 							onChange={(e) =>
 								setAsteroid({
 									...asteroid,
@@ -54,28 +54,6 @@ export default function AsteroidImpactForm() {
 							}
 						/>
 						{/* Add more asteroid parameters */}
-					</div>
-				)}
-
-				{activeTab === 'target' && (
-					<div className="mb-3">
-						<label className="form-label">Target Type</label>
-						<select
-							className="form-select"
-							value={targetBody.type}
-							onChange={(e) =>
-								setTargetBody({
-									...targetBody,
-									type: e.target.value as
-										| 'planet'
-										| 'asteroid',
-								})
-							}
-						>
-							<option value="planet">Planet</option>
-							<option value="asteroid">Asteroid</option>
-						</select>
-						{/* Add more target body parameters */}
 					</div>
 				)}
 

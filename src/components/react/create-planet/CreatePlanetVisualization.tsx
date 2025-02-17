@@ -36,7 +36,7 @@ export default function CreatePlanetVisualization({
 
 	return (
 		<div
-			className="p-2 rounded border mb-5 position-relative"
+			className="rounded border mb-5 position-relative"
 			style={{ height: '600px' }}
 		>
 			{isLoading && (

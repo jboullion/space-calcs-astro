@@ -8,36 +8,82 @@ import ImpactEffects from './objects/ImpactEffects';
 
 export default function AsteroidImpactVisualization() {
 	const [isLoading, setIsLoading] = useState(true);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [animationProgress, setAnimationProgress] = useState(0);
 	const { asteroid, targetBody, impactParams } = useImpact();
 
 	// Calculate appropriate camera distance based on the larger of the two bodies
 	const cameraDistance = useMemo(() => {
 		const largerDiameter = Math.max(asteroid.diameter, targetBody.diameter);
 		const visualDiameter = Math.max(2, Math.log10(largerDiameter + 1) * 2);
-
-		// Use basic trigonometry to calculate required distance
-		// We want the scene to take up about 75% of the view height
-		const fov = 45; // degrees
-		const halfFov = (fov / 2) * (Math.PI / 180); // convert to radians
+		const fov = 45;
+		const halfFov = (fov / 2) * (Math.PI / 180);
 		const distance = (visualDiameter * 1.5) / Math.tan(halfFov);
-		return Math.max(20, distance); // Ensure minimum distance of 20
+		return Math.max(20, distance);
 	}, [asteroid.diameter, targetBody.diameter]);
 
-	// Calculate relative positions based on impact parameters
+	// Calculate initial and final asteroid positions
 	const positions = useMemo(() => {
-		// Convert impact angle to radians
 		const angleRad = (impactParams.angle * Math.PI) / 180;
-
-		// Position asteroid and target for visualization
-		const asteroidPos = [
-			Math.sin(angleRad) * cameraDistance * 0.5,
-			Math.cos(angleRad) * cameraDistance * 0.5,
+		const startDistance = cameraDistance * 0.5;
+		const startPos = [
+			Math.sin(angleRad) * startDistance,
+			Math.cos(angleRad) * startDistance,
 			0,
 		];
-		const targetPos = [0, 0, 0]; // Target at center
-
-		return { asteroidPos, targetPos };
+		const endPos = [0, 0, 0]; // Target at center
+		return { startPos, endPos };
 	}, [impactParams.angle, cameraDistance]);
+
+	// Calculate current asteroid position based on animation progress
+	const currentAsteroidPosition = useMemo(() => {
+		if (!isPlaying) return positions.startPos;
+
+		const progress = Math.min(animationProgress * 2, 1); // First half of animation
+		return positions.startPos.map(
+			(start, i) => start + (positions.endPos[i] - start) * progress,
+		);
+	}, [positions, isPlaying, animationProgress]);
+
+	useEffect(() => {
+		// Add play button
+		const playButton = document.createElement('button');
+		const updateButtonState = () => {
+			if (isPlaying) {
+				playButton.textContent = 'Impacting...';
+				playButton.disabled = true;
+			} else {
+				playButton.textContent =
+					animationProgress >= 1 ? 'Replay Impact' : 'Play Impact';
+				playButton.disabled = false;
+			}
+		};
+
+		playButton.className = 'btn btn-primary';
+		playButton.onclick = () => {
+			setIsPlaying(true);
+			setAnimationProgress(0);
+		};
+
+		// Initial button state
+		updateButtonState();
+
+		// Update button state when animation state changes
+		const observer = new MutationObserver(() => {
+			updateButtonState();
+		});
+
+		const container = document.querySelector('#asteroid-impact__results');
+		if (container) {
+			container.appendChild(playButton);
+			observer.observe(playButton, { attributes: true, childList: true });
+
+			return () => {
+				observer.disconnect();
+				container.removeChild(playButton);
+			};
+		}
+	}, [isPlaying, animationProgress]);
 
 	const handleSceneLoad = () => {
 		setIsLoading(false);
@@ -45,7 +91,7 @@ export default function AsteroidImpactVisualization() {
 
 	return (
 		<div
-			className="p-2 rounded border mb-5 position-relative"
+			className="rounded border mb-3 position-relative"
 			style={{ height: '600px' }}
 		>
 			{isLoading && (
@@ -68,21 +114,25 @@ export default function AsteroidImpactVisualization() {
 
 				<Asteroid
 					diameter={asteroid.diameter}
-					position={positions.asteroidPos}
+					position={currentAsteroidPosition}
 				/>
 
 				<TargetBody
 					diameter={targetBody.diameter}
 					type={targetBody.type}
 					hasAtmosphere={targetBody.hasAtmosphere}
-					position={positions.targetPos}
+					position={[0, 0, 0]}
 				/>
 
 				<ImpactEffects
 					asteroid={asteroid}
 					targetBody={targetBody}
 					impactParams={impactParams}
-					position={positions.targetPos}
+					position={[0, 0, 0]}
+					isPlaying={isPlaying}
+					setIsPlaying={setIsPlaying}
+					animationProgress={animationProgress}
+					setAnimationProgress={setAnimationProgress}
 				/>
 
 				<OrbitControls
