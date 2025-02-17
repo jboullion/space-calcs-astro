@@ -40,6 +40,12 @@ export default function ImpactEffects({
 		return Math.max(0.5, Math.log10(craterSize + 1) * 2);
 	}, [asteroid, impactParams]);
 
+	// Calculate impact point on planet's surface
+	const impactPoint = useMemo(() => {
+		const targetRadius = Math.max(0.1, Math.log10(targetBody.diameter + 1));
+		return [-targetRadius, 0, 0]; // Relative to planet center
+	}, [targetBody.diameter]);
+
 	// Create materials
 	const fireballMaterial = useMemo(() => {
 		return new THREE.MeshStandardMaterial({
@@ -61,27 +67,30 @@ export default function ImpactEffects({
 
 	// Handle animation frame updates
 	useFrame((state, delta) => {
-		if (isPlaying) {
-			if (animationProgress < 1) {
-				setAnimationProgress(
-					Math.min(animationProgress + delta / 5, 1),
-				); // 5 second animation
-			} else {
-				// Animation is complete
+		if (isPlaying && animationProgress < 1) {
+			setAnimationProgress(Math.min(animationProgress + delta / 2, 1)); // 2 second animation
+			if (animationProgress + delta / 2 >= 1) {
 				setIsPlaying(false);
 			}
 		}
 	});
 
-	// Only show effects after asteroid reaches target (halfway through animation)
-	const showEffects = isPlaying && animationProgress > 0.5;
-	const effectProgress = showEffects ? (animationProgress - 0.5) * 2 : 0;
+	// Only show effects after asteroid reaches target
+	const showEffects = isPlaying && animationProgress >= 0.98; // Show effects just before full contact
+	const effectProgress = showEffects ? (animationProgress - 0.98) * 50 : 0; // Compress effect animation
 	const currentEffectSize = effectSize * Math.pow(effectProgress, 0.5);
 	const fireballOpacity =
 		effectProgress < 0.8 ? 0.8 : 0.8 * (1 - (effectProgress - 0.8) / 0.2);
 
+	// Position effects at the impact point
+	const effectPosition = [
+		position[0] + impactPoint[0],
+		position[1] + impactPoint[1],
+		position[2] + impactPoint[2],
+	];
+
 	return (
-		<group position={position as [number, number, number]}>
+		<group position={effectPosition as [number, number, number]}>
 			{showEffects && (
 				<>
 					{/* Expanding fireball */}
@@ -94,7 +103,7 @@ export default function ImpactEffects({
 					</mesh>
 
 					{/* Crater */}
-					<mesh rotation={[-Math.PI / 2, 0, 0]}>
+					<mesh rotation={[0, 0, 0]}>
 						<ringGeometry args={[0, currentEffectSize * 0.8, 32]} />
 						<meshStandardMaterial
 							{...craterMaterial}

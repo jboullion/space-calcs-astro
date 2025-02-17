@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import { useImpact } from './AsteroidImpactContext';
 import Asteroid from './objects/Asteroid';
 import TargetBody from './objects/TargetBody';
@@ -12,38 +11,42 @@ export default function AsteroidImpactVisualization() {
 	const [animationProgress, setAnimationProgress] = useState(0);
 	const { asteroid, targetBody, impactParams } = useImpact();
 
-	// Calculate appropriate camera distance based on the larger of the two bodies
-	const cameraDistance = useMemo(() => {
+	// Calculate appropriate scale for bodies based on their sizes
+	const visualScales = useMemo(() => {
 		const largerDiameter = Math.max(asteroid.diameter, targetBody.diameter);
-		const visualDiameter = Math.max(2, Math.log10(largerDiameter + 1) * 2);
-		const fov = 45;
-		const halfFov = (fov / 2) * (Math.PI / 180);
-		const distance = (visualDiameter * 1.5) / Math.tan(halfFov);
-		return Math.max(20, distance);
+		const visualScale = Math.max(2, Math.log10(largerDiameter + 1) * 2);
+		return {
+			camera: visualScale * 4, // Increased camera distance for wider view
+			spacing: visualScale * 1.5, // Reduced spacing between bodies
+		};
 	}, [asteroid.diameter, targetBody.diameter]);
 
-	// Calculate initial and final asteroid positions
+	// Calculate positions for asteroid and target body
 	const positions = useMemo(() => {
-		const angleRad = (impactParams.angle * Math.PI) / 180;
-		const startDistance = cameraDistance * 0.5;
-		const startPos = [
-			Math.sin(angleRad) * startDistance,
-			Math.cos(angleRad) * startDistance,
-			0,
-		];
-		const endPos = [0, 0, 0]; // Target at center
-		return { startPos, endPos };
-	}, [impactParams.angle, cameraDistance]);
+		const spacing = visualScales.spacing;
+		return {
+			asteroid: [-spacing, 0, 0], // Left side
+			target: [spacing, 0, 0], // Right side
+			impact: [0, 0, 0], // Center for impact
+		};
+	}, [visualScales.spacing]);
 
 	// Calculate current asteroid position based on animation progress
 	const currentAsteroidPosition = useMemo(() => {
-		if (!isPlaying) return positions.startPos;
+		if (!isPlaying) return positions.asteroid;
 
-		const progress = Math.min(animationProgress * 2, 1); // First half of animation
-		return positions.startPos.map(
-			(start, i) => start + (positions.endPos[i] - start) * progress,
+		// Calculate the target point on the planet's surface
+		const targetRadius = Math.max(0.1, Math.log10(targetBody.diameter + 1));
+		const impactPoint = [
+			positions.target[0] - targetRadius, // X coordinate just at planet's surface
+			positions.target[1], // Same Y
+			positions.target[2], // Same Z
+		];
+
+		return positions.asteroid.map(
+			(start, i) => start + (impactPoint[i] - start) * animationProgress,
 		);
-	}, [positions, isPlaying, animationProgress]);
+	}, [positions, isPlaying, animationProgress, targetBody.diameter]);
 
 	useEffect(() => {
 		// Add play button
@@ -53,8 +56,10 @@ export default function AsteroidImpactVisualization() {
 				playButton.textContent = 'Impacting...';
 				playButton.disabled = true;
 			} else {
-				playButton.textContent =
-					animationProgress >= 1 ? 'Replay Impact' : 'Play Impact';
+				playButton.textContent = 'Play Impact';
+				if (animationProgress >= 1) {
+					playButton.textContent = 'Replay Impact';
+				}
 				playButton.disabled = false;
 			}
 		};
@@ -65,14 +70,9 @@ export default function AsteroidImpactVisualization() {
 			setAnimationProgress(0);
 		};
 
-		// Initial button state
 		updateButtonState();
 
-		// Update button state when animation state changes
-		const observer = new MutationObserver(() => {
-			updateButtonState();
-		});
-
+		const observer = new MutationObserver(updateButtonState);
 		const container = document.querySelector('#asteroid-impact__results');
 		if (container) {
 			container.appendChild(playButton);
@@ -100,13 +100,18 @@ export default function AsteroidImpactVisualization() {
 				</div>
 			)}
 			<Canvas
-				camera={{ position: [0, 0, cameraDistance], fov: 45 }}
+				camera={{
+					position: [0, 0, visualScales.camera],
+					fov: 50,
+					near: 0.1,
+					far: 1000,
+				}}
 				shadows
 				onCreated={handleSceneLoad}
 			>
 				<ambientLight intensity={0.5} />
 				<directionalLight
-					position={[10, 10, 5]}
+					position={[10, 0, 0]}
 					intensity={2}
 					castShadow
 				/>
@@ -121,28 +126,18 @@ export default function AsteroidImpactVisualization() {
 					diameter={targetBody.diameter}
 					type={targetBody.type}
 					hasAtmosphere={targetBody.hasAtmosphere}
-					position={[0, 0, 0]}
+					position={positions.target}
 				/>
 
 				<ImpactEffects
 					asteroid={asteroid}
 					targetBody={targetBody}
 					impactParams={impactParams}
-					position={[0, 0, 0]}
+					position={positions.impact}
 					isPlaying={isPlaying}
 					setIsPlaying={setIsPlaying}
 					animationProgress={animationProgress}
 					setAnimationProgress={setAnimationProgress}
-				/>
-
-				<OrbitControls
-					enableZoom={true}
-					enablePan={true}
-					enableRotate={true}
-					autoRotate={false}
-					autoRotateSpeed={0.5}
-					minDistance={cameraDistance * 0.5}
-					maxDistance={cameraDistance * 2}
 				/>
 			</Canvas>
 		</div>
