@@ -70,12 +70,6 @@ function PlanetCalculator() {
 				className="col-xl-4 col-lg-5 col-md-6"
 			>
 				<CreatePlanetForm />
-				<CreatePlanetResults planetProperties={planetProperties} />
-				<AtmosphereResults
-					atmosphere={atmosphere}
-					radius={radius}
-					surfaceGravity={parseFloat(planetProperties.surfaceGravity)}
-				/>
 			</div>
 			<div
 				id="create-planet__results"
@@ -89,6 +83,13 @@ function PlanetCalculator() {
 					atmosphere={atmosphere}
 					planetType={planetType}
 					surfaceColors={surfaceColors}
+				/>
+
+				<CreatePlanetResults planetProperties={planetProperties} />
+				<AtmosphereResults
+					atmosphere={atmosphere}
+					radius={radius}
+					surfaceGravity={parseFloat(planetProperties.surfaceGravity)}
 				/>
 			</div>
 		</div>

@@ -102,14 +102,14 @@ const AtmosphereResults: React.FC<AtmosphereResultsProps> = ({
 				<th>Gas Retention Threshold</th>
 				<td>{formatNumber(escapeVelocity)} km/s</td>
 			</tr>
-			<tr>
+			{/* <tr>
 				<th>Greenhouse Effect</th>
 				<td>{formatNumber(greenhouseEffect)} °C</td>
-			</tr>
-			<tr>
+			</tr> */}
+			{/* <tr>
 				<th>Effective Temperature</th>
 				<td>{formatNumber(effectiveTemperature)} K</td>
-			</tr>
+			</tr> */}
 			<tr>
 				<th className="border-bottom-0">Atmospheric Mass</th>
 				<td className="border-bottom-0">

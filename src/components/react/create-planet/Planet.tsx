@@ -54,7 +54,7 @@ export default function Planet({
 				<meshStandardMaterial
 					map={textures.colorMap}
 					normalMap={textures.normalMap}
-					normalScale={new THREE.Vector2(1, 1)}
+					normalScale={new THREE.Vector2(0.5, 0.5)}
 					displacementMap={textures.heightMap}
 					displacementScale={0.3}
 					roughness={0.8}

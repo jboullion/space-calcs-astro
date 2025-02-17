@@ -193,6 +193,21 @@ export function generatePlanetTextures(
 			colorData.data[i + 3] = 255;
 
 			// Normal map calculation
+			// const s = 1 / size;
+			// const hu = heightData.data[(y * size + ((x + 1) % size)) * 4] / 255;
+			// const hd =
+			// 	heightData.data[(y * size + ((x - 1 + size) % size)) * 4] / 255;
+			// const hr = heightData.data[(((y + 1) % size) * size + x) * 4] / 255;
+			// const hl =
+			// 	heightData.data[(((y - 1 + size) % size) * size + x) * 4] / 255;
+
+			// const normal = new THREE.Vector3(
+			// 	(hu - hd) * roughness * 2,
+			// 	(hr - hl) * roughness * 2,
+			// 	1,
+			// ).normalize();
+
+			// Normal map calculation with smoother transitions
 			const s = 1 / size;
 			const hu = heightData.data[(y * size + ((x + 1) % size)) * 4] / 255;
 			const hd =
@@ -201,10 +216,12 @@ export function generatePlanetTextures(
 			const hl =
 				heightData.data[(((y - 1 + size) % size) * size + x) * 4] / 255;
 
+			// Reduce the strength of the normal map based on roughness
+			const normalStrength = Math.min(0.5, roughness);
 			const normal = new THREE.Vector3(
-				(hu - hd) * roughness * 2,
-				(hr - hl) * roughness * 2,
-				1,
+				(hu - hd) * normalStrength,
+				(hr - hl) * normalStrength,
+				1.0,
 			).normalize();
 
 			normalData.data[i] = (normal.x * 0.5 + 0.5) * 255;
