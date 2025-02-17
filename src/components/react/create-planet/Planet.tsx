@@ -12,26 +12,31 @@ export default function Planet({
 	roughness,
 	seed,
 	atmosphere,
+	surfaceColors,
 }: PlanetProps) {
 	const planetRef = useRef<THREE.Mesh>(null);
 	const waterRef = useRef<THREE.Mesh>(null);
 
 	// Generate textures with the current seed
 	const textures = useMemo(() => {
-		const maps = generatePlanetTextures(512, roughness, seed);
+		const maps = generatePlanetTextures(
+			512,
+			roughness,
+			surfaceColors,
+			seed,
+		);
 		Object.values(maps).forEach((texture) => {
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 		});
 		return maps;
-	}, [roughness, seed]);
+	}, [roughness, seed, surfaceColors]);
 
 	const visualRadius = Math.max(2, Math.log10(radius + 1) * 2);
 	const waterRadius = visualRadius * (1 + waterLevel * 0.001);
 	const maxSurfaceHeight = visualRadius * (1 + roughness * 0.04); // 0.3 matches the displacementScale in the planet material
 	const effectiveSurfaceRadius = Math.max(waterRadius, maxSurfaceHeight);
-
 	// Calculate cloud properties based on atmosphere
-	const clouds = atmosphere.clouds || {
+	const clouds = atmosphere?.clouds || {
 		enabled: true,
 		density: 0.8,
 		coverage: 0.6,
@@ -66,7 +71,7 @@ export default function Planet({
 						transparent={true}
 						opacity={Math.max(
 							0,
-							0.6 / (1 + atmosphere.pressure * 0.2),
+							0.6 / (1 + (atmosphere?.pressure || 0) * 0.2),
 						)}
 						roughness={0.1}
 						metalness={0.1}
@@ -75,7 +80,7 @@ export default function Planet({
 						ior={1.333}
 						transmission={Math.max(
 							0.1,
-							0.5 / (1 + atmosphere.pressure * 0.2),
+							0.5 / (1 + (atmosphere?.pressure || 0) * 0.2),
 						)}
 						thickness={1}
 					/>
@@ -83,7 +88,7 @@ export default function Planet({
 			)}
 
 			{/* Cloud and Atmosphere layers */}
-			{atmosphere?.pressure > 0 && (
+			{atmosphere?.pressure && atmosphere.pressure > 0 && (
 				<>
 					{/* Only show clouds if we have enough atmosphere and water vapor */}
 					{clouds.enabled && atmosphere.composition.h2o > 0 && (

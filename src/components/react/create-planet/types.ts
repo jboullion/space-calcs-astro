@@ -4,6 +4,7 @@ export interface PlanetProps {
 	roughness: number;
 	seed: number;
 	atmosphere: AtmosphereProperties | null;
+	surfaceColors: SurfaceColors;
 }
 
 export interface CreatePlanetVisualizationProps {
@@ -13,6 +14,7 @@ export interface CreatePlanetVisualizationProps {
 	seed: number;
 	atmosphere: AtmosphereProperties;
 	planetType: string;
+	surfaceColors: SurfaceColors;
 }
 
 export interface CreatePlanetFormProps {
@@ -22,12 +24,14 @@ export interface CreatePlanetFormProps {
 	roughness: number;
 	seed: number;
 	atmosphere: AtmosphereProperties;
+	surfaceColors: SurfaceColors;
 	onRadiusChange: (value: number) => void;
 	onDensityChange: (value: number) => void;
 	onWaterLevelChange: (value: number) => void;
 	onRoughnessChange: (value: number) => void;
 	onSeedChange: (value: number) => void;
 	onAtmosphereChange: (value: AtmosphereProperties) => void;
+	onSurfaceColorsChange: (value: SurfaceColors) => void;
 }
 
 export interface CloudProperties {
@@ -73,6 +77,8 @@ export interface PlanetContextType {
 	setAtmosphere: (value: AtmosphereProperties) => void;
 	planetType: string;
 	setPlanetType: (value: string) => void;
+	surfaceColors: SurfaceColors;
+	setSurfaceColors: (value: SurfaceColors) => void;
 }
 
 export type PlanetType =
@@ -88,4 +94,11 @@ export interface GasGiantVisuals {
 	rotationSpeed: number;
 	bandColors: string[];
 	bandBlending: number;
+}
+
+export interface SurfaceColors {
+	lowland: string; // For areas with low elevation (valleys)
+	midland: string; // For medium elevation areas
+	highland: string; // For high elevation areas (mountains)
+	base: string; // Base color for the planet's surface
 }

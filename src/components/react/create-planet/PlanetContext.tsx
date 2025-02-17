@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
-import type { AtmosphereProperties, PlanetContextType } from './types';
+import type {
+	AtmosphereProperties,
+	PlanetContextType,
+	SurfaceColors,
+} from './types';
 
 const PlanetContext = createContext<PlanetContextType | undefined>(undefined);
 
@@ -32,6 +36,12 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 		},
 	});
 	const [planetType, setPlanetType] = useState('terrestrial');
+	const [surfaceColors, setSurfaceColors] = useState<SurfaceColors>({
+		base: '#8B4513', // Saddle Brown
+		lowland: '#A05A2C', // Sienna
+		midland: '#8B4513', // Saddle Brown
+		highland: '#A9A9A9', // Dark Gray
+	});
 
 	const value = {
 		radius,
@@ -48,6 +58,8 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 		setAtmosphere,
 		planetType,
 		setPlanetType,
+		surfaceColors,
+		setSurfaceColors,
 	};
 
 	return (

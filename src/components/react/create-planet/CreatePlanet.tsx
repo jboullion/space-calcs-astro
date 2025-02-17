@@ -26,6 +26,7 @@ function PlanetCalculator() {
 		seed,
 		atmosphere,
 		planetType,
+		surfaceColors,
 	} = usePlanet();
 
 	// Calculate derived properties
@@ -87,6 +88,7 @@ function PlanetCalculator() {
 					seed={seed}
 					atmosphere={atmosphere}
 					planetType={planetType}
+					surfaceColors={surfaceColors}
 				/>
 			</div>
 		</div>

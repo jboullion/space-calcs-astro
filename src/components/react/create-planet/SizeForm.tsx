@@ -3,7 +3,7 @@ import InputWrapper from '../forms/InputWrapper';
 import NumberInput from '../forms/NumberInput';
 import SimpleUnit from '../forms/SimpleUnit';
 import { usePlanet } from './PlanetContext';
-import { PLANET_PRESETS } from './constants';
+import SurfaceColorsForm from './SurfaceColorsForm';
 
 export default function SizeForm() {
 	const {
@@ -88,7 +88,6 @@ export default function SizeForm() {
 						step={0.1}
 					/>
 				}
-				unit={<SimpleUnit unit="roughness" />}
 			/>
 
 			<InputWrapper
@@ -99,6 +98,8 @@ export default function SizeForm() {
 					<NumberInput id="seed" value={seed} onChange={setSeed} />
 				}
 			/>
+
+			<SurfaceColorsForm />
 		</div>
 	);
 }

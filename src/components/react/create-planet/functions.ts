@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import type { SurfaceColors } from './types';
 
 // Seedable random number generator
 class Random {
@@ -19,13 +20,67 @@ class Random {
 	}
 }
 
+function hexToRgb(hex: string) {
+	const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	if (!result) {
+		return { r: 0, g: 0, b: 0 };
+	}
+	return {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16),
+	};
+}
+
 export function generatePlanetTextures(
 	size: number,
 	roughness: number,
+	surfaceColors: SurfaceColors,
 	seed?: number,
 ) {
 	// Initialize random number generator with seed or current timestamp
 	const rng = new Random(seed ?? Date.now());
+
+	// Convert hex colors to RGB
+	const baseColorRgb = hexToRgb(surfaceColors.base);
+	const lowlandColorRgb = hexToRgb(surfaceColors.lowland);
+	const midlandColorRgb = hexToRgb(surfaceColors.midland);
+	const highlandColorRgb = hexToRgb(surfaceColors.highland);
+
+	// Helper function to interpolate colors
+	function interpolateColor(height: number) {
+		if (height < 0.3) {
+			// Interpolate between lowland and midland
+			const t = height / 0.3;
+			return {
+				r:
+					lowlandColorRgb.r +
+					(midlandColorRgb.r - lowlandColorRgb.r) * t,
+				g:
+					lowlandColorRgb.g +
+					(midlandColorRgb.g - lowlandColorRgb.g) * t,
+				b:
+					lowlandColorRgb.b +
+					(midlandColorRgb.b - lowlandColorRgb.b) * t,
+			};
+		} else if (height < 0.7) {
+			// Interpolate between midland and base
+			const t = (height - 0.3) / 0.4;
+			return {
+				r: midlandColorRgb.r + (baseColorRgb.r - midlandColorRgb.r) * t,
+				g: midlandColorRgb.g + (baseColorRgb.g - midlandColorRgb.g) * t,
+				b: midlandColorRgb.b + (baseColorRgb.b - midlandColorRgb.b) * t,
+			};
+		} else {
+			// Interpolate between base and highland
+			const t = (height - 0.7) / 0.3;
+			return {
+				r: baseColorRgb.r + (highlandColorRgb.r - baseColorRgb.r) * t,
+				g: baseColorRgb.g + (highlandColorRgb.g - baseColorRgb.g) * t,
+				b: baseColorRgb.b + (highlandColorRgb.b - baseColorRgb.b) * t,
+			};
+		}
+	}
 
 	// Helper function to create a canvas
 	const createCanvas = () => {
@@ -62,24 +117,24 @@ export function generatePlanetTextures(
 		z: 4 + rng.next() * 4,
 	}));
 
-	// Generate random color variations
-	const baseColor = {
-		r: 139 + (rng.next() * 40 - 20),
-		g: 69 + (rng.next() * 20 - 10),
-		b: 19 + (rng.next() * 20 - 10),
-	};
+	// // Generate random color variations
+	// const baseColor = {
+	// 	r: 139 + (rng.next() * 40 - 20),
+	// 	g: 69 + (rng.next() * 20 - 10),
+	// 	b: 19 + (rng.next() * 20 - 10),
+	// };
 
-	const mountainColor = {
-		r: 169 + (rng.next() * 40 - 20),
-		g: 169 + (rng.next() * 40 - 20),
-		b: 169 + (rng.next() * 40 - 20),
-	};
+	// const mountainColor = {
+	// 	r: 169 + (rng.next() * 40 - 20),
+	// 	g: 169 + (rng.next() * 40 - 20),
+	// 	b: 169 + (rng.next() * 40 - 20),
+	// };
 
-	const lowlandColor = {
-		r: 160 + (rng.next() * 40 - 20),
-		g: 82 + (rng.next() * 20 - 10),
-		b: 45 + (rng.next() * 20 - 10),
-	};
+	// const lowlandColor = {
+	// 	r: 160 + (rng.next() * 40 - 20),
+	// 	g: 82 + (rng.next() * 20 - 10),
+	// 	b: 45 + (rng.next() * 20 - 10),
+	// };
 
 	// Generate terrain
 	for (let y = 0; y < size; y++) {
@@ -131,13 +186,7 @@ export function generatePlanetTextures(
 			heightData.data[i + 3] = 255;
 
 			// Color map with interpolation
-			const color =
-				height < 0.4
-					? lowlandColor
-					: height > 0.7
-					? mountainColor
-					: baseColor;
-
+			const color = interpolateColor(height);
 			colorData.data[i] = color.r;
 			colorData.data[i + 1] = color.g;
 			colorData.data[i + 2] = color.b;
