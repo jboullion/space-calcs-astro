@@ -159,6 +159,7 @@ export default function GasVisualsForm() {
 						min={1}
 						max={16}
 						step={1}
+						updateOnBlur={true}
 					/>
 				}
 			/>
@@ -178,6 +179,7 @@ export default function GasVisualsForm() {
 						min={0}
 						max={5}
 						step={0.1}
+						updateOnBlur={true}
 					/>
 				}
 			/>
@@ -197,6 +199,7 @@ export default function GasVisualsForm() {
 						min={0}
 						max={1}
 						step={0.1}
+						updateOnBlur={true}
 					/>
 				}
 			/>

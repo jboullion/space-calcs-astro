@@ -112,13 +112,13 @@ export default function Planet({
 						/>
 					</mesh>
 
-					{isFrozen && (
+					{/* {isFrozen && (
 						<IceLayer
 							maxSurfaceHeight={planetDimensions.maxSurfaceHeight}
 							waterLevel={waterLevel}
 							temperature={surfaceTemp}
 						/>
-					)}
+					)} */}
 				</>
 			)}
 

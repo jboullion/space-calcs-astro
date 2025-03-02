@@ -22,6 +22,7 @@ export default function GasGiantPropertiesForm() {
 						min={15000}
 						max={200000}
 						step={1000}
+						updateOnBlur={true}
 					/>
 				}
 				unit={<SimpleUnit unit="km" />}
@@ -40,6 +41,7 @@ export default function GasGiantPropertiesForm() {
 						min={500}
 						max={2000}
 						step={10}
+						updateOnBlur={true}
 					/>
 				}
 				unit={<SimpleUnit unit="kg/m³" />}

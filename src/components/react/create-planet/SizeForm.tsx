@@ -36,6 +36,7 @@ export default function SizeForm() {
 						min={400}
 						max={75000}
 						step={100}
+						updateOnBlur={true}
 					/>
 				}
 				unit={<SimpleUnit unit="km" />}
@@ -54,6 +55,7 @@ export default function SizeForm() {
 						min={1000}
 						max={20000}
 						step={100}
+						updateOnBlur={true}
 					/>
 				}
 				unit={<SimpleUnit unit="kg/m³" />}
@@ -71,6 +73,7 @@ export default function SizeForm() {
 						min={0}
 						max={100}
 						step={1}
+						updateOnBlur={true}
 					/>
 				}
 			/>
@@ -88,6 +91,7 @@ export default function SizeForm() {
 						min={50}
 						max={1000}
 						step={1}
+						updateOnBlur={true}
 					/>
 				}
 				unit={<SimpleUnit unit="K" />}
@@ -106,6 +110,7 @@ export default function SizeForm() {
 						min={0}
 						max={1}
 						step={0.1}
+						updateOnBlur={true}
 					/>
 				}
 			/>
@@ -115,7 +120,12 @@ export default function SizeForm() {
 				label="Surface Seed"
 				description="The seed for the planet generation"
 				input={
-					<NumberInput id="seed" value={seed} onChange={setSeed} />
+					<NumberInput
+						id="seed"
+						value={seed}
+						onChange={setSeed}
+						updateOnBlur={true}
+					/>
 				}
 			/>
 

@@ -99,6 +99,7 @@ export default function AtmosphereForm({
 						min={0}
 						max={200}
 						step={0.1}
+						updateOnBlur={true}
 					/>
 				}
 				unit={<SimpleUnit unit="atm" />}
@@ -163,6 +164,7 @@ export default function AtmosphereForm({
 						min={0}
 						max={5}
 						step={0.1}
+						updateOnBlur={true}
 					/>
 				}
 			/>
@@ -181,6 +183,7 @@ export default function AtmosphereForm({
 						min={0}
 						max={5}
 						step={0.1}
+						updateOnBlur={true}
 					/>
 				}
 			/>
