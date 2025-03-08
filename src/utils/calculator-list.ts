@@ -177,6 +177,14 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/create-planet',
 	},
+	{
+		id: 'launch-pads',
+		name: 'Launch Pads',
+		description: 'Search all public launch pads on Earth',
+		categories: [categories[ROCKET_CAT]],
+		image: '',
+		link: '/calcs/launch-pads',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
