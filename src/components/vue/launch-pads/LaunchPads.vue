@@ -100,9 +100,6 @@
 											<th>#</th>
 											<th>Location</th>
 											<th>Pad</th>
-											<th class="text-center">
-												Launches
-											</th>
 											<th class="text-end">Country</th>
 										</tr>
 									</thead>
@@ -121,9 +118,6 @@
 											</td>
 											<td class="">
 												{{ pad.name }}
-											</td>
-											<td class="text-center">
-												{{ pad.total_launch_count }}
 											</td>
 											<td class="text-end">
 												{{ pad.country_code }}
@@ -294,9 +288,6 @@ async function buildMapMarker(pad: any) {
 			title +
 			'</h2>' +
 			'<div class="info-window__content">' +
-			'<div class="info-window__stat"><span class="info-window__label">Launches:</span> <span class="info-window__value">' +
-			pad.total_launch_count +
-			'</span></div>' +
 			'<div class="info-window__stat"><span class="info-window__label">Location:</span> <span class="info-window__value">' +
 			pad.location_name +
 			'</span></div>' +
