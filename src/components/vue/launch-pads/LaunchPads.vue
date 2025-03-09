@@ -155,6 +155,7 @@ import { storeUser } from '../../../utils/store';
 // Map element reference
 let googleMap: google.maps.Map;
 const markers = ref<google.maps.Marker[]>([]);
+const infoWindow = ref<google.maps.InfoWindow>();
 
 // Google Maps configuration
 const additionalOptions = {};
@@ -249,6 +250,8 @@ async function initializeMap() {
 		rotateControl: false,
 		fullscreenControl: true,
 	});
+
+	infoWindow.value = new google.maps.InfoWindow();
 }
 
 // Build the Google Map with markers for each pad
@@ -278,8 +281,6 @@ async function buildMapMarker(pad: any) {
 				'marker',
 			)) as google.maps.MarkerLibrary;
 
-		const infoWindow = new google.maps.InfoWindow();
-
 		const padLocation = {
 			lat: parseFloat(pad.latitude),
 			lng: parseFloat(pad.longitude),
@@ -289,21 +290,24 @@ async function buildMapMarker(pad: any) {
 
 		const contentString =
 			'<div id="content" class="info-window">' +
-			'<h2>' +
+			'<h2 class="info-window__title">' +
 			title +
 			'</h2>' +
 			'<div class="info-window__content">' +
-			'<p class="text-elipsis"><b>Launches:</b> ' +
+			'<div class="info-window__stat"><span class="info-window__label">Launches:</span> <span class="info-window__value">' +
 			pad.total_launch_count +
-			'<br />' +
-			'<b>Wiki:</b> <a href="' +
-			pad.wiki_url +
-			'" target="_blank">' +
-			pad.wiki_url +
-			'</a><br />' +
-			'<b>Country:</b> ' +
+			'</span></div>' +
+			'<div class="info-window__stat"><span class="info-window__label">Location:</span> <span class="info-window__value">' +
+			pad.location_name +
+			'</span></div>' +
+			'<div class="info-window__stat"><span class="info-window__label">Country:</span> <span class="info-window__value">' +
 			pad.country_code +
-			'</p>' +
+			'</span></div>' +
+			(pad.wiki_url
+				? '<div class="info-window__wiki"><a href="' +
+				  pad.wiki_url +
+				  '" target="_blank">View on Wikipedia <i class="fa-solid fa-external-link-alt"></i></a></div>'
+				: '') +
 			'</div>' +
 			'</div>';
 
@@ -327,9 +331,9 @@ async function buildMapMarker(pad: any) {
 			});
 
 			marker.addListener('gmp-click', () => {
-				infoWindow.close();
-				infoWindow.setContent(contentString);
-				infoWindow.open(googleMap, marker);
+				infoWindow.value?.close();
+				infoWindow.value?.setContent(contentString);
+				infoWindow.value?.open(googleMap, marker);
 			});
 
 			marker.padId = pad.id;
@@ -374,29 +378,100 @@ function openMapMarker(padId: number) {
 /* Customize the Google Maps Info Window */
 .gm-style-iw {
 	background-color: #fff;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 	border-radius: 8px;
-	padding: 10px;
+	padding: 0 !important;
+	max-width: 320px;
 }
 
-.gm-style-iw h2 {
-	font-size: 26px;
-	color: black;
+.gm-style-iw-ch {
+	padding-top: 0;
 }
 
-.gm-style-iw p {
-	font-size: 16px;
-	line-height: 1.5;
-	color: black;
+.gm-ui-hover-effect {
+	position: absolute !important;
+	right: 2px !important;
 }
 
-.gm-style-iw p b {
-	font-weight: bold;
+.gm-style-iw-d {
+	overflow: hidden !important;
+}
+
+.info-window {
+	padding: 0;
+}
+
+.info-window__title {
+	font-size: 18px;
+	font-weight: 600;
+	color: #fff;
+	background-color: #f84d33;
+	margin: 0;
+	padding: 12px 50px 12px 16px;
+	border-radius: 8px 8px 0 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.info-window__content {
+	padding: 12px 16px;
+}
+
+.info-window__stat {
+	margin-bottom: 8px;
+	font-size: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.info-window__label {
+	font-weight: 600;
+	color: #333;
+	margin-right: 4px;
+}
+
+.info-window__value {
+	color: #555;
+}
+
+.info-window__wiki {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid #eee;
+	text-align: center;
+}
+
+.info-window__wiki a {
+	display: inline-block;
+	color: #f84d33;
+	font-weight: 500;
+	text-decoration: none;
+	padding: 6px 12px;
+	border: 1px solid #f84d33;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+}
+
+.info-window__wiki a:hover {
+	background-color: #f84d33;
+	color: #fff;
+}
+
+.info-window__wiki a i {
+	margin-left: 4px;
+	font-size: 12px;
 }
 
 /* Customize the Close Button */
 .gm-style-iw-close {
-	color: #111;
-	font-size: 18px;
+	position: absolute !important;
+	top: 8px !important;
+	right: 8px !important;
+	color: #fff !important;
+	background-color: rgba(255, 255, 255, 0.2) !important;
+	border-radius: 50% !important;
+	z-index: 10 !important;
 }
 </style>
