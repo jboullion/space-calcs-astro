@@ -156,7 +156,7 @@ const markers = ref<google.maps.Marker[]>([]);
 // Google Maps configuration
 const additionalOptions = {};
 const loader = new Loader({
-	apiKey: 'AIzaSyB91VWTuV0MHfslFCxfhjFWv4n-rqVoJfk',
+	apiKey: import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY,
 	version: 'weekly',
 	...additionalOptions,
 });

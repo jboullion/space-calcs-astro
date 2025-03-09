@@ -1,6 +1,7 @@
 import { supabase } from '../../../lib/supabaseClient';
 import type { LaunchPad } from './launchpad.types';
 
+// Use environment variable with a fallback
 const API_URL = 'https://lldev.thespacedevs.com/2.2.0';
 
 export class LaunchPadService {
@@ -31,6 +32,8 @@ export class LaunchPadService {
 			}))
 			.filter((pad) => pad.name !== 'Unknown Pad');
 	}
+
+	// Rest of the service methods remain the same...
 
 	/**
 	 * Get a single launch pad by ID
