@@ -41,7 +41,7 @@
 							</div>
 
 							<!-- Admin-only section if user is authenticated -->
-							<div class="mt-4 mb-3 p-3 border rounded">
+							<!-- <div class="mt-4 mb-3 p-3 border rounded">
 								<h4>Admin Controls</h4>
 								<button
 									class="btn btn-primary"
@@ -70,7 +70,7 @@
 								>
 									{{ updateMessage }}
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 					<div class="col-md-8">
@@ -88,7 +88,10 @@
 						<div v-else>
 							<div id="map" ref="map" class="google-map"></div>
 
-							<div class="pad_list mt-5">
+							<div
+								class="pad_list mt-5"
+								style="max-height: 500px; overflow-y: auto"
+							>
 								<table
 									class="pad_list__table table table-striped table-hover"
 								>
@@ -150,7 +153,7 @@ import { useStore } from '@nanostores/vue';
 import { storeUser } from '../../../utils/store';
 
 // Map element reference
-let map: HTMLElement;
+let googleMap: google.maps.Map;
 const markers = ref<google.maps.Marker[]>([]);
 
 // Google Maps configuration
@@ -188,7 +191,10 @@ const updateSuccess = ref(false);
 // Load all pads on component mount
 onMounted(async () => {
 	await loadPads();
-	buildMapPads();
+	loader.load().then(async () => {
+		await initializeMap();
+		await buildMapPads();
+	});
 });
 
 // Update launch pads from the Space Devs API (admin only)
@@ -226,101 +232,111 @@ function debounceBuildMapPads() {
 	}, 200);
 }
 
+async function initializeMap() {
+	const { Map } = (await google.maps.importLibrary(
+		'maps',
+	)) as google.maps.MapsLibrary;
+
+	googleMap = new Map(document.getElementById('map'), {
+		center: { lat: 28.4458, lng: -80.5657 },
+		zoom: 3,
+		minZoom: 2,
+		mapId: 'c9aed3a80eb0e1f2',
+		zoomControl: false,
+		mapTypeControl: true,
+		scaleControl: true,
+		streetViewControl: false,
+		rotateControl: false,
+		fullscreenControl: true,
+	});
+}
+
 // Build the Google Map with markers for each pad
-function buildMapPads(recenter = false) {
+async function buildMapPads(recenter = false) {
+	// Clear existing markers from the map
+	markers.value.forEach((marker) => (marker.map = null));
 	markers.value = [];
 
 	if (filteredPads.value.length > 0) {
-		loader.load().then(async () => {
-			const { Map } = (await google.maps.importLibrary(
-				'maps',
-			)) as google.maps.MapsLibrary;
+		filteredPads.value.forEach((pad) => buildMapMarker(pad));
 
-			const { AdvancedMarkerElement, PinElement } =
-				(await google.maps.importLibrary(
-					'marker',
-				)) as google.maps.MarkerLibrary;
+		if (recenter && filteredPads.value.length > 0) {
+			const newCenter = new google.maps.LatLng(
+				parseFloat(filteredPads.value[0].latitude),
+				parseFloat(filteredPads.value[0].longitude),
+			);
 
-			map = new Map(document.getElementById('map'), {
-				center: { lat: 28.4458, lng: -80.5657 },
-				zoom: 3,
-				minZoom: 2,
-				mapId: 'c9aed3a80eb0e1f2',
-				zoomControl: false,
-				mapTypeControl: true,
-				scaleControl: true,
-				streetViewControl: false,
-				rotateControl: false,
-				fullscreenControl: true,
-			});
+			googleMap.setCenter(newCenter);
+		}
+	}
+}
 
-			const infoWindow = new google.maps.InfoWindow();
+async function buildMapMarker(pad: any) {
+	{
+		const { AdvancedMarkerElement, PinElement } =
+			(await google.maps.importLibrary(
+				'marker',
+			)) as google.maps.MarkerLibrary;
 
-			filteredPads.value.forEach((pad) => {
-				const padLocation = {
-					lat: parseFloat(pad.latitude),
-					lng: parseFloat(pad.longitude),
-				};
+		const infoWindow = new google.maps.InfoWindow();
 
-				const title = pad.name;
+		const padLocation = {
+			lat: parseFloat(pad.latitude),
+			lng: parseFloat(pad.longitude),
+		};
 
-				const contentString =
-					'<div id="content" class="info-window">' +
-					'<h2>' +
-					title +
-					'</h2>' +
-					'<div class="info-window__content">' +
-					'<p class="text-elipsis"><b>Launches:</b> ' +
-					pad.total_launch_count +
-					'<br />' +
-					'<b>Wiki:</b> <a href="' +
-					pad.wiki_url +
-					'" target="_blank">' +
-					pad.wiki_url +
-					'</a><br />' +
-					'<b>Country:</b> ' +
-					pad.country_code +
-					'</p>' +
-					'</div>' +
-					'</div>';
+		const title = pad.name;
 
-				// A new icon and faPin must me created for each marker
-				const icon = document.createElement('div');
-				icon.innerHTML =
-					'<svg xmlns="http://www.w3.org/2000/svg" style="padding-top: 3px;" width="20" height="20" viewBox="0 0 512 512"><path fill="none" stroke="#f84d33" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M461.81 53.81a4.4 4.4 0 0 0-3.3-3.39c-54.38-13.3-180 34.09-248.13 102.17a294.9 294.9 0 0 0-33.09 39.08c-21-1.9-42-.3-59.88 7.5c-50.49 22.2-65.18 80.18-69.28 105.07a9 9 0 0 0 9.8 10.4l81.07-8.9a180.29 180.29 0 0 0 1.1 18.3a18.15 18.15 0 0 0 5.3 11.09l31.39 31.39a18.15 18.15 0 0 0 11.1 5.3a179.91 179.91 0 0 0 18.19 1.1l-8.89 81a9 9 0 0 0 10.39 9.79c24.9-4 83-18.69 105.07-69.17c7.8-17.9 9.4-38.79 7.6-59.69a293.91 293.91 0 0 0 39.19-33.09c68.38-68 115.47-190.86 102.37-247.95M298.66 213.67a42.7 42.7 0 1 1 60.38 0a42.65 42.65 0 0 1-60.38 0"/><path fill="none" stroke="#f84d33" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M109.64 352a45.06 45.06 0 0 0-26.35 12.84C65.67 382.52 64 448 64 448s65.52-1.67 83.15-19.31A44.73 44.73 0 0 0 160 402.32"/></svg>';
+		const contentString =
+			'<div id="content" class="info-window">' +
+			'<h2>' +
+			title +
+			'</h2>' +
+			'<div class="info-window__content">' +
+			'<p class="text-elipsis"><b>Launches:</b> ' +
+			pad.total_launch_count +
+			'<br />' +
+			'<b>Wiki:</b> <a href="' +
+			pad.wiki_url +
+			'" target="_blank">' +
+			pad.wiki_url +
+			'</a><br />' +
+			'<b>Country:</b> ' +
+			pad.country_code +
+			'</p>' +
+			'</div>' +
+			'</div>';
 
-				const faPin = new PinElement({
-					glyph: icon,
-					background: '#f7f0dc',
-					borderColor: '#f84d33',
-				});
+		// A new icon and faPin must me created for each marker
+		const icon = document.createElement('div');
+		icon.innerHTML =
+			'<svg xmlns="http://www.w3.org/2000/svg" style="padding-top: 3px;" width="20" height="20" viewBox="0 0 512 512"><path fill="none" stroke="#f84d33" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M461.81 53.81a4.4 4.4 0 0 0-3.3-3.39c-54.38-13.3-180 34.09-248.13 102.17a294.9 294.9 0 0 0-33.09 39.08c-21-1.9-42-.3-59.88 7.5c-50.49 22.2-65.18 80.18-69.28 105.07a9 9 0 0 0 9.8 10.4l81.07-8.9a180.29 180.29 0 0 0 1.1 18.3a18.15 18.15 0 0 0 5.3 11.09l31.39 31.39a18.15 18.15 0 0 0 11.1 5.3a179.91 179.91 0 0 0 18.19 1.1l-8.89 81a9 9 0 0 0 10.39 9.79c24.9-4 83-18.69 105.07-69.17c7.8-17.9 9.4-38.79 7.6-59.69a293.91 293.91 0 0 0 39.19-33.09c68.38-68 115.47-190.86 102.37-247.95M298.66 213.67a42.7 42.7 0 1 1 60.38 0a42.65 42.65 0 0 1-60.38 0"/><path fill="none" stroke="#f84d33" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M109.64 352a45.06 45.06 0 0 0-26.35 12.84C65.67 382.52 64 448 64 448s65.52-1.67 83.15-19.31A44.73 44.73 0 0 0 160 402.32"/></svg>';
 
-				const marker = new AdvancedMarkerElement({
-					map: map,
-					position: padLocation,
-					content: faPin.element,
-					title: title,
-				});
-
-				marker.addListener('click', () => {
-					infoWindow.close();
-					infoWindow.setContent(contentString);
-					infoWindow.open(map, marker);
-				});
-
-				marker.padId = pad.id;
-				markers.value.push(marker);
-			});
-
-			if (recenter && filteredPads.value.length > 0) {
-				const newCenter = new google.maps.LatLng(
-					parseFloat(filteredPads.value[0].latitude),
-					parseFloat(filteredPads.value[0].longitude),
-				);
-
-				map.setCenter(newCenter);
-			}
+		const faPin = new PinElement({
+			glyph: icon,
+			background: '#f7f0dc',
+			borderColor: '#f84d33',
 		});
+
+		try {
+			const marker = new AdvancedMarkerElement({
+				map: googleMap,
+				position: padLocation,
+				content: faPin.element,
+				title: title,
+			});
+
+			marker.addListener('gmp-click', () => {
+				infoWindow.close();
+				infoWindow.setContent(contentString);
+				infoWindow.open(googleMap, marker);
+			});
+
+			marker.padId = pad.id;
+			markers.value.push(marker);
+		} catch (error) {
+			//console.error('Error building map marker:', error);
+		}
 	}
 }
 
@@ -331,7 +347,7 @@ function openMapMarker(padId: number) {
 	});
 
 	if (marker) {
-		new google.maps.event.trigger(marker, 'click');
+		new google.maps.event.trigger(marker, 'gmp-click');
 	}
 }
 </script>

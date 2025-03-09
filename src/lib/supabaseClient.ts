@@ -15,14 +15,6 @@ const localSessionDuration = 1000 * 60 * 60;
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
-console.log(supabaseUrl, supabaseAnonKey);
-
-// Near the beginning of your supabaseClient.ts
-console.log('ENV Variables:', {
-	SUPABASE_URL: supabaseUrl,
-	SUPABASE_ANON_KEY: supabaseAnonKey,
-});
-
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
 	console.error(
