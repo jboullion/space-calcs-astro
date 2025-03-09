@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { User } from '@supabase/supabase-js';
 import { getWithExpiry, setWithExpiry } from '../components/vue/utils';
-import { SUPA_PROJECT_URL, SUPA_ANON_PUBLIC } from '../utils/public-variables';
 import type { Database, CalculatorRow } from '../services/database.types';
 
 import { useStore } from '@nanostores/vue';
@@ -12,10 +11,18 @@ const $user = useStore(storeUser);
 
 const localSessionDuration = 1000 * 60 * 60;
 
-export const supabase = createClient<Database>(
-	SUPA_PROJECT_URL,
-	SUPA_ANON_PUBLIC,
-);
+// Use Vite environment variables instead of imported constants
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+// Validate environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+	console.error(
+		'Missing Supabase environment variables. Check your .env file.',
+	);
+}
+
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
 export async function signOut() {
 	const { error } = await supabase.auth.signOut();
@@ -24,9 +31,9 @@ export async function signOut() {
 	window.location.href = '/';
 }
 
+// Rest of the file remains the same...
 export async function getSession() {
 	const { data, error } = await supabase.auth.getSession();
-
 	return data;
 }
 
@@ -50,7 +57,7 @@ export async function refreshSession() {
 	} else {
 		const { data, error } = await supabase.auth.refreshSession();
 		//const { session, user } = data;
-		localStorage.setItem('localSession', new Date().getTime().toString());
+		localStorage.setItem('lastSession', new Date().getTime().toString());
 	}
 }
 
