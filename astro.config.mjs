@@ -10,6 +10,9 @@ export default defineConfig({
 	site: 'https://spacecalcs.com',
 	integrations: [vue(), sitemap(), react()],
 	vite: {
+		ssr: {
+			noExternal: ['@googlemaps/js-api-loader'],
+		},
 		resolve: {
 			alias: {
 				'@': fileURLToPath(new URL('./src', import.meta.url)),
