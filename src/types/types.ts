@@ -17,4 +17,5 @@ export type SpaceCalc = {
 	sponsorImg?: string;
 	sponsorLink?: string;
 	newTab?: boolean;
+	tags?: string[];
 };

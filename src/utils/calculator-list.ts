@@ -185,6 +185,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/launch-pads',
 	},
+	{
+		id: 'moon-phases',
+		name: 'Moon Phases',
+		description: 'Calculate the moon phases for a given date and location',
+		categories: [categories[ORBIT_CAT]],
+		image: '',
+		link: '/calcs/moon-phases',
+		tags: ['moon', 'astronomy', 'lunar', 'phases'],
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
