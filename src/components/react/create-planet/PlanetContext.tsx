@@ -9,13 +9,13 @@ const PlanetContext = createContext<PlanetContextType | undefined>(undefined);
 
 export function PlanetProvider({ children }: { children: React.ReactNode }) {
 	// Core planet parameters
-	const [radius, setRadius] = useState(6371); // Default to Earth's radius
-	const [density, setDensity] = useState(5500); // Default Earth-like density
-	const [waterLevel, setWaterLevel] = useState(0);
+	const [radius, setRadius] = useState(6371); // Already matches terrestrial
+	const [density, setDensity] = useState(5500); // Already matches terrestrial
+	const [waterLevel, setWaterLevel] = useState(2); // Changed from 0 to 2
 	const [roughness, setRoughness] = useState(0.5);
 	const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1000000));
 	const [atmosphere, setAtmosphere] = useState<AtmosphereProperties>({
-		pressure: 1.0, // Earth-like defaults
+		pressure: 1.0, // Changed property name from 'pressure' to match PLANET_PRESETS structure
 		temperature: 288,
 		composition: {
 			n2: 78,
@@ -35,7 +35,7 @@ export function PlanetProvider({ children }: { children: React.ReactNode }) {
 			cloudSeed: Math.floor(Math.random() * 1000000),
 		},
 	});
-	const [planetType, setPlanetType] = useState('terrestrial');
+	const [planetType, setPlanetType] = useState('terrestrial'); // Already correct
 	const [surfaceColors, setSurfaceColors] = useState<SurfaceColors>({
 		base: '#8B4513', // Saddle Brown
 		lowland: '#A05A2C', // Sienna

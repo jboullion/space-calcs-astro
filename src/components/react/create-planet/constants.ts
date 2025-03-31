@@ -16,7 +16,6 @@ export const ATMOSPHERIC_CONSTANTS = {
 };
 
 export const PLANET_TYPES: { value: PlanetType; label: string }[] = [
-	{ value: 'custom', label: 'Custom' },
 	{ value: 'dwarf_planet', label: 'Dwarf Planet' },
 	{ value: 'terrestrial', label: 'Terrestrial (Earth-like)' },
 	{ value: 'super_earth', label: 'Super Earth' },
@@ -151,8 +150,8 @@ export const PLANET_PRESETS = {
 			cloudSeed: Math.random() * 100,
 		},
 		gasGiantVisuals: {
-			bandCount: 8,
-			rotationSpeed: 1.2,
+			bandCount: 6,
+			rotationSpeed: 0.8,
 			bandColors: [
 				'#2E4B8A', // Dark blue
 				'#3A5CA6',
@@ -192,7 +191,7 @@ export const PLANET_PRESETS = {
 		},
 		gasGiantVisuals: {
 			bandCount: 8,
-			rotationSpeed: 1.0,
+			rotationSpeed: 0.5,
 			bandColors: [
 				'#A86920', // Dark brown
 				'#C88B3A', // Light brown
