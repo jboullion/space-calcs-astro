@@ -63,7 +63,7 @@
 					<tr class="">
 						<th>Total Structure Mass</th>
 						<th class="text-end">
-							{{ formatNumber(totalStructureMass, 0) }} ton
+							{{ formatNumber(totalStructureMass / 1000, 0) }} ton
 						</th>
 					</tr>
 					<tr>
