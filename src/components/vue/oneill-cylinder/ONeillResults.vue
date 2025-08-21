@@ -40,42 +40,40 @@
 					<tr>
 						<td>{{ formData.structure.material.name }} Mass</td>
 						<td class="text-end">
-							{{ formatNumber(materialMass / 1000, 0) }} ton
+							{{ formatNumber(materialMassInTons, 0) }} ton
 						</td>
 					</tr>
-					<!-- <tr>
-            <td>Shielding Mass</td>
-            <td class="text-end">ton</td>
-          </tr> -->
 					<tr>
 						<td>Internal Structures Mass</td>
 						<td class="text-end">
-							{{ formatNumber(internalStructureMass / 1000, 0) }}
+							{{
+								formatNumber(internalStructureMassInTons, 0)
+							}}
 							ton
 						</td>
 					</tr>
 					<tr>
 						<td>Air Mass</td>
 						<td class="text-end">
-							{{ formatNumber(airMass, 0) }} ton
+							{{ formatNumber(airMassInTons, 0) }} ton
 						</td>
 					</tr>
 					<tr class="">
 						<th>Total Structure Mass</th>
 						<th class="text-end">
-							{{ formatNumber(totalStructureMass / 1000, 0) }} ton
+							{{ formatNumber(totalStructureMassInTons, 0) }} ton
 						</th>
 					</tr>
 					<tr>
 						<td>Internal Floors Mass</td>
 						<td class="text-end">
-							{{ formatNumber(floorsMass, 0) }} ton
+							{{ formatNumber(floorsMassInTons, 0) }} ton
 						</td>
 					</tr>
 					<tr class="">
 						<th>Total Mass</th>
 						<th class="text-end">
-							{{ formatNumber(finalTotalMass, 0) }} ton
+							{{ formatNumber(finalTotalMassInTons, 0) }} ton
 						</th>
 					</tr>
 				</tbody>
@@ -152,6 +150,31 @@ const showArea = ref(true);
 const showMass = ref(true);
 const showPopulation = ref(true);
 const showShielding = ref(false);
+
+const materialMassInTons = computed(() => materialMass.value / 1000);
+const internalStructureMassInTons = computed(
+	() => internalStructureMass.value / 1000,
+);
+const airMassInTons = computed(() => airMass.value / 1000); // This was the main issue
+const totalStructureMassInTons = computed(
+	() => totalStructureMass.value / 1000,
+);
+
+// Fix floorsMass - it's already in tons from the calculation, but let's be explicit
+const floorsMassInTons = computed(() => {
+	// floorsMass is already divided by 1000 in its calculation, so it's already in tons
+	return floorsMass.value;
+});
+
+// Fix final total mass - now properly sum all values in tons
+const finalTotalMassInTons = computed(() => {
+	return (
+		materialMassInTons.value +
+		internalStructureMassInTons.value +
+		airMassInTons.value +
+		floorsMassInTons.value
+	);
+});
 
 const {
 	shellFloorArea,
