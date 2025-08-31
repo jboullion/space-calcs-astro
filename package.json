@@ -5,10 +5,12 @@
 	"scripts": {
 		"dev": "astro dev",
 		"start": "astro dev",
+		"prebuild": "node src/scripts/fetch-launch-pads.js",
 		"build": "astro build",
 		"preview": "astro preview",
 		"astro": "astro",
-		"lint:fix": "eslint --fix --ext .js,.ts,.vue ."
+		"lint:fix": "eslint --fix --ext .js,.ts,.vue .",
+		"update-launch-pads": "node src/scripts/fetch-launch-pads.js"
 	},
 	"dependencies": {
 		"@astrojs/netlify": "^3.0.1",
