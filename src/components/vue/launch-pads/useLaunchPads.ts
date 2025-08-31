@@ -1,3 +1,4 @@
+// src/components/vue/launch-pads/useLaunchPads.ts
 import { ref, computed } from 'vue';
 import { LaunchPadService } from './LaunchPadService';
 import type { LaunchPad } from './launchpad.types';
@@ -8,6 +9,13 @@ export function useLaunchPads() {
 	const error = ref<string | null>(null);
 	const padSearch = ref<string>('');
 	const padCountry = ref<string>('');
+	const dataInfo = ref<{
+		lastUpdated: string;
+		totalPads: number;
+		totalLocations: number;
+		countriesCount: number;
+		isStale: boolean;
+	} | null>(null);
 
 	// List of unique country codes
 	const countryCodes = computed(() => {
@@ -45,10 +53,25 @@ export function useLaunchPads() {
 		error.value = null;
 
 		try {
-			pads.value = await LaunchPadService.getList();
+			// Load both pads and data info
+			const [padsData, info] = await Promise.all([
+				LaunchPadService.getList(),
+				LaunchPadService.getDataInfo(),
+			]);
+
+			pads.value = padsData;
+			dataInfo.value = info;
+
+			if (padsData.length === 0) {
+				error.value =
+					'No launch pads data available. Please check back later.';
+			}
 		} catch (err) {
 			console.error('Error loading launch pads:', err);
-			error.value = 'Failed to load launch pads. Please try again later.';
+			error.value =
+				err instanceof Error
+					? err.message
+					: 'Failed to load launch pads. Please try again later.';
 		} finally {
 			loading.value = false;
 		}
@@ -64,37 +87,44 @@ export function useLaunchPads() {
 		}
 	};
 
-	// Update all launch pads from the Space Devs API
-	// This would typically be called by an admin or scheduled task
-	const updateAllPads = async (): Promise<{
-		success: boolean;
-		message: string;
-	}> => {
+	// Force refresh data (clears cache and reloads)
+	const refreshData = async (): Promise<void> => {
 		loading.value = true;
 		error.value = null;
 
 		try {
-			const result = await LaunchPadService.updateLaunchPads();
-
-			if (result.success) {
-				// Reload the pads after a successful update
-				await loadPads();
-			} else {
-				error.value = result.message;
-			}
-
-			return result;
+			LaunchPadService.clearCache();
+			await loadPads();
 		} catch (err) {
-			const message =
+			console.error('Error refreshing data:', err);
+			error.value =
 				err instanceof Error
 					? err.message
-					: 'An unknown error occurred';
-			error.value = message;
-			return { success: false, message };
+					: 'Failed to refresh data. Please try again later.';
 		} finally {
 			loading.value = false;
 		}
 	};
+
+	// Format last updated date for display
+	const formattedLastUpdated = computed(() => {
+		if (
+			!dataInfo.value?.lastUpdated ||
+			dataInfo.value.lastUpdated === 'Unknown'
+		) {
+			return 'Unknown';
+		}
+
+		const date = new Date(dataInfo.value.lastUpdated);
+		return date.toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			timeZoneName: 'short',
+		});
+	});
 
 	return {
 		pads,
@@ -104,8 +134,10 @@ export function useLaunchPads() {
 		padCountry,
 		countryCodes,
 		filteredPads,
+		dataInfo,
+		formattedLastUpdated,
 		loadPads,
 		getPad,
-		updateAllPads,
+		refreshData,
 	};
 }

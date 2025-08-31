@@ -40,37 +40,59 @@
 								</select>
 							</div>
 
-							<!-- Admin-only section if user is authenticated -->
-							<!-- <div class="mt-4 mb-3 p-3 border rounded">
-								<h4>Admin Controls</h4>
-								<button
-									class="btn btn-primary"
-									@click="updatePads"
-									:disabled="loading || updateLoading"
-								>
-									<span v-if="updateLoading">
-										<i
-											class="fa-solid fa-circle-notch fa-spin me-2"
-										></i
-										>Updating...
-									</span>
-									<span v-else>
-										<i class="fa-solid fa-sync me-2"></i
-										>Update Launch Pads
-									</span>
-								</button>
+							<!-- Data Info Section -->
+							<div
+								v-if="dataInfo"
+								class="mt-4 mb-3 p-3 border rounded bg-light"
+							>
 								<div
-									v-if="updateMessage"
-									class="mt-2 alert"
-									:class="
-										updateSuccess
-											? 'alert-success'
-											: 'alert-danger'
-									"
+									class="d-flex justify-content-between align-items-center mb-2"
 								>
-									{{ updateMessage }}
+									<h6 class="mb-0">Data Status</h6>
+									<button
+										class="btn btn-sm btn-outline-primary"
+										@click="refreshData"
+										:disabled="loading"
+										title="Refresh data from cache"
+									>
+										<i
+											class="fa-solid fa-refresh"
+											:class="{ 'fa-spin': loading }"
+										></i>
+									</button>
 								</div>
-							</div> -->
+								<div class="small text-muted">
+									<div>
+										<strong>Last Updated:</strong>
+										{{ formattedLastUpdated }}
+									</div>
+									<div>
+										<strong>Launch Pads:</strong>
+										{{
+											dataInfo.totalPads.toLocaleString()
+										}}
+									</div>
+									<div>
+										<strong>Locations:</strong>
+										{{
+											dataInfo.totalLocations.toLocaleString()
+										}}
+									</div>
+									<div>
+										<strong>Countries:</strong>
+										{{ dataInfo.countriesCount }}
+									</div>
+									<div
+										v-if="dataInfo.isStale"
+										class="text-warning mt-1"
+									>
+										<i
+											class="fa-solid fa-exclamation-triangle"
+										></i>
+										Data may be outdated
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="col-md-8">
@@ -82,7 +104,23 @@
 						</div>
 
 						<div v-else-if="error" class="alert alert-danger">
-							{{ error }}
+							<div
+								class="d-flex justify-content-between align-items-center"
+							>
+								<div>
+									<i
+										class="fa-solid fa-exclamation-triangle me-2"
+									></i>
+									{{ error }}
+								</div>
+								<button
+									class="btn btn-sm btn-outline-danger"
+									@click="refreshData"
+								>
+									<i class="fa-solid fa-retry me-1"></i>
+									Retry
+								</button>
+							</div>
 						</div>
 
 						<div v-else>
@@ -92,6 +130,23 @@
 								class="pad_list mt-5"
 								style="max-height: 500px; overflow-y: auto"
 							>
+								<div
+									class="d-flex justify-content-between align-items-center mb-2"
+								>
+									<h5 class="mb-0">
+										Launch Pads
+										<span class="badge bg-primary ms-2">{{
+											filteredPads.length
+										}}</span>
+									</h5>
+									<div
+										v-if="padSearch || padCountry"
+										class="small text-muted"
+									>
+										Filtered from {{ pads.length }} total
+										pads
+									</div>
+								</div>
 								<table
 									class="pad_list__table table table-striped table-hover"
 								>
@@ -142,9 +197,6 @@
 import { computed, onMounted, ref } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
 import { useLaunchPads } from './useLaunchPads';
-import { supabase } from '../../../lib/supabaseClient';
-import { useStore } from '@nanostores/vue';
-import { storeUser } from '../../../utils/store';
 
 // Map element reference
 let googleMap: google.maps.Map;
@@ -159,14 +211,6 @@ const loader = new Loader({
 	...additionalOptions,
 });
 
-// Get current user from store
-const $user = useStore(storeUser);
-
-// Check if user is an admin (you'll need to define your own criteria)
-const isAdmin = computed(() => {
-	return !!$user.value;
-});
-
 // Launch pad state
 const {
 	loading,
@@ -175,13 +219,12 @@ const {
 	padCountry,
 	countryCodes,
 	filteredPads,
+	pads,
+	dataInfo,
+	formattedLastUpdated,
 	loadPads,
+	refreshData,
 } = useLaunchPads();
-
-// Update state
-const updateLoading = ref(false);
-const updateMessage = ref('');
-const updateSuccess = ref(false);
 
 // Load all pads on component mount
 onMounted(async () => {
@@ -191,32 +234,6 @@ onMounted(async () => {
 		await buildMapPads();
 	});
 });
-
-// Update launch pads from the Space Devs API (admin only)
-async function updatePads() {
-	//if (!isAdmin.value) return;
-
-	updateLoading.value = true;
-	updateMessage.value = '';
-
-	try {
-		const { updateAllPads } = useLaunchPads();
-		const result = await updateAllPads();
-
-		updateSuccess.value = result.success;
-		updateMessage.value = result.message;
-
-		if (result.success) {
-			// Rebuild the map with the updated pads
-			buildMapPads(true);
-		}
-	} catch (error) {
-		updateSuccess.value = false;
-		updateMessage.value = error.message || 'An unknown error occurred';
-	} finally {
-		updateLoading.value = false;
-	}
-}
 
 // Debounce map updates when filtering
 let timeoutId: ReturnType<typeof setTimeout>;
