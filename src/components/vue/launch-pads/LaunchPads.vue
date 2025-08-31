@@ -41,7 +41,7 @@
 							</div>
 
 							<!-- Data Info Section -->
-							<div
+							<!-- <div
 								v-if="dataInfo"
 								class="mt-4 mb-3 p-3 border rounded bg-light"
 							>
@@ -92,7 +92,7 @@
 										Data may be outdated
 									</div>
 								</div>
-							</div>
+							</div> -->
 						</div>
 					</div>
 					<div class="col-md-8">
