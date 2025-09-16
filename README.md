@@ -1,55 +1,110 @@
-# Astro Starter Kit: Basics
+# 🚀 Space Calcs
 
+Free and open tools for space enthusiasts, students, and professionals.
+
+
+---
+
+
+
+## 🌌 Overview
+
+
+
+**Space Calcs** is a collection of interactive calculators and visualizations for space science, engineering, and exploration. Our mission is to make advanced space-related tools accessible to everyone—whether you're a hobbyist, student, educator, or professional.
+
+
+
+-   **Website:** [spacecalcs.com](https://spacecalcs.com) (or your deployment URL)
+-   **License:** MIT
+
+
+
+## ✨ Features
+
+
+
+-   🚀 **Rocket Science:** Delta-V, Hohmann transfers, rocket engine performance, launch pads, mass drivers, and more
+-   � **Habitats & Colonies:** O'Neill cylinders, rotating habitats, habitat requirements, space elevators, create-your-own planet
+-   🌞 **Astrophysics:** Habitable zones, solar energy, Lagrange points, interstellar travel
+-   📈 **Visualization:** 3D graphics (Three.js), Google Charts, and interactive UI
+-   🧮 **Open & Extensible:** Add your own calculators or contribute improvements
+
+
+
+## 🛠️ Tech Stack
+
+
+
+-   **Framework:** [Astro.js](https://astro.build/) (primary)
+-   **UI:** React (all new calculators), legacy Vue support
+-   **Styling:** Bootstrap 5
+-   **Visualization:** Three.js, Google Charts
+-   **Other:** Supabase, PapaParse, FontAwesome, Sass
+
+
+
+## 📚 Calculator Examples
+
+
+
+-   **Rocket Potential Delta V** — Calculate mission delta-v
+-   **Hohmann Transfer** — Transfer orbit calculations
+-   **Orbit Visualizer** — Visualize satellite orbits
+-   **Rotating Habitats** — Simulate artificial gravity
+-   **Habitat Requirements** — Estimate mass, crew, and energy for habitats
+-   **Create Planet** — Design a planet and estimate its properties
+-   **Lagrange Points** — Find Lagrange points for two-body systems
+-   **Solar Energy** — Estimate solar panel output anywhere in the solar system
+-   **Population Growth** — Model population growth in space settlements
+-   ...and many more! (see `/src/utils/calculator-list.ts`)
+
+
+
+## 🚀 Getting Started
+
+
+
+```bash
+# Install dependencies
+npm install
+
+# Start the local dev server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview the production build
+npm run preview
 ```
-npm create astro@latest -- --template basics
-```
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-![basics](https://user-images.githubusercontent.com/4677417/186188965-73453154-fdec-4d6b-9c34-cb35c248ae5b.png)
 
 
-## 🚀 Project Structure
 
-Inside of your Astro project, you'll see the following folders and files:
+## 🤝 Contributing
 
-```
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+We welcome contributions! You can:
 
-Any static assets, like images, can be placed in the `public/` directory.
+-   Add new calculators (React preferred)
+-   Improve UI/UX or visualizations
+-   Fix bugs or suggest new features
+-   Help with documentation
 
-## 🧞 Commands
 
-All commands are run from the root of the project, from a terminal:
 
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `npm install`          | Installs dependencies                            |
-| `npm run dev`          | Starts local dev server at `localhost:3000`      |
-| `npm run build`        | Build your production site to `./dist/`          |
-| `npm run preview`      | Preview your build locally, before deploying     |
-| `npm run astro ...`    | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro --help` | Get help using the Astro CLI                     |
+See [CONTRIBUTING.md](CONTRIBUTING.md) (coming soon) or open an issue/PR.
 
-## 👀 Want to learn more?
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## 📝 License
+
+
+
+This project is licensed under the MIT License.
+
+
+#
+
+_Space Calcs is free and open for all. Ad Astra!_
