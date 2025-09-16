@@ -111,6 +111,7 @@ const three = {
 	renderer: null as THREE.WebGLRenderer | null,
 	scene: new THREE.Scene(),
 	camera: new THREE.PerspectiveCamera(),
+	sunLight: null as THREE.DirectionalLight | null,
 	controls: null as OrbitControls | null,
 	bodyOne: new THREE.Mesh(),
 	bodyTwo: new THREE.Mesh(),
@@ -381,8 +382,30 @@ function setupThreeJS() {
 	three.scene.add(new THREE.AmbientLight(0x404040));
 
 	if (props.formData.relationship.value === 'star') {
-		const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
+		// Use directional light positioned to shine from sun to planet
+		const light = new THREE.DirectionalLight(0xffffff, 1.5);
+
+		// Position it as if coming from the sun's position
+		light.position.set(0, 0, 0);
+		light.target.position.set(scaledDistance, 0, 0); // Point toward planet
+
+		light.castShadow = true;
+		light.shadow.mapSize.width = 1024;
+		light.shadow.mapSize.height = 1024;
+		light.shadow.camera.near = 1;
+		light.shadow.camera.far = scaledDistance * 2;
+		light.shadow.camera.left = -300;
+		light.shadow.camera.right = 300;
+		light.shadow.camera.top = 300;
+		light.shadow.camera.bottom = -300;
+
 		three.scene.add(light);
+		three.scene.add(light.target); // Don't forget to add the target
+		three.sunLight = light; // Store reference for rotation
+
+		// Add the light and target to the orbit group so they rotate together
+		three.orbitGroup.add(light);
+		three.orbitGroup.add(light.target);
 	} else {
 		const light = new THREE.DirectionalLight(0xffffff, 1.5);
 
