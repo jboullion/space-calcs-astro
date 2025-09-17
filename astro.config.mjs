@@ -1,14 +1,25 @@
 import { defineConfig } from 'astro/config';
 import { fileURLToPath } from 'url';
+import { calculators } from './src/utils/calculator-list.ts';
+
 import vue from '@astrojs/vue';
 import sitemap from '@astrojs/sitemap';
-
 import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://spacecalcs.com',
-	integrations: [vue(), sitemap(), react()],
+	integrations: [
+		vue(),
+		sitemap({
+			// Create a list of all your calculator pages
+			customPages: calculators.map(
+				(calc) => `https://spacecalcs.com${calc.link}`,
+			),
+		}),
+		,
+		react(),
+	],
 	vite: {
 		ssr: {
 			noExternal: ['@googlemaps/js-api-loader'],
