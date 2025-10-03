@@ -9,6 +9,7 @@ import react from '@astrojs/react';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://spacecalcs.com',
+	trailingSlash: 'ignore',
 	integrations: [
 		vue(),
 		sitemap({
@@ -17,7 +18,6 @@ export default defineConfig({
 				(calc) => `https://spacecalcs.com${calc.link}`,
 			),
 		}),
-		,
 		react(),
 	],
 	vite: {
