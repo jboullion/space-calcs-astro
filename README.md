@@ -15,7 +15,7 @@ Free and open tools for space enthusiasts, students, and professionals.
 
 
 
--   **Website:** [spacecalcs.com](https://spacecalcs.com) (or your deployment URL)
+-   **Website:** [spacecalcs.com](https://spacecalcs.com)
 -   **License:** MIT
 
 
@@ -99,7 +99,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) (coming soon) or open an issue/PR.
 
 
 ## 📝 License
-
 
 
 This project is licensed under the MIT License.
