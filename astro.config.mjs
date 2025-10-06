@@ -13,7 +13,7 @@ export default defineConfig({
 	integrations: [
 		vue(),
 		sitemap({
-			// Create a list of all your calculator pages
+			// Create a list of all calculator pages
 			customPages: calculators.map(
 				(calc) => `https://spacecalcs.com${calc.link}`,
 			),

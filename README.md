@@ -2,27 +2,16 @@
 
 Free and open tools for space enthusiasts, students, and professionals.
 
-
 ---
-
-
 
 ## 🌌 Overview
 
-
-
 **Space Calcs** is a collection of interactive calculators and visualizations for space science, engineering, and exploration. Our mission is to make advanced space-related tools accessible to everyone—whether you're a hobbyist, student, educator, or professional.
-
-
 
 -   **Website:** [spacecalcs.com](https://spacecalcs.com) (or your deployment URL)
 -   **License:** MIT
 
-
-
 ## ✨ Features
-
-
 
 -   🚀 **Rocket Science:** Delta-V, Hohmann transfers, rocket engine performance, launch pads, mass drivers, and more
 -   � **Habitats & Colonies:** O'Neill cylinders, rotating habitats, habitat requirements, space elevators, create-your-own planet
@@ -30,11 +19,7 @@ Free and open tools for space enthusiasts, students, and professionals.
 -   📈 **Visualization:** 3D graphics (Three.js), Google Charts, and interactive UI
 -   🧮 **Open & Extensible:** Add your own calculators or contribute improvements
 
-
-
 ## 🛠️ Tech Stack
-
-
 
 -   **Framework:** [Astro.js](https://astro.build/) (primary)
 -   **UI:** React (all new calculators), legacy Vue support
@@ -42,11 +27,7 @@ Free and open tools for space enthusiasts, students, and professionals.
 -   **Visualization:** Three.js, Google Charts
 -   **Other:** Supabase, PapaParse, FontAwesome, Sass
 
-
-
 ## 📚 Calculator Examples
-
-
 
 -   **Rocket Potential Delta V** — Calculate mission delta-v
 -   **Hohmann Transfer** — Transfer orbit calculations
@@ -59,11 +40,7 @@ Free and open tools for space enthusiasts, students, and professionals.
 -   **Population Growth** — Model population growth in space settlements
 -   ...and many more! (see `/src/utils/calculator-list.ts`)
 
-
-
 ## 🚀 Getting Started
-
-
 
 ```bash
 # Install dependencies
@@ -79,11 +56,7 @@ npm run build
 npm run preview
 ```
 
-
-
 ## 🤝 Contributing
-
-
 
 We welcome contributions! You can:
 
@@ -92,18 +65,11 @@ We welcome contributions! You can:
 -   Fix bugs or suggest new features
 -   Help with documentation
 
-
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) (coming soon) or open an issue/PR.
-
-
-
 ## 📝 License
 
+This project is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
-
-This project is licensed under the MIT License.
-
+This license permits non-commercial use, adaptation, and contribution, but prohibits commercial reuse and requires any derivative works to be shared under the same license terms.
 
 #
 
