@@ -67,6 +67,8 @@ We welcome contributions! You can:
 
 ## 📝 License
 
+This project is licensed under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
 This license permits non-commercial use, adaptation, and contribution, but prohibits commercial reuse and requires any derivative works to be shared under the same license terms.
 
 #
