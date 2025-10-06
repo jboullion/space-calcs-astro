@@ -14,7 +14,7 @@ Free and open tools for space enthusiasts, students, and professionals.
 ## ✨ Features
 
 -   🚀 **Rocket Science:** Delta-V, Hohmann transfers, rocket engine performance, launch pads, mass drivers, and more
--   � **Habitats & Colonies:** O'Neill cylinders, rotating habitats, habitat requirements, space elevators, create-your-own planet
+-   🏗️ **Habitats & Colonies:** O'Neill cylinders, rotating habitats, habitat requirements, space elevators, create-your-own planet
 -   🌞 **Astrophysics:** Habitable zones, solar energy, Lagrange points, interstellar travel
 -   📈 **Visualization:** 3D graphics (Three.js), Google Charts, and interactive UI
 -   🧮 **Open & Extensible:** Add your own calculators or contribute improvements
