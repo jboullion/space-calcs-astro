@@ -4,8 +4,8 @@
 			id="radius"
 			label="Radius"
 			v-model="model.radius"
-			:step="0.1"
-			:min="0.1"
+			:step="0.05"
+			:min="0.05"
 			:max="1000000"
 			unit="km"
 		/>
@@ -14,8 +14,8 @@
 			id="cylinderLength"
 			label="Cylinder Length"
 			v-model="model.cylinderLength"
-			:step="0.1"
-			:min="0.1"
+			:step="0.05"
+			:min="0.05"
 			:max="1000000"
 			:description="`Max Passive Stability: ${formatNumber(
 				maxPassiveStabilty,
