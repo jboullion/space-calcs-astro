@@ -36,7 +36,7 @@
 					label="Thickness"
 					v-model="formData.thickness"
 					tooltip="The distance from the inner edge to the outer edge of the structure."
-					:min="2"
+					:min="0.5"
 					:max="formData.radius"
 					unit="m"
 					@change="updateThickness"
@@ -400,54 +400,56 @@
 					></i>
 				</h3>
 				<table class="table table-striped border">
-					<tr>
-						<th>Incidence Angle</th>
-						<td><span class="h4">⦩</span></td>
-						<td>{{ funnel.angleOfIncidence }}</td>
-						<td>&deg;</td>
-					</tr>
-					<tr>
-						<th>Opposite Angle</th>
-						<td><span class="h4">⦮</span></td>
-						<td>{{ funnel.oppositeAngle }}</td>
-						<td>&deg;</td>
-					</tr>
-					<tr>
-						<th>Net Force</th>
-						<td><span class="h4">↥</span></td>
-						<td>{{ funnel.netCentripetalForce }}</td>
-						<td>m/s</td>
-					</tr>
-					<tr>
-						<th>Platform Width</th>
-						<td><span class="h4">c</span></td>
-						<td>{{ formData.shipLength }}</td>
-						<td>m</td>
-					</tr>
-					<tr>
-						<th>Width</th>
-						<td><span class="h4">a</span></td>
-						<td>{{ funnel.baseWidth }}</td>
-						<td>m</td>
-					</tr>
-					<tr>
-						<th>Height</th>
-						<td><span class="h4">b</span></td>
-						<td>{{ funnel.baseHeight }}</td>
-						<td>m</td>
-					</tr>
-					<tr>
-						<th>Inner Radius</th>
-						<td><i class="far fa-dot-circle"></i></td>
-						<td>{{ funnel.innerRadius }}</td>
-						<td>m</td>
-					</tr>
-					<tr>
-						<th>Outer Radius</th>
-						<td><i class="far fa-circle"></i></td>
-						<td>{{ funnel.outerRadius }}</td>
-						<td>m</td>
-					</tr>
+					<tbody>
+						<tr>
+							<th>Incidence Angle</th>
+							<td><span class="h4">⦩</span></td>
+							<td>{{ funnel.angleOfIncidence }}</td>
+							<td>&deg;</td>
+						</tr>
+						<tr>
+							<th>Opposite Angle</th>
+							<td><span class="h4">⦮</span></td>
+							<td>{{ funnel.oppositeAngle }}</td>
+							<td>&deg;</td>
+						</tr>
+						<tr>
+							<th>Net Force</th>
+							<td><span class="h4">↥</span></td>
+							<td>{{ funnel.netCentripetalForce }}</td>
+							<td>m/s</td>
+						</tr>
+						<tr>
+							<th>Platform Width</th>
+							<td><span class="h4">c</span></td>
+							<td>{{ formData.shipLength }}</td>
+							<td>m</td>
+						</tr>
+						<tr>
+							<th>Width</th>
+							<td><span class="h4">a</span></td>
+							<td>{{ funnel.baseWidth }}</td>
+							<td>m</td>
+						</tr>
+						<tr>
+							<th>Height</th>
+							<td><span class="h4">b</span></td>
+							<td>{{ funnel.baseHeight }}</td>
+							<td>m</td>
+						</tr>
+						<tr>
+							<th>Inner Radius</th>
+							<td><i class="far fa-dot-circle"></i></td>
+							<td>{{ funnel.innerRadius }}</td>
+							<td>m</td>
+						</tr>
+						<tr>
+							<th>Outer Radius</th>
+							<td><i class="far fa-circle"></i></td>
+							<td>{{ funnel.outerRadius }}</td>
+							<td>m</td>
+						</tr>
+					</tbody>
 				</table>
 			</div>
 
