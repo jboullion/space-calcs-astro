@@ -9,7 +9,7 @@ Free and open tools for space enthusiasts, students, and professionals.
 **Space Calcs** is a collection of interactive calculators and visualizations for space science, engineering, and exploration. Our mission is to make advanced space-related tools accessible to everyone—whether you're a hobbyist, student, educator, or professional.
 
 -   **Website:** [spacecalcs.com](https://spacecalcs.com)
--   **License:** MIT
+-   **License:** GNU v3.0
 
 ## ✨ Features
 
