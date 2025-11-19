@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Home from '../components/vue/home/Home.vue';
 import Sponsor from '../components/shared/Sponsor.astro';
+import SisterSites from '../components/shared/SisterSites.astro';
 import Collaborate from '../components/shared/Collaborate.astro';
 ---
 
@@ -10,6 +11,8 @@ import Collaborate from '../components/shared/Collaborate.astro';
     description="All the tools you need to calculate your mission to space!"
 >
     <Home client:load />
+
+    <!-- <SisterSites /> -->
 
     <Collaborate />
 </Layout>

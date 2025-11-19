@@ -18,58 +18,82 @@ const year = new Date().getFullYear();
   (adsbygoogle = window.adsbygoogle || []).push({});
 </script> -->
 <footer class="py-5 px-3 bg-dark text-light">
-    <div class="d-flex justify-content-center align-items-center flex-column">
-        <div class="mb-4">
-            <p class="text-center mb-0 fs-6">Comments or Questions?</p>
-            <div class="contact-options text-center fs-4">
-                <a
-                    href="mailto:jboullion@nexusaurora.org"
-                    class="text-decoration-none mx-md-3 mx-3 text-white"
-                >
-                    <i class="fa-solid fa-envelope"></i>
-                </a>
-                <a
-                    href="https://www.linkedin.com/company/nexusaurora/"
+    <div class="container">
+        <div class="row g-4">
+            <!-- Contact Column -->
+            <div class="col-md-4 text-center text-md-start">
+                <div class="contact-options fs-4">
+                    <a
+                        href="mailto:jboullion@nexusaurora.org"
+                        class="text-decoration-none me-3 text-white"
+                    >
+                        <i class="fa-solid fa-envelope"></i>
+                    </a>
+                    <a
+                        href="https://www.linkedin.com/company/nexusaurora/"
+                        target="_blank"
+                        class="text-linkedin me-3"
+                    >
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                    <a
+                        href="https://www.discord.gg/W66AhPA4y7"
+                        target="_blank"
+                        class="text-discord"
+                    >
+                        <i class="fa-brands fa-discord"></i>
+                    </a>
+                </div>
+                <p class="mt-3 mb-0 small">
+                    &copy;{year}&nbsp;<a
+                        href="https://github.com/jboullion"
+                        target="_blank"
+                        class="link-light">James Boullion</a
+                    > and
+                    <a href="http://nexusaurora.org/" target="_blank" class="link-light"
+                        >Nexus Aurora</a
+                    >
+                </p>
+            </div>
+
+            <!-- Sister Sites Column -->
+            <div class="col-md-4 text-center">
+                <p class="mb-2 fs-6 fw-bold">Sister Sites</p>
+                <div class="d-flex flex-column gap-2">
+                    <a 
+                        href="https://simple-calcs.com" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="link-light text-decoration-none"
+                    >
+                        <i class="fa-solid fa-calculator me-1"></i> Simple Calcs
+                    </a>
+                    <!-- <a 
+                        href="#" 
+                        class="link-light text-decoration-none opacity-50"
+                        title="Coming Soon"
+                    >
+                        <i class="fa-solid fa-gamepad me-1"></i>Simple Games
+                    </a> -->
+                </div>
+            </div>
+
+            <!-- Support Column -->
+            <div class="col-md-4 text-center text-md-end">
+                <a 
+                    href="https://www.buymeacoffee.com/jboullion" 
                     target="_blank"
-                    class="text-linkedin mx-md-3 mx-3"
+                    rel="noopener noreferrer"
+                    class="d-inline-block"
                 >
-                    <i class="fa-brands fa-linkedin-in"></i>
-                </a>
-                <a
-                    href="https://www.discord.gg/W66AhPA4y7"
-                    target="_blank"
-                    class="text-discord mx-md-3 mx-3"
-                >
-                    <i class="fa-brands fa-discord"></i>
+                    <img 
+                        src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                        alt="Buy Me A Coffee" 
+                        class="w-auto hover:opacity-90 transition-opacity duration-200"
+                        style="height: 50px;"
+                    />
                 </a>
             </div>
-        </div>
-
-        <p class="text-center mb-0">
-            &copy;{year}&nbsp;<a
-                href="https://github.com/jboullion"
-                target="_blank"
-                class="link-light">James Boullion</a
-            > and
-            <a href="http://nexusaurora.org/" target="_blank" class="link-light"
-                >Nexus Aurora</a
-            >
-        </p>
-
-        <div class="mt-4">
-            <a 
-                href="https://www.buymeacoffee.com/jboullion" 
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center"
-            >
-                <img 
-                    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
-                    alt="Buy Me A Coffee" 
-                    class="w-auto hover:opacity-90 transition-opacity duration-200"
-                    style="height: 50px;"
-                />
-            </a>
         </div>
     </div>
 </footer>
