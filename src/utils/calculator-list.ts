@@ -186,6 +186,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		link: '/calcs/launch-pads',
 	},
 	// {
+	// 	id: 'srm-simulator',
+	// 	name: 'Solid Rocket Motor Simulator',
+	// 	description:
+	// 		'Design and simulate solid rocket motors with BATES and Finocyl grain geometries',
+	// 	categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
+	// 	image: '',
+	// 	link: '/calcs/srm-simulator',
+	// },
+	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
 	// 	description: 'Calculate the transfer window between two planets',

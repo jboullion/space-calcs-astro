@@ -1,0 +1,42 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Hero from "../../components/calcs/Hero.astro";
+import SRMSimulator from "../../components/react/srmlab/SRMSimulator.tsx";
+import References from "../../components/shared/References.astro";
+import type { Reference } from "../../types/types";
+
+const title = "Solid Rocket Motor Simulator";
+const description =
+	"Design and simulate solid rocket motors with BATES and Finocyl grain geometries. Analyze thrust curves, chamber pressure, and motor performance with real-time 3D visualization.";
+
+const references: Reference[] = [
+	{
+		title: "Solid-propellant Rocket - Wikipedia",
+		url: "https://en.wikipedia.org/wiki/Solid-propellant_rocket",
+	},
+	{
+		title: "Rocket Propulsion Elements (Sutton & Biblarz)",
+		url: "https://arc.aiaa.org/doi/book/10.2514/4.866852",
+	},
+	{
+		title: "OpenMotor - Open Source Motor Simulator",
+		url: "https://github.com/reilleya/openMotor",
+	},
+	{
+		title: "Nakka Rocketry - Solid Rocket Motor Design",
+		url: "https://www.nakka-rocketry.net/",
+	},
+	{
+		title: "BATES Grain Geometry",
+		url: "https://en.wikipedia.org/wiki/Solid-propellant_rocket#Grain_geometry",
+	},
+];
+---
+
+<Layout title={title} description={description}>
+	<div class="container">
+		<Hero title={title} description={description} />
+		<SRMSimulator client:load />
+		<References references={references} />
+	</div>
+</Layout>
