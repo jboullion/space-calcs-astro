@@ -1,9 +1,11 @@
 import { useSRM } from './SRMContext';
+import { useState } from 'react';
 import ResultTable from '../forms/ResultTable';
 import { formatNumber, addCommas } from './constants';
 
 export default function SRMResults() {
 	const { results, isSimulating } = useSRM();
+	const [activeTab, setActiveTab] = useState('performance');
 
 	if (isSimulating) {
 		return (
@@ -25,6 +27,44 @@ export default function SRMResults() {
 
 	return (
 		<>
+			{/* Tab Navigation */}
+			<ul className="nav nav-tabs mb-3" role="tablist">
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'performance' ? 'active' : ''}`}
+						onClick={() => setActiveTab('performance')}
+						type="button"
+					>
+						<i className="fas fa-chart-bar me-1"></i>
+						Performance
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'pressure' ? 'active' : ''}`}
+						onClick={() => setActiveTab('pressure')}
+						type="button"
+					>
+						<i className="fas fa-gauge-high me-1"></i>
+						Pressure
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'propellant' ? 'active' : ''}`}
+						onClick={() => setActiveTab('propellant')}
+						type="button"
+					>
+						<i className="fas fa-gas-pump me-1"></i>
+						Propellant
+					</button>
+				</li>
+			</ul>
+
+			{/* Tab Content */}
+			<div className="tab-content">
+				{/* Performance Tab */}
+				{activeTab === 'performance' && (
 			<ResultTable
 				title={
 					<h5 className="mb-3">
@@ -98,7 +138,10 @@ export default function SRMResults() {
 					</td>
 				</tr>
 			</ResultTable>
+				)}
 
+				{/* Pressure Tab */}
+				{activeTab === 'pressure' && (
 			<ResultTable
 				title={
 					<h5 className="mb-3">
@@ -130,7 +173,10 @@ export default function SRMResults() {
 					</td>
 				</tr>
 			</ResultTable>
+				)}
 
+				{/* Propellant Tab */}
+				{activeTab === 'propellant' && (
 			<ResultTable
 				title={
 					<h5 className="mb-3">
@@ -204,6 +250,8 @@ export default function SRMResults() {
 					</td>
 				</tr>
 			</ResultTable>
+				)}
+			</div>
 		</>
 	);
 }
