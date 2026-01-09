@@ -67,6 +67,7 @@ export default function SRMForm() {
 				{/* Motor Case Tab */}
 				<div className={`tab-pane fade ${activeTab === 'case' ? 'show active' : ''}`}>
 					<div className="p-3 rounded border">
+						<h5 className="mb-3">Motor Case</h5>
 						<InputWrapper
 							id="case-diameter"
 							label="Case Inner Diameter"
