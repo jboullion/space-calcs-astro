@@ -3,66 +3,76 @@
 		<NumberInput
 			id="urbanDensity"
 			label="Urban Density"
-			v-model.number="landUse.urbanDensity"
+			v-model.number="model.landUse.urbanDensity"
 			:step="1"
 			:min="1"
 			:max="100"
-			description=""
+			:description="`${formatNumber(urbanArea)} km²`"
 			unit="%"
 		/>
 
 		<NumberInput
 			id="agriculturalDensity"
 			label="Agricultural Density"
-			v-model.number="landUse.agriculturalDensity"
+			v-model.number="model.landUse.agriculturalDensity"
 			:step="1"
 			:min="1"
 			:max="100"
-			description=""
+			:description="`${formatNumber(agriculturalArea)} km²`"
 			unit="%"
 		/>
 
 		<NumberInput
 			id="industrialDensity"
 			label="Industrial Density"
-			v-model.number="landUse.industrialDensity"
+			v-model.number="model.landUse.industrialDensity"
 			:step="1"
 			:min="1"
 			:max="100"
-			description=""
+			:description="`${formatNumber(industrialArea)} km²`"
 			unit="%"
 		/>
-
-		<!-- <NumberInput
-                    id="unusedDensity"
-                    label="Unused Density"
-                    v-model.number="formData.land.unusedDensity"
-                    :step="1"
-                    :min="1"
-                    :max="100"
-                    description=""
-                    unit="%"
-                  /> -->
 
 		<SelectInput
 			id="urbanDensityExample"
 			label="Urban Density Example"
-			v-model="landUse.urbanDensityExample"
+			v-model="model.landUse.urbanDensityExample"
 			:options="populationDensityExamples"
+			:description="`${formatNumber(
+				model.landUse.urbanDensityExample.popKm2,
+			)} people / km²`"
 		/>
+
+		<div v-if="unusedArea > 0" class="alert alert-info mt-3">
+			Unused Area: {{ formatNumber(unusedArea) }} km²
+		</div>
+
+		<div v-if="unusedArea < 0" class="alert mt-3 alert-danger">
+			Overused Area: {{ formatNumber(unusedArea) }} km²
+		</div>
 	</div>
 </template>
+
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-
-import type { LandUse } from './types';
-
+import { computed } from 'vue';
+import type { ILandUse, ONeillCylinderForm } from './types';
 import { populationDensityExamples } from './constants';
-
 import NumberInput from '../forms/NumberInput.vue';
 import SelectInput from '../forms/SelectInput.vue';
+import { formatNumber } from '../utils';
+import { useStationCalculations } from './composables/useStationCalculations';
+
+const model = defineModel<ONeillCylinderForm>({ required: true });
 
 const props = defineProps<{
-	landUse: LandUse;
+	totalArea?: number;
 }>();
+
+const {
+	urbanPopulation,
+	unusedArea,
+	urbanArea,
+	agriculturalArea,
+	industrialArea,
+} = useStationCalculations(model.value);
 </script>

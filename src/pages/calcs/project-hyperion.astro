@@ -1,0 +1,39 @@
+---
+import type { Reference } from '../../types/types';
+
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import ProjectHyperionComponent from '../../components/react/project-hyperion/ProjectHyperion.tsx';
+import References from '../../components/shared/References.astro';
+import { calculators } from '../../utils/calculator-list';
+
+const calculator = calculators.find((calc) => calc.id === 'project-hyperion');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+const references: Reference[] = [
+    {
+        title: 'Project Hyperion Competition Brief',
+        url: '/assets/Project Hyperion Competition Brief - Version 2.pdf',
+    },
+];
+---
+
+
+
+<Layout title={calculator.name} description={calculator.description}>
+
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div style="min-height: 700px;" class="calculator">
+            <ProjectHyperionComponent client:only="react" />
+        </div>
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>

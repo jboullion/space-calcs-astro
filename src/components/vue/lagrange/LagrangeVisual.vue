@@ -76,6 +76,7 @@ import type { ILagrangeForm } from './types';
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { throttle } from '../../../utils/utils';
 
 import {
 	CSS2DObject,
@@ -110,6 +111,7 @@ const three = {
 	renderer: null as THREE.WebGLRenderer | null,
 	scene: new THREE.Scene(),
 	camera: new THREE.PerspectiveCamera(),
+	sunLight: null as THREE.DirectionalLight | null,
 	controls: null as OrbitControls | null,
 	bodyOne: new THREE.Mesh(),
 	bodyTwo: new THREE.Mesh(),
@@ -131,15 +133,38 @@ const animation = {
 
 const scaledDistance = 1000;
 
+const throttledResize = throttle(onWindowResize, 32);
+
 onMounted(() => {
 	load();
 
-	window.addEventListener('resize', setupScene, { passive: true });
+	window.addEventListener('resize', throttledResize, { passive: true });
 });
 
 onBeforeUnmount(() => {
-	window.removeEventListener('resize', setupScene);
+	window.removeEventListener('resize', throttledResize);
 });
+
+function updateRenderSize() {
+	if (!three.canvas) return;
+	if (!three.renderer) return;
+
+	const width = three.canvas.getBoundingClientRect().width;
+	const height = width * 0.75;
+
+	// Update aspect ratio
+	three.camera.aspect = width / height;
+
+	// Update the camera's projection matrix
+	three.camera.updateProjectionMatrix();
+
+	three.renderer.setSize(width, height);
+	three.canvas.style.paddingTop = `0px`;
+}
+
+function onWindowResize() {
+	updateRenderSize();
+}
 
 const bodyOneName = computed<string>(() => {
 	return props.formData.relationship.value === 'star' ? 'Star' : 'Planet';
@@ -357,8 +382,30 @@ function setupThreeJS() {
 	three.scene.add(new THREE.AmbientLight(0x404040));
 
 	if (props.formData.relationship.value === 'star') {
-		const light = new THREE.PointLight(0xffffff, 1.5, cameraDistance);
+		// Use directional light positioned to shine from sun to planet
+		const light = new THREE.DirectionalLight(0xffffff, 1.5);
+
+		// Position it as if coming from the sun's position
+		light.position.set(0, 0, 0);
+		light.target.position.set(scaledDistance, 0, 0); // Point toward planet
+
+		light.castShadow = true;
+		light.shadow.mapSize.width = 1024;
+		light.shadow.mapSize.height = 1024;
+		light.shadow.camera.near = 1;
+		light.shadow.camera.far = scaledDistance * 2;
+		light.shadow.camera.left = -300;
+		light.shadow.camera.right = 300;
+		light.shadow.camera.top = 300;
+		light.shadow.camera.bottom = -300;
+
 		three.scene.add(light);
+		three.scene.add(light.target); // Don't forget to add the target
+		three.sunLight = light; // Store reference for rotation
+
+		// Add the light and target to the orbit group so they rotate together
+		three.orbitGroup.add(light);
+		three.orbitGroup.add(light.target);
 	} else {
 		const light = new THREE.DirectionalLight(0xffffff, 1.5);
 

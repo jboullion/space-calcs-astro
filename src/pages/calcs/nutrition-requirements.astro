@@ -4,7 +4,7 @@ import Hero from "../../components/calcs/Hero.astro";
 
 import References from "../../components/shared/References.astro";
 import type { Reference } from "../../types/types";
-import NutritionRequirements from "../../components/vue/nutrition-requirements/NutritionRequirements.vue";
+import NutritionRequirementsComponent from "../../components/vue/nutrition-requirements/NutritionRequirements.vue";
 const title = "Nutrition Requirements";
 const description =
   "Estimate the nutrition requirements and the mass of the food required for a mission";
@@ -25,7 +25,7 @@ const references: Reference[] = [
   <div class="container">
     <Hero title={title} description={description} />
     <div style="min-height: 600px;" class="calculator">
-      <NutritionRequirements client:load />
+      <NutritionRequirementsComponent client:load />
     </div>
 
     <References references={references} />

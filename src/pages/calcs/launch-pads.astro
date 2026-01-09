@@ -1,0 +1,36 @@
+---
+import type { Reference } from '../../types/types';
+
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+
+import LaunchPadsComponent from '../../components/vue/launch-pads/LaunchPads.vue';
+import References from '../../components/shared/References.astro';
+import { calculators } from '../../utils/calculator-list';
+
+const calculator = calculators.find((calc) => calc.id === 'launch-pads');
+
+if (!calculator) {
+    throw new Error('Calculator not found');
+}
+
+const references: Reference[] = [
+    {
+        title: 'The Space Devs',
+        url: 'https://thespacedevs.com/'
+    },
+];
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+    <div class="container">
+        <Hero title={calculator.name} description={calculator.description} />
+        <div style="min-height: 700px;" class="calculator">
+            <LaunchPadsComponent client:load />
+        </div>
+
+        <References references={references} />
+    </div>
+</Layout>
+
+<style></style>

@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="-1265 -140 2328 3104">
+ <title>Solar system delta v map</title>
+ <desc>Delta-v map of selected bodies in the solar system, assuming burns are at periapsis, and gravity assist and inclination changes are ignored, by CMG Lee based on data on http://deltavposter.space and http://i.imgur.com/WGOy3qT.png .</desc>
+ <style type="text/css">
+.main   { font-family:Helvetica,Arial,sans-serif; font-size:30px; text-anchor:middle;
+          fill:#000000; stroke:none; stroke-width:30px; }
+text    { stroke:none; cursor:default; }
+.object { font-weight:bold; font-style:italic; }
+.deltav { font-weight:bold; font-style:normal; }
+.pack   { letter-spacing:-0.1ex; }
+ </style>
+ <defs>
+  <circle id="object" cx="0" cy="0" r="22" fill="currentColor" stroke="none"/>
+  <circle id="transfer" cx="0" cy="0" r="15" fill="#ffffff" stroke="#000000" stroke-width="8"/>
+  <path id="escape" d="M 0,-25 V 0 H 28" fill="none" stroke-width="28"/>
+  <path id="orbit"  d="M 0,-15 V 0 H 13" fill="none" stroke-width="28" stroke-linecap="round"/>
+  <text id="ec1"              x="0"  y="-4ex"><tspan>escape</tspan><tspan dy="0.1em">/</tspan><tspan x="0"     dy="0.9em">capture</tspan></text>
+  <text id="ec2" class="pack" x="5.5ex" y="0"><tspan>escape</tspan><tspan dy="0.1em">/</tspan><tspan x="5.5ex" dy="0.9em">capture</tspan></text>
+ </defs>
+ <circle cx="0" cy="0" r="99999" fill="#ffffff"/>
+ <g class="main">
+  <g font-size="50" font-weight="bold" text-anchor="start">
+   <path d="M -1300, 710 H -340 c 100,0 100,-120 200,-120 H 1100 V  130 H -1300 Z" fill="#ccffff"/>
+   <path d="M -1300,1650 H -210 c 100,0 100,-120 200,-120 H 1100 V 1980 H -1300 Z" fill="#ffddff"/>
+   <rect x="-1240" y="2650" width="1080" height="290" rx="30" ry="30"              fill="#ddffdd"/>
+   <text transform="translate(-1250, -90)" x="0" y="0.7ex"><tspan>SOLAR SYSTEM</tspan><tspan x="0" dy="1em">DELTA-V MAP</tspan></text>
+   <text transform="translate(-1250, 180)" x="0" y="0.7ex"><tspan >Kuiper belt</tspan><tspan x="0" dy="1em">objects</tspan></text>
+   <text transform="translate(-1250, 750)" x="0" y="0.7ex">Gas and ice giants</text>
+   <text transform="translate(-1250,1710)" x="0" y="0.7ex">Asteroids</text>
+   <text transform="translate(-1250,2030)" x="0" y="0.7ex">Terrestrial planets</text>
+   <text transform="translate(-1230,2690)" x="0" y="0.7ex">LEGEND</text>
+  </g>
+  <g color="#00ff00" stroke="currentColor" transform="translate(-310,2820)">
+   <path d="M               0,-50 V 50" stroke="#ffee00"/>
+   <path d="M 0,0 H -860 M -360,0 V 50"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="5ex" y="-4ex"><tspan>Hohmann</tspan><tspan x="5ex" dy="1em">transfer</tspan><tspan x="5ex" dy="1em">orbit</tspan><tspan x="5ex" dy="1em">from</tspan><tspan x="5ex" dy="1em">Earth</tspan><tspan x="5ex" dy="1em">to object</tspan></text></g>
+   <g transform="translate(-110,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(-360,   0)"><use xlink:href="#transfer"/><text x="0"   y="-4ex"><tspan>Hohmann transfer orbit</tspan><tspan x="0" dy="1em">from object to satellite</tspan></text></g>
+   <g transform="translate(-630,   0)"><use xlink:href="#orbit"   /><text x="0"   y="-4ex"><tspan>low circular</tspan><tspan x="3" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-860,   0)"><use xlink:href="#object"  /><text x="0"   y="-4ex"  class="object"><tspan>Celestial</tspan><tspan x="0" dy="1em">object</tspan></text></g>
+   <g transform="translate(-360,  60)"><use xlink:href="#object"  /><text x="6ex" y="0.7ex" class="object"><tspan>Satellite</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(-630,0)" x="0" y="0.7ex"><tspan font-style="italic">&#916;v</tspan><tspan> for each segment in ms</tspan><tspan dx="3" dy="-7" font-size="20">&#8722;1</tspan></text>
+    <text transform="translate(-180,0)" x="0" y="0.7ex"><tspan>&#9664; = can aerobrake</tspan></text>
+   </g>
+   <text transform="translate(-630,40)" x="0" y="0.7ex"><tspan>(burns at periapsis; gravity assist</tspan><tspan x="0" dy="1em">&#160;and inclination changes ignored)</tspan></text>
+  </g>
+  <g color="#ffee00" stroke="currentColor">
+   <path d="M 25,-105 H -25 H 0 V 2920 H 1000" fill="none"/>
+   <g transform="translate(   0,-105)"><text x="8ex" y="0.7ex"><tspan>Sun escape</tspan></text></g>
+   <g transform="translate(   0,2920)"><use xlink:href="#transfer"/><text x="-5ex" y="-1ex"><tspan>Sun</tspan><tspan x="-5ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 400,2920)"><use xlink:href="#orbit"   /><text x="0"    y="-3ex"><tspan>10000&#8202;km orbit</tspan></text></g>
+   <g transform="translate(1000,2920)"><use xlink:href="#object"  /><text x="0"    y="-3ex" class="object"><tspan>Sun</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(  0, -65) rotate(90)" x="0" y="0.7ex"    >30</text>
+    <text transform="translate(  0,  40) rotate(90)" x="0" y="0.7ex"   >200</text>
+    <text transform="translate(  0, 165) rotate(90)" x="0" y="0.7ex"   >109</text>
+    <text transform="translate(  0, 275) rotate(90)" x="0" y="0.7ex"    >17</text>
+    <text transform="translate(  0, 365) rotate(90)" x="0" y="0.7ex"    >33</text>
+    <text transform="translate(  0, 550) rotate(90)" x="0" y="0.7ex"   >117</text>
+    <text transform="translate(  0, 800) rotate(90)" x="0" y="0.7ex"   >269</text>
+    <text transform="translate(  0,1010) rotate(90)" x="0" y="0.7ex"   >690</text>
+    <text transform="translate(  0,1220) rotate(90)" x="0" y="0.7ex"   >987</text>
+    <text transform="translate(  0,1480) rotate(90)" x="0" y="0.7ex"  >1099</text>
+    <text transform="translate(  0,1705) rotate(90)" x="0" y="0.7ex"   >297</text>
+    <text transform="translate(  0,1797) rotate(90)" x="0" y="0.7ex"     >3</text>
+    <text transform="translate(  0,1885) rotate(90)" x="0" y="0.7ex"   >379</text>
+    <text transform="translate(  0,2010) rotate(90)" x="0" y="0.7ex"   >923</text>
+    <text transform="translate(  0,2140) rotate(90)" x="0" y="0.7ex"   >388</text>
+    <text transform="translate(  0,2330) rotate(90)" x="0" y="0.7ex"   >280</text>
+    <text transform="translate(  0,2530) rotate(90)" x="0" y="0.7ex"  >2085</text>
+    <text transform="translate(  0,2760) rotate(90)" x="0" y="0.7ex" >15743</text>
+    <text transform="translate(200,2920)" x="0" y="0.7ex">178107</text>
+    <text transform="translate(700,2920)" x="0" y="0.7ex"><tspan>440000 ms</tspan><tspan dx="3" dy="-7" font-size="20">&#8722;1</tspan></text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,-20)">
+   <path d="M 0,0 H -700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="6ex" y="0"><tspan>Sedna</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate(-300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(-500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>20&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-700,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Sedna</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(-150, 0)" x="0" y="0.7ex">820</text>
+    <text transform="translate(-400, 0)" x="0" y="0.7ex">150</text>
+    <text transform="translate(-600, 0)" x="0" y="0.7ex">290</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,95)">
+   <path d="M 0,0 H 700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="-6ex" y="-1ex"><tspan>Eris</tspan><tspan x="-6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( 500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>100&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 700,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Eris</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( 150, 0)" x="0" y="0.7ex">1956</text>
+    <text transform="translate( 400, 0)" x="0" y="0.7ex" >388</text>
+    <text transform="translate( 600, 0)" x="0" y="0.7ex" >937</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,230)">
+   <path d="M 0,0 H -700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="7ex" y="0"><tspan>Makemake</tspan><tspan x="7ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate(-300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(-500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>100&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-700,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Makemake</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(-150, 0)" x="0" y="0.7ex">2857</text>
+    <text transform="translate(-400, 0)" x="0" y="0.7ex" >209</text>
+    <text transform="translate(-600, 0)" x="0" y="0.7ex" >517</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,320)">
+   <path d="M 0,0 H 1000 M 500,0 V 240 M 700,0 V 240"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="-6ex" y="0"><tspan >Haumea</tspan><tspan x="-6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Hi'iaka</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 700,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan >Namaka</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( 500,  80)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( 700,  80)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( 840,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>100&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 500, 160)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 700, 160)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 980,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan >Haumea</tspan></text></g>
+   <g transform="translate( 500, 230)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Hi'iaka</tspan></text></g>
+   <g transform="translate( 700, 230)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan >Namaka</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( 150,  0)" x="0"    y="0.7ex">2836</text>
+    <text transform="translate( 400,  0)" x="0"    y="0.7ex"   >6</text>
+    <text transform="translate( 600,  0)" x="0"    y="0.7ex"   >6</text>
+    <text transform="translate( 780,  0)" x="0"    y="0.7ex" >229</text>
+    <text transform="translate( 910,  0)" x="0"    y="0.7ex" >356</text>
+    <text transform="translate( 500, 50) rotate(90)" x="0" y="0.7ex">16</text>
+    <text transform="translate( 500,125) rotate(90)" x="0" y="0.7ex">31</text>
+    <text transform="translate( 500,195) rotate(90)" x="0" y="0.7ex">97</text>
+    <text transform="translate( 700, 50) rotate(90)" x="0" y="0.7ex">46</text>
+    <text transform="translate( 700,120) rotate(90)" x="0" y="0.7ex">12</text>
+    <text transform="translate( 700,195) rotate(90)" x="0" y="0.7ex">45</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,410)">
+   <path d="M 0,0 H -900 M -500,0 V 250"/>
+   <g transform="translate(    0,   0)"><use xlink:href="#transfer"/><text x="6ex"  y="0"><tspan >Pluto</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Charon</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( -500,  80)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -700,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>100&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -500, 160)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -900,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan >Pluto</tspan></text></g>
+   <g transform="translate( -500, 250)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Charon</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( -150,  0)" x="0"    y="0.7ex">2703</text>
+    <text transform="translate( -400,  0)" x="0"    y="0.7ex"  >36</text>
+    <text transform="translate( -600,  0)" x="0"    y="0.7ex" >304</text>
+    <text transform="translate( -800,  0)" x="0"    y="0.7ex" >876</text>
+    <text transform="translate( -500, 45) rotate(90)" x="0" y="0.7ex" >16</text>
+    <text transform="translate( -500,120) rotate(90)" x="0" y="0.7ex">166</text>
+    <text transform="translate( -500,205) rotate(90)" x="0" y="0.7ex">427</text>
+   </g>
+  </g>
+  <g color="#9999ff" stroke="currentColor" transform="translate(0,700)">
+   <path d="M 0,0 H 1000 M 300,0 V 290 M 500,0 V 290 M 700,0 V 290"/>
+   <g transform="translate(    0,   0)"><use xlink:href="#transfer"/><text x="-5ex" y="0"><tspan>Neptune</tspan><tspan x="-5ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  300,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan >Nereid</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan >Triton</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  700,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Proteus</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  150,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(  300, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(  500, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(  700, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(  840,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>1000&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  300, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >10&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  500, 190)"><use xlink:href="#orbit"   /><text x="6ex"  y="0"><tspan >100&#8202;km</tspan><tspan x="6ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  700, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >20&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  980,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan>Neptune</tspan></text></g>
+   <g transform="translate(  300, 290)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"><tspan >Nereid</tspan></text></g>
+   <g transform="translate(  500, 290)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"><tspan >Triton</tspan></text></g>
+   <g transform="translate(  700, 290)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Proteus</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(   80,  0)" x="0"    y="0.7ex"  >354 &#9654;</text>
+    <text transform="translate(  220,  0)" x="0"    y="0.7ex"   >50 &#9654;</text>
+    <text transform="translate(  400,  0)" x="0"    y="0.7ex"  >740 &#9654;</text>
+    <text transform="translate(  600,  0)" x="0"    y="0.7ex" >1380 &#9654;</text>
+    <text transform="translate(  780,  0)" x="0"    y="0.7ex" >4580 &#9654;</text>
+    <text transform="translate(  910,  0)" x="0"    y="0.7ex">16781 &#9654;</text>
+    <text transform="translate(  300, 60) rotate(90)" x="0" y="0.7ex" >870</text>
+    <text transform="translate(  300,150) rotate(90)" x="0" y="0.7ex"  >40</text>
+    <text transform="translate(  300,240) rotate(90)" x="0" y="0.7ex"  >90</text>
+    <text transform="translate(  500, 60) rotate(90)" x="0" y="0.7ex">1707</text>
+    <text transform="translate(  500,150) rotate(90)" x="0" y="0.7ex" >411</text>
+    <text transform="translate(  500,240) rotate(90)" x="0" y="0.7ex">1046</text>
+    <text transform="translate(  700, 60) rotate(90)" x="0" y="0.7ex">2900</text>
+    <text transform="translate(  700,150) rotate(90)" x="0" y="0.7ex"  >50</text>
+    <text transform="translate(  700,240) rotate(90)" x="0" y="0.7ex" >110</text>
+   </g>
+  </g>
+  <g color="#99cccc" stroke="currentColor" transform="translate(0,900)">
+   <path d="M 0,0 H -1200 M -300,0 V 270 M -500,0 V 270 M -700,0 V 270 M -900,0 V 270"/>
+   <g transform="translate(    0,   0)"><use xlink:href="#transfer"/><text x="6ex"  y="0"><tspan >Uranus</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -300,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan >Oberon</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Titania</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -700,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Umbriel</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -900,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan  >Ariel</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -150,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( -300, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -500, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -700, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -900, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(-1050,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>1000&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -300, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -500, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -700, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -900, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-1200,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan >Uranus</tspan></text></g>
+   <g transform="translate( -300, 270)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan >Oberon</tspan></text></g>
+   <g transform="translate( -500, 270)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Titania</tspan></text></g>
+   <g transform="translate( -700, 270)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Umbriel</tspan></text></g>
+   <g transform="translate( -900, 270)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"><tspan  >Ariel</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(  -80,  0)" x="0"    y="0.7ex">&#9664; 513</text>
+    <text transform="translate( -220,  0)" x="0"    y="0.7ex">&#9664; 460</text>
+    <text transform="translate( -400,  0)" x="0"    y="0.7ex">&#9664; 149</text>
+    <text transform="translate( -600,  0)" x="0"    y="0.7ex">&#9664; 362</text>
+    <text transform="translate( -800,  0)" x="0"    y="0.7ex">&#9664; 346</text>
+    <text transform="translate( -980,  0)" x="0"    y="0.7ex">&#9664; 4802</text>
+    <text transform="translate(-1130,  0)" x="0"    y="0.7ex">&#9664; 15807</text>
+    <text transform="translate( -300, 60) rotate(90)" x="0" y="0.7ex">1621</text>
+    <text transform="translate( -300,150) rotate(90)" x="0" y="0.7ex" >208</text>
+    <text transform="translate( -300,230) rotate(90)" x="0" y="0.7ex" >531</text>
+    <text transform="translate( -500, 60) rotate(90)" x="0" y="0.7ex">1784</text>
+    <text transform="translate( -500,150) rotate(90)" x="0" y="0.7ex" >215</text>
+    <text transform="translate( -500,230) rotate(90)" x="0" y="0.7ex" >546</text>
+    <text transform="translate( -700, 60) rotate(90)" x="0" y="0.7ex">2210</text>
+    <text transform="translate( -700,150) rotate(90)" x="0" y="0.7ex" >152</text>
+    <text transform="translate( -700,230) rotate(90)" x="0" y="0.7ex" >387</text>
+    <text transform="translate( -900, 60) rotate(90)" x="0" y="0.7ex">2318</text>
+    <text transform="translate( -900,150) rotate(90)" x="0" y="0.7ex" >151</text>
+    <text transform="translate( -900,230) rotate(90)" x="0" y="0.7ex" >378</text>
+   </g>
+  </g>
+  <g color="#cccc99" stroke="currentColor" transform="translate(0,1120)">
+   <path d="M 0,0 H 990 M 300,0 V 350 M 500,0 V 350 M 700,0 V 350"/>
+   <g transform="translate(    0,   0)"><use xlink:href="#transfer"/><text x="-5ex" y="0"><tspan >Saturn</tspan><tspan x="-5ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  300,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Iapetus</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan  >Titan</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  700,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan   >Rhea</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate(  150,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(  300, 130)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(  500, 130)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(  700, 130)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(  840,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>2000&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  300, 230)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  500, 230)"><use xlink:href="#orbit"   /><text x="6ex"  y="0"><tspan>1000&#8202;km</tspan><tspan x="6ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  700, 230)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >50&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(  990,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan >Saturn</tspan></text></g>
+   <g transform="translate(  300, 350)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Iapetus</tspan></text></g>
+   <g transform="translate(  500, 350)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"><tspan  >Titan</tspan></text></g>
+   <g transform="translate(  700, 350)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"><tspan   >Rhea</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(   80,  0)" x="0"    y="0.7ex"  >421 &#9654;</text>
+    <text transform="translate(  220,  0)" x="0"    y="0.7ex"  >301 &#9654;</text>
+    <text transform="translate(  400,  0)" x="0"    y="0.7ex"  >556 &#9654;</text>
+    <text transform="translate(  600,  0)" x="0"    y="0.7ex" >1039 &#9654;</text>
+    <text transform="translate(  780,  0)" x="0"    y="0.7ex" >8328 &#9654;</text>
+    <text transform="translate(  915,  0)" x="0"    y="0.7ex">20413 &#9654;</text>
+    <text transform="translate(  300, 75) rotate(90)" x="0" y="0.7ex">2162</text>
+    <text transform="translate(  300,180) rotate(90)" x="0" y="0.7ex" >162</text>
+    <text transform="translate(  300,290) rotate(90)" x="0" y="0.7ex" >418</text>
+    <text transform="translate(  500, 75) rotate(90)" x="0" y="0.7ex">2202&#9654;</text>
+    <text transform="translate(  500,180) rotate(90)" x="0" y="0.7ex" >656&#9654;</text>
+    <text transform="translate(  500,290) rotate(90)" x="0" y="0.7ex">8341&#9654;</text>
+    <text transform="translate(  700, 75) rotate(90)" x="0" y="0.7ex">4163</text>
+    <text transform="translate(  700,180) rotate(90)" x="0" y="0.7ex" >129</text>
+    <text transform="translate(  700,290) rotate(90)" x="0" y="0.7ex" >298</text>
+   </g>
+  </g>
+  <g color="#ffcc99" stroke="currentColor" transform="translate(0,1320)">
+   <path d="M 0,0 H -1200 M -300,0 V 290 M -500,0 V 290 M -700,0 V 290 M -900,0 V 290"/>
+   <g transform="translate(    0,   0)"><use xlink:href="#transfer"/><text x="6ex"  y="0"><tspan >Jupiter</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -300,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Callisto</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Ganymede</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -700,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan  >Europa</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -900,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan      >Io</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -150,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( -300, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -500, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -700, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( -900, 110)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(-1050,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>2000&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -300, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >100&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -500, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >100&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -700, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >100&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -900, 190)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >100&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-1200,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan >Jupiter</tspan></text></g>
+   <g transform="translate( -300, 290)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"><tspan>Callisto</tspan></text></g>
+   <g transform="translate( -500, 290)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object pack"><tspan>Ganymede</tspan></text></g>
+   <g transform="translate( -700, 290)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan  >Europa</tspan></text></g>
+   <g transform="translate( -900, 290)"><use xlink:href="#object"  /><text x="4ex"  y="0.7ex" class="object"><tspan      >Io</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(  -80,  0)" x="0"    y="0.7ex">&#9664; 271</text>
+    <text transform="translate( -220,  0)" x="0"    y="0.7ex">&#9664; 1114</text>
+    <text transform="translate( -400,  0)" x="0"    y="0.7ex">&#9664; 804</text>
+    <text transform="translate( -600,  0)" x="0"    y="0.7ex">&#9664; 1055</text>
+    <text transform="translate( -800,  0)" x="0"    y="0.7ex">&#9664; 1558</text>
+    <text transform="translate( -985,  0)" x="0"    y="0.7ex">&#9664; 12667</text>
+    <text transform="translate(-1130,  0)" x="0"    y="0.7ex">&#9664; 33146</text>
+    <text transform="translate( -300, 60) rotate(90)" x="0" y="0.7ex">4025</text>
+    <text transform="translate( -300,150) rotate(90)" x="0" y="0.7ex" >701</text>
+    <text transform="translate( -300,240) rotate(90)" x="0" y="0.7ex">1750</text>
+    <text transform="translate( -500, 60) rotate(90)" x="0" y="0.7ex">4790</text>
+    <text transform="translate( -500,150) rotate(90)" x="0" y="0.7ex" >788</text>
+    <text transform="translate( -500,240) rotate(90)" x="0" y="0.7ex">1947</text>
+    <text transform="translate( -700, 60) rotate(90)" x="0" y="0.7ex">5920</text>
+    <text transform="translate( -700,150) rotate(90)" x="0" y="0.7ex" >575</text>
+    <text transform="translate( -700,240) rotate(90)" x="0" y="0.7ex">1444</text>
+    <text transform="translate( -900, 60) rotate(90)" x="0" y="0.7ex">5783</text>
+    <text transform="translate( -900,150) rotate(90)" x="0" y="0.7ex" >730</text>
+    <text transform="translate( -900,240) rotate(90)" x="0" y="0.7ex">1781</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,1650)">
+   <path d="M 0,0 H 700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="-5ex" y="1ex"><tspan>Hygiea</tspan><tspan x="-5ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( 500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>20&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 700,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Hygiea</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( 150, 0)" x="0" y="0.7ex">4915</text>
+    <text transform="translate( 400, 0)" x="0" y="0.7ex"  >63</text>
+    <text transform="translate( 600, 0)" x="0" y="0.7ex" >139</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,1760)">
+   <path d="M 0,0 H -700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="6ex" y="0"><tspan>Pallas</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate(-300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(-500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>20&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-700,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Pallas</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(-150, 0)" x="0" y="0.7ex">4562</text>
+    <text transform="translate(-400, 0)" x="0" y="0.7ex"  >91</text>
+    <text transform="translate(-600, 0)" x="0" y="0.7ex" >172</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,1830)">
+   <path d="M 0,0 H 700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="-5ex" y="0"><tspan>Ceres</tspan><tspan x="-5ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( 500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>20&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 700,   0)"><use xlink:href="#object"  /><text x="0"  y="-3ex"  class="object"><tspan>Ceres</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( 150, 0)" x="0" y="0.7ex">4381</text>
+    <text transform="translate( 400, 0)" x="0" y="0.7ex" >148</text>
+    <text transform="translate( 600, 0)" x="0" y="0.7ex" >280</text>
+   </g>
+  </g>
+  <g color="#cccccc" stroke="currentColor" transform="translate(0,1940)">
+   <path d="M 0,0 H -700"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="6ex" y="-1ex"><tspan>Vesta</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate(-300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate(-500,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>20&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-700,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Vesta</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(-150, 0)" x="0" y="0.7ex">4096</text>
+    <text transform="translate(-400, 0)" x="0" y="0.7ex" >102</text>
+    <text transform="translate(-600, 0)" x="0" y="0.7ex" >173</text>
+   </g>
+  </g>
+  <g color="#ff9999" stroke="currentColor" transform="translate(0,2080)">
+   <path d="M 0,0 H 1000 M 500,0 V 250 M 700,0 V 250"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="-5ex" y="0"><tspan  >Mars</tspan><tspan x="-5ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 500,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Deimos</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 700,   0)"><use xlink:href="#transfer"/><text x="0" y="-4ex"><tspan>Phobos</tspan><tspan x="0"    dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( 500, 100)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( 700, 100)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate( 850,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>200&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 500, 180)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >1&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( 700, 180)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan  >1&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(1000,   0)"><use xlink:href="#object"  /><text x="0"    y="-3ex"  class="object"><tspan  >Mars</tspan></text></g>
+   <g transform="translate( 500, 250)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Deimos</tspan></text></g>
+   <g transform="translate( 700, 250)"><use xlink:href="#object"  /><text x="6ex"  y="0.7ex" class="object"><tspan>Phobos</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( 150,  0)" x="0"    y="0.7ex" >673 &#9654;</text>
+    <text transform="translate( 400,  0)" x="0"    y="0.7ex" >336 &#9654;</text>
+    <text transform="translate( 600,  0)" x="0"    y="0.7ex" >395 &#9654;</text>
+    <text transform="translate( 780,  0)" x="0"    y="0.7ex" >698 &#9654;</text>
+    <text transform="translate( 920,  0)" x="0"    y="0.7ex">3578 &#9654;</text>
+    <text transform="translate( 500, 60) rotate(90)" x="0" y="0.7ex">649</text>
+    <text transform="translate( 500,140) rotate(90)" x="0" y="0.7ex"  >2</text>
+    <text transform="translate( 500,210) rotate(90)" x="0" y="0.7ex"  >4</text>
+    <text transform="translate( 700, 60) rotate(90)" x="0" y="0.7ex">535</text>
+    <text transform="translate( 700,140) rotate(90)" x="0" y="0.7ex"  >3</text>
+    <text transform="translate( 700,210) rotate(90)" x="0" y="0.7ex"  >6</text>
+   </g>
+  </g>
+  <g color="#99ccff" stroke="currentColor" transform="translate(0,2200)">
+   <path d="M 25,0 H -1200 M -500,0 V 270 M -800,0 V 194"/>
+   <g transform="translate( -500,   0)"><use xlink:href="#transfer"/><text x="0"   y="-4ex"><tspan         >Moon</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -800,   0)"><use xlink:href="#transfer"/><text x="0"   y="-4ex"><tspan>Geostationary</tspan><tspan x="0"   dy="1em">transfer</tspan></text></g>
+   <g transform="translate(    0,  10)"><use xlink:href="#ec2"     /><text x="6ex" y="-1em"><tspan        >Earth</tspan></text></g>
+   <g transform="translate( -500,  90)"><use xlink:href="#escape"  /><use xlink:href="#ec2"/></g>
+   <g transform="translate(-1020,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan >250&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -500, 170)"><use xlink:href="#orbit"   /><text x="5ex"  y="0"><tspan >100&#8202;km</tspan><tspan x="5ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -800, 180)"><use xlink:href="#orbit"   /><text x="9ex"  y="-1.3ex"><tspan>Geostationary</tspan><tspan x="9ex" dy="1em">(35786 km)</tspan><tspan x="9ex" dy="1em">orbit</tspan></text></g>
+   <g transform="translate(-1200,   0)"><use xlink:href="#object"  /><text x="0"    y="-2ex"  class="object" font-size="40"><tspan>Earth</tspan></text></g>
+   <g transform="translate( -500, 270)"><use xlink:href="#object"  /><text x="5ex"  y="0.7ex" class="object"               ><tspan >Moon</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( -250,  0)" x="0"    y="0.7ex">&#9664; 93</text>
+    <text transform="translate( -650,  0)" x="0"    y="0.7ex">&#9664; 679</text>
+    <text transform="translate( -920,  0)" x="0"    y="0.7ex">&#9664; 2440</text>
+    <text transform="translate(-1110,  0)" x="0"    y="0.7ex">&#9664; 9256</text>
+    <text transform="translate( -500, 55) rotate(90)" x="0" y="0.7ex" >145</text>
+    <text transform="translate( -500,132) rotate(90)" x="0" y="0.7ex" >676</text>
+    <text transform="translate( -500,220) rotate(90)" x="0" y="0.7ex">1721</text>
+    <text transform="translate( -800,100) rotate(90)" x="0" y="0.7ex">1472</text>
+   </g>
+  </g>
+  <g color="#ffcc00" stroke="currentColor" transform="translate(0,2460)">
+   <path d="M 0,0 H 1000"/>
+   <g transform="translate(   0,   0)"><use xlink:href="#transfer"/><text x="-6ex" y="0"><tspan>Venus</tspan><tspan x="-6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( 300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( 580,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>400&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate(1000,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Venus</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate( 150, 0)" x="0" y="0.7ex"  >359 &#9654;</text>
+    <text transform="translate( 430, 0)" x="0" y="0.7ex" >2939 &#9654;</text>
+    <text transform="translate( 800, 0)" x="0" y="0.7ex">29705 &#9654;</text>
+   </g>
+  </g>
+  <g color="#dddddd" stroke="currentColor" transform="translate(0,2600)">
+   <path d="M 0,0 H -950"/>
+   <g transform="translate(    0,   0)"><use xlink:href="#transfer"/><text x="6ex" y="0"><tspan>Mercury</tspan><tspan x="6ex" dy="1em">transfer</tspan></text></g>
+   <g transform="translate( -300,   0)"><use xlink:href="#escape"  /><use xlink:href="#ec1"/></g>
+   <g transform="translate( -660,   0)"><use xlink:href="#orbit"   /><text x="0" y="-4ex"><tspan>100&#8202;km</tspan><tspan x="0"   dy="1em">orbit</tspan></text></g>
+   <g transform="translate( -950,   0)"><use xlink:href="#object"  /><text x="0" y="-3ex"  class="object"><tspan>Mercury</tspan></text></g>
+   <g class="deltav">
+    <text transform="translate(-150, 0)" x="0" y="0.7ex">6310</text>
+    <text transform="translate(-480, 0)" x="0" y="0.7ex">1220</text>
+    <text transform="translate(-800, 0)" x="0" y="0.7ex">3062</text>
+   </g>
+  </g>
+ </g>
+</svg>

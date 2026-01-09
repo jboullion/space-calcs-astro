@@ -2,7 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/calcs/Hero.astro";
 
-import HabitatRequirements from "../../components/vue/habitat-requirements/HabitatRequirements.vue";
+import HabitatRequirementsComponent from "../../components/vue/habitat-requirements/HabitatRequirements.vue";
 import References from "../../components/shared/References.astro";
 import type { Reference } from "../../types/types";
 import SponsorCalc from "../../components/calcs/SponsorCalc.astro";
@@ -25,7 +25,7 @@ const references: Reference[] = [
     <Hero title={title} description={description} />
     <div style="min-height: 600px;" class="calculator">
       <SkeletonLoader />
-      <HabitatRequirements client:only />
+      <HabitatRequirementsComponent client:only />
     </div>
     <SponsorCalc />
     <References references={references} />

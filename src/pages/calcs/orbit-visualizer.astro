@@ -4,7 +4,7 @@ import type { Reference } from "../../types/types";
 import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/calcs/Hero.astro";
 
-import OrbitVisualizer from "../../components/vue/orbit-visualizer/OrbitVisualizer.vue";
+import OrbitVisualizerComponent from "../../components/vue/orbit-visualizer/OrbitVisualizer.vue";
 import References from "../../components/shared/References.astro";
 
 const title = "Orbit Visualizer";
@@ -46,7 +46,7 @@ const references: Reference[] = [
   <div class="container">
     <Hero title={title} description={description} />
     <div style="min-height: 700px;" class="calculator">
-      <OrbitVisualizer client:load />
+      <OrbitVisualizerComponent client:load />
     </div>
 
     <References references={references} />

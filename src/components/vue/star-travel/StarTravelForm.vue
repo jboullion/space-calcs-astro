@@ -100,7 +100,7 @@
 						type="number"
 						class="form-control"
 						v-model.number="formData.maxVelocity"
-						:min="0.1"
+						:min="0.01"
 						:max="
 							(physicsConstants.c * 1000) /
 							formData.maxVelocityUnit.value

@@ -1,0 +1,69 @@
+name: Update Launch Pads Data
+
+on:
+    schedule:
+        # Run daily at 6 AM UTC
+        - cron: '0 6 * * *'
+    workflow_dispatch: # Allow manual triggers
+
+jobs:
+    update-data:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Update launch pads data
+              run: npm run update-launch-pads
+
+            - name: Check for changes
+              id: verify-changed-files
+              run: |
+                  if [ -n "$(git status --porcelain)" ]; then
+                    echo "changed=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "changed=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Commit changes
+              if: steps.verify-changed-files.outputs.changed == 'true'
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git add public/launch-pads-data.json
+                  git commit -m "🚀 Update launch pads data - $(date +'%Y-%m-%d %H:%M:%S UTC')"
+                  git push
+
+            - name: Trigger Netlify Deploy
+              if: steps.verify-changed-files.outputs.changed == 'true'
+              run: |
+                  curl -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.NETLIFY_BUILD_HOOK }}
+              env:
+                  NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+
+            - name: Create workflow summary
+              run: |
+                  echo "## Launch Pads Data Update" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  if [ "${{ steps.verify-changed-files.outputs.changed }}" == "true" ]; then
+                    echo "✅ **Data Updated Successfully**" >> $GITHUB_STEP_SUMMARY
+                    echo "- New data fetched from Space Devs API" >> $GITHUB_STEP_SUMMARY
+                    echo "- Changes committed to repository" >> $GITHUB_STEP_SUMMARY
+                    echo "- Netlify deploy triggered" >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "ℹ️ **No Changes Detected**" >> $GITHUB_STEP_SUMMARY
+                    echo "- Data is up to date" >> $GITHUB_STEP_SUMMARY
+                    echo "- No deployment needed" >> $GITHUB_STEP_SUMMARY
+                  fi

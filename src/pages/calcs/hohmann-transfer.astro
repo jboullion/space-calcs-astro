@@ -2,7 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/calcs/Hero.astro";
 
-import HohmannTransfer from "../../components/vue/hohmann-transfer/HohmannTransfer.vue";
+import HohmannTransferComponent from "../../components/vue/hohmann-transfer/HohmannTransfer.vue";
 import References from "../../components/shared/References.astro";
 import type { Reference } from "../../types/types";
 
@@ -31,7 +31,7 @@ const references: Reference[] = [
     <Hero title={title} description={description} />
 
     <div style="min-height: 500px;" class="calculator">
-      <HohmannTransfer client:load />
+      <HohmannTransferComponent client:load />
     </div>
 
     <References references={references} />

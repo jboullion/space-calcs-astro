@@ -1,0 +1,11 @@
+{
+	"lastUpdated": "2025-01-01T00:00:00.000Z",
+	"locations": [],
+	"pads": [],
+	"stats": {
+		"totalLocations": 0,
+		"totalPads": 0,
+		"countriesCount": 0
+	},
+	"error": "Fallback data - API unavailable during build"
+}

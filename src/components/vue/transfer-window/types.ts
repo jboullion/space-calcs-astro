@@ -43,7 +43,8 @@ export type TransferData = {
 	maneuvers: Maneuver[];
 	originPlanet: PlanetOrbit;
 	destinationPlanet: PlanetOrbit;
-	properName: string;
+	properName?: string;
+	properNameTwo?: string;
 	fromRadius: number;
 	toRadius: number;
 };
@@ -52,6 +53,7 @@ export type Maneuver = {
 	name: string;
 	title: string;
 	deltaVee: number;
+	hide?: boolean;
 };
 
 // Format ALL THE LOGGING DATA
@@ -125,7 +127,7 @@ export type PlanetOrbit = {
 	gravParam: number; // gravitational parameter
 	colour: number; // Colour of planetary marker
 	trackColour: number; // Colour of orbital track
-	SOI?: number; // Sphere of Influence
+	SOI: number; // Sphere of Influence
 	center: string; // PLanetary body it is centered on
 	rotation: number; // rotation period in days
 	rotEpoch?: number; // Initial rotation at epoch
@@ -154,3 +156,43 @@ export interface ITransferWindowForm {
 	departureDateMin: Date;
 	departureDateMax: Date;
 }
+
+export type TransferFormat = {
+	pos: Vector3Tuple;
+	vel: Vector3Tuple;
+	TO: number;
+	CO: number;
+	TOGrav: number;
+	COGrav: number;
+	capTime: Date;
+	depTime: Date;
+	pos2: Vector3Tuple;
+	vel2: Vector3Tuple;
+	depVel: Vector3Tuple;
+	arrVel: Vector3Tuple;
+	predictedTime: number;
+	tTime: number;
+	timeDiff: string;
+	a: number;
+	misc: {
+		p: number;
+		highP: number;
+		lowP: number;
+		m: number;
+		k: number;
+		l: number;
+		f: number[];
+		g: number;
+		fDot: number[];
+		gDot: number[];
+	};
+	numTries: number;
+	gravParam: number;
+	dTime: number;
+	deltaVee: number;
+	originPlanet: PlanetOrbit;
+	destinationPlanet: PlanetOrbit;
+	rawDTime: number;
+	rawTTime: number;
+	index?: number;
+};

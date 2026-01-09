@@ -51,7 +51,6 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		description:
 			'Esimate the energy, mass, crew, and volume requirements for a habitat',
 		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
-		advanced: true,
 		image: '',
 		link: '/calcs/habitat-requirements',
 		sponsor: 'Sam Ross',
@@ -144,13 +143,65 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		link: '/calcs/fly-wheel',
 	},
 	{
-		id: 'transfer-window',
-		name: 'Transfer Window',
-		description: 'Calculate the transfer window between two planets',
+		id: 'population-growth',
+		name: 'Population Growth',
+		description: 'Estimate population growth based on initial parameters',
+		categories: [categories[LIFE_CAT]],
+		image: '',
+		link: '/calcs/population-growth',
+	},
+	{
+		id: 'project-hyperion',
+		name: 'Project Hyperion',
+		description:
+			"O'Neill Cylinder visualizer built for the Project Hyperion contest",
+		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/project-hyperion',
+		sponsor: 'Nexus Aurora',
+		sponsorImg: '/images/sponsors/na-logo.png',
+	},
+	{
+		id: 'rocket-performance',
+		name: 'Rocket Engine Performance',
+		description: 'Calculate the performance of a rocket engine',
+		categories: [categories[ROCKET_CAT]],
+		image: '',
+		link: '/calcs/rocket-performance',
+	},
+	{
+		id: 'create-planet',
+		name: 'Create Planet',
+		description: 'Create a planet and estimate its properties',
+		categories: [categories[HABITAT_CAT]],
+		image: '',
+		link: '/calcs/create-planet',
+	},
+	{
+		id: 'launch-pads',
+		name: 'Launch Pads',
+		description: 'Search all public launch pads on Earth',
+		categories: [categories[ROCKET_CAT]],
+		image: '',
+		link: '/calcs/launch-pads',
+	},
+	{
+		id: 'srm-simulator',
+		name: 'Solid Rocket Motor Simulator',
+		description:
+			'Design and simulate solid rocket motors with BATES and Finocyl grain geometries',
 		categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
 		image: '',
-		link: '/calcs/transfer-window',
+		link: '/calcs/srm-simulator',
 	},
+	// {
+	// 	id: 'transfer-window',
+	// 	name: 'Transfer Window',
+	// 	description: 'Calculate the transfer window between two planets',
+	// 	categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
+	// 	image: '',
+	// 	link: '/calcs/transfer-window',
+	// },
 ];
 
 export const calculators = unOrderedCalculators.sort((a, b) =>

@@ -217,16 +217,14 @@
 							></small
 						>
 					</p>
-					<img
-						src="/images/Solar_system_delta_v_map.svg"
-						alt="Delta V Map"
-					/>
+					<DeltaVMap />
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
+import DeltaVMap from './DeltaVMap.vue';
 // TODO: Must Dos!
 
 // ! BUGS
@@ -1296,5 +1294,11 @@ function getC3Options() {
 
 #delta-v__map .pack {
 	letter-spacing: -0.1ex;
+}
+
+.delta-v-map {
+	width: 100%;
+	height: auto;
+	max-width: 100%;
 }
 </style>

@@ -1,79 +1,100 @@
 <template>
-    <div
-        class="btn-group w-100 mb-2"
-        role="group"
-        aria-label="Vertical radio toggle button group"
-    >
-        <template v-for="(tab, index) in tabs">
-            <input
-                type="radio"
-                class="btn-check"
-                name="vbtn-radio"
-                :value="tab.id"
-                v-model="currentTab"
-                :id="tab.id"
-                autocomplete="off"
-                :checked="index == 0"
-            />
-            <label class="btn btn-outline-primary" :for="tab.id">{{
-                tab.label
-            }}</label>
-        </template>
-    </div>
-    <div class="calc-form">
-        <StructureTab
-            v-show="currentTab == 'structureTab'"
-            :structure="formData.structure"
-            :internal="formData.internal"
-        />
+	<div class="d-flex">
+		<div class="calc-form flex-grow-1">
+			<StructureTab
+				v-show="currentTab == ONEILL_TABS.structure"
+				v-model="model.structure"
+				:internal="model.internal"
+			/>
 
-        <InternalFloors
-            v-show="currentTab == 'internalFloors'"
-            :internal="formData.internal"
-            :structure="formData.structure"
-        />
+			<InternalFloors
+				v-show="currentTab == ONEILL_TABS.internal"
+				v-model="model.internal"
+				:structure="model.structure"
+			/>
 
-        <LandUse v-show="currentTab == 'landUse'" :landUse="formData.landUse" />
-    </div>
+			<MovementOptions
+				v-show="currentTab == ONEILL_TABS.movement"
+				v-model="model.movementOptions"
+				:structure="model.structure"
+				:internal="model.internal"
+			/>
+
+			<LandUse
+				v-show="currentTab == ONEILL_TABS.land"
+				v-model="model"
+				:totalArea="totalArea"
+			/>
+
+			<VisualTab
+				v-show="currentTab == ONEILL_TABS.visuals"
+				v-model="model.visuals"
+				:visuals="model.visuals"
+			/>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
-// TODO: Must Dos!
-
-// ! BUGS
-
-// ? NOTE: Optional Improvements!
-
-import { computed, onMounted, ref } from 'vue';
-
-import type { ONeillCylinderForm, Structure } from './types';
-
+import { computed, ref } from 'vue';
+import type { IONeillTabs, ONeillCylinderForm } from './types';
 import StructureTab from './StructureTab.vue';
 import InternalFloors from './InternalFloors.vue';
 import LandUse from './LandUse.vue';
+import MovementOptions from './MovementOptions.vue';
+import VisualTab from './VisualTab.vue';
+import { ONEILL_TABS } from './constants';
 
-const currentTab = ref<'structureTab' | 'internalFloors' | 'landUse'>(
-    'structureTab',
-);
-
-const tabs = [
-    {
-        id: 'structureTab',
-        label: 'Structure',
-    },
-    {
-        id: 'internalFloors',
-        label: 'Floors',
-    },
-    // {
-    //   id: "landUse",
-    //   label: "Land Use",
-    // },
-];
+const model = defineModel<ONeillCylinderForm>({ required: true });
 
 const props = defineProps<{
-    formData: ONeillCylinderForm;
+	currentTab: IONeillTabs;
 }>();
 
-onMounted(() => {});
+// Calculate total area for LandUse component
+const shellFloorArea = computed(() => {
+	return (
+		model.value.structure.radius *
+		2 *
+		Math.PI *
+		model.value.structure.cylinderLength
+	);
+});
+
+const internalRadius = computed(() => {
+	return (
+		model.value.structure.radius -
+		model.value.structure.shellWallThickness / 1000
+	);
+});
+
+const floorsArea = computed(() => {
+	if (model.value.internal.levels === 0) return 0;
+	const circumference = 2 * Math.PI * internalRadius.value;
+	return (
+		circumference *
+		model.value.structure.cylinderLength *
+		model.value.internal.levels
+	);
+});
+
+const totalArea = computed(() => shellFloorArea.value + floorsArea.value);
 </script>
+
+<style scoped>
+.nav-link {
+	color: var(--bs-body-color);
+	background-color: var(--bs-light);
+	border: 1px solid var(--bs-border-color);
+}
+
+.nav-link.active {
+	background-color: var(--bs-primary);
+	color: white;
+	border-color: var(--bs-primary);
+}
+
+.nav-link:hover:not(.active) {
+	background-color: var(--bs-gray-200);
+}
+</style>

@@ -1,0 +1,15 @@
+TODO:
+- Biomes and life options
+- Update how gas planets work. Thicker atmosphere / smaller surface
+- Setup export / hashed query params
+
+- Hide surface tab when isGasGiant is true. 
+- Add a new tab for manipulating gas giant parameters
+
+
+
+- bigred Note
+I did notice that it recalls after every change. I'm in asia behind my vpn at the moment and this recalc makes it difficult to utilise.
+Could I suggest you put a recalc button on the page so that the user enters all data seamlessly without recalc delays then one calc to create the planet.
+
+-- What does he mean here? Yes it updates after every change, but it seems fairly seemless. Is his VPN causing an issue? I think it SHOULD automatically update, but perhaps he is using a phone?
