@@ -33,6 +33,8 @@ export default function GrainStackBuilder() {
 			}),
 		};
 		updateGrainStack([...config.grainStack, newSegment]);
+		// Add new segment to collapsed state
+		setCollapsedSegments(prev => new Set([...prev, newSegment.id]));
 	};
 
 	const removeSegment = (id: string) => {
