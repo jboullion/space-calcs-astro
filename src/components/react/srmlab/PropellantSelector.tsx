@@ -6,7 +6,7 @@ export default function PropellantSelector() {
 	const { config, updatePropellant } = useSRM();
 
 	return (
-		<div className="p-2 rounded border mb-3">
+		<div className="p-3 rounded border mb-3">
 			<h5 className="mb-3">Propellant</h5>
 
 			<InputWrapper

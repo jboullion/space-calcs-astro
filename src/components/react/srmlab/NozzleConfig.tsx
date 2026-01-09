@@ -11,7 +11,7 @@ export default function NozzleConfig() {
 	};
 
 	return (
-		<div className="p-2 rounded border mb-3">
+		<div className="p-3 rounded border mb-3">
 			<h5 className="mb-3">Nozzle Configuration</h5>
 
 			<InputWrapper

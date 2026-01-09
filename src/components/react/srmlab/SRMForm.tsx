@@ -1,4 +1,5 @@
 import { useSRM } from './SRMContext';
+import { useState } from 'react';
 import PropellantSelector from './PropellantSelector';
 import GrainStackBuilder from './GrainStackBuilder';
 import NozzleConfig from './NozzleConfig';
@@ -7,56 +8,111 @@ import NumberInput from '../forms/NumberInput';
 
 export default function SRMForm() {
 	const { config, updateCaseInnerDiameter, updateFreeVolume, runSimulation, isSimulating } = useSRM();
+	const [activeTab, setActiveTab] = useState('grain');
 
 	return (
 		<div className="calc-form">
-			{/* Motor Case Section */}
-			<div className="p-2 rounded border mb-3">
-				<h5 className="mb-3">Motor Case</h5>
+			{/* Tab Navigation */}
+			<ul className="nav nav-tabs mb-3" role="tablist">
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'grain' ? 'active' : ''}`}
+						onClick={() => setActiveTab('grain')}
+						type="button"
+					>
+						<i className="fas fa-layer-group me-1"></i>
+						Grain Stack
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'case' ? 'active' : ''}`}
+						onClick={() => setActiveTab('case')}
+						type="button"
+					>
+						<i className="fas fa-box me-1"></i>
+						Motor Case
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'propellant' ? 'active' : ''}`}
+						onClick={() => setActiveTab('propellant')}
+						type="button"
+					>
+						<i className="fas fa-fire me-1"></i>
+						Propellant
+					</button>
+				</li>
+				
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'nozzle' ? 'active' : ''}`}
+						onClick={() => setActiveTab('nozzle')}
+						type="button"
+					>
+						<i className="fas fa-stream me-1"></i>
+						Nozzle
+					</button>
+				</li>
+			</ul>
 
-				<InputWrapper
-					id="case-diameter"
-					label="Case Inner Diameter"
-					description="Internal diameter of motor casing"
-					input={
-						<NumberInput
+			{/* Tab Content */}
+			<div className="tab-content mb-3">
+				{/* Grain Stack Tab */}
+				<div className={`tab-pane fade ${activeTab === 'grain' ? 'show active' : ''}`}>
+					<GrainStackBuilder />
+				</div>
+
+				{/* Motor Case Tab */}
+				<div className={`tab-pane fade ${activeTab === 'case' ? 'show active' : ''}`}>
+					<div className="p-3 rounded border">
+						<InputWrapper
 							id="case-diameter"
-							value={config.caseInnerDiameter * 1000}
-							min={10}
-							max={500}
-							step={1}
-							onChange={(val) => updateCaseInnerDiameter(val / 1000)}
+							label="Case Inner Diameter"
+							description="Internal diameter of motor casing"
+							input={
+								<NumberInput
+									id="case-diameter"
+									value={config.caseInnerDiameter * 1000}
+									min={10}
+									max={500}
+									step={1}
+									onChange={(val) => updateCaseInnerDiameter(val / 1000)}
+								/>
+							}
+							unit={<span className="input-group-text">mm</span>}
 						/>
-					}
-					unit={<span className="input-group-text">mm</span>}
-				/>
 
-				<InputWrapper
-					id="free-volume"
-					label="Free Volume"
-					description="Head-end free volume"
-					input={
-						<NumberInput
+						<InputWrapper
 							id="free-volume"
-							value={config.freeVolume * 1e6}
-							min={0}
-							max={10000}
-							step={10}
-							onChange={(val) => updateFreeVolume(val / 1e6)}
+							label="Free Volume"
+							description="Head-end free volume"
+							input={
+								<NumberInput
+									id="free-volume"
+									value={config.freeVolume * 1e6}
+									min={0}
+									max={10000}
+									step={10}
+									onChange={(val) => updateFreeVolume(val / 1e6)}
+								/>
+							}
+							unit={<span className="input-group-text">cm³</span>}
 						/>
-					}
-					unit={<span className="input-group-text">cm³</span>}
-				/>
+					</div>
+				</div>
+
+				{/* Propellant Tab */}
+				<div className={`tab-pane fade ${activeTab === 'propellant' ? 'show active' : ''}`}>
+					<PropellantSelector />
+				</div>
+
+				{/* Nozzle Tab */}
+				<div className={`tab-pane fade ${activeTab === 'nozzle' ? 'show active' : ''}`}>
+					<NozzleConfig />
+				</div>
 			</div>
-
-			{/* Propellant Selection */}
-			<PropellantSelector />
-
-			{/* Grain Stack Builder */}
-			<GrainStackBuilder />
-
-			{/* Nozzle Configuration */}
-			<NozzleConfig />
 
 			{/* Simulate Button */}
 			<button

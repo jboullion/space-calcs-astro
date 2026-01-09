@@ -1,10 +1,22 @@
 import { useSRM } from './SRMContext';
+import { useState } from 'react';
 import InputWrapper from '../forms/InputWrapper';
 import NumberInput from '../forms/NumberInput';
 import type { GrainSegment } from './types';
 
 export default function GrainStackBuilder() {
 	const { config, updateGrainStack } = useSRM();
+	const [collapsedSegments, setCollapsedSegments] = useState<Set<string>>(new Set());
+
+	const toggleCollapse = (id: string) => {
+		const newCollapsed = new Set(collapsedSegments);
+		if (newCollapsed.has(id)) {
+			newCollapsed.delete(id);
+		} else {
+			newCollapsed.add(id);
+		}
+		setCollapsedSegments(newCollapsed);
+	};
 
 	const addSegment = (type: 'bates' | 'finocyl') => {
 		const newSegment: GrainSegment = {
@@ -47,7 +59,7 @@ export default function GrainStackBuilder() {
 	};
 
 	return (
-		<div className="p-2 rounded border mb-3">
+		<div className="p-3 rounded border mb-3">
 			<div className="d-flex justify-content-between align-items-center mb-3">
 				<h5 className="mb-0">Grain Stack</h5>
 				<div className="btn-group">
@@ -79,10 +91,19 @@ export default function GrainStackBuilder() {
 			)}
 
 			<div className="grain-stack">
-				{config.grainStack.map((segment, index) => (
+				{config.grainStack.map((segment, index) => {
+					const isCollapsed = collapsedSegments.has(segment.id);
+					return (
 					<div key={segment.id} className="card mb-2">
 						<div className="card-header d-flex justify-content-between align-items-center">
 							<div className="d-flex align-items-center gap-2">
+								<button
+									className="btn btn-sm btn-link p-0 text-decoration-none"
+									onClick={() => toggleCollapse(segment.id)}
+									title={isCollapsed ? "Expand" : "Collapse"}
+								>
+									<i className={`fas fa-chevron-${isCollapsed ? 'right' : 'down'} me-2`}></i>
+								</button>
 								<strong>
 									{segment.type.toUpperCase()} #{index + 1}
 								</strong>
@@ -118,6 +139,7 @@ export default function GrainStackBuilder() {
 								</button>
 							</div>
 						</div>
+						{!isCollapsed && (
 						<div className="card-body">
 							<InputWrapper
 								id={`length-${segment.id}`}
@@ -289,8 +311,10 @@ export default function GrainStackBuilder() {
 								</label>
 							</div>
 						</div>
+						)}
 					</div>
-				))}
+					);
+				})}
 			</div>
 		</div>
 	);
