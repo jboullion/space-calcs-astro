@@ -1,152 +1,313 @@
-// Interactive thrust and pressure curves using Plotly
+// Interactive charts using Chart.js with Bootstrap tabs
 import { useEffect, useRef, useState } from 'react';
 import { useSRM } from './SRMContext';
+import {
+	Chart,
+	CategoryScale,
+	LinearScale,
+	PointElement,
+	LineElement,
+	LineController,
+	Title,
+	Tooltip,
+	Legend,
+	Filler,
+} from 'chart.js';
+
+// Register Chart.js components
+Chart.register(
+	CategoryScale,
+	LinearScale,
+	PointElement,
+	LineElement,
+	LineController,
+	Title,
+	Tooltip,
+	Legend,
+	Filler
+);
 
 export default function SRMCharts() {
 	const { results, isSimulating } = useSRM();
-	const thrustChartRef = useRef<HTMLDivElement>(null);
-	const pressureChartRef = useRef<HTMLDivElement>(null);
-	const knChartRef = useRef<HTMLDivElement>(null);
-	const burnAreaChartRef = useRef<HTMLDivElement>(null);
-	const [Plotly, setPlotly] = useState<any>(null);
-
-	// Load Plotly only on client side
-	useEffect(() => {
-		import('plotly.js-dist-min').then((module) => {
-			setPlotly(module.default);
-		});
-	}, []);
+	const thrustChartRef = useRef<HTMLCanvasElement>(null);
+	const pressureChartRef = useRef<HTMLCanvasElement>(null);
+	const knChartRef = useRef<HTMLCanvasElement>(null);
+	const burnAreaChartRef = useRef<HTMLCanvasElement>(null);
+	
+	const [thrustChart, setThrustChart] = useState<Chart | null>(null);
+	const [pressureChart, setPressureChart] = useState<Chart | null>(null);
+	const [knChart, setKnChart] = useState<Chart | null>(null);
+	const [burnAreaChart, setBurnAreaChart] = useState<Chart | null>(null);
+	const [activeTab, setActiveTab] = useState('thrust');
 
 	useEffect(() => {
-		if (!Plotly || !results || !thrustChartRef.current || !pressureChartRef.current ||
-			!knChartRef.current || !burnAreaChartRef.current) {
-			return;
+		if (!results) return;
+
+		// Common chart options
+		const commonOptions = {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					display: false,
+				},
+			},
+			scales: {
+				x: {
+					grid: {
+						color: '#444',
+					},
+					ticks: {
+						color: '#aaa',
+					},
+				},
+				y: {
+					grid: {
+						color: '#444',
+					},
+					ticks: {
+						color: '#aaa',
+					},
+				},
+			},
+		};
+
+		// Thrust Chart
+		if (thrustChartRef.current) {
+			if (thrustChart) thrustChart.destroy();
+			const ctx = thrustChartRef.current.getContext('2d');
+			if (ctx) {
+				const newChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: results.t.map((t) => t.toFixed(3)),
+						datasets: [
+							{
+								label: 'Thrust (N)',
+								data: results.F,
+								borderColor: '#0d6efd',
+								backgroundColor: 'rgba(13, 110, 253, 0.1)',
+								borderWidth: 2,
+								pointRadius: 0,
+								fill: true,
+							},
+						],
+					},
+					options: {
+						...commonOptions,
+						plugins: {
+							...commonOptions.plugins,
+							title: {
+								display: true,
+								text: 'Thrust vs Time',
+								color: '#fff',
+								font: { size: 16 },
+							},
+						},
+						scales: {
+							...commonOptions.scales,
+							x: {
+								...commonOptions.scales.x,
+								title: {
+									display: true,
+									text: 'Time (s)',
+									color: '#aaa',
+								},
+							},
+							y: {
+								...commonOptions.scales.y,
+								title: {
+									display: true,
+									text: 'Thrust (N)',
+									color: '#aaa',
+								},
+							},
+						},
+					},
+				});
+				setThrustChart(newChart);
+			}
 		}
 
-		// Thrust curve
-		const thrustTrace = {
-			x: results.t,
-			y: results.F,
-			type: 'scatter',
-			mode: 'lines',
-			name: 'Thrust',
-			line: { color: '#0d6efd', width: 2 },
-		};
+		// Pressure Chart
+		if (pressureChartRef.current) {
+			if (pressureChart) pressureChart.destroy();
+			const ctx = pressureChartRef.current.getContext('2d');
+			if (ctx) {
+				const newChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: results.t.map((t) => t.toFixed(3)),
+						datasets: [
+							{
+								label: 'Pressure (MPa)',
+								data: results.Pc.map((p) => p / 1e6),
+								borderColor: '#dc3545',
+								backgroundColor: 'rgba(220, 53, 69, 0.1)',
+								borderWidth: 2,
+								pointRadius: 0,
+								fill: true,
+							},
+						],
+					},
+					options: {
+						...commonOptions,
+						plugins: {
+							...commonOptions.plugins,
+							title: {
+								display: true,
+								text: 'Chamber Pressure vs Time',
+								color: '#fff',
+								font: { size: 16 },
+							},
+						},
+						scales: {
+							...commonOptions.scales,
+							x: {
+								...commonOptions.scales.x,
+								title: {
+									display: true,
+									text: 'Time (s)',
+									color: '#aaa',
+								},
+							},
+							y: {
+								...commonOptions.scales.y,
+								title: {
+									display: true,
+									text: 'Pressure (MPa)',
+									color: '#aaa',
+								},
+							},
+						},
+					},
+				});
+				setPressureChart(newChart);
+			}
+		}
 
-		const thrustLayout = {
-			title: 'Thrust vs Time',
-			xaxis: { title: 'Time (s)', gridcolor: '#444' },
-			yaxis: { title: 'Thrust (N)', gridcolor: '#444' },
-			plot_bgcolor: '#1a1a1a',
-			paper_bgcolor: '#212529',
-			font: { color: '#fff' },
-			margin: { l: 60, r: 40, t: 50, b: 50 },
-		};
+		// Kn Chart
+		if (knChartRef.current) {
+			if (knChart) knChart.destroy();
+			const ctx = knChartRef.current.getContext('2d');
+			if (ctx) {
+				const newChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: results.t.map((t) => t.toFixed(3)),
+						datasets: [
+							{
+								label: 'Kn',
+								data: results.Kn,
+								borderColor: '#ffc107',
+								backgroundColor: 'rgba(255, 193, 7, 0.1)',
+								borderWidth: 2,
+								pointRadius: 0,
+								fill: true,
+							},
+						],
+					},
+					options: {
+						...commonOptions,
+						plugins: {
+							...commonOptions.plugins,
+							title: {
+								display: true,
+								text: 'Kn Ratio vs Time',
+								color: '#fff',
+								font: { size: 16 },
+							},
+						},
+						scales: {
+							...commonOptions.scales,
+							x: {
+								...commonOptions.scales.x,
+								title: {
+									display: true,
+									text: 'Time (s)',
+									color: '#aaa',
+								},
+							},
+							y: {
+								...commonOptions.scales.y,
+								title: {
+									display: true,
+									text: 'Kn (Ab/At)',
+									color: '#aaa',
+								},
+							},
+						},
+					},
+				});
+				setKnChart(newChart);
+			}
+		}
 
-		Plotly.newPlot(
-			thrustChartRef.current,
-			[thrustTrace],
-			thrustLayout,
-			{ responsive: true, displayModeBar: false },
-		);
-
-		// Pressure curve
-		const pressureTrace = {
-			x: results.t,
-			y: results.Pc.map((p: number) => p / 1e6), // Convert to MPa
-			type: 'scatter',
-			mode: 'lines',
-			name: 'Pressure',
-			line: { color: '#dc3545', width: 2 },
-		};
-
-		const pressureLayout = {
-			title: 'Chamber Pressure vs Time',
-			xaxis: { title: 'Time (s)', gridcolor: '#444' },
-			yaxis: { title: 'Pressure (MPa)', gridcolor: '#444' },
-			plot_bgcolor: '#1a1a1a',
-			paper_bgcolor: '#212529',
-			font: { color: '#fff' },
-			margin: { l: 60, r: 40, t: 50, b: 50 },
-		};
-
-		Plotly.newPlot(
-			pressureChartRef.current,
-			[pressureTrace],
-			pressureLayout,
-			{ responsive: true, displayModeBar: false },
-		);
-
-		// Kn ratio curve
-		const knTrace = {
-			x: results.t,
-			y: results.Kn,
-			type: 'scatter',
-			mode: 'lines',
-			name: 'Kn',
-			line: { color: '#ffc107', width: 2 },
-		};
-
-		const knLayout = {
-			title: 'Kn Ratio vs Time',
-			xaxis: { title: 'Time (s)', gridcolor: '#444' },
-			yaxis: { title: 'Kn (Ab/At)', gridcolor: '#444' },
-			plot_bgcolor: '#1a1a1a',
-			paper_bgcolor: '#212529',
-			font: { color: '#fff' },
-			margin: { l: 60, r: 40, t: 50, b: 50 },
-		};
-
-		Plotly.newPlot(
-			knChartRef.current,
-			[knTrace],
-			knLayout,
-			{ responsive: true, displayModeBar: false },
-		);
-
-		// Burn area curve
-		const burnAreaTrace = {
-			x: results.t,
-			y: results.Ab.map((a: number) => a * 1e4), // Convert to cm²
-			type: 'scatter',
-			mode: 'lines',
-			name: 'Burn Area',
-			line: { color: '#20c997', width: 2 },
-		};
-
-		const burnAreaLayout = {
-			title: 'Burn Area vs Time',
-			xaxis: { title: 'Time (s)', gridcolor: '#444' },
-			yaxis: { title: 'Burn Area (cm²)', gridcolor: '#444' },
-			plot_bgcolor: '#1a1a1a',
-			paper_bgcolor: '#212529',
-			font: { color: '#fff' },
-			margin: { l: 60, r: 40, t: 50, b: 50 },
-		};
-
-		Plotly.newPlot(
-			burnAreaChartRef.current,
-			[burnAreaTrace],
-			burnAreaLayout,
-			{ responsive: true, displayModeBar: false },
-		);
+		// Burn Area Chart
+		if (burnAreaChartRef.current) {
+			if (burnAreaChart) burnAreaChart.destroy();
+			const ctx = burnAreaChartRef.current.getContext('2d');
+			if (ctx) {
+				const newChart = new Chart(ctx, {
+					type: 'line',
+					data: {
+						labels: results.t.map((t) => t.toFixed(3)),
+						datasets: [
+							{
+								label: 'Burn Area (cm²)',
+								data: results.Ab.map((a) => a * 1e4),
+								borderColor: '#20c997',
+								backgroundColor: 'rgba(32, 201, 151, 0.1)',
+								borderWidth: 2,
+								pointRadius: 0,
+								fill: true,
+							},
+						],
+					},
+					options: {
+						...commonOptions,
+						plugins: {
+							...commonOptions.plugins,
+							title: {
+								display: true,
+								text: 'Burn Area vs Time',
+								color: '#fff',
+								font: { size: 16 },
+							},
+						},
+						scales: {
+							...commonOptions.scales,
+							x: {
+								...commonOptions.scales.x,
+								title: {
+									display: true,
+									text: 'Time (s)',
+									color: '#aaa',
+								},
+							},
+							y: {
+								...commonOptions.scales.y,
+								title: {
+									display: true,
+									text: 'Burn Area (cm²)',
+									color: '#aaa',
+								},
+							},
+						},
+					},
+				});
+				setBurnAreaChart(newChart);
+			}
+		}
 
 		// Cleanup
 		return () => {
-			if (thrustChartRef.current) {
-				Plotly.purge(thrustChartRef.current);
-			}
-			if (pressureChartRef.current) {
-				Plotly.purge(pressureChartRef.current);
-			}
-			if (knChartRef.current) {
-				Plotly.purge(knChartRef.current);
-			}
-			if (burnAreaChartRef.current) {
-				Plotly.purge(burnAreaChartRef.current);
-			}
+			thrustChart?.destroy();
+			pressureChart?.destroy();
+			knChart?.destroy();
+			burnAreaChart?.destroy();
 		};
-	}, [Plotly, results]);
+	}, [results]);
 
 	if (isSimulating) {
 		return (
@@ -165,10 +326,71 @@ export default function SRMCharts() {
 
 	return (
 		<div className="mb-3">
-			<div ref={thrustChartRef} className="mb-4" />
-			<div ref={pressureChartRef} className="mb-4" />
-			<div ref={knChartRef} className="mb-4" />
-			<div ref={burnAreaChartRef} className="mb-4" />
+			<ul className="nav nav-tabs mb-3" role="tablist">
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'thrust' ? 'active' : ''}`}
+						onClick={() => setActiveTab('thrust')}
+						type="button"
+					>
+						<i className="fas fa-rocket me-1"></i>
+						Thrust
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'pressure' ? 'active' : ''}`}
+						onClick={() => setActiveTab('pressure')}
+						type="button"
+					>
+						<i className="fas fa-gauge me-1"></i>
+						Pressure
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'kn' ? 'active' : ''}`}
+						onClick={() => setActiveTab('kn')}
+						type="button"
+					>
+						<i className="fas fa-chart-line me-1"></i>
+						Kn Ratio
+					</button>
+				</li>
+				<li className="nav-item" role="presentation">
+					<button
+						className={`nav-link ${activeTab === 'burnArea' ? 'active' : ''}`}
+						onClick={() => setActiveTab('burnArea')}
+						type="button"
+					>
+						<i className="fas fa-fire me-1"></i>
+						Burn Area
+					</button>
+				</li>
+			</ul>
+
+			<div className="tab-content">
+				<div className={`tab-pane fade ${activeTab === 'thrust' ? 'show active' : ''}`}>
+					<div style={{ height: '400px' }}>
+						<canvas ref={thrustChartRef}></canvas>
+					</div>
+				</div>
+				<div className={`tab-pane fade ${activeTab === 'pressure' ? 'show active' : ''}`}>
+					<div style={{ height: '400px' }}>
+						<canvas ref={pressureChartRef}></canvas>
+					</div>
+				</div>
+				<div className={`tab-pane fade ${activeTab === 'kn' ? 'show active' : ''}`}>
+					<div style={{ height: '400px' }}>
+						<canvas ref={knChartRef}></canvas>
+					</div>
+				</div>
+				<div className={`tab-pane fade ${activeTab === 'burnArea' ? 'show active' : ''}`}>
+					<div style={{ height: '400px' }}>
+						<canvas ref={burnAreaChartRef}></canvas>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

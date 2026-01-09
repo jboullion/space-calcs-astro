@@ -15,7 +15,9 @@ export default function SRMSimulator() {
 
 				{/* Right Panel: Visualization & Results */}
 				<div id="srm-simulator__results" className="col-lg-7">
-					<SRMVisualization />				<SRMCharts />					<SRMResults />
+					{/* <SRMVisualization />				 */}
+                    <SRMCharts />					
+                    <SRMResults />
 				</div>
 			</div>
 		</SRMProvider>

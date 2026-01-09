@@ -153,14 +153,10 @@ export default function SRMVisualization() {
 
 	return (
 		<div
-			className="p-2 rounded border mb-3 position-relative"
+			className="p-2 rounded border mb-5 position-relative"
 			style={{ height: '500px' }}
 		>
-			{isLoading && (
-				<div className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center">
-					<i className="fas fa-cog fa-spin mb-0 h1"></i>
-				</div>
-			)}
+			
 
 			{config.grainStack.length === 0 ? (
 				<div className="d-flex align-items-center justify-content-center h-100">
@@ -206,28 +202,7 @@ export default function SRMVisualization() {
 					/>
 				))}
 
-				{/* Separator rings between segments (insulator/inhibitor layers) */}
-					{separators.map((sepZ, idx) => (
-						<mesh
-							key={`sep-${idx}`}
-							position={[0, 0, sepZ]}
-							rotation={[Math.PI / 2, 0, 0]}
-						>
-							<cylinderGeometry
-								args={[
-									config.caseInnerDiameter / 2,
-									config.caseInnerDiameter / 2,
-									GAP * 0.3,
-									32,
-								]}
-							/>
-							<meshStandardMaterial
-								color="#2a2a2a"
-								opacity={0.8}
-								transparent
-							/>
-						</mesh>
-					))}
+
 
 				
 
@@ -243,8 +218,7 @@ export default function SRMVisualization() {
 				<p className="mb-0">
 					<small className="text-muted">
 						<i className="fas fa-info-circle me-1"></i>
-						3D preview of grain stack geometry. Use mouse to
-						rotate/zoom.
+						Use mouse to rotate/zoom.
 						{config.grainStack.length > 0 &&
 							` Total length: ${(totalLength * 1000).toFixed(1)}mm`}
 					</small>
