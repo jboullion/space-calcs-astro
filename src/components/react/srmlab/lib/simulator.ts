@@ -114,7 +114,7 @@ export function simulateMotor(config: MotorConfig): SimulationOutput {
 		arrays.mdot_noz[k] = nozzleMassFlow(arrays.Pc[k], Cd, At, gamma, Rspec, Tc);
 
 		// Calculate thrust using nozzle function
-		arrays.F[k] = nozzleThrustFromCf(arrays.Pc[k], At, Ae, Cd, Pa, gamma);
+		arrays.F[k] = nozzleThrustFromCf(arrays.Pc[k], At, Cd, eps, gamma, Pa);
 
 		// RK4 integration step
 		const state: SimState = { x: arrays.x[k], Pc: arrays.Pc[k] };
