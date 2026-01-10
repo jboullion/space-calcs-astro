@@ -68,22 +68,44 @@ export default function NozzleConfig() {
 					<InputWrapper
 						id="target-expansion"
 						label="Expansion Ratio (ε)"
-						tooltip="Area ratio: exit area / throat area"
+						tooltip="Leave blank for automatic optimization. Area ratio: exit area / throat area"
 						input={
 							<NumberInput
 								id="target-expansion"
-								value={nozzle.targetExpansion || 25}
-								min={1}
+								value={nozzle.targetExpansion || 0}
+								min={0}
 								max={100}
 								step={1}
 								onChange={(val) =>
 									updateNozzleField({
-										targetExpansion: val,
+										targetExpansion: val > 0 ? val : undefined,
 									})
 								}
 							/>
 						}
+						description={
+							!nozzle.targetExpansion || nozzle.targetExpansion === 0
+								? 'Auto (optimized for ambient pressure)'
+								: undefined
+						}
 					/>
+
+					{/* Display auto-calculated values if they exist */}
+					{nozzle.throatDiameter && nozzle.throatDiameter > 0 && (
+						<div className="alert alert-info mt-2">
+							<small>
+								<strong>Auto-sized dimensions:</strong>
+								<br />
+								Throat: {(nozzle.throatDiameter * 1000).toFixed(2)} mm (
+								{(nozzle.throatDiameter / 0.0254).toFixed(3)} in)
+								<br />
+								Exit: {(nozzle.exitDiameter * 1000).toFixed(2)} mm (
+								{(nozzle.exitDiameter / 0.0254).toFixed(3)} in)
+								<br />
+								Expansion: {((nozzle.exitDiameter / nozzle.throatDiameter) ** 2).toFixed(1)}:1
+							</small>
+						</div>
+					)}
 				</>
 			) : (
 				<>

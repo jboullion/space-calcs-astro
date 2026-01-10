@@ -92,7 +92,7 @@ while t(k) < tmax
     rdot(k) = a * max(Pc(k), 1.0)^n;
     mdg(k)  = rho * Ab(k) * rdot(k);
     mdo(k) = nozzleMassFlow(Pc(k), cfg.noz.Cd, cfg.noz.At, gamma, Rspec, Tc);
-    F(k) = nozzleThrustFromCf(Pc(k), cfg.noz, cfg.prop.gamma);
+    F(k) = max(0, nozzleThrustFromCf(Pc(k), cfg.noz, cfg.prop.gamma));
 
     % RK4 step on [x; Pc]
     yk = [x(k); Pc(k)];

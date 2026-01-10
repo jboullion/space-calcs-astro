@@ -14,6 +14,8 @@ import type {
 } from './types';
 import { DEFAULT_PROPELLANT, DEFAULT_NOZZLE } from './constants';
 import { simulateMotor } from './lib/simulator';
+import { autoSizeNozzle } from './lib/nozzle';
+import { evaluateGrainStack } from './lib/geometry';
 
 interface SRMContextType {
 	config: MotorConfig;
@@ -78,7 +80,55 @@ export function SRMProvider({ children }: { children: ReactNode }) {
 		// Run simulation asynchronously to allow UI to update
 		setTimeout(() => {
 			try {
-				const output = simulateMotor(config);
+				let finalConfig = config;
+
+				// Auto-size nozzle if in auto mode
+				if (config.nozzle.mode === 'auto') {
+					// Ensure targetPressure is set
+					const targetPressure = config.nozzle.targetPressure || 13789520; // Default 2000 psi
+
+					// Create geometry function for auto-sizing
+					const geoFcn = (x: number) => evaluateGrainStack(x, config.grainStack);
+
+					// Run auto-sizing
+					const autoResult = autoSizeNozzle(
+						{
+							propellant: config.propellant,
+							grainStack: config.grainStack,
+							nozzle: {
+								...config.nozzle,
+								targetPressure,
+							},
+						},
+						geoFcn,
+					);
+
+					// Display warnings if any
+					if (autoResult.warnings.length > 0) {
+						console.warn('Auto-sizing warnings:');
+						autoResult.warnings.forEach((w) => console.warn('  ' + w));
+					} else {
+						console.log('Auto-sizing successful:');
+						console.log(`  Throat diameter: ${(autoResult.throatDiameter * 1000).toFixed(2)} mm`);
+						console.log(`  Exit diameter: ${(autoResult.exitDiameter * 1000).toFixed(2)} mm`);
+						console.log(`  Expansion ratio: ${autoResult.eps.toFixed(1)}:1`);
+					}
+
+					// Update config with auto-sized nozzle
+					finalConfig = {
+						...config,
+						nozzle: {
+							...config.nozzle,
+							throatDiameter: autoResult.throatDiameter,
+							exitDiameter: autoResult.exitDiameter,
+						},
+					};
+
+					// Update the context with the auto-sized values so user can see them
+					setConfig(finalConfig);
+				}
+
+				const output = simulateMotor(finalConfig);
 				setResults(output);
 			} catch (error) {
 				console.error('Simulation error:', error);
@@ -87,7 +137,7 @@ export function SRMProvider({ children }: { children: ReactNode }) {
 				setIsSimulating(false);
 			}
 		}, 50);
-	}, [config]);
+	}, [config, setConfig]);
 
 	return (
 		<SRMContext.Provider

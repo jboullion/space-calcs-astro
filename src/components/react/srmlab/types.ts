@@ -35,6 +35,8 @@ export interface NozzleConfig {
 	// Auto mode
 	targetPressure?: number; // Pa
 	targetExpansion?: number;
+	throatDiameterMin?: number; // m - optional constraint
+	throatDiameterMax?: number; // m - optional constraint
 }
 
 export interface MotorConfig {
