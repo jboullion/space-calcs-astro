@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import Hero from "../../components/calcs/Hero.astro";
 import SRMSimulator from "../../components/react/srmlab/SRMSimulator.tsx";
 import References from "../../components/shared/References.astro";
+import SponsorCalc from "../../components/calcs/SponsorCalc.astro";
 import type { Reference } from "../../types/types";
 
 const title = "Solid Rocket Motor Simulator";
@@ -37,6 +38,15 @@ const references: Reference[] = [
 	<div class="container">
 		<Hero title={title} description={description} />
 		<SRMSimulator client:load />
+		<SponsorCalc>
+			<a href="https://www.linkedin.com/in/cameronrough/" target="_blank" class="d-flex justify-content-center align-items-center mb-4">
+				<img src="/images/sponsors/cameron-rough.jpg" alt="Cameron Rough" class="rounded-circle me-3" width="50"/>
+				<h4>Cameron Rough</h4>
+			</a>
+
+			<p>Cameron is a graduate student in Aerospace Engineering at Colorado State University.</p>
+			<p>Cameron was one of the principal authors of the Nexus Aurora report on a Martian City State presented at the 2020 Mars Convention.</p>
+		</SponsorCalc>
 		<References references={references} />
 	</div>
 </Layout>

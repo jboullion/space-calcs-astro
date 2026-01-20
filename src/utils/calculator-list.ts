@@ -185,15 +185,17 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		image: '',
 		link: '/calcs/launch-pads',
 	},
-	// {
-	// 	id: 'srm-simulator',
-	// 	name: 'Solid Rocket Motor Simulator',
-	// 	description:
-	// 		'Design and simulate solid rocket motors with BATES and Finocyl grain geometries',
-	// 	categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
-	// 	image: '',
-	// 	link: '/calcs/srm-simulator',
-	// },
+	{
+		id: 'srm-simulator',
+		name: 'Solid Rocket Motor Simulator',
+		description:
+			'Design and simulate solid rocket motors with BATES and Finocyl grain geometries',
+		categories: [categories[ROCKET_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/srm-simulator',
+		sponsor: 'Cameron Rough',
+		sponsorImg: '/images/sponsors/na-logo.png',
+	},
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',
