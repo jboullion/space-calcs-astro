@@ -119,7 +119,36 @@ export default function SRMForm() {
 			<button
 				className="btn btn-primary btn-lg w-100 mb-3"
 				disabled={config.grainStack.length === 0 || isSimulating}
-				onClick={runSimulation}
+				onClick={() => {
+					// Track Google Analytics event
+					if (typeof window !== 'undefined' && (window as any).gtag) {
+						// Calculate some useful metrics
+						const grainTypes = config.grainStack.map(g => g.type).join(',');
+						const hasFinocyl = config.grainStack.some(g => g.type === 'finocyl');
+						const totalGrainLength = config.grainStack.reduce((sum, g) => sum + g.length, 0);
+						
+						(window as any).gtag('event', 'run_simulation', {
+							event_category: 'SRM_Calculator',
+							event_label: 'SRM_Lab_Simulation',
+							// Grain configuration
+							grain_count: config.grainStack.length,
+							grain_types: grainTypes.substring(0, 100), // Limit to 100 chars
+							has_finocyl: hasFinocyl,
+							total_grain_length_mm: Math.round(totalGrainLength * 1000),
+							// Propellant
+							propellant_name: config.propellant.name,
+							propellant_density: Math.round(config.propellant.density),
+							// Motor case
+							case_diameter_mm: Math.round(config.caseInnerDiameter * 1000),
+							free_volume_cm3: Math.round(config.freeVolume * 1e6),
+							// Nozzle
+							nozzle_mode: config.nozzle.mode,
+							throat_diameter_mm: Math.round(config.nozzle.throatDiameter * 1000),
+							exit_diameter_mm: Math.round(config.nozzle.exitDiameter * 1000),
+						});
+					}
+					runSimulation();
+				}}
 			>
 				{isSimulating ? (
 					<>
