@@ -178,6 +178,15 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		link: '/calcs/create-planet',
 	},
 	{
+		id: 'garnet-station',
+		name: 'Garnet Station',
+		description:
+			'Build modular space stations by attaching rhombic dodecahedron F12 modules',
+		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/garnet-station',
+	},
+	{
 		id: 'launch-pads',
 		name: 'Launch Pads',
 		description: 'Search all public launch pads on Earth',

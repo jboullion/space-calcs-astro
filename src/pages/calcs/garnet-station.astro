@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+import GarnetStationComponent from '../../components/react/garnet-station/GarnetStation.tsx';
+import { calculators } from '../../utils/calculator-list';
+
+const calculator = calculators.find((calc) => calc.id === 'garnet-station');
+
+if (!calculator) {
+	throw new Error('Calculator not found');
+}
+---
+
+<Layout title={calculator.name} description={calculator.description}>
+	<div class="container">
+		<Hero title={calculator.name} description={calculator.description} />
+		<div style="min-height: 760px;" class="calculator">
+			<GarnetStationComponent client:load />
+		</div>
+	</div>
+</Layout>
