@@ -1,0 +1,18 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Hero from '../../components/calcs/Hero.astro';
+import GarnetStationComponent from '../../components/react/garnet-station/GarnetStation.tsx';
+
+const title = 'Garnet Station';
+const description =
+	'Build modular space stations by attaching rhombic dodecahedron modules';
+---
+
+<Layout title={title} description={description}>
+	<div class="container mb-5">
+		<Hero title={title} description={description} />
+		<div style="min-height: 760px;" class="calculator">
+			<GarnetStationComponent client:load />
+		</div>
+	</div>
+</Layout>
