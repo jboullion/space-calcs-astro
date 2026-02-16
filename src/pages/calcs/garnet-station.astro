@@ -2,18 +2,15 @@
 import Layout from '../../layouts/Layout.astro';
 import Hero from '../../components/calcs/Hero.astro';
 import GarnetStationComponent from '../../components/react/garnet-station/GarnetStation.tsx';
-import { calculators } from '../../utils/calculator-list';
 
-const calculator = calculators.find((calc) => calc.id === 'garnet-station');
-
-if (!calculator) {
-	throw new Error('Calculator not found');
-}
+const title = 'Garnet Station';
+const description =
+	'Build modular space stations by attaching rhombic dodecahedron modules';
 ---
 
-<Layout title={calculator.name} description={calculator.description}>
+<Layout title={title} description={description}>
 	<div class="container mb-5">
-		<Hero title={calculator.name} description={calculator.description} />
+		<Hero title={title} description={description} />
 		<div style="min-height: 760px;" class="calculator">
 			<GarnetStationComponent client:load />
 		</div>

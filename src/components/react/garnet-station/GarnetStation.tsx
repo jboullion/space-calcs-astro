@@ -1,6 +1,7 @@
 import { OrbitControls } from '@react-three/drei';
-import { Canvas, type ThreeEvent } from '@react-three/fiber';
-import { useMemo, useState } from 'react';
+import { Canvas, type ThreeEvent, useFrame, useLoader } from '@react-three/fiber';
+import { Bloom, BrightnessContrast, EffectComposer } from '@react-three/postprocessing';
+import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { MODULE_SIZE_METERS, type GridCoord } from './constants';
 import { createRhombicDodecahedronGeometry } from './geometry';
@@ -20,6 +21,126 @@ import {
 } from './procedural';
 
 type BuilderMode = 'build' | 'delete';
+
+function SunDot({ position }: { position: [number, number, number] }) {
+	return (
+		<mesh position={position}>
+			<sphereGeometry args={[7, 24, 24]} />
+			<meshStandardMaterial
+				color="#fff6d8"
+				emissive="#fff6d8"
+				emissiveIntensity={2.6}
+				toneMapped={false}
+			/>
+		</mesh>
+	);
+}
+
+function EarthNightLights({
+	nightMap,
+	sunDirection,
+}: {
+	nightMap: THREE.Texture;
+	sunDirection: THREE.Vector3;
+}) {
+	const uniforms = useMemo(
+		() => ({
+			uNightMap: { value: nightMap },
+			uLightDir: { value: sunDirection.clone().normalize() },
+		}),
+		[nightMap, sunDirection],
+	);
+
+	return (
+		<mesh>
+			<sphereGeometry args={[281.6, 64, 64]} />
+			<shaderMaterial
+				uniforms={uniforms}
+				vertexShader={`
+					varying vec2 vUv;
+					varying vec3 vWorldNormal;
+					void main() {
+						vUv = uv;
+						vWorldNormal = normalize(mat3(modelMatrix) * normal);
+						gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+					}
+				`}
+				fragmentShader={`
+					uniform sampler2D uNightMap;
+					uniform vec3 uLightDir;
+					varying vec2 vUv;
+					varying vec3 vWorldNormal;
+					void main() {
+						vec3 nightTex = texture2D(uNightMap, vUv).rgb;
+						float ndl = dot(normalize(vWorldNormal), normalize(uLightDir));
+						float nightMask = smoothstep(-0.14, 0.22, -ndl);
+						nightMask = pow(nightMask, 0.72);
+						vec3 city = nightTex * nightMask * 1.12;
+						float alpha = clamp(max(max(city.r, city.g), city.b) * 1.25, 0.0, 0.94);
+						gl_FragColor = vec4(city, alpha);
+					}
+				`}
+				transparent
+				depthWrite={false}
+				blending={THREE.AdditiveBlending}
+			/>
+		</mesh>
+	);
+}
+
+function SpaceBackdrop() {
+	const earthMap = useLoader(THREE.TextureLoader, '/textures/2k_earth_daymap.jpg');
+	const earthNightMap = useLoader(THREE.TextureLoader, '/textures/2k_earth_nightmap.jpg');
+	earthMap.colorSpace = THREE.SRGBColorSpace;
+	earthNightMap.colorSpace = THREE.SRGBColorSpace;
+	const earthSpinGroup = useRef<THREE.Group>(null);
+	const sunPosition = useMemo(() => new THREE.Vector3(560, 220, -420), []);
+	const earthCenter = useMemo(() => new THREE.Vector3(-430, -60, -180), []);
+	const sunDirection = useMemo(
+		() => sunPosition.clone().sub(earthCenter).normalize(),
+		[earthCenter, sunPosition],
+	);
+
+	useFrame((_, delta) => {
+		if (!earthSpinGroup.current) {
+			return;
+		}
+
+		earthSpinGroup.current.rotation.y += delta * 0.02;
+	});
+
+	return (
+		<>
+			<color attach="background" args={['#000000']} />
+
+			<group position={[-430, -60, -180]} rotation={[0.02, 0.62, 0]}>
+				<group rotation={[0, 0, 0.41]}>
+					<group ref={earthSpinGroup}>
+						<mesh>
+							<sphereGeometry args={[280, 64, 64]} />
+							<meshStandardMaterial map={earthMap} roughness={1} metalness={0} />
+						</mesh>
+
+						<mesh>
+							<sphereGeometry args={[284, 64, 64]} />
+							<meshStandardMaterial
+								color="#5ca3ff"
+								transparent
+								opacity={0.1}
+								side={THREE.DoubleSide}
+								depthWrite={false}
+							/>
+						</mesh>
+
+						<EarthNightLights nightMap={earthNightMap} sunDirection={sunDirection} />
+					</group>
+				</group>
+			</group>
+
+			<SunDot position={[560, 220, -420]} />
+		</>
+	);
+}
 
 function ModuleMesh({
 	coord,
@@ -167,7 +288,7 @@ export default function GarnetStation() {
 		() => createRhombicDodecahedronGeometry(MODULE_SIZE_METERS),
 		[],
 	);
-    const moduleEdgesGeometry = useMemo(
+	const moduleEdgesGeometry = useMemo(
 		() => new THREE.EdgesGeometry(moduleGeometry),
 		[moduleGeometry],
 	);
@@ -467,13 +588,10 @@ export default function GarnetStation() {
 
 			<div className="col-xl-8 col-lg-7">
 				<div className="card p-2" style={{ height: 720 }}>
-					<Canvas camera={{ position: [22, 18, 22], fov: 50 }}>
-						<color attach="background" args={['#0c1119']} />
-						<ambientLight intensity={0.5} />
-						<directionalLight position={[16, 20, 10]} intensity={1.2} />
-
-						<gridHelper args={[80, 40, '#3b475f', '#2a3446']} />
-						<axesHelper args={[6]} />
+					<Canvas camera={{ position: [22, 18, 22], fov: 50, near: 0.1, far: 2600 }}>
+						<SpaceBackdrop />
+						<ambientLight intensity={0.34} />
+						<directionalLight position={[560, 220, -420]} intensity={1.4} />
 
 						{modules.map((coord) => (
 							<ModuleMesh
@@ -516,6 +634,15 @@ export default function GarnetStation() {
 								)}
 							</group>
 						)}
+
+						<EffectComposer multisampling={0}>
+							<BrightnessContrast brightness={0.01} contrast={0.2} />
+							<Bloom
+								intensity={0.35}
+								luminanceThreshold={0.16}
+								luminanceSmoothing={0.4}
+							/>
+						</EffectComposer>
 
 						<OrbitControls makeDefault enableDamping />
 					</Canvas>
