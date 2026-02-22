@@ -196,6 +196,16 @@ export const unOrderedCalculators: SpaceCalc[] = [
 		sponsor: 'Cameron Rough',
 		sponsorImg: '/images/sponsors/na-logo.png',
 	},
+	{
+		id: 'garnet-station',
+		name: 'Garnet Station',
+		description: 'Build modular space stations by attaching rhombic dodecahedron modules',
+		categories: [categories[HABITAT_CAT], categories[ADVANCED_CAT]],
+		image: '',
+		link: '/calcs/garnet-station',
+		sponsor: 'Elliott Orion Ruzicka',
+		sponsorImg: '/images/sponsors/Elliott.webp',
+	}
 	// {
 	// 	id: 'transfer-window',
 	// 	name: 'Transfer Window',

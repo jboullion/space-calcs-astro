@@ -2,10 +2,20 @@
 import Layout from '../../layouts/Layout.astro';
 import Hero from '../../components/calcs/Hero.astro';
 import GarnetStationComponent from '../../components/react/garnet-station/GarnetStation.tsx';
+import SponsorCalc from '../../components/calcs/SponsorCalc.astro';
+import References from '../../components/shared/References.astro';
+import type { Reference } from '../../types/types';
 
 const title = 'Garnet Station';
 const description =
 	'Build modular space stations by attaching rhombic dodecahedron modules';
+
+const references: Reference[] = [
+	{
+		title: "Project F12 - Orbital Design",
+		url: "https://www.orbital.design/projects/f12",
+	},
+];
 ---
 
 <Layout title={title} description={description}>
@@ -14,5 +24,15 @@ const description =
 		<div style="min-height: 760px;" class="calculator">
 			<GarnetStationComponent client:load />
 		</div>
+		<SponsorCalc>
+			<a href="https://www.linkedin.com/in/elliottruzicka/" target="_blank" class="d-flex justify-content-center align-items-center mb-4">
+				<img src="/images/sponsors/Elliott.webp" alt="Elliott Orion Ruzicka" class="rounded-circle me-3" width="50"/>
+				<h4>Elliott Orion Ruzicka</h4>
+			</a>
+
+			<p>Elliott is an architect and laboratory design specialist working in New York City. He has published two papers on the use of rhombic dodecahedron modules to create agglomerated space stations.</p>
+			<p>His space design work is published on his website: <a href="https://www.orbital.design" target="_blank">www.orbital.design</a></p>
+		</SponsorCalc>
+		<References references={references} />
 	</div>
 </Layout>

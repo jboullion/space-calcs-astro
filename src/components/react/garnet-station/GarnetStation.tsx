@@ -1,7 +1,7 @@
 import { OrbitControls } from '@react-three/drei';
 import { Canvas, type ThreeEvent, useFrame, useLoader } from '@react-three/fiber';
 import { Bloom, BrightnessContrast, EffectComposer } from '@react-three/postprocessing';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { MODULE_SIZE_METERS, type GridCoord } from './constants';
 import { createRhombicDodecahedronGeometry } from './geometry';
@@ -20,7 +20,16 @@ import {
 	type ProceduralShape,
 } from './procedural';
 
-type BuilderMode = 'build' | 'delete';
+type BuilderMode = 'build' | 'paint' | 'delete';
+
+interface StationModule {
+	coord: GridCoord;
+	color: string;
+	metalness: number;
+}
+
+const DEFAULT_MODULE_COLOR = '#7f8a94';
+const DEFAULT_MODULE_METALNESS = 0.55;
 
 function SunDot({ position }: { position: [number, number, number] }) {
 	return (
@@ -144,12 +153,17 @@ function SpaceBackdrop() {
 
 function ModuleMesh({
 	coord,
+	moduleColor,
+	moduleMetalness,
 	spacing,
 	mode,
 	xRay,
 	outline,
 	isHoveredDelete,
 	onBuild,
+	onPaint,
+	onPaintStart,
+	onPaintHover,
 	onDelete,
 	onPreview,
 	onPreviewClear,
@@ -159,12 +173,17 @@ function ModuleMesh({
 	edgesGeometry,
 }: {
 	coord: GridCoord;
+	moduleColor: string;
+	moduleMetalness: number;
 	spacing: number;
 	mode: BuilderMode;
 	xRay: boolean;
 	outline: boolean;
 	isHoveredDelete: boolean;
 	onBuild: (coord: GridCoord) => void;
+	onPaint: (coord: GridCoord) => void;
+	onPaintStart: (coord: GridCoord) => void;
+	onPaintHover: (coord: GridCoord) => void;
 	onDelete: (coord: GridCoord) => void;
 	onPreview: (coord: GridCoord | null) => void;
 	onPreviewClear: () => void;
@@ -183,6 +202,10 @@ function ModuleMesh({
 
 	const handleClick = (event: ThreeEvent<MouseEvent>) => {
 		event.stopPropagation();
+		if (mode === 'paint') {
+			return;
+		}
+
 		if (mode === 'delete') {
 			onDelete(coord);
 			return;
@@ -211,12 +234,32 @@ function ModuleMesh({
 		onPreview(neighborCoord);
 	};
 
+	const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
+		event.stopPropagation();
+		if (mode !== 'paint') {
+			return;
+		}
+
+		onPaintStart(coord);
+	};
+
+	const handlePointerEnter = (event: ThreeEvent<PointerEvent>) => {
+		event.stopPropagation();
+		if (mode !== 'paint') {
+			return;
+		}
+
+		onPaintHover(coord);
+	};
+
 	return (
 		<group position={worldPosition}>
 			<mesh
 				geometry={geometry}
 				renderOrder={outline ? 1 : 0}
 				onClick={handleClick}
+				onPointerDown={handlePointerDown}
+				onPointerEnter={handlePointerEnter}
 				onPointerMove={handlePointerMove}
 				onPointerOut={() => {
 					onPreviewClear();
@@ -242,10 +285,10 @@ function ModuleMesh({
 					)
 				) : (
 					<meshStandardMaterial
-						color={isHoveredDelete ? '#f0a3a3' : '#93a2b8'}
+						color={isHoveredDelete ? '#f0a3a3' : moduleColor}
 						emissive={isHoveredDelete ? '#3b0f0f' : '#000000'}
 						emissiveIntensity={isHoveredDelete ? 0.45 : 0}
-						metalness={0.2}
+						metalness={moduleMetalness}
 						roughness={0.7}
 					/>
 				)}
@@ -264,13 +307,43 @@ function ModuleMesh({
 }
 
 export default function GarnetStation() {
-	const [modules, setModules] = useState<GridCoord[]>([{ x: 0, y: 0, z: 0 }]);
+	const [modules, setModules] = useState<StationModule[]>([
+		{
+			coord: { x: 0, y: 0, z: 0 },
+			color: DEFAULT_MODULE_COLOR,
+			metalness: DEFAULT_MODULE_METALNESS,
+		},
+	]);
 	const [mode, setMode] = useState<BuilderMode>('build');
+	const [paintColor, setPaintColor] = useState(DEFAULT_MODULE_COLOR);
+	const [paintMetalness, setPaintMetalness] = useState(DEFAULT_MODULE_METALNESS);
+	const [isPainting, setIsPainting] = useState(false);
 	const [previewCoord, setPreviewCoord] = useState<GridCoord | null>(null);
 	const [hoveredDeleteKey, setHoveredDeleteKey] = useState<string | null>(null);
 	const [replaceExisting, setReplaceExisting] = useState(false);
 	const [xRay, setXRay] = useState(false);
 	const [outline, setOutline] = useState(false);
+
+	const handleOutlineToggle = (checked: boolean) => {
+		setOutline(checked);
+		if (checked) {
+			setXRay(false);
+		}
+	};
+
+	const handleXRayToggle = (checked: boolean) => {
+		setXRay(checked);
+		if (checked) {
+			setOutline(false);
+		}
+	};
+
+	useEffect(() => {
+		if (outline && xRay) {
+			setXRay(false);
+		}
+	}, [outline, xRay]);
+
 	const [procedural, setProcedural] = useState<ProceduralParams>({
 		shape: 'hollow-box',
 		sizeX: 8,
@@ -295,8 +368,8 @@ export default function GarnetStation() {
 
 	const occupied = useMemo(() => {
 		const keys = new Set<string>();
-		for (const coord of modules) {
-			keys.add(coordKey(coord));
+		for (const module of modules) {
+			keys.add(coordKey(module.coord));
 		}
 		return keys;
 	}, [modules]);
@@ -316,19 +389,75 @@ export default function GarnetStation() {
 			return;
 		}
 
-		setModules((previous) => [...previous, coord]);
+		setModules((previous) => [
+			...previous,
+			{ coord, color: paintColor, metalness: paintMetalness },
+		]);
 	};
+
+	const handlePaint = (coord: GridCoord) => {
+		setModules((previous) =>
+			previous.map((module) =>
+				coordKey(module.coord) === coordKey(coord)
+					? { ...module, color: paintColor, metalness: paintMetalness }
+					: module,
+			),
+		);
+	};
+
+	const handlePaintStart = (coord: GridCoord) => {
+		handlePaint(coord);
+		setIsPainting(true);
+	};
+
+	const handlePaintHover = (coord: GridCoord) => {
+		if (!isPainting) {
+			return;
+		}
+
+		handlePaint(coord);
+	};
+
+	useEffect(() => {
+		if (!isPainting) {
+			return;
+		}
+
+		const stopPainting = () => setIsPainting(false);
+		window.addEventListener('pointerup', stopPainting);
+		window.addEventListener('pointercancel', stopPainting);
+
+		return () => {
+			window.removeEventListener('pointerup', stopPainting);
+			window.removeEventListener('pointercancel', stopPainting);
+		};
+	}, [isPainting]);
+
+	useEffect(() => {
+		if (mode !== 'paint' && isPainting) {
+			setIsPainting(false);
+		}
+	}, [isPainting, mode]);
 
 	const handleDelete = (coord: GridCoord) => {
 		if (isOrigin(coord)) {
 			return;
 		}
 
-		setModules((previous) => previous.filter((value) => coordKey(value) !== coordKey(coord)));
+		setModules((previous) =>
+			previous.filter((module) => coordKey(module.coord) !== coordKey(coord)),
+		);
 	};
 
 	const handleReset = () => {
-		setModules([{ x: 0, y: 0, z: 0 }]);
+		setModules([
+			{
+				coord: { x: 0, y: 0, z: 0 },
+				color: DEFAULT_MODULE_COLOR,
+				metalness: DEFAULT_MODULE_METALNESS,
+			},
+		]);
+		setIsPainting(false);
 		setPreviewCoord(null);
 		setHoveredDeleteKey(null);
 	};
@@ -355,7 +484,7 @@ export default function GarnetStation() {
 	const handleGenerateProcedural = () => {
 		const generated = generateProceduralCoords(procedural);
 		const starting = replaceExisting ? [] : modules;
-		const keySet = new Set(starting.map((coord) => coordKey(coord)));
+		const keySet = new Set(starting.map((module) => coordKey(module.coord)));
 		const merged = [...starting];
 
 		for (const coord of generated) {
@@ -366,11 +495,12 @@ export default function GarnetStation() {
 			const key = coordKey(coord);
 			if (!keySet.has(key)) {
 				keySet.add(key);
-				merged.push(coord);
+				merged.push({ coord, color: paintColor, metalness: paintMetalness });
 			}
 		}
 
 		setModules(merged);
+		setIsPainting(false);
 		setPreviewCoord(null);
 		setHoveredDeleteKey(null);
 	};
@@ -380,33 +510,66 @@ export default function GarnetStation() {
 			<div className="col-xl-4 col-lg-5">
 				<div className="card p-3 mb-3">
 					<h5 className="mb-3">Garnet Station Controls</h5>
-					<div className="btn-group mb-3" role="group" aria-label="Builder mode">
+					<div className="d-flex gap-2 mb-3" aria-label="Builder mode">
 						<button
 							type="button"
-							className={`btn btn-${mode === 'build' ? 'primary' : 'outline-primary'}`}
+							className={`btn flex-fill btn-${mode === 'build' ? 'primary' : 'outline-primary'}`}
 							onClick={() => setMode('build')}
 						>
 							Build
 						</button>
 						<button
 							type="button"
-							className={`btn btn-${mode === 'delete' ? 'danger' : 'outline-danger'}`}
+							className={`btn flex-fill btn-${mode === 'paint' ? 'warning' : 'outline-warning'}`}
+							onClick={() => setMode('paint')}
+						>
+							Paint
+						</button>
+						<button
+							type="button"
+							className={`btn flex-fill btn-${mode === 'delete' ? 'danger' : 'outline-danger'}`}
 							onClick={() => setMode('delete')}
 						>
 							Delete
 						</button>
 					</div>
 
+					<div className="row g-2 mb-3 align-items-end">
+						<div className="col-6">
+							<label className="form-label" htmlFor="paintColorPicker">
+								Paint Color
+							</label>
+							<input
+								type="color"
+								id="paintColorPicker"
+								className="form-control form-control-color w-100"
+								value={paintColor}
+								onChange={(event) => setPaintColor(event.target.value)}
+								title="Choose module paint color"
+							/>
+						</div>
+						<div className="col-6">
+							<label className="form-label" htmlFor="paintMetalnessRange">
+								Paint Metallic: {paintMetalness.toFixed(2)}
+							</label>
+							<input
+								type="range"
+								id="paintMetalnessRange"
+								className="form-range"
+								min={0}
+								max={1}
+								step={0.01}
+								value={paintMetalness}
+								onChange={(event) => setPaintMetalness(Number(event.target.value))}
+							/>
+						</div>
+					</div>
+
 					<button type="button" className="btn btn-outline-light w-100 mb-3" onClick={handleReset}>
 						Reset Station
 					</button>
 
-					<ul className="mb-0">
-						<li>Modules: {modules.length}</li>
-						<li>Left-click a module face to attach in Build mode</li>
-						<li>Left-click a module to remove in Delete mode</li>
-						<li>The core module at origin cannot be deleted</li>
-					</ul>
+					<p>Modules: {modules.length}</p>
 				</div>
 
 				<div className="card p-3">
@@ -469,18 +632,7 @@ export default function GarnetStation() {
 					</div>
 
 					<div className="row g-2 mb-2">
-						<div className="col-4">
-							<label className="form-label">Shell Thickness</label>
-							<input
-								type="number"
-								className="form-control"
-								min={1}
-								value={procedural.wallThickness}
-								onChange={(event) =>
-									updateProceduralNumber('wallThickness', Number(event.target.value))
-								}
-							/>
-						</div>
+						
 						<div className="col-4">
 							<label className="form-label">Offset X</label>
 							<input
@@ -503,9 +655,6 @@ export default function GarnetStation() {
 								}
 							/>
 						</div>
-					</div>
-
-					<div className="row g-2 mb-3">
 						<div className="col-4">
 							<label className="form-label">Offset Z</label>
 							<input
@@ -514,6 +663,21 @@ export default function GarnetStation() {
 								value={procedural.offsetZ}
 								onChange={(event) =>
 									updateProceduralOffset('offsetZ', Number(event.target.value))
+								}
+							/>
+						</div>
+					</div>
+
+					<div className="row g-2 mb-3">
+						<div className="col-4">
+							<label className="form-label">Shell Thickness</label>
+							<input
+								type="number"
+								className="form-control"
+								min={1}
+								value={procedural.wallThickness}
+								onChange={(event) =>
+									updateProceduralNumber('wallThickness', Number(event.target.value))
 								}
 							/>
 						</div>
@@ -543,7 +707,7 @@ export default function GarnetStation() {
 							type="checkbox"
 							id="outlineToggle"
 							checked={outline}
-							onChange={(event) => setOutline(event.target.checked)}
+							onChange={(event) => handleOutlineToggle(event.target.checked)}
 						/>
 						<label className="form-check-label" htmlFor="outlineToggle">
 							Outline (occluded)
@@ -556,7 +720,7 @@ export default function GarnetStation() {
 							type="checkbox"
 							id="xRayToggle"
 							checked={xRay}
-							onChange={(event) => setXRay(event.target.checked)}
+							onChange={(event) => handleXRayToggle(event.target.checked)}
 						/>
 						<label className="form-check-label" htmlFor="xRayToggle">
 							X-Ray (outline only)
@@ -587,24 +751,29 @@ export default function GarnetStation() {
 			</div>
 
 			<div className="col-xl-8 col-lg-7">
-				<div className="card p-2" style={{ height: 720 }}>
+				<div className="card p-2 mb-3" style={{ height: 720 }}>
 					<Canvas camera={{ position: [22, 18, 22], fov: 50, near: 0.1, far: 2600 }}>
 						<SpaceBackdrop />
 						<ambientLight intensity={0.34} />
 						<directionalLight position={[560, 220, -420]} intensity={1.4} />
 
-						{modules.map((coord) => (
+						{modules.map((module) => (
 							<ModuleMesh
-								key={coordKey(coord)}
-								coord={coord}
+								key={coordKey(module.coord)}
+								coord={module.coord}
+								moduleColor={module.color}
+								moduleMetalness={module.metalness}
 								spacing={spacing}
 								mode={mode}
 								xRay={xRay}
 								outline={outline}
 								isHoveredDelete={
-									mode === 'delete' && hoveredDeleteKey === coordKey(coord)
+									mode === 'delete' && hoveredDeleteKey === coordKey(module.coord)
 								}
 								onBuild={handleBuild}
+								onPaint={handlePaint}
+								onPaintStart={handlePaintStart}
+								onPaintHover={handlePaintHover}
 								onDelete={handleDelete}
 								onPreview={setPreviewCoord}
 								onPreviewClear={() => setPreviewCoord(null)}
@@ -644,8 +813,12 @@ export default function GarnetStation() {
 							/>
 						</EffectComposer>
 
-						<OrbitControls makeDefault enableDamping />
+						<OrbitControls makeDefault enableDamping enabled={!(mode === 'paint' && isPainting)} />
 					</Canvas>
+					
+				</div>
+				<div className='mb-3'>
+					<p><strong>Note:</strong> Not to scale</p>
 				</div>
 			</div>
 		</div>
